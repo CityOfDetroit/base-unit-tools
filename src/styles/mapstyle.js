@@ -7176,7 +7176,7 @@ const style = {
         }
       },
       {
-        "id": "streets-link-highlight",
+        "id": "streets-linked",
         "type": "line",
         "source": "streets",
         "source-layer": "streets",
@@ -7187,10 +7187,10 @@ const style = {
         },
         "paint": {
           "line-width": {
-            "stops": [[14, 2], [20, 20]]
+            "stops": [[14, 5], [20, 20]]
           },
-          "line-color": "green",
-          "line-opacity": 1
+          "line-color": layers['streets'].color,
+          "line-opacity": 0.35
         }
       },
       {
@@ -16978,6 +16978,29 @@ const style = {
         }
       },
       {
+        "id": "parcel-linked",
+        "type": "fill",
+        "source": "parcels",
+        "source-layer": "parcels",
+        "minzoom": 11,
+        "filter": ["==", "parcelno", "02004940."],
+        "layout": {
+          "visibility": "visible"
+        },
+        "paint": {
+          "fill-color": layers['parcels'].color,
+          "fill-opacity": {
+            "base": 1,
+            "stops": [
+              [12, 0],
+              [12.1, 0.1],
+              [12.5, 0.25],
+              [22, 0.25]
+            ]
+          }
+        }
+      },
+      {
         "id": "parcel-fill",
         "type": "fill",
         "source": "parcels",
@@ -17017,6 +17040,29 @@ const style = {
         }
       },
       {
+        "id": "building-linked",
+        "type": "fill",
+        "source": "buildings",
+        "source-layer": "buildings",
+        "minzoom": 11,
+        "filter": ["==", "id", ""],
+        "layout": {
+          "visibility": "visible"
+        },
+        "paint": {
+          "fill-color": layers['buildings'].color,
+          "fill-opacity": {
+            "base": 1,
+            "stops": [
+              [12, 0],
+              [12.1, 0.1],
+              [12.5, 0.25],
+              [22, 0.25]
+            ]
+          }
+        }
+      },
+      {
         "id": "building-highlight",
         "type": "line",
         "source": "buildings",
@@ -17050,6 +17096,26 @@ const style = {
       },
       {
         "id": "address-highlight",
+        "type": "circle",
+        "source": "addresses",
+        "source-layer": "addresses",
+        "minzoom": 11,
+        "filter": ["==", "id", ""],
+        "layout": {
+          "visibility": "visible"
+        },
+        "paint": {
+          "circle-radius": {
+            "base": 1,
+            "stops": [[12.5, 0.2], [13.5, 1], [16.5, 3], [19, 12]]
+          },
+          "circle-color": layers['addresses'].color,
+          "circle-stroke-color": '#333',
+          "circle-stroke-width": 1
+        }
+      },
+      {
+        "id": "address-linked",
         "type": "circle",
         "source": "addresses",
         "source-layer": "addresses",

@@ -8,7 +8,7 @@ import videoIcon from '../images/video.png'
 
 import layers from '../data/layers.json'
 
-const ExplorerMap = ({ clicked, setClicked, feature, showSv, svCoords, svBearing }) => {
+const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, svBearing }) => {
   const [theMap, setTheMap] = useState(null);
 
   // detroit bbox
@@ -104,6 +104,44 @@ const ExplorerMap = ({ clicked, setClicked, feature, showSv, svCoords, svBearing
       })
     }
   }, [theMap, clicked])
+
+  useEffect(() => {
+    if (theMap && linked) {
+      console.log(linked)
+      let layer = layers[clicked.type]
+      let others = Object.keys(layers).filter(l => l !== clicked.type && l !== 'units')
+
+      // set our clickedType link to null
+      theMap.setFilter(layer.link, ["==", "$id", ""])
+
+      // loop thru the others and get their linked
+      others.forEach(o => {
+        console.log(o)
+        console.log(linked[o])
+        let filter = ["in", layers[o].filter_id].concat(linked[o])
+        console.log(filter)
+        theMap.setFilter(layers[o].link, filter)
+      })
+      // let filter = ["==", "$id", clicked.id]
+      // if (clicked.type === 'parcels') {
+      //   filter[1] = 'parcel_id'
+      // }
+      // if (clicked.type === 'streets') {
+      //   filter[1] = 'street_id'
+      //   filter[2] = parseInt(clicked.id)
+      // }
+      // if (clicked.type === 'buildings') {
+      //   filter[2] = parseInt(clicked.id)
+      // }
+      // if (clicked.type === 'addresses') {
+      //   filter[2] = parseInt(clicked.id)
+      // }
+      // theMap.setFilter(layer.link, filter)
+      // others.forEach(o => {
+      //   theMap.setFilter(layers[o].link, ["==", "$id", ""])
+      // })
+    }
+  }, [theMap, linked])
 
   useEffect(() => {
     console.log(svCoords, svBearing);

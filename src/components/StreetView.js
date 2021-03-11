@@ -93,8 +93,8 @@ const featureToCentroidCoords = (feature) => {
 
 let markerStyle = {
   ballColor: "white",
-  ballOpacity: 0.5,
-  color: "#445554",
+  ballOpacity: 0.65,
+  color: "#feb70d",
   opacity: 0.55,
   interactive: false,
   radius: 2,

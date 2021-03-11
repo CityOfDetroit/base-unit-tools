@@ -7,6 +7,8 @@
         "click": "id",
         "interaction": "address-point",
         "highlight": "address-highlight",
+        "link": "address-linked",
+        "filter_id": "$id",
         "text_color": "#555",
         "color": "rgb(170, 200, 221)"
     },
@@ -19,7 +21,9 @@
         "click": "id",
         "color": "rgb(203, 77, 79)",
         "text_color": "#eee",
-        "highlight": "building-highlight"
+        "filter_id": "$id",
+        "highlight": "building-highlight",
+        "link": "building-linked"
     },
     "parcels": {
         "name": "parcels",
@@ -30,7 +34,9 @@
         "click": "parcel_id",
         "color": "rgb(163, 200, 112)",
         "text_color": "#555",
-        "highlight": "parcel-highlight"
+        "filter_id": "parcel_id",
+        "highlight": "parcel-highlight",
+        "link": "parcel-linked"
     },
     "streets": {
         "name": "streets",
@@ -40,6 +46,8 @@
         "interaction": "streets-line",
         "click": "street_id",
         "highlight": "streets-highlight",
+        "link": "streets-linked",
+        "filter_id": "street_id",
         "color": "rgb(148, 70, 109)",
         "text_color": "#eee"
     },
@@ -51,6 +59,7 @@
         "interaction": "units-point",
         "click": "unit_id",
         "highlight": "units-highlight",
+        "link": "units-linked",
         "color": "rgb(46, 55, 97)",
         "text_color": "#eee"
     }

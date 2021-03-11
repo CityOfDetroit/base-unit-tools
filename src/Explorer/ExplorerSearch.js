@@ -4,34 +4,36 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState, useEffect } from 'react';
 import { geocoders } from '../Geocoder/Geocoder';
 
+// we call this function when we actually want to geocode
+const geocode = (value, setClicked, setFound) => {
+  let spacesRe = /\s/g
+  let url = `${geocoders[0].url}/findAddressCandidates?SingleLine=${value.replace(spacesRe, '+')}&outFields=*&f=pjson`
+  fetch(url)
+    .then(r => r.json())
+    .then(d => {
+      if (Object.keys(d).indexOf('candidates') > -1 && (d.candidates.length > 0)) {
+        setClicked({
+          type: "addresses",
+          id: d.candidates[0].attributes.address_id
+        })
+        setFound(true)
+      }
+      // TODO replace this with the esri-arcgis-rest geocoding library.
+      else {
+        let centerlineUrl = `https://gis.detroitmi.gov/arcgis/rest/services/DoIT/StreetCenterlineGeocoder/GeocodeServer/findAddressCandidates?Single+Line+Input=${value.replace(spacesRe, '+')}&outFields=*&outSR=4326&f=pjson`
+        fetch(centerlineUrl)
+          .then(r => r.json())
+          .then(d => {
+            setFound(false)
+          })
+      }
+    })
+}
+
 const ExplorerSearch = ({ clicked, setClicked }) => {
 
   let [value, setValue] = useState('')
   let [found, setFound] = useState(null)
-
-  const geocode = (value, setClicked) => {
-    let spacesRe = /\s/g
-    let url = `${geocoders[0].url}/findAddressCandidates?SingleLine=${value.replace(spacesRe, '+')}&outFields=*&f=pjson`
-    fetch(url)
-      .then(r => r.json())
-      .then(d => {
-        if (Object.keys(d).indexOf('candidates') > -1 && (d.candidates.length > 0)) {
-          setClicked({
-            type: "addresses",
-            id: d.candidates[0].attributes.address_id
-          })
-          setFound(true)
-        }
-        else {
-          let centerlineUrl = `https://gis.detroitmi.gov/arcgis/rest/services/DoIT/StreetCenterlineGeocoder/GeocodeServer/findAddressCandidates?Single+Line+Input=${value.replace(spacesRe, '+')}&outFields=*&outSR=4326&f=pjson`
-          fetch(centerlineUrl)
-            .then(r => r.json())
-            .then(d => {
-              setFound(false)
-            })
-        }
-      })
-  }
 
   useEffect(() => {
     setFound(null)
@@ -47,12 +49,12 @@ const ExplorerSearch = ({ clicked, setClicked }) => {
           type="text"
           value={value}
           onChange={(e) => {setValue(e.target.value); setFound(null);}} 
-          onKeyPress={(e) => e.code === 'Enter' && geocode(value, setClicked)}
+          onKeyPress={(e) => e.code === 'Enter' && geocode(value, setClicked, setFound)}
           />
         <button
           className={value !== '' ? 'btn-enabled' : 'btn-disabled'}
           disabled={value === ''}
-          onClick={() => geocode(value, setClicked)}>
+          onClick={() => geocode(value, setClicked, setFound)}>
           <FontAwesomeIcon icon={faSearch} />
         </button>
       </div>

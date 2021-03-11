@@ -1,26 +1,21 @@
-import './styles/App.css';
-
+import { useState } from 'react';
 import {
   BrowserRouter as Router,
-  Switch,
-  Route
+  Route, Switch
 } from "react-router-dom";
-
+import Analytics from 'react-router-ga';
 import BaseUnitTools from './BaseUnitTools/BaseUnitTools';
 import Explorer from './Explorer/Explorer';
 import Geocoder from './Geocoder/Geocoder';
 import IssueReporter from './IssueReporter/IssueReporter';
-import Validator from './Validator/Validator';
-import { useState, useContext } from 'react';
 import SiteWrapper from './layout/SiteWrapper';
-import Mailer from './Mailer/Mailer';
-import Assignment from './Assignment/Assignment';
-import Analytics from 'react-router-ga';
+import Validator from './Validator/Validator';
 
 const trackingId = 'UA-107915075-11'
 
 function App() {
 
+  // we use this session to track the ArcGIS Online login
   const [session, setSession] = useState(null)
   
   return (

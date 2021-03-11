@@ -37,9 +37,21 @@ const ExplorerBuilding = ({ feature, clicked, setClicked, linked, setLinked }) =
                 if (Object.keys(d).indexOf('features') > -1) {
                     if (d.features.length > 0) {
                         setAddresses(d.features.map(f => f.attributes))
+                        setLinked({
+                          buildings: [],
+                          addresses: d.features.map(f => f.attributes.addr_id), 
+                          streets: Array.from(new Set(d.features.map(f => f.attributes.street_id))),
+                          parcels: Array.from(new Set(d.features.map(f => f.attributes.parcel_id)))
+                        })
                     }
                     else {
                         setAddresses([])
+                        setLinked({
+                          buildings: [],
+                          addresses: [], 
+                          streets: [],
+                          parcels: []
+                        })
                     }
                 }
             })
