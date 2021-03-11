@@ -1,0 +1,69 @@
+
+import React from 'react';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowAltCircleRight, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+
+import ExplorerFeature from './ExplorerFeature';
+import IdBadge from './IdBadge'
+import layers from '../data/layers.json'
+
+const ExplorerAddress = ({ feature, clicked, setClicked, linked, setLinked }) => {
+
+    let { attributes: attr } = feature;
+
+    let attributes = {
+        "Street Number": attr.street_number,
+        "Street Prefix": attr.street_prefix,
+        "Street Name": attr.street_name,
+        "Street Type": attr.street_type,
+        "Unit Type": attr.unit_type,
+        "Unit Number": attr.unit_number
+    }
+
+    return (
+        <>
+            <ExplorerFeature {...{ attr, attributes, clicked }} />
+            {attr.parcel_id ? <section className='sidebar-section' style={{borderLeft: `4px solid ${layers['parcels'].color}`}}>
+                <div className="flex items-center justify-between" >
+                    <h2 className="text-base">linked to parcel:</h2>
+                    <IdBadge layer={layers['parcels']} id={attr.parcel_id} setClicked={setClicked} link />
+                </div>
+            </section> :
+                <section className='sidebar-section warning flex items-center' >
+                    <FontAwesomeIcon icon={faExclamationCircle} className="mr-3" />
+                    <p className="font-semibold">There is no linked parcel for this address!</p>
+                </section>
+            }
+            {attr.bldg_id ? <section className='sidebar-section' style={{borderLeft: `4px solid ${layers['buildings'].color}`}}>
+                <div className="flex items-center justify-between" >
+                    <h2 className="text-base">linked to building:</h2>
+                    <IdBadge layer={layers['buildings']} id={attr.bldg_id} setClicked={setClicked} link />
+                </div>
+            </section> :
+                <section className='sidebar-section info flex items-center' >
+                    <FontAwesomeIcon icon={faExclamationCircle} className="mr-3 text-lg" />
+                    <p className="font-semibold py-1">There is no linked building for this address.</p>
+                </section>
+            }
+
+            {attr.street_id ? <section className='sidebar-section' style={{borderLeft: `4px solid ${layers['streets'].color}`}}>
+                <div className="flex items-center justify-between" >
+                    <h2 className="text-base">linked to street:</h2>
+                    <IdBadge layer={layers['streets']} id={attr.street_id} setClicked={setClicked} link />
+                </div>
+            </section> :
+                            <section className='sidebar-section warning flex items-center justify-between' >
+                            <div className="flex items-center">
+                                <FontAwesomeIcon icon={faExclamationCircle} className="mr-3" />
+                                <p className="font-semibold">There is no linked street for this address!</p>
+                            </div>
+                            {/* <div>
+                                <FontAwesomeIcon icon={faLink} className="mx-2" />
+                            </div> */}
+                        </section>}
+        </>
+    )
+}
+
+export default ExplorerAddress;

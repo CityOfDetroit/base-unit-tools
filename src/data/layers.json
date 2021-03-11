@@ -1,0 +1,57 @@
+{
+    "addresses": {
+        "name": "addresses",
+        "label": "Address Point",
+        "endpoint": "AddressPoints/FeatureServer/0",
+        "id_column": "addr_id",
+        "click": "id",
+        "interaction": "address-point",
+        "highlight": "address-highlight",
+        "text_color": "#555",
+        "color": "rgb(170, 200, 221)"
+    },
+    "buildings": {
+        "name": "buildings",
+        "label": "Building",
+        "endpoint": "BuildingMetrics/FeatureServer/0",
+        "id_column": "bldg_id",
+        "interaction": "building-fill",
+        "click": "id",
+        "color": "rgb(203, 77, 79)",
+        "text_color": "#eee",
+        "highlight": "building-highlight"
+    },
+    "parcels": {
+        "name": "parcels",
+        "label": "Parcel",
+        "endpoint": "ParcelMetrics/FeatureServer/0",
+        "id_column": "parcel_id",
+        "interaction": "parcel-fill",
+        "click": "parcel_id",
+        "color": "rgb(163, 200, 112)",
+        "text_color": "#555",
+        "highlight": "parcel-highlight"
+    },
+    "streets": {
+        "name": "streets",
+        "label": "Street",
+        "endpoint": "StreetsMetrics/MapServer/0",
+        "id_column": "objectid",
+        "interaction": "streets-line",
+        "click": "street_id",
+        "highlight": "streets-highlight",
+        "color": "rgb(148, 70, 109)",
+        "text_color": "#eee"
+    },
+    "units": {
+        "name": "units",
+        "label": "Unit",
+        "endpoint": "UnitMetrics/MapServer/0",
+        "id_column": "objectid",
+        "interaction": "units-point",
+        "click": "unit_id",
+        "highlight": "units-highlight",
+        "color": "rgb(46, 55, 97)",
+        "text_color": "#eee"
+    }
+}
