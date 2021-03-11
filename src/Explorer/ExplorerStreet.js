@@ -38,7 +38,7 @@ const ExplorerStreet = ({ feature, clicked, setClicked, linked, setLinked }) => 
                         setLinked({
                           addresses: d.features.map(f => f.attributes.addr_id), 
                           streets: [],
-                          buildings: Array.from(new Set(d.features.map(f => f.attributes.bldg_id))),
+                          buildings: Array.from(new Set(d.features.map(f => f.attributes.bldg_id))).filter(a => a !== null),
                           parcels: Array.from(new Set(d.features.map(f => f.attributes.parcel_id)))
                         })
                     }

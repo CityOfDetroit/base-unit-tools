@@ -12,6 +12,8 @@ const ExplorerAddress = ({ feature, clicked, setClicked, linked, setLinked }) =>
 
   let { attributes: attr } = feature;
 
+  console.log(attr)
+
   let attributes = {
     "Street Number": attr.street_number,
     "Street Prefix": attr.street_prefix,
@@ -21,15 +23,17 @@ const ExplorerAddress = ({ feature, clicked, setClicked, linked, setLinked }) =>
     "Unit Number": attr.unit_number
   }
 
-  useEffect(() => {
 
-    setLinked({
-      addresses: [],
-      parcels: [attr.parcel_id],
-      buildings: [attr.bldg_id],
-      streets: [attr.street_id],
-    })
-  }, [])
+  useEffect(() => {
+    if(feature) {
+      setLinked({
+        addresses: [],
+        parcels: [attr.parcel_id],
+        buildings: [attr.bldg_id],
+        streets: [attr.street_id],
+      })
+    }
+  }, [feature])
 
   return (
     <>

@@ -106,7 +106,7 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
   }, [theMap, clicked])
 
   useEffect(() => {
-    if (theMap && linked) {
+    if (theMap && linked && clicked.type) {
       console.log(linked)
       let layer = layers[clicked.type]
       let others = Object.keys(layers).filter(l => l !== clicked.type && l !== 'units')
@@ -116,9 +116,13 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
 
       // loop thru the others and get their linked
       others.forEach(o => {
-        console.log(o)
-        console.log(linked[o])
-        let filter = ["in", layers[o].filter_id].concat(linked[o])
+        let filter;
+        if (linked[o].length === 1 && (linked[o][0] === undefined || linked[o][0] === null)) {
+          filter = ["==", layers[o].filter_id, ""]
+        }
+        else {
+          filter = ["in", layers[o].filter_id].concat(linked[o]) 
+        }
         console.log(filter)
         theMap.setFilter(layers[o].link, filter)
       })
