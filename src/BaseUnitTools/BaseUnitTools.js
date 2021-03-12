@@ -19,7 +19,7 @@ const BaseUnitTools = ({ session, setSession }) => {
             Base Units are the fundamental units of measurement we use to describe our city.
           </p>
           <p>
-            <a href="https://base-units-detroitmi.hub.arcgis.com/">Learn more about them here</a>.
+            <a href="https://base-units-detroitmi.hub.arcgis.com/">Learn more about them at our Hub Site</a>.
           </p>
         </section>
         <Login {...{ session, setSession }} />
