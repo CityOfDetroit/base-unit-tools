@@ -1,4 +1,4 @@
-import { faStreetView, faWrench } from '@fortawesome/free-solid-svg-icons';
+import { faLeaf, faSatellite, faStreetView, faWrench } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
 import { Link, useHistory, useLocation } from "react-router-dom";
@@ -11,6 +11,7 @@ import ExplorerMap from './ExplorerMap';
 import ExplorerParcel from './ExplorerParcel';
 import ExplorerSearch from './ExplorerSearch';
 import ExplorerStreet from './ExplorerStreet';
+import Button from '../components/Button'
 
 // a very tiny helper function
 // that i don't fully understand
@@ -49,7 +50,8 @@ const Explorer = () => {
 
   // an options object
   let [options, setOptions] = useState({
-    streetView: querySv === 'true' ? true : false
+    streetView: querySv === 'true' ? true : false,
+    satellite: false
   })
   
   // streetview-specific information
@@ -114,15 +116,27 @@ const Explorer = () => {
     <>
       <SiteSidebar title="Explorer">
 
-        {/* Our little search/options area */}
+        {/* Search area */}
         <section className="sidebar-section">
           <ExplorerSearch {...{ clicked, setClicked }} />
-          <div className="mt-2">
-            <button
-              className={options.streetView ? 'btn-enabled' : 'btn-disabled'}
-              onClick={() => setOptions({ ...options, streetView: !options.streetView })}>
-              <FontAwesomeIcon icon={faStreetView} className="text-xl" />
-            </button>
+        </section>
+
+        {/* Options area */}
+        <section className="sidebar-section">   
+          <h2>Map options</h2>       
+          <div className="mt-2 flex">
+            <Button
+              onClick={() => setOptions({ ...options, streetView: !options.streetView })}
+              icon={faStreetView}
+              text="Street view"
+              active={options.streetView}
+              />
+            <Button
+              onClick={() => setOptions({ ...options, satellite: !options.satellite })}
+              icon={faSatellite}
+              text="Satellite imagery"
+              active={options.satellite}
+              />
           </div>
         </section>
 
@@ -150,7 +164,7 @@ const Explorer = () => {
 
       {/* the main panel contains the map, and we pass it many of our useState variables */}
       <main>
-        <ExplorerMap {...{ clicked, setClicked, linked, feature, history, svCoords, svBearing, showSv: options.streetView }} />
+        <ExplorerMap {...{ clicked, setClicked, linked, feature, history, svCoords, svBearing, showSv: options.streetView, showSatellite: options.satellite }} />
       </main>
     </>
   )

@@ -1,4 +1,5 @@
 import layers from '../data/layers.json'
+import _ from 'lodash';
 
 export const baseStyle = {
     "version": 8,
@@ -25,6 +26,12 @@ export const baseStyle = {
         "type": "vector",
         "tiles": ["https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/StreetVectorTiles/VectorTileServer/tile/{z}/{y}/{x}.pbf"]
       },
+      "satellite": {
+        "type": "raster",
+        "tiles": [
+          "https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/Detroit_RGB_projFix_sid/MapServer/tile/{z}/{y}/{x}"
+        ]
+      },
       "mapillary": {
         "type": "geojson",
         "data": {
@@ -34,6 +41,19 @@ export const baseStyle = {
       }
     },
     "layers": [
+      {
+        "id": "satellite",
+        "type": "raster",
+        "source": "satellite",
+        "minzoom": 0,
+        "maxzoom": 22,
+        "paint": {
+          "raster-opacity": 0.66
+        },
+        "layout": {
+          "visibility": "none"
+        }
+      },
       {
         "id": "Land/Not ice",
         "type": "fill",
@@ -107,44 +127,6 @@ export const baseStyle = {
             ]
           },
           "fill-antialias": false
-        }
-      },
-      {
-        "id": "Parcel/fill",
-        "type": "fill",
-        "source": "esri",
-        "source-layer": "Parcel",
-        "minzoom": 18,
-        "layout": {},
-        "paint": {
-          "fill-color": "#f0ebe5"
-        }
-      },
-      {
-        "id": "Parcel/line",
-        "type": "line",
-        "source": "esri",
-        "source-layer": "Parcel",
-        "minzoom": 17,
-        "layout": {
-          "line-cap": "round",
-          "line-join": "round"
-        },
-        "paint": {
-          "line-color": "#dddbd8",
-          "line-width": {
-            "base": 1.2,
-            "stops": [
-              [
-                17,
-                0.6
-              ],
-              [
-                22,
-                5
-              ]
-            ]
-          }
         }
       },
       {
@@ -6415,505 +6397,6 @@ export const baseStyle = {
               [
                 9,
                 1.3
-              ]
-            ]
-          }
-        }
-      },
-      {
-        "id": "Tree/Elm",
-        "type": "symbol",
-        "source": "esri",
-        "source-layer": "Tree",
-        "filter": [
-          "==",
-          "_symbol",
-          0
-        ],
-        "minzoom": 16,
-        "layout": {
-          "symbol-avoid-edges": true,
-          "icon-image": "Tree/Elm",
-          "icon-allow-overlap": true,
-          "icon-padding": 1,
-          "icon-size": {
-            "stops": [
-              [
-                16,
-                0.07
-              ],
-              [
-                17,
-                0.18
-              ],
-              [
-                18,
-                0.3
-              ],
-              [
-                20,
-                1
-              ]
-            ]
-          }
-        },
-        "paint": {
-          "icon-opacity": {
-            "stops": [
-              [
-                16,
-                0.4
-              ],
-              [
-                17,
-                0.6
-              ],
-              [
-                20,
-                0.9
-              ]
-            ]
-          }
-        }
-      },
-      {
-        "id": "Tree/Eucalyptus",
-        "type": "symbol",
-        "source": "esri",
-        "source-layer": "Tree",
-        "filter": [
-          "==",
-          "_symbol",
-          1
-        ],
-        "minzoom": 16,
-        "layout": {
-          "symbol-avoid-edges": true,
-          "icon-image": "Tree/Eucalyptus",
-          "icon-allow-overlap": true,
-          "icon-padding": 1,
-          "icon-size": {
-            "stops": [
-              [
-                16,
-                0.07
-              ],
-              [
-                17,
-                0.18
-              ],
-              [
-                18,
-                0.3
-              ],
-              [
-                20,
-                1
-              ]
-            ]
-          }
-        },
-        "paint": {
-          "icon-opacity": {
-            "stops": [
-              [
-                16,
-                0.4
-              ],
-              [
-                17,
-                0.6
-              ],
-              [
-                20,
-                0.9
-              ]
-            ]
-          }
-        }
-      },
-      {
-        "id": "Tree/Maple",
-        "type": "symbol",
-        "source": "esri",
-        "source-layer": "Tree",
-        "filter": [
-          "==",
-          "_symbol",
-          2
-        ],
-        "minzoom": 16,
-        "layout": {
-          "symbol-avoid-edges": true,
-          "icon-image": "Tree/Maple",
-          "icon-allow-overlap": true,
-          "icon-padding": 1,
-          "icon-size": {
-            "stops": [
-              [
-                16,
-                0.07
-              ],
-              [
-                17,
-                0.18
-              ],
-              [
-                18,
-                0.3
-              ],
-              [
-                20,
-                1
-              ]
-            ]
-          }
-        },
-        "paint": {
-          "icon-opacity": {
-            "stops": [
-              [
-                16,
-                0.4
-              ],
-              [
-                17,
-                0.6
-              ],
-              [
-                20,
-                0.9
-              ]
-            ]
-          }
-        }
-      },
-      {
-        "id": "Tree/Oak",
-        "type": "symbol",
-        "source": "esri",
-        "source-layer": "Tree",
-        "filter": [
-          "==",
-          "_symbol",
-          3
-        ],
-        "minzoom": 16,
-        "layout": {
-          "symbol-avoid-edges": true,
-          "icon-image": "Tree/Oak",
-          "icon-allow-overlap": true,
-          "icon-padding": 1,
-          "icon-size": {
-            "stops": [
-              [
-                16,
-                0.07
-              ],
-              [
-                17,
-                0.18
-              ],
-              [
-                18,
-                0.3
-              ],
-              [
-                20,
-                1
-              ]
-            ]
-          }
-        },
-        "paint": {
-          "icon-opacity": {
-            "stops": [
-              [
-                16,
-                0.4
-              ],
-              [
-                17,
-                0.6
-              ],
-              [
-                20,
-                0.9
-              ]
-            ]
-          }
-        }
-      },
-      {
-        "id": "Tree/Orange",
-        "type": "symbol",
-        "source": "esri",
-        "source-layer": "Tree",
-        "filter": [
-          "==",
-          "_symbol",
-          4
-        ],
-        "minzoom": 16,
-        "layout": {
-          "symbol-avoid-edges": true,
-          "icon-image": "Tree/Orange",
-          "icon-allow-overlap": true,
-          "icon-padding": 1,
-          "icon-size": {
-            "stops": [
-              [
-                16,
-                0.07
-              ],
-              [
-                17,
-                0.18
-              ],
-              [
-                18,
-                0.3
-              ],
-              [
-                20,
-                1
-              ]
-            ]
-          }
-        },
-        "paint": {
-          "icon-opacity": {
-            "stops": [
-              [
-                16,
-                0.4
-              ],
-              [
-                17,
-                0.6
-              ],
-              [
-                20,
-                0.9
-              ]
-            ]
-          }
-        }
-      },
-      {
-        "id": "Tree/Palm",
-        "type": "symbol",
-        "source": "esri",
-        "source-layer": "Tree",
-        "filter": [
-          "==",
-          "_symbol",
-          5
-        ],
-        "minzoom": 16,
-        "layout": {
-          "symbol-avoid-edges": true,
-          "icon-image": "Tree/Palm",
-          "icon-allow-overlap": true,
-          "icon-padding": 1,
-          "icon-size": {
-            "stops": [
-              [
-                16,
-                0.07
-              ],
-              [
-                17,
-                0.18
-              ],
-              [
-                18,
-                0.3
-              ],
-              [
-                20,
-                1
-              ]
-            ]
-          }
-        },
-        "paint": {
-          "icon-opacity": {
-            "stops": [
-              [
-                16,
-                0.4
-              ],
-              [
-                17,
-                0.6
-              ],
-              [
-                20,
-                0.9
-              ]
-            ]
-          }
-        }
-      },
-      {
-        "id": "Tree/Pine",
-        "type": "symbol",
-        "source": "esri",
-        "source-layer": "Tree",
-        "filter": [
-          "==",
-          "_symbol",
-          6
-        ],
-        "minzoom": 16,
-        "layout": {
-          "symbol-avoid-edges": true,
-          "icon-image": "Tree/Pine",
-          "icon-allow-overlap": true,
-          "icon-padding": 1,
-          "icon-size": {
-            "stops": [
-              [
-                16,
-                0.07
-              ],
-              [
-                17,
-                0.18
-              ],
-              [
-                18,
-                0.3
-              ],
-              [
-                20,
-                1
-              ]
-            ]
-          }
-        },
-        "paint": {
-          "icon-opacity": {
-            "stops": [
-              [
-                16,
-                0.4
-              ],
-              [
-                17,
-                0.6
-              ],
-              [
-                20,
-                0.9
-              ]
-            ]
-          }
-        }
-      },
-      {
-        "id": "Tree/Spruce",
-        "type": "symbol",
-        "source": "esri",
-        "source-layer": "Tree",
-        "filter": [
-          "==",
-          "_symbol",
-          7
-        ],
-        "minzoom": 16,
-        "layout": {
-          "symbol-avoid-edges": true,
-          "icon-image": "Tree/Spruce",
-          "icon-allow-overlap": true,
-          "icon-padding": 1,
-          "icon-size": {
-            "stops": [
-              [
-                16,
-                0.07
-              ],
-              [
-                17,
-                0.18
-              ],
-              [
-                18,
-                0.3
-              ],
-              [
-                20,
-                1
-              ]
-            ]
-          }
-        },
-        "paint": {
-          "icon-opacity": {
-            "stops": [
-              [
-                16,
-                0.4
-              ],
-              [
-                17,
-                0.6
-              ],
-              [
-                20,
-                0.9
-              ]
-            ]
-          }
-        }
-      },
-      {
-        "id": "Shrub",
-        "type": "symbol",
-        "source": "esri",
-        "source-layer": "Shrub",
-        "minzoom": 16,
-        "layout": {
-          "symbol-avoid-edges": true,
-          "icon-image": "Shrub",
-          "icon-allow-overlap": true,
-          "icon-padding": 1,
-          "icon-size": {
-            "stops": [
-              [
-                16,
-                0.07
-              ],
-              [
-                17,
-                0.18
-              ],
-              [
-                18,
-                0.3
-              ],
-              [
-                20,
-                1
-              ]
-            ]
-          }
-        },
-        "paint": {
-          "icon-opacity": {
-            "stops": [
-              [
-                16,
-                0.4
-              ],
-              [
-                17,
-                0.6
-              ],
-              [
-                20,
-                0.9
               ]
             ]
           }
@@ -17169,5 +16652,15 @@ export const baseStyle = {
   }
 
 export const satelliteStyle = () => {
-  return baseStyle;
+  let satStyle = _.cloneDeep(baseStyle)
+
+  satStyle.layers[0].layout.visibility = 'visible'
+
+  satStyle.layers.slice(0, 40).forEach((l, i) => {
+    if (l.type === 'fill') {
+      satStyle.layers[i].layout['visibility'] = 'none'
+    }
+  })
+
+  return satStyle;
 }

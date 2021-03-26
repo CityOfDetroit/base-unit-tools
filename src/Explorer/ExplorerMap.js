@@ -3,13 +3,17 @@ import React, { useEffect, useState } from "react";
 import { arcgisToGeoJSON } from '@esri/arcgis-to-geojson-utils';
 import centroid from '@turf/centroid';
 
-import { baseStyle } from '../styles/mapstyle'
+import { baseStyle, satelliteStyle } from '../styles/mapstyle'
 import videoIcon from '../images/video.png'
 
 import layers from '../data/layers.json'
 
-const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, svBearing }) => {
+console.log(baseStyle)
+
+const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, svBearing, showSatellite }) => {
   const [theMap, setTheMap] = useState(null);
+
+  const [loading, setLoading] = useState(false)
 
   // detroit bbox
   let [xMin, yMin, xMax, yMax] = [-83.237803, 42.355192, -82.910451, 42.45023];
@@ -34,6 +38,7 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
     });
 
     map.on('style.load', () => {
+      setLoading(false)
       map.loadImage(videoIcon, (error, image) => {
         if (error) throw error;
         map.addImage("video", image);
@@ -81,7 +86,7 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
   }, []);
 
   useEffect(() => {
-    if (theMap && clicked.type && clicked.id) {
+    if (theMap && clicked.type && clicked.id && !loading) {
       let layer = layers[clicked.type]
       let others = Object.keys(layers).filter(l => l !== clicked.type && l !== 'units')
       let filter = ["==", "$id", clicked.id]
@@ -103,10 +108,10 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
         theMap.setFilter(layers[o].highlight, ["==", "$id", ""])
       })
     }
-  }, [theMap, clicked])
+  }, [theMap, clicked, loading])
 
   useEffect(() => {
-    if (theMap && linked && clicked.type) {
+    if (theMap && linked && clicked.type && !loading) {
       console.log(linked)
       let layer = layers[clicked.type]
       let others = Object.keys(layers).filter(l => l !== clicked.type && l !== 'units')
@@ -126,26 +131,8 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
         console.log(filter)
         theMap.setFilter(layers[o].link, filter)
       })
-      // let filter = ["==", "$id", clicked.id]
-      // if (clicked.type === 'parcels') {
-      //   filter[1] = 'parcel_id'
-      // }
-      // if (clicked.type === 'streets') {
-      //   filter[1] = 'street_id'
-      //   filter[2] = parseInt(clicked.id)
-      // }
-      // if (clicked.type === 'buildings') {
-      //   filter[2] = parseInt(clicked.id)
-      // }
-      // if (clicked.type === 'addresses') {
-      //   filter[2] = parseInt(clicked.id)
-      // }
-      // theMap.setFilter(layer.link, filter)
-      // others.forEach(o => {
-      //   theMap.setFilter(layers[o].link, ["==", "$id", ""])
-      // })
     }
-  }, [theMap, linked])
+  }, [theMap, linked, loading])
 
   useEffect(() => {
     console.log(svCoords, svBearing);
@@ -181,6 +168,21 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
       theMap.setLayoutProperty("mapillary-location", "visibility", "none")
     }
   }, [showSv])
+
+  useEffect(() => {
+    if(theMap) {
+      if(showSatellite) {
+        console.log(`show ze satellite`)
+        theMap.setStyle(satelliteStyle())
+        setLoading(true)
+      }
+      else {
+        console.log(`do not show ze satellite`)
+        theMap.setStyle(baseStyle)
+        setLoading(true)
+      }
+    }
+  }, [showSatellite])
 
   useEffect(() => {
     if (theMap) {
