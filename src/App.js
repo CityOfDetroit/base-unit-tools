@@ -10,6 +10,7 @@ import Geocoder from './Geocoder/Geocoder';
 import IssueReporter from './IssueReporter/IssueReporter';
 import SiteWrapper from './layout/SiteWrapper';
 import Validator from './Validator/Validator';
+import Mailer from './Mailer/Mailer';
 
 const trackingId = 'UA-107915075-11'
 
@@ -38,9 +39,9 @@ function App() {
             <Route path="/validator">
               <Validator />
             </Route>
-            {/* <Route path="/mailer">
+            <Route path="/mailer">
               <Mailer {...{session}} />
-            </Route> */}
+            </Route>
             {/* {session && <Route path="/assignment">
               <Assignment />
             </Route>} */}

@@ -48,16 +48,16 @@ export const apps = {
         icon: faCheckSquare,
         private: false
     },
-    // 'mailer': {
-    //     name: 'Mailer',
-    //     url: `/mailer`,
-    //     description: 'Create mailing lists',
-    //     questions: [
-    //         `I'd like to send a mailing to all owner-occupants in a historic district.`
-    //     ],
-    //     icon: faMailBulk,
-    //     private: true
-    // },
+    'mailer': {
+        name: 'Mailer',
+        url: `/mailer`,
+        description: 'Create mailing lists',
+        questions: [
+            `I'd like to send a mailing to all owner-occupants in a historic district.`
+        ],
+        icon: faMailBulk,
+        private: true
+    }
     // 'assignment': {
     //     name: 'Assignment',
     //     url: `/assignment`,
