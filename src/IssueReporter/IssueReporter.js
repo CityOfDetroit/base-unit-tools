@@ -2,10 +2,10 @@ import { addFeatures } from '@esri/arcgis-rest-feature-layer';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { geocoders } from '../data/geocoders';
 import layers from '../data/layers.json';
 import IdBadge from '../Explorer/IdBadge';
-import { geocoders } from '../Geocoder/Geocoder';
 import SiteSidebar from '../layout/SiteSidebar';
 import IssueReporterExtantAddress from './IssueReporterExtantAddress';
 import IssueReporterMap from './IssueReporterMap';
@@ -86,8 +86,6 @@ const IssueReporter = ({ session }) => {
 
   let [sent, setSent] = useState(false)
   let [addResponse, setAddResponse] = useState(null)
-  console.log(addResponse)
-
   let [feature, setFeature] = useState(null)
 
   const geocode = (value, setResponse) => {
@@ -254,6 +252,7 @@ const IssueReporter = ({ session }) => {
             <textarea type="text" cols="40" rows="8" className="p-2 m-1" value={formText} onChange={(e) => { setFormText(e.target.value); setSent(false) }}></textarea>
             <button
               className={formText !== '' && !sent ? "btn-enabled w-full" : 'btn-disabled w-full'}
+              disabled={formText === ''}
               onClick={() => {      
                 addFeature({
                   session: session,
@@ -275,7 +274,7 @@ const IssueReporter = ({ session }) => {
         {
           addResponse && addResponse.addResults[0].success &&
           <section className="sidebar-section">
-            Thanks for your input!
+            Thanks for your input! <Link to={`/explorer?type=${target.type}&id=${target.id}`}>Jump back to the explorer</Link>
           </section>
         }
       </SiteSidebar>

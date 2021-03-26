@@ -1,30 +1,22 @@
-import React, { useState, useRef, useEffect } from 'react';
-import {Link} from 'react-router-dom'
-
-import SiteSidebar from '../layout/SiteSidebar';
-import SiteWrapper from '../layout/SiteWrapper';
-import { CSVLink } from 'react-csv';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWrench } from '@fortawesome/free-solid-svg-icons';
-
-
-export const geocoders = [
-  {
-    name: 'Base Units Geocoder',
-    url: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoder/GeocodeServer`
-  },
-  {
-    name: 'Base Units Geocoder Units',
-    url: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoderUnits/GeocodeServer`
-  }
-]
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useEffect, useState } from 'react';
+import { CSVLink } from 'react-csv';
+import { Link } from 'react-router-dom';
+import { geocoders } from '../data/geocoders';
+import SiteSidebar from '../layout/SiteSidebar';
 
 const Geocoder = () => {
 
+  // we store the user input in value
   let [value, setValue] = useState('')
+  // and split on a newline to get a list of addresses to geocode
+  let addresses = value.split("\n").filter(a => a !== "")
+
+  // TODO: let the user pick from a number of geocoders
   let [geocoder, setGeocoder] = useState(geocoders[0])
 
-  // options htmlFor geocoding
+  // options for geocoding
   let [matched, setMatched] = useState(true)
   let [coords, setCoords] = useState(true)
   let [council, setCouncil] = useState(true)
@@ -36,12 +28,9 @@ const Geocoder = () => {
   // container for results
   let [results, setResults] = useState([])
 
-  let addresses = value.split("\n").filter(a => a !== "")
 
   useEffect(() => {
     if (payload.length > 0) {
-
-
       let dataToSend = {
         records: addresses.map((a, i) => {
           return {
@@ -65,6 +54,7 @@ const Geocoder = () => {
     }
   }, [payload])
 
+  
   let formattedData = results.map((r, i) => {
     return {
       input: addresses[i],
@@ -72,6 +62,7 @@ const Geocoder = () => {
       zip_code: r.attributes.Postal,
       address_id: r.attributes.address_id,
       building_id: r.attributes.building_id,
+      // we format 
       parcel_id: `=""${r.attributes.parcel_id}""`,
       street_id: r.attributes.street_id,
       lng: r.attributes.X.toFixed(5),
