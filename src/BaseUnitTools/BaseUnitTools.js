@@ -22,7 +22,6 @@ const BaseUnitTools = ({ session, setSession }) => {
             <a href="https://base-units-detroitmi.hub.arcgis.com/">Learn more about them at our Hub Site</a>.
           </p>
         </section>
-        <Login {...{ session, setSession }} />
       </SiteSidebar>
       <main>
         <div style={toolGridStyle}>
