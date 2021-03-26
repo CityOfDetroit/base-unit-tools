@@ -1,7 +1,8 @@
-import { faLeaf, faSatellite, faStreetView, faWrench } from '@fortawesome/free-solid-svg-icons';
+import { faSatellite, faStreetView, faWrench } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
 import { Link, useHistory, useLocation } from "react-router-dom";
+import Button from '../components/Button';
 import StreetView from '../components/StreetView';
 import layers from '../data/layers.json';
 import SiteSidebar from '../layout/SiteSidebar';
@@ -11,7 +12,6 @@ import ExplorerMap from './ExplorerMap';
 import ExplorerParcel from './ExplorerParcel';
 import ExplorerSearch from './ExplorerSearch';
 import ExplorerStreet from './ExplorerStreet';
-import Button from '../components/Button'
 
 // a very tiny helper function
 // that i don't fully understand
@@ -31,8 +31,10 @@ const Explorer = () => {
   let history = useHistory()
 
   // this stores the type and id of the currently clicked feature
-  // derive initial values from the URL parameter if we can
+  // that drives everything, so the value and setter 
+  // are passed to child components often to consult or use
   let [clicked, setClicked] = useState({
+    // derive initial values from the URL parameter if we can
     type: queryType ? queryType : null,
     id: queryId ? queryId : null
   })
