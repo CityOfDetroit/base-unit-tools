@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useMediaQuery } from '../components/mediaQuery';
 import apps from '../data/apps';
@@ -15,10 +15,12 @@ const SiteWrapper = ({ session, setSession, children }) => {
   // return true or false based on screen width
   let isDesktop = useMediaQuery('(min-width: 769px)')
 
+  const [login, setLogin] = useState(false)
+
   return (
     <>
       <>
-        <SiteHeader {...{session}} />
+        <SiteHeader {...{session, setSession, login, setLogin}} />
         <nav className="">
           {isDesktop ?
             // desktop nav
@@ -27,7 +29,7 @@ const SiteWrapper = ({ session, setSession, children }) => {
                 if ((apps[k].private && session) || !apps[k].private) {
                   return (
                   <Link key={k} to={`.${apps[k].url}`}>
-                    <li className={`p-3 px-4`}
+                    <li className={`p-6`}
                       style={location.pathname === apps[k].url ? { background: "#feb70d" } : {}}
                     >
                       <FontAwesomeIcon icon={apps[k].icon} className="mr-2" />

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { UserSession } from '@esri/arcgis-rest-auth';
 
-export const Login = ({ session, setSession }) => {
+export const Login = ({ session, setSession, setLogin }) => {
 
   const [creds, setCreds] = useState({ user: '', pass: '' });
 
@@ -46,6 +46,7 @@ export const Login = ({ session, setSession }) => {
               "https://detroitmi.maps.arcgis.com/arcgis/rest/sharing"
             ).then(d => {
               setSession(userSession);
+              setLogin(false)
             });
           }}>
           Log in
