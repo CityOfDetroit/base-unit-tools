@@ -48,7 +48,8 @@ export const baseStyle = {
         "minzoom": 0,
         "maxzoom": 22,
         "paint": {
-          "raster-opacity": 0.66
+          "raster-opacity": 1,
+          "raster-saturation": -0.75
         },
         "layout": {
           "visibility": "none"
@@ -16517,7 +16518,7 @@ export const baseStyle = {
           "fill-opacity": {
             "stops": [
               [14, 0.1],
-              [19, 0.9]
+              [19, 0.5]
             ]
           }
         }
@@ -16651,16 +16652,33 @@ export const baseStyle = {
     }
   }
 
+// since this is a function and not an object, we'll have to call it in the map like so:
+// satelliteStyle()
 export const satelliteStyle = () => {
+
+  // clone the baseStyle into a new object to we can make changes
   let satStyle = _.cloneDeep(baseStyle)
 
+  // set the satellite layer, which is first, to visible
   satStyle.layers[0].layout.visibility = 'visible'
 
-  satStyle.layers.slice(0, 40).forEach((l, i) => {
+  // run through the first 200 layers and turn them off if they're a fill
+  // or if they're a road line layer
+  // lazy hack for invisible'ing all the layers which are in the way of the satellite
+  satStyle.layers.slice(0,200).forEach((l, i) => {
+    console.log(l.id)
     if (l.type === 'fill') {
       satStyle.layers[i].layout['visibility'] = 'none'
+      console.log('off')
+    }
+    if (l.type === 'line' && l.id.indexOf("Road") === 0) {
+      satStyle.layers[i].layout['visibility'] = 'none'
+      console.log('off')
     }
   })
 
+
+  
+  // return the object
   return satStyle;
 }
