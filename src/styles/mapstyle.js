@@ -1,6 +1,6 @@
 import layers from '../data/layers.json'
 
-const style = {
+export const baseStyle = {
     "version": 8,
     "sprite": "https://cdn.arcgis.com/sharing/rest/content/items/273bf8d5c8ac400183fc24e109d20bcf/resources/styles/../sprites/sprite",
     "glyphs": "https://basemaps.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer/resources/fonts/{fontstack}/{range}.pbf",
@@ -17168,4 +17168,6 @@ const style = {
     }
   }
 
-  export default style;
+export const satelliteStyle = () => {
+  return baseStyle;
+}

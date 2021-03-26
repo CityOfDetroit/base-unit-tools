@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { arcgisToGeoJSON } from '@esri/arcgis-to-geojson-utils';
 import centroid from '@turf/centroid';
 
-import mapStyle from '../styles/mapstyle'
+import { baseStyle } from '../styles/mapstyle'
 import videoIcon from '../images/video.png'
 
 import layers from '../data/layers.json'
@@ -21,7 +21,7 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
   useEffect(() => {
     var map = new mapboxgl.Map({
       container: "map", // container id
-      style: mapStyle, // stylesheet location
+      style: baseStyle, // stylesheet location
       center: [xRandomCenter, yRandomCenter], // starting position [lng, lat]
       zoom: 16.25, // starting zoom
       maxZoom: 19.99

@@ -4,7 +4,7 @@ import { arcgisToGeoJSON } from '@esri/arcgis-to-geojson-utils';
 import centroid from '@turf/centroid';
 import IdBadge from '../Explorer/IdBadge';
 
-import mapStyle from '../styles/mapstyle'
+import { baseStyle } from '../styles/mapstyle'
 import layers from '../data/layers.json'
 
 const IssueReporterMap = ({ response, target, feature, center, setCenter }) => {
@@ -24,7 +24,7 @@ const IssueReporterMap = ({ response, target, feature, center, setCenter }) => {
   useEffect(() => {
     var map = new mapboxgl.Map({
       container: "map", // container id
-      style: mapStyle, // stylesheet location
+      style: baseStyle, // stylesheet location
       center: center, // starting position [lng, lat]
       zoom: 18, // starting zoom
       interactive: false
