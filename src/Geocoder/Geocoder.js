@@ -14,7 +14,7 @@ const Geocoder = () => {
   let addresses = value.split("\n").filter(a => a !== "")
 
   // TODO: let the user pick from a number of geocoders
-  let [geocoder, setGeocoder] = useState(geocoders[0])
+  let [geocoder, setGeocoder] = useState(geocoders[-1])
 
   // options for geocoding
   let [matched, setMatched] = useState(true)

@@ -17,3 +17,5 @@ Initial release, with geocoder tool, cloned from https://cityofdetroit.github.io
 ### Fixed
 
 - Issue reporter will thank you for submitting an issue
+
+## 1.2.0 - 2021-03-26

@@ -90,7 +90,7 @@ const IssueReporter = ({ session }) => {
 
   const geocode = (value, setResponse) => {
     let spacesRe = /\s/g
-    let url = `${geocoders[0].url}/findAddressCandidates?SingleLine=${value.replace(spacesRe, '+')}&outFields=*&f=pjson`
+    let url = `${geocoders[-1].url}/findAddressCandidates?SingleLine=${value.replace(spacesRe, '+')}&outFields=*&f=pjson`
     fetch(url)
       .then(r => r.json())
       .then(d => {
