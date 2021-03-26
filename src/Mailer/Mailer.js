@@ -1,108 +1,22 @@
 import React, { useState, useEffect } from 'react';
 
-import mapboxgl from "mapbox-gl";
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
-import MapboxDraw from '@mapbox/mapbox-gl-draw';
-import bbox from '@turf/bbox'
 import area from '@turf/area'
-import simplify from '@turf/simplify'
 
 import { geojsonToArcGIS } from '@esri/arcgis-to-geojson-utils';
 import { getLayer, queryFeatures } from '@esri/arcgis-rest-feature-layer'
 
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-import mapStyle from '../styles/mailerstyle.json'
+import { faDownload, faTrash } from '@fortawesome/free-solid-svg-icons';
 import SiteSidebar from '../layout/SiteSidebar'
-
-const presets = {
-  "neighborhoods": {
-    name: "Neighborhoods",
-    singular: 'neighborhood',
-    pickColumn: 'name',
-    url: "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Neighborhoods/FeatureServer/0/"
-  },
-  "cbo": {
-    name: "CBOs",
-    singular: 'CBO area',
-    url: "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/CBO_Impact_Areas/FeatureServer/0/",
-    pickColumn: "Name",
-  },
-  "historic_districts": {
-    name: "Historic Districts",
-    singular: 'historic district',
-    pickColumn: "Name",
-    url: "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Detroit_Local_Historic_Districts/FeatureServer/0/"
-  }
-}
-
-const MailingMap = ({ geom, setGeom }) => {
-
-  let [theMap, setTheMap] = useState(null);
-  let [theDraw, setTheDraw] = useState(null)
-
-  useEffect(() => {
-
-    const detroitBbox = [-83.287803, 42.255192, -82.910451, 42.45023];
-
-    var map = new mapboxgl.Map({
-      container: "map",
-      style: mapStyle,
-      bounds: detroitBbox
-    });
-
-    let Draw = new MapboxDraw();
-    setTheDraw(Draw)
-
-    map.addControl(Draw, 'top-left')
-
-    map.on("load", e => {
-      setTheMap(map);
-      map.resize();
-    });
-
-    map.on("draw.create", e => {
-      let geometry = Draw.getAll()
-      setGeom(geometry)
-      map.fitBounds(bbox(geometry), { padding: 20 })
-    })
-
-    map.on("draw.update", e => {
-      setGeom(Draw.getAll())
-    })
-
-    map.on("draw.modechange", e => {
-      if (Draw.getAll().features.length > 1 && e.mode.slice(0, 4) === 'draw') {
-        Draw.delete(Draw.getAll().features[0].id)
-      }
-    })
-  }, []);
-
-  useEffect(() => {
-    if (theMap && theDraw && geom) {
-      theMap.fitBounds(bbox(geom), { padding: 40 })
-      theDraw.set(geom)
-      theDraw.changeMode("simple_select")
-    }
-    if (theMap && theDraw && !geom) {
-      // theDraw.delete(theDraw.getAll().features[0].id)
-    }
-  }, [geom])
-
-  return (
-    <div id="map" className="explorer-map" />
-  )
-}
-
+import Button from '../components/Button';
+import MailerBuffer from './MailerBuffer';
+import MailerLayerSelector from './MailerLayerSelector';
+import MailerMap  from './MailerMap';
 
 const Mailer = ({ session }) => {
 
   const [geom, setGeom] = useState(null)
   const [access, setAccess] = useState(false)
-  const [currentLayer, setCurrentLayer] = useState('')
-  const [layerFeatures, setLayerFeatures] = useState([])
-  const [currentFeature, setCurrentFeature] = useState(null)
   const [resultIds, setResultIds] = useState(null)
   
   let url = `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/AddrPoints_USPS_Jan2021/FeatureServer/0`
@@ -117,6 +31,7 @@ const Mailer = ({ session }) => {
   }, [])
 
   useEffect(() => {
+    setResultIds(null)
     if (geom && access) {
       queryFeatures({
         url: url,
@@ -131,25 +46,15 @@ const Mailer = ({ session }) => {
         setResultIds(d)
       })
     }
-  }, [geom])
+  }, [geom, session])
 
-  useEffect(() => {
-    if (currentLayer !== '') {
-      queryFeatures({
-        url: presets[currentLayer].url,
-        geometryPrecision: 5,
-        f: 'geojson'
-      }).then(d => {
-        setLayerFeatures(d.features)
-      })
-    }
-  }, [currentLayer])
 
   const fetchAddresses = () => {
+    let addresses = []
     const chunkSize = 500
     let breakpoints = resultIds.objectIds.filter((oid, i) => i % chunkSize === 0)
     breakpoints.push(resultIds.objectIds.slice(-1,)[0])
-    let results = breakpoints.map((b, i) => {
+    breakpoints.forEach((b, i) => {
       if(i > 0) {
         queryFeatures({
           url: url,
@@ -162,11 +67,12 @@ const Mailer = ({ session }) => {
           resultRecordCount: chunkSize,
           authentication: session
         }).then(d => {
-          return d.features
+          addresses = addresses.concat(d.features)
         }
         )
       }
     })
+    console.log(addresses)
   }
 
   return (
@@ -177,53 +83,29 @@ const Mailer = ({ session }) => {
           <div className="flex items-center justify-between">
           </div>
         </section>
-        <section className="sidebar-section">
-          <h2>Choose a layer</h2>
-
-          <select className="p-2 m-2" onChange={(e) => setCurrentLayer(e.target.value)} value={currentLayer} >
-            <option value=''>Please choose a layer</option>
-            {Object.keys(presets).map(l => (
-              <option value={l}>{presets[l].name}</option>
-            ))}
-          </select>
-
-          {layerFeatures.length > 0 && <select className="p-2 m-2" onChange={(e) => {
-            let matching = layerFeatures.filter(ft => { return ft.id === parseInt(e.target.value) })
-            setCurrentFeature(simplify(matching[0], { tolerance: 0.0001 }))
-            setResultIds(null)
-            setGeom({type: "FeatureCollection", features: [simplify(matching[0], { tolerance: 0.00005 })]})
-          }} >
-            <option value=''>Please choose a {presets[currentLayer].singular}</option>
-            {layerFeatures.map(ft => (
-              <option value={ft.id}>{ft.properties[presets[currentLayer].pickColumn]}</option>
-            ))}
-          </select>}
-
-        </section>
+        {!access && <section className="sidebar-section warning">
+          You don't currently have access to this tool, so it may not work correctly.
+        </section>}
+        <MailerLayerSelector {...{geom, setGeom}} />
+        {geom && <MailerBuffer {...{geom, setGeom}}/>}
         {geom && <section className='sidebar-section'>
           <h2>Current selection: {(area(geom) * 0.000000386102).toFixed(3)} sq. mi.</h2>
-          <button className='flex items-center btn-enabled my-2'>
-            <FontAwesomeIcon className="text-lg mr-2" icon={faTrash} onClick={() => setGeom(null)} />
-            <p>Delete current selection</p>
-          </button>
+          <Button icon={faTrash} onClick={() => setGeom(null)} text="Delete current selection" />
         </section>}
-        {!access && <section className="sidebar-section">
-          You don't currently have access to this tool.
-        </section>}
-        {geom && 
+        {geom && access && 
           <section className="sidebar-section">
-            {!resultIds && currentFeature && <h1>Loading...</h1>}
+            {!resultIds && geom && <h1>Loading...</h1>}
             {resultIds && 
               <>
               <h2>{resultIds.objectIds.length} addresses in the selection area</h2>
-              <button className='btn-enabled my-2' onClick={() => fetchAddresses()}>Get addresses (just in the console for now)</button>
+              <Button icon={faDownload} onClick={() => fetchAddresses()} text="Get addresses" />
               </>
             }
           </section>
         }
       </SiteSidebar>
       <main>
-        <MailingMap {...{ geom, setGeom }} />
+        <MailerMap {...{ geom, setGeom }} />
       </main>
     </>
   )
