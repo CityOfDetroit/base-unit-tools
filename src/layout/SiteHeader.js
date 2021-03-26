@@ -44,7 +44,7 @@ const SiteHeader = ({ session, setSession, login, setLogin }) => {
 
   if (login) {
     return (
-      <div style={{ height: '100vh', width: '100vw', background: 'red', position: 'absolute', zIndex: 5 }}>
+      <div className="absolute w-full h-full z-20 bg-gray-800 bg-opacity-90 flex justify-around">
         <Login {...{ session, setSession, setLogin }} />
       </div>
     )

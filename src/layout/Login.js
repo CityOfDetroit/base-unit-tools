@@ -1,13 +1,22 @@
 import React, { useState } from 'react';
 import { UserSession } from '@esri/arcgis-rest-auth';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faWindowClose } from '@fortawesome/free-solid-svg-icons';
 
 export const Login = ({ session, setSession, setLogin }) => {
 
   const [creds, setCreds] = useState({ user: '', pass: '' });
 
   return (
-    <section className="sidebar-section text-sm">
-      <h2 className="text-base">{session ? `Logged in as ${session.username}` : 'Log in to ArcGIS Online'}</h2>
+    <section className="text-sm w-1/2 h-1/3 mt-12 p-6 bg-gray-100">
+      <h2 className="text-base flex items-center justify-between">
+        {session ? 
+          `Logged in as ${session.username}` 
+          : 'Log in to ArcGIS Online'
+        } 
+        <FontAwesomeIcon icon={faWindowClose} onClick={() => setLogin(false)} />
+      </h2>
+      
       {!session && <span className="text-sm">If you are a City of Detroit employee, log in for additional tools and options.</span>}
       {!session &&
         <div className="my-2">
