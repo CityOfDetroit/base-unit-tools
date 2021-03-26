@@ -7,7 +7,7 @@ import { geocoders } from '../data/geocoders';
 // we call this function when we actually want to geocode
 const geocode = (value, setClicked, setFound) => {
   let spacesRe = /\s/g
-  let url = `${geocoders[-1].url}/findAddressCandidates?SingleLine=${value.replace(spacesRe, '+')}&outFields=*&f=pjson`
+  let url = `${geocoders[3].url}/findAddressCandidates?SingleLine=${value.replace(spacesRe, '+')}&outFields=*&f=pjson`
   fetch(url)
     .then(r => r.json())
     .then(d => {
