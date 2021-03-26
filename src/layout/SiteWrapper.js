@@ -3,27 +3,25 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useMediaQuery } from '../components/mediaQuery';
 import apps from '../data/apps';
-import logo from '../images/logo.png';
 import SiteFooter from './SiteFooter';
+import SiteHeader from './SiteHeader';
 
 
 const SiteWrapper = ({ session, setSession, children }) => {
+
+  // get the current browser URL to highlight the correct nav entry
   const location = useLocation()
 
+  // return true or false based on screen width
   let isDesktop = useMediaQuery('(min-width: 769px)')
-  console.log(isDesktop)
 
   return (
     <>
       <>
-        <header className="flex items-center justify-between">
-          <img src={logo} className="h-10 m-2" alt={"City logo"} />
-          <h1 className="w-full font-black">
-            Base Unit Tools
-                </h1>
-        </header>
+        <SiteHeader {...{session}} />
         <nav className="">
           {isDesktop ?
+            // desktop nav
             <ul className="flex items-center justify-start">
               {Object.keys(apps).map((k, i) => {
                 if ((apps[k].private && session) || !apps[k].private) {
@@ -42,6 +40,7 @@ const SiteWrapper = ({ session, setSession, children }) => {
               })}
             </ul>
             :
+            // hacky mobile navigation
             <div className="flex items-center justify-around text-xs">
               {Object.keys(apps).map((k, i) => {
                 if ((apps[k].private && session) || (!apps[k].private)) {return (
