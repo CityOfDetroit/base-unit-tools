@@ -22,13 +22,16 @@ const Mailer = ({ session }) => {
   let url = `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/AddrPoints_USPS_Jan2021/FeatureServer/0`
 
   useEffect(() => {
+    if(!session) {
+      setAccess(false)
+    }
     getLayer({
       url: url,
       authentication: session
     }).then(d => {
       setAccess(d)
     })
-  }, [])
+  }, [session])
 
   useEffect(() => {
     setResultIds(null)
