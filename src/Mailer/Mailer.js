@@ -13,6 +13,18 @@ import MailerBuffer from './MailerBuffer';
 import MailerLayerSelector from './MailerLayerSelector';
 import MailerMap  from './MailerMap';
 
+const filters = {
+  'Owner-occupied': null,
+  'Publicly-owned': null,
+  'Multifamily': null 
+}
+
+const options = {
+  'Neighborhood': null,
+  'Council district': null,
+  'Census tract': null
+}
+
 const Mailer = ({ session }) => {
 
   const [geom, setGeom] = useState(null)
@@ -49,7 +61,7 @@ const Mailer = ({ session }) => {
         setResultIds(d)
       })
     }
-  }, [geom, session])
+  }, [geom, session, access])
 
 
   const fetchAddresses = () => {
@@ -81,27 +93,52 @@ const Mailer = ({ session }) => {
   return (
     <>
       <SiteSidebar title="Mailer">
-        <section className="sidebar-section">
-          <h2>Mailer</h2>
-          <div className="flex items-center justify-between">
-          </div>
-        </section>
         {!access && <section className="sidebar-section warning">
           You don't currently have access to this tool, so it may not work correctly.
         </section>}
         <MailerLayerSelector {...{geom, setGeom}} />
         {geom && <MailerBuffer {...{geom, setGeom}}/>}
         {geom && <section className='sidebar-section'>
-          <h2>Current selection: {(area(geom) * 0.000000386102).toFixed(3)} sq. mi.</h2>
-          <Button icon={faTrash} onClick={() => setGeom(null)} text="Delete current selection" />
+          <h2>Current selection:</h2> 
+          <ul className="list-disc list-inside">
+            <li>
+              {(area(geom) * 0.000000386102).toFixed(3)} square miles
+            </li>
+            {resultIds && <li>
+              {resultIds.objectIds.length} addresses in the selection area
+            </li>}
+          </ul>
+          <h3 className="text-sm mt-3">Filter addresses by:</h3>
+              {
+                Object.keys(filters).map(f => (
+                  <div className="p-1">
+                  <input type="checkbox" name={f} checked={false}></input>
+                  <label for={f} className="ml-2">{f}</label>
+                  </div>
+                ))
+              }
+          <div className="flex flex-row-reverse">
+            <Button icon={faTrash} onClick={() => setGeom(null)} text="Delete current selection" />
+          </div>
         </section>}
         {geom && access && 
           <section className="sidebar-section">
             {!resultIds && geom && <h1>Loading...</h1>}
             {resultIds && 
               <>
-              <h2>{resultIds.objectIds.length} addresses in the selection area</h2>
-              <Button icon={faDownload} onClick={() => fetchAddresses()} text="Get addresses" />
+              <h2>Export mailing addresses to CSV</h2>
+              <h3 className="text-sm mt-3">Include these attributes for each address:</h3>
+              {
+                Object.keys(options).map(o => (
+                  <div className="p-1">
+                  <input type="checkbox" name={o} checked={false}></input>
+                  <label for={o} className="ml-2">{o}</label>
+                  </div>
+                ))
+              }
+              <div className="flex flex-row-reverse">
+              <Button icon={faDownload} onClick={() => fetchAddresses()} text="Download .csv" />
+              </div>
               </>
             }
           </section>

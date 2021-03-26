@@ -34,7 +34,7 @@ const MailerMap = ({ geom, setGeom }) => {
       setGeom(geometry);
       console.log(geometry);
       if (geometry.features[0].geometry.type === 'Polygon') {
-        map.fitBounds(bbox(geometry), { padding: 20, maxZoom: 18 });
+        map.fitBounds(bbox(geometry), { padding: 20, maxZoom: 17 });
       }
     });
 
@@ -53,7 +53,7 @@ const MailerMap = ({ geom, setGeom }) => {
     if (theMap && theDraw && geom) {
       console.log(geom);
       if (geom.features[0].geometry.type !== 'Point') {
-        theMap.fitBounds(bbox(geom), { padding: 40, maxZoom: 18});
+        theMap.fitBounds(bbox(geom), { padding: 40, maxZoom: 17 });
       }
       theDraw.set(geom);
       theDraw.changeMode("simple_select");

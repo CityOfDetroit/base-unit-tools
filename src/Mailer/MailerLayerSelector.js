@@ -7,8 +7,8 @@ const presets = {
   "neighborhoods": {
     name: "Neighborhoods",
     singular: 'neighborhood',
-    pickColumn: 'name',
-    url: "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Neighborhoods/FeatureServer/0/"
+    pickColumn: 'nhood_name',
+    url: "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Current_City_of_Detroit_Neighborhoods/FeatureServer/0/"
   },
   "cbo": {
     name: "CBOs",
@@ -42,29 +42,32 @@ const MailerLayerSelector = ({ geom, setGeom }) => {
     }
   }, [currentLayer])
 
+  useEffect(() => {
+    setCurrentFeature(null)
+  }, [geom])
 
   return (
     <section className="sidebar-section">
     <h2>Choose from existing boundaries</h2>
     <p>
-      Choose your layer, then choose a feature within that layer. For example, the Sherwood Forest neighborhood.
+      Choose your layer, then choose a feature within that layer.
     </p>
 
-    <select className="p-2 m-2" onChange={(e) => setCurrentLayer(e.target.value)} value={currentLayer} >
+    <select className="p-2 m-2 text-xs w-1/3" onChange={(e) => {setCurrentLayer(e.target.value); setLayerFeatures([])}} value={currentLayer} >
       <option value=''>Please choose a layer</option>
       {Object.keys(presets).map(l => (
         <option value={l}>{presets[l].name}</option>
       ))}
     </select>
 
-    {layerFeatures.length > 0 && <select className="p-2 m-2" onChange={(e) => {
+    {layerFeatures.length > 0 && <select className="p-2 m-2 text-xs" onChange={(e) => {
       let matching = layerFeatures.filter(ft => { return ft.id === parseInt(e.target.value) })
       setCurrentFeature(simplify(matching[0], { tolerance: 0.0001 }))
       setGeom({type: "FeatureCollection", features: [simplify(matching[0], { tolerance: 0.00005 })]})
-    }} >
+    }}>
       <option value=''>Please choose a {presets[currentLayer].singular}</option>
       {layerFeatures.map(ft => (
-        <option value={ft.id}>{ft.properties[presets[currentLayer].pickColumn]}</option>
+        <option value={ft.id}>{ft.properties[presets[currentLayer].pickColumn].slice(0,40)}</option>
       ))}
     </select>}
 

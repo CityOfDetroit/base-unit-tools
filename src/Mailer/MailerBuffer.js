@@ -24,32 +24,35 @@ const MailerBuffer = ({ geom, setGeom }) => {
 
   return (
     <section className="sidebar-section">
-      <h2>Buffer your feature</h2>
-      <p>
-        Apply a buffer to the feature
-      </p>
+      <h2>Buffer current selection</h2>
+      <div className="flex items-center justify-between mx-2">
+
+      <div className='w-1/2'>
+
       <input
         type="number"
         value={distance}
         onChange={(e) => setDistance(e.target.value)}
-        className="p-2 mr-2"
-      />
+        className="p-2 mr-2 w-1/2"
+        />
       <select
         className="p-2"
         onChange={(e) => setUnit(e.target.value)}
-      >
+        >
 
         {Object.keys(units).map(u => (
           <option value={u}>{u}</option>
-        ))}
+          ))}
 
       </select>
+      </div>
 
       <Button
         icon={faExpandArrowsAlt}
         onClick={() => setGeom(buffer(geom, distanceInMiles, { units: 'miles' }))}
-        text={`Buffer by ${distance} ${unit}`}
-      />
+        text={`${distance} ${unit}`}
+        />
+      </div>
 
     </section>
   )
