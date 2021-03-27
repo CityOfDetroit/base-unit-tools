@@ -59,6 +59,7 @@ const Mailer = ({ session }) => {
         authentication: session
       }).then(d => {
         console.log(d.objectIds[0])
+        console.log(d.objectIds.slice(-1))
         setResultIds(d)
       })
     }
@@ -68,13 +69,12 @@ const Mailer = ({ session }) => {
   const fetchAddresses = () => {
     const chunkSize = 500
     let breakpoints = resultIds.objectIds.filter((oid, i) => i % chunkSize === 0)
-    breakpoints.push(resultIds.objectIds.slice(-1,)[0])
+    breakpoints.push(resultIds.objectIds.slice(-1,)[0] + 1)
     let promises = breakpoints.slice(1).map((b, i) => {
-
       let params = {
         url: url,
         orderByFields: "OBJECTID",
-        where: `OBJECTID between ${i === 0 ? (breakpoints[0] - 1) : (breakpoints[i] + 1)} and ${b}`,
+        where: `OBJECTID between ${i === 0 ? (breakpoints[0] - 1) : (breakpoints[i])} and ${b}`,
         geometry: geojsonToArcGIS(geom)[0].geometry,
         geometryType: "esriGeometryPolygon",
         spatialRel: "esriSpatialRelIntersects",
@@ -82,13 +82,13 @@ const Mailer = ({ session }) => {
         resultRecordCount: chunkSize,
         authentication: session
       }
-      console.log(params)
       return queryFeatures(params)
     })
     Promise.all(promises)
       .then(resps => {
         let allAddresses = []
         resps.forEach(r => {
+          console.log(r)
           allAddresses = allAddresses.concat(r.features)
         })
         console.log(allAddresses)
@@ -132,7 +132,7 @@ const Mailer = ({ session }) => {
             {resultIds && 
               <>
               <h2>Export mailing addresses to CSV</h2>
-              <h3 className="text-sm mt-3">Include these attributes for each address:</h3>
+              {/* <h3 className="text-sm mt-3">Include these attributes for each address:</h3>
               {
                 Object.keys(options).map(o => (
                   <div className="p-1">
@@ -140,7 +140,7 @@ const Mailer = ({ session }) => {
                   <label for={o} className="ml-2">{o}</label>
                   </div>
                 ))
-              }
+              } */}
               <div className="flex flex-row-reverse">
               <Button icon={faDownload} onClick={() => fetchAddresses()} text="Download .csv" />
               </div>
