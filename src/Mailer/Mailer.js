@@ -18,10 +18,11 @@ const filters = {
 
 const Mailer = ({ session }) => {
 
-  // this tool is principally driven by this geom
+  // this tool is principally driven by this piece of state
+  // which represents represents the current selection area
   const [geom, setGeom] = useState(null)
 
-  // use this to see if the user has access to the mailing list layer
+  // use this boolean to see if the user has access to the mailing list layer
   const [access, setAccess] = useState(false)
 
   // store the selection area object IDs and the actual results, respectively.
@@ -92,7 +93,7 @@ const Mailer = ({ session }) => {
         url: url,
         orderByFields: "OBJECTID",
         // this is confusing, but produces the correct result.
-        // it has to be weird because of how BETWEEN works in the Esri API
+        // it has to be weird because of how BETWEEN seems to work.
         where: `OBJECTID between ${i === 0 ? (breakpoints[0] - 1) : (breakpoints[i])} and ${b - 1}`,
         geometry: geojsonToArcGIS(geom)[0].geometry,
         geometryType: "esriGeometryPolygon",
