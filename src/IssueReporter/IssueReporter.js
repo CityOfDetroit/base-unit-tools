@@ -121,7 +121,6 @@ const IssueReporter = ({ session }) => {
       let layer = layers[target.type]
       let url = layer.endpoint
       let fullUrl;
-      let SERVER_ROOT = `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/`
       if (target.type === 'parcels') {
         let params = {
           'where': `parcel_id='${target.id}'`,
@@ -134,7 +133,7 @@ const IssueReporter = ({ session }) => {
           return encodeURIComponent(key) + '=' + encodeURIComponent(params[key])
         }).join('&');
 
-        fullUrl = SERVER_ROOT + url + `/query?` + queryString
+        fullUrl = url + `/query?` + queryString
       }
       else {
         let params = {
@@ -147,7 +146,7 @@ const IssueReporter = ({ session }) => {
         let queryString = Object.keys(params).map((key) => {
           return encodeURIComponent(key) + '=' + encodeURIComponent(params[key])
         }).join('&');
-        fullUrl = SERVER_ROOT + url + `/query?` + queryString
+        fullUrl = url + `/query?` + queryString
       }
 
 

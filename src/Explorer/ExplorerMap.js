@@ -22,7 +22,9 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
   let xRandomCenter = xMin + xRandomOffset
   let yRandomCenter = yMin + yRandomOffset
 
+  // this effect runs once, when the component loads
   useEffect(() => {
+
     var map = new mapboxgl.Map({
       container: "map", // container id
       style: baseStyle, // stylesheet location
@@ -37,11 +39,16 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
       setTheMap(map);
     });
 
+    // when a new style loaders after the user switches styles
     map.on('style.load', () => {
       setLoading(false)
+
+      // load our mapillary video icon in
       map.loadImage(videoIcon, (error, image) => {
         if (error) throw error;
         map.addImage("video", image);
+
+        // set the Mapillary data
         svCoords && map.getSource("mapillary").setData({
           type: "FeatureCollection",
           // we'll make the map data here
@@ -59,9 +66,6 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
           ],
         });
       });
-    })
-
-    map.on('style.load', () => {
     })
 
     map.on('moveend', (e) => {
@@ -158,7 +162,7 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
         type: "FeatureCollection", features: []
       })
     }
-  }, [svCoords, svBearing]);
+  }, [svCoords, svBearing, loading]);
 
   useEffect(() => {
     if (theMap && showSv) {
@@ -167,7 +171,7 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
     if (theMap && !showSv) {
       theMap.setLayoutProperty("mapillary-location", "visibility", "none")
     }
-  }, [showSv])
+  }, [showSv, loading])
 
   useEffect(() => {
     if (theMap) {

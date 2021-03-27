@@ -22,17 +22,17 @@ const SiteHeader = ({ session, setSession, login, setLogin }) => {
             <span className="leading-tight text-base text-gray-500 font-semibold ml-2" onClick={() => setSession(null)}>
               <FontAwesomeIcon icon={faSignOutAlt} />
             </span>
-            <span className="leading-tight  text-sm text-gray-500 font-semibold">
+            <span className="leading-tight text-sm text-gray-500 font-semibold">
               logged in as: <b>{session.username}</b>
             </span>
           </div>
           :
           // Else, this div.
           <div className="w-100 flex flex-row-reverse ml-3 items-center" onClick={() => setLogin(true)}>
-            <span className="leading-tight text-base text-gray-500 font-semibold ml-2" >
+            <span className="leading-none text-base text-gray-500 font-semibold ml-2" >
               <FontAwesomeIcon icon={faSignInAlt} />
             </span>
-            <span className="leading-tight text-sm text-gray-500 font-semibold">
+            <span className="leading-none text-sm text-gray-500 font-semibold">
               Log in to ArcGIS Online
             </span>
           </div>
@@ -44,7 +44,7 @@ const SiteHeader = ({ session, setSession, login, setLogin }) => {
 
   if (login) {
     return (
-      <div className="absolute w-full h-full z-20 bg-gray-800 bg-opacity-90 flex justify-around">
+      <div className="absolute w-full h-3/4 z-20 bg-gray-800 bg-opacity-90 flex justify-around">
         <Login {...{ session, setSession, setLogin }} />
       </div>
     )

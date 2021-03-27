@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import layers from '../data/layers'
 
-let SERVER_ROOT = `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/`
-
 const FeatureDisplay = ({ attributes }) => {
     return (
         <div>
@@ -25,6 +23,7 @@ const SelectedFeature = ({ featureId, selectedLayer, setSelectedFeature }) => {
     let layer = layers[selectedLayer]
     let url = layer.endpoint
 
+    // TODO: use the esri arcgis library
     let params = {
         'where': `${layer.id_column}=${selectedLayer === 'parcels' ? `'${featureId}'` : featureId}`,
         'outFields': '*',
@@ -37,7 +36,7 @@ const SelectedFeature = ({ featureId, selectedLayer, setSelectedFeature }) => {
     }).join('&');
 
     useEffect(() => {
-        let fullUrl = SERVER_ROOT + url + `/query?` + queryString
+        let fullUrl = url + `/query?` + queryString
         fetch(fullUrl)
             .then(r => r.json())
             .then(d => {

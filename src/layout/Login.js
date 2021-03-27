@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { UserSession } from '@esri/arcgis-rest-auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faWindowClose } from '@fortawesome/free-solid-svg-icons';
+import { faExclamationTriangle, faSignInAlt, faWindowClose } from '@fortawesome/free-solid-svg-icons';
+import Button from '../components/Button'
 
 export const Login = ({ session, setSession, setLogin }) => {
 
   const [creds, setCreds] = useState({ user: '', pass: '' });
+  const [error, setError] = useState(null)
 
   return (
-    <section className="text-sm w-1/2 h-1/3 mt-12 p-6 bg-gray-100">
+    <section className="text-sm w-1/2 p-6 bg-gray-100 mt-12 h-96">
       <h2 className="text-base flex items-center justify-between">
         {session ? 
           `Logged in as ${session.username}` 
@@ -36,30 +38,36 @@ export const Login = ({ session, setSession, setLogin }) => {
               onChange={(e) => setCreds({ pass: e.target.value, user: creds.user })} />
           </label>
         </div>}
-      {session ?
-        <button
-          className='btn-enabled my-2'
-          onClick={() => setSession(null)}>
-          Log out
-        </button>
-        :
-        <button
-          className={creds.user !== '' && creds.pass !== '' ? 'btn-enabled my-1 text-sm' : 'btn-disabled my-1 text-sm'}
+      {error &&
+      <div className="px-8 py-4 my-8 bg-red-200 flex items-center justify-between">
+        <span className="">
+          <FontAwesomeIcon icon={faExclamationTriangle} className="mr-2" />
+         {error.response.error.message} ({error.response.error.details[0]})
+        </span>
+        <FontAwesomeIcon icon={faWindowClose} className="text-xl" onClick={() => setError(null)} />
+      </div>
+      }
+
+        <Button
+        className="px-8"
+          active={creds.user !== '' && creds.pass !== ''}
           onClick={() => {
             let userSession = new UserSession({
               username: creds.user,
               password: creds.pass
             });
-
             userSession.getToken(
               "https://detroitmi.maps.arcgis.com/arcgis/rest/sharing"
             ).then(d => {
+              console.log(d)
               setSession(userSession);
               setLogin(false)
-            });
-          }}>
-          Log in
-    </button>}
+            })
+            .catch(err => setError(err));
+          }} 
+          icon={faSignInAlt}
+          text='Log in'
+          />
     </section>
   );
 };

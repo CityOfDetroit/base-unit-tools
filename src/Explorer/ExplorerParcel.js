@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import AddressesHere from './AddressesHere'
 import BuildingsHere from './BuildingsHere';
 import ExplorerFeature from './ExplorerFeature';
+import layers from '../data/layers'
 
 const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => {
 
@@ -21,7 +22,8 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
     let [buildings, setBuildings] = useState([])
 
     useEffect(() => {
-        let url = `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/AddressPoints/FeatureServer/0/query?`
+        let url = layers.addresses.endpoint + `/query?`
+
         let params = {
             where: `parcel_id = '${attr.parcel_id}'`,
             outFields: `*`,
@@ -54,7 +56,9 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
     }, [attr.parcel_id])
     
     useEffect(() => {
-        let url = `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BuildingMetrics/FeatureServer/0/query?`
+        let url = layers.buildings.endpoint + `/query?`
+
+        // TODO: Replace with esri library
         let params = {
             where: `parcel_id = '${attr.parcel_id}'`,
             outFields: `*`,

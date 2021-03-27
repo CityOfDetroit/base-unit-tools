@@ -21,7 +21,7 @@ const ExplorerBuilding = ({ feature, clicked, setClicked, linked, setLinked }) =
   let [addresses, setAddresses] = useState([])
 
   useEffect(() => {
-    let url = `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/AddressPoints/FeatureServer/0/query?`
+    let url = layers.addresses.endpoint + `/query?`
     let params = {
       where: `bldg_id = ${attr.bldg_id}`,
       outFields: `*`,
