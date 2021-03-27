@@ -34,7 +34,7 @@ const Validator = () => {
         <section className="sidebar-section">
           <h4>Output</h4>
           {displayFields.map(f => (
-            <div className="bg-grey-200 flex items-center justify-start my-2">
+            <div key={f[1]} className="bg-grey-200 flex items-center justify-start my-2">
               <h4 className="w-1/3 text-sm font-normal">{f[1]}</h4>
               <pre className="text-sm">{results[f[0]]}</pre>
             </div>
@@ -43,7 +43,7 @@ const Validator = () => {
         <section className="p-2 mb-2 text-sm bg-gray-300">
           <h4 className="text-sm">Rules applied:</h4>
           {applied.map(a => (
-            <div className="bg-grey-200 flex items-center justify-start my-2 text-sm">
+            <div key={a.rule} className="bg-grey-200 flex items-center justify-start my-2 text-sm">
               <span className="w-2/3 text-sm text-gray-700">{a.rule}</span>
               <pre>{a.results[0].trim()}</pre>
             </div>

@@ -133,6 +133,12 @@ const StreetView = ({ feature, setSvBearing, setSvCoords, children }) => {
     mapillaryView.on("bearingchanged", (b) => {
       setSvBearing(b);
     });
+
+    const cleanup = () => {
+      mapillaryView.remove()
+    }
+
+    return cleanup;
   }, [setSvBearing, setSvCoords, setLoading]);
 
   useEffect(() => {
@@ -141,7 +147,6 @@ const StreetView = ({ feature, setSvBearing, setSvCoords, children }) => {
       let coords = featureToCentroidCoords(feature);
       mapillary.moveToKey(currentKey.properties.key).then((node) => {
         setBearing(node, mapillary, currentKey.geometry.coordinates, [coords.lng || coords.x, coords.lat || coords.y]);
-        setLoading(false)
       });
     }
   }, [currentKey, mapillary, feature]);
@@ -164,6 +169,7 @@ const StreetView = ({ feature, setSvBearing, setSvCoords, children }) => {
         let sorted = sequences.sort((a, b) => moment(a.properties.captured_at) - moment(b.properties.captured_at));
         setImageKeys(sorted);
         setCurrentKey(sorted[sorted.length - 1]);
+        setLoading(false)
       });
     }
   }, [feature, mapillary]);

@@ -224,12 +224,10 @@ a {
 
 .btn-disabled {
   @apply opacity-50;
-  @apply bg-blue-100;
 }
 
 .btn-enabled {
   @apply font-semibold;
-  @apply bg-blue-300;
 }
 
 #mly {
