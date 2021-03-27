@@ -10,8 +10,6 @@ const ExplorerAddress = ({ feature, clicked, setClicked, linked, setLinked }) =>
 
   let { attributes: attr } = feature;
 
-  console.log(attr)
-
   let attributes = {
     "Street Number": attr.street_number,
     "Street Prefix": attr.street_prefix,

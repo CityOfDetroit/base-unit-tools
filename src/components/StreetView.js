@@ -158,7 +158,6 @@ const StreetView = ({ feature, setSvBearing, setSvCoords, children }) => {
       mapillary.moveToKey(currentKey.properties.key).then((node) => {
         setBearing(node, mapillary, currentKey.geometry.coordinates, [coords.lng || coords.x, coords.lat || coords.y]);
         setLoading(false);
-        console.log('loaded')
       });
     }
   }, [currentKey, mapillary]);
@@ -166,7 +165,6 @@ const StreetView = ({ feature, setSvBearing, setSvCoords, children }) => {
   useEffect(() => {
     if (mapillary) {  
       setLoading(true);
-      console.log('loading...')
       setImageKeys(null);
       let coords = featureToCentroidCoords(feature);
       let defaultMarker = new Mapillary.MarkerComponent.SimpleMarker("default-id", { lat: coords.lat, lon: coords.lng }, markerStyle);

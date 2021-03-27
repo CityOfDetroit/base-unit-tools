@@ -8,8 +8,6 @@ import videoIcon from '../images/video.png'
 
 import layers from '../data/layers'
 
-console.log(baseStyle)
-
 const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, svBearing, showSatellite }) => {
   const [theMap, setTheMap] = useState(null);
 
@@ -116,7 +114,6 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
 
   useEffect(() => {
     if (theMap && linked && clicked.type && !loading) {
-      console.log(linked)
       let layer = layers[clicked.type]
       let others = Object.keys(layers).filter(l => l !== clicked.type && l !== 'units')
 
@@ -132,14 +129,12 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
         else {
           filter = ["in", layers[o].filter_id].concat(linked[o])
         }
-        console.log(filter)
         theMap.setFilter(layers[o].link, filter)
       })
     }
   }, [theMap, linked, loading])
 
   useEffect(() => {
-    console.log(svCoords, svBearing);
     theMap && showSv &&
       theMap.getSource("mapillary").setData({
         type: "FeatureCollection",
@@ -176,12 +171,10 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
   useEffect(() => {
     if (theMap) {
       if (showSatellite) {
-        console.log(`show ze satellite`)
         theMap.setStyle(satelliteStyle())
         setLoading(true)
       }
       else {
-        console.log(`do not show ze satellite`)
         theMap.setStyle(baseStyle)
         setLoading(true)
       }

@@ -32,7 +32,6 @@ const MailerMap = ({ geom, setGeom }) => {
     map.on("draw.create", e => {
       let geometry = Draw.getAll();
       setGeom(geometry);
-      console.log(geometry);
       if (geometry.features[0].geometry.type === 'Polygon') {
         map.fitBounds(bbox(geometry), { padding: 20, maxZoom: 17 });
       }
@@ -51,7 +50,6 @@ const MailerMap = ({ geom, setGeom }) => {
 
   useEffect(() => {
     if (theMap && theDraw && geom) {
-      console.log(geom);
       if (geom.features[0].geometry.type !== 'Point') {
         theMap.fitBounds(bbox(geom), { padding: 40, maxZoom: 17 });
       }

@@ -216,7 +216,7 @@ const IssueReporter = ({ session }) => {
                 onChange={(e) => setTarget({ ...target, type: e.target.value })}
               >
                 {Object.keys(layers).map(l => (
-                  <option value={l}>{layers[l].label}</option>
+                  <option value={l} key={l}>{layers[l].label}</option>
                 ))}
               </select>
 

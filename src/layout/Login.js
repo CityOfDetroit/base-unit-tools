@@ -59,7 +59,6 @@ export const Login = ({ session, setSession, setLogin }) => {
             userSession.getToken(
               "https://detroitmi.maps.arcgis.com/arcgis/rest/sharing"
             ).then(d => {
-              console.log(d)
               setSession(userSession);
               setLogin(false)
             })

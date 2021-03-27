@@ -16666,14 +16666,11 @@ export const satelliteStyle = () => {
   // or if they're a road line layer
   // lazy hack for invisible'ing all the layers which are in the way of the satellite
   satStyle.layers.slice(0,200).forEach((l, i) => {
-    console.log(l.id)
     if (l.type === 'fill') {
       satStyle.layers[i].layout['visibility'] = 'none'
-      console.log('off')
     }
     if (l.type === 'line' && l.id.indexOf("Road") === 0) {
       satStyle.layers[i].layout['visibility'] = 'none'
-      console.log('off')
     }
   })
 
