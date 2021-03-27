@@ -19,17 +19,16 @@ const ExplorerAddress = ({ feature, clicked, setClicked, linked, setLinked }) =>
     "Unit Number": attr.unit_number
   }
 
-
   useEffect(() => {
     if (feature) {
       setLinked({
         addresses: [],
-        parcels: [attr.parcel_id],
-        buildings: [attr.bldg_id],
-        streets: [attr.street_id],
+        parcels: [feature.attributes.parcel_id],
+        buildings: [feature.attributes.bldg_id],
+        streets: [feature.attributes.street_id],
       })
     }
-  }, [feature])
+  }, [feature, setLinked])
 
   return (
     <>

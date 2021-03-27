@@ -1,17 +1,15 @@
-import React, { useState, useEffect } from 'react';
-
-import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css'
-import area from '@turf/area'
-
+import { getLayer, queryFeatures } from '@esri/arcgis-rest-feature-layer';
 import { geojsonToArcGIS } from '@esri/arcgis-to-geojson-utils';
-import { getLayer, queryFeatures } from '@esri/arcgis-rest-feature-layer'
-
-import { faDownload, faTrash } from '@fortawesome/free-solid-svg-icons';
-import SiteSidebar from '../layout/SiteSidebar'
+import { faDownload, faLock, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
+import area from '@turf/area';
+import React, { useEffect, useState } from 'react';
 import Button from '../components/Button';
+import SiteSidebar from '../layout/SiteSidebar';
 import MailerBuffer from './MailerBuffer';
 import MailerLayerSelector from './MailerLayerSelector';
-import MailerMap  from './MailerMap';
+import MailerMap from './MailerMap';
 
 // object to track filters
 const filters = {
@@ -29,7 +27,7 @@ const Mailer = ({ session }) => {
   // store the selection area object IDs and the actual results, respectively.
   const [resultIds, setResultIds] = useState(null)
   const [addresses, setAddresses] = useState([])
-  
+
   // mailing list layer.
   // theoretically we can put any layer here to make a generalized selection tool.
   let url = `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/AddrPoints_USPS_Jan2021/FeatureServer/0`
@@ -37,7 +35,7 @@ const Mailer = ({ session }) => {
   // this effect runs if the user logs in or out.
   // it tests access to the mailing list layer
   useEffect(() => {
-    if(!session) {
+    if (!session) {
       setAccess(false)
     }
     getLayer({
@@ -45,8 +43,10 @@ const Mailer = ({ session }) => {
       authentication: session
     }).then(d => {
       setAccess(d)
+    }).catch(err => {
+      setAccess(false)
     })
-  }, [session])
+  }, [session, url])
 
   // this effect runs when the geom changes (or if there's a change in access)
   // it gets the objectids for all the features in the selection -- 
@@ -70,7 +70,7 @@ const Mailer = ({ session }) => {
         setResultIds(d)
       })
     }
-  }, [geom, access])
+  }, [geom, access, session, url])
 
 
   // this function is what runs when we click "Download CSV"
@@ -119,24 +119,32 @@ const Mailer = ({ session }) => {
 
   return (
     <>
-      
+
       <SiteSidebar title="Mailer">
 
         {/* Show a warning if the user doesn't have access to the layer. */}
-        {!access && <section className="sidebar-section warning">
-          You don't currently have access to this tool, so it may not work correctly.
+        {!access && <section className="sidebar-section caution flex items-center">
+          <FontAwesomeIcon icon={faLock} className="text-xl ml-2 mr-4" />
+          <div>
+            <p>
+              You don't currently have access to this tool, so it may not work correctly.
+            </p>
+            <p>
+              Please log in, or if you are logged in, <a href="https://app.smartsheet.com/b/form/6919c51a844448e2a6811f04a6267292">contact the team</a> for access.
+            </p>
+          </div>
         </section>}
 
         {/* Boundary picker */}
-        <MailerLayerSelector {...{geom, setGeom}} />
+        <MailerLayerSelector {...{ geom, setGeom }} />
 
         {/* If we have a shape, display the Buffer tool */}
-        {geom && <MailerBuffer {...{geom, setGeom}}/>}
+        {geom && <MailerBuffer {...{ geom, setGeom }} />}
 
         {/* If we have a shape, display information about the selection */}
-        {geom && 
+        {geom &&
           <section className='sidebar-section'>
-            <h2>Current selection:</h2> 
+            <h2>Current selection:</h2>
             <ul className="list-disc list-inside">
               <li>
                 {(area(geom) * 0.000000386102).toFixed(3)} square miles
@@ -146,14 +154,14 @@ const Mailer = ({ session }) => {
               </li>}
             </ul>
             <h3 className="text-sm mt-3">Filter addresses by:</h3>
-                {
-                  Object.keys(filters).map(f => (
-                    <div className="p-1">
-                    <input type="checkbox" name={f} checked={false}></input>
-                    <label for={f} className="ml-2">{f}</label>
-                    </div>
-                  ))
-                }
+            {
+              Object.keys(filters).map(f => (
+                <div className="p-1" key={f}>
+                  <input type="checkbox" name={f} checked={false} readOnly></input>
+                  <label htmlFor={f} className="ml-2">{f}</label>
+                </div>
+              ))
+            }
             <div className="flex flex-row-reverse">
               <Button icon={faTrash} onClick={() => setGeom(null)} text="Delete current selection" />
             </div>
@@ -161,17 +169,17 @@ const Mailer = ({ session }) => {
         }
 
         {/* If there's a shape and access to the layer */}
-        {geom && access && 
+        {geom && access &&
           <section className="sidebar-section">
 
             {/* If we're waiting on result IDs, show a Loading message */}
             {!resultIds && geom && <h1>Loading...</h1>}
-            
+
             {/* If we have result IDs, show the export portion. */}
-            {resultIds && 
+            {resultIds &&
               <>
-              <h2>Export mailing addresses to CSV</h2>
-              {/* <h3 className="text-sm mt-3">Include these attributes for each address:</h3>
+                <h2>Export mailing addresses to CSV</h2>
+                {/* <h3 className="text-sm mt-3">Include these attributes for each address:</h3>
               {
                 Object.keys(options).map(o => (
                   <div className="p-1">
@@ -180,9 +188,9 @@ const Mailer = ({ session }) => {
                   </div>
                 ))
               } */}
-              <div className="flex flex-row-reverse">
-              <Button icon={faDownload} onClick={() => fetchAddresses()} text="Download .csv" />
-              </div>
+                <div className="flex flex-row-reverse">
+                  <Button icon={faDownload} onClick={() => fetchAddresses()} text="Download .csv" />
+                </div>
               </>
             }
           </section>

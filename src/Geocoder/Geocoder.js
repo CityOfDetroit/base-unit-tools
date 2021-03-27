@@ -1,4 +1,4 @@
-import { faDownload, faWrench } from '@fortawesome/free-solid-svg-icons';
+import { faBan, faCheckSquare, faDownload, faWrench } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
 import { CSVLink } from 'react-csv';
@@ -112,6 +112,7 @@ const Geocoder = () => {
             disabled={addresses.length === 0}
             onClick={() => { addresses.length > 0 && setPayload(addresses) }}
             text={addresses.length > 0 ? 'Go!' : 'No addresses'}
+            icon={addresses.length > 0 ? faCheckSquare : faBan}
             />
         </section>
         {formattedData.length > 0 && <section className="sidebar-section flex justify-between">

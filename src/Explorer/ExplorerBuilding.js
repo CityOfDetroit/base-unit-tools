@@ -1,15 +1,13 @@
-import { faArrowAltCircleRight } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
+import types from '../data/building_types.json';
+import layers from '../data/layers';
 import AddressesHere from './AddressesHere';
 import ExplorerFeature from './ExplorerFeature';
-import types from '../data/building_types.json'
 import IdBadge from './IdBadge';
-import layers from '../data/layers'
 
 const ExplorerBuilding = ({ feature, clicked, setClicked, linked, setLinked }) => {
 
-  let { geometry: geom, attributes: attr } = feature;
+  let { attributes: attr } = feature;
 
   let attributes = {
     "Use type": attr.use_category,
@@ -56,7 +54,7 @@ const ExplorerBuilding = ({ feature, clicked, setClicked, linked, setLinked }) =
         }
       })
 
-  }, [attr.bldg_id])
+  }, [attr.bldg_id, setLinked])
 
   return (
     <>

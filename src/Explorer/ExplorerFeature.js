@@ -3,7 +3,7 @@ import IdBadge from './IdBadge'
 
 const ExplorerFeature = ({ attr, attributes, clicked }) => {
 
-  let hasSource = Object.keys(attr).indexOf('geo_source') > -1
+  // let hasSource = Object.keys(attr).indexOf('geo_source') > -1
 
   let layer = layers[clicked.type]
 

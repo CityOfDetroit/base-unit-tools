@@ -22,7 +22,7 @@ function App() {
   return (
     <Router basename='/base-unit-tools'>
       <Analytics id={trackingId} debug>
-        <SiteWrapper {...{ session, setSession }} title="Explorer">
+        <SiteWrapper {...{ session, setSession }}>
           <Switch>
             <Route path="/explorer">
               <Explorer />
@@ -43,7 +43,7 @@ function App() {
               <Geocoder />
             </Route>
             <Route path="/">
-              <BaseUnitTools {...{ session, setSession }} />
+              <BaseUnitTools />
             </Route>
           </Switch>
         </SiteWrapper>

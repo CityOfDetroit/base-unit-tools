@@ -1,15 +1,12 @@
-import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
 import { Link } from 'react-router-dom';
-
-import SiteSidebar from '../layout/SiteSidebar';
 import { apps } from '../data/apps';
-import Login from '../layout/Login';
+import SiteSidebar from '../layout/SiteSidebar';
 
 let toolGridStyle = { display: 'grid', gridTemplateColumns: `repeat(auto-fit, minmax(300px, 1fr))`, gridAutoRows: 150, gridGap: '.75rem' }
 
-const BaseUnitTools = ({ session, setSession }) => {
-
+const BaseUnitTools = () => {
   return (
     <>
       <SiteSidebar title="Home">
@@ -25,28 +22,21 @@ const BaseUnitTools = ({ session, setSession }) => {
       </SiteSidebar>
       <main>
         <div style={toolGridStyle}>
-          {Object.values(apps).slice(1,).map(a => {
-
-            if (session || (!session && !a.private)) {
-
-              return (
-                <div className="bg-gray-200 p-4" key={a.name}>
-                  <div className="flex items-center">
-                    <FontAwesomeIcon icon={a.icon} size="2x" className="mr-3" />
-                    <Link to={`.${a.url}`}>
-                      <p className="text-xl font-bold">{a.name}</p>
-                    </Link>
-                  </div>
-                  <p className="my-4">{a.description}</p>
-                  {/* <h4 className="text-sm">Common scenarios</h4>
-                  <ul className="list-disc ml-4">
-                    {a.questions.map(q => <li className="text-sm" key={q}>"{q}"</li>)}
-                  </ul> */}
-                </div>
-              )
-            }
-            else { return; }
-          })}
+          {Object.values(apps).slice(1).map(a => (
+            <div className="bg-gray-200 p-4" key={a.name}>
+              <div className="flex items-center">
+                <FontAwesomeIcon icon={a.icon} size="2x" className="mr-3" />
+                <Link to={`.${a.url}`}>
+                  <p className="text-xl font-bold">{a.name}</p>
+                </Link>
+              </div>
+              <p className="my-4">{a.description}</p>
+              {/* <h4 className="text-sm">Common scenarios</h4>
+              <ul className="list-disc ml-4">
+                {a.questions.map(q => <li className="text-sm" key={q}>"{q}"</li>)}
+              </ul> */}
+            </div>
+          ))}
         </div>
       </main>
     </>

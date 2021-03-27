@@ -66,16 +66,8 @@ const IssueReporter = ({ session }) => {
     id: queryId
   })
 
-  // detroit bbox
-  let [xMin, yMin, xMax, yMax] = [-83.237803, 42.355192, -82.910451, 42.45023];
-  let xRandomOffset = (xMax - xMin) * Math.random()
-  let yRandomOffset = (yMax - yMin) * Math.random()
-  let xRandomCenter = xMin + xRandomOffset
-  let yRandomCenter = yMin + yRandomOffset
-
   let [targetType, setTargetType] = useState(target.type ? 'base_unit' : 'address')
-  let [returned, setReturned] = useState(false)
-  let [center, setCenter] = useState({ lng: xRandomCenter, lat: yRandomCenter })
+  // let [returned, setReturned] = useState(false)
   let [formText, setFormText] = useState('')
 
   let [response, setResponse] = useState({
@@ -128,12 +120,14 @@ const IssueReporter = ({ session }) => {
           'resultRecordCount': 1,
           'outSR': 4326,
           'f': 'pjson',
+          'returnCentroid': true
         }
         let queryString = Object.keys(params).map((key) => {
           return encodeURIComponent(key) + '=' + encodeURIComponent(params[key])
         }).join('&');
 
         fullUrl = url + `/query?` + queryString
+        console.log(fullUrl)
       }
       else {
         let params = {
@@ -142,6 +136,7 @@ const IssueReporter = ({ session }) => {
           'resultRecordCount': 1,
           'outSR': 4326,
           'f': 'pjson',
+          'returnCentroid': true
         }
         let queryString = Object.keys(params).map((key) => {
           return encodeURIComponent(key) + '=' + encodeURIComponent(params[key])
@@ -166,9 +161,12 @@ const IssueReporter = ({ session }) => {
       fetchFeature(target, setFeature)
       setAddResponse(null)
     }
-  }, [targetType])
+  }, [targetType, value, target])
 
-  return (
+  if(feature) {
+    console.log(feature)
+  }
+    return (
     <>
       <SiteSidebar title="Issue Reporter">
         <section className="sidebar-section">
@@ -188,7 +186,7 @@ const IssueReporter = ({ session }) => {
               name="address"
               disabled={targetType === 'base_unit'}
               value={value}
-              onChange={(e) => setValue(e.target.value) && setReturned(false)}
+              onChange={(e) => setValue(e.target.value)}
               onKeyPress={(e) => e.code === 'Enter' && geocode(value, setResponse)}
             />
             <Button
@@ -226,7 +224,7 @@ const IssueReporter = ({ session }) => {
                 name="address"
                 value={target.id ? target.id : ''}
                 disabled={targetType === 'address'}
-                onChange={(e) => setTarget({ ...target, id: e.target.value }) && setReturned(false)}
+                onChange={(e) => setTarget({ ...target, id: e.target.value })}
                 onKeyPress={(e) => e.code === 'Enter' && fetchFeature(target, setFeature)}
               />
             </div>
@@ -263,8 +261,8 @@ const IssueReporter = ({ session }) => {
                   session: session,
                   formText: formText,
                   address: targetType === 'address' ? value : null,
-                  x: center.lng,
-                  y: center.lat,
+                  x: feature.centroid.x,
+                  y: feature.centroid.y,
                   targetType: targetType === 'base_unit' ? target.type.replaceAll(/[es]$/g, '') : null,
                   targetId: targetType === 'base_unit' ? target.id : null,
                   setAddResponse: setAddResponse
@@ -282,7 +280,7 @@ const IssueReporter = ({ session }) => {
         }
       </SiteSidebar>
       <main>
-        {(response.geocoder || feature) && <IssueReporterMap {...{ response, target, feature, center, setCenter }} />}
+        {(response.geocoder || feature) && <IssueReporterMap {...{ response, target, feature }} />}
       </main>
     </>
   )

@@ -10,18 +10,17 @@ import layers from '../data/layers'
 
 const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, svBearing, showSatellite }) => {
   const [theMap, setTheMap] = useState(null);
-
   const [loading, setLoading] = useState(false)
-
-  // detroit bbox
-  let [xMin, yMin, xMax, yMax] = [-83.237803, 42.355192, -82.910451, 42.45023];
-  let xRandomOffset = (xMax - xMin) * Math.random()
-  let yRandomOffset = (yMax - yMin) * Math.random()
-  let xRandomCenter = xMin + xRandomOffset
-  let yRandomCenter = yMin + yRandomOffset
 
   // this effect runs once, when the component loads
   useEffect(() => {
+
+    // detroit bbox
+    let [xMin, yMin, xMax, yMax] = [-83.237803, 42.355192, -82.910451, 42.45023];
+    let xRandomOffset = (xMax - xMin) * Math.random()
+    let yRandomOffset = (yMax - yMin) * Math.random()
+    let xRandomCenter = xMin + xRandomOffset
+    let yRandomCenter = yMin + yRandomOffset
 
     var map = new mapboxgl.Map({
       container: "map", // container id
@@ -47,21 +46,10 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
         map.addImage("video", image);
 
         // set the Mapillary data
-        svCoords && map.getSource("mapillary").setData({
+        map.getSource("mapillary").setData({
           type: "FeatureCollection",
           // we'll make the map data here
-          features: [
-            {
-              type: "Feature",
-              geometry: {
-                type: "Point",
-                coordinates: [svCoords.lon, svCoords.lat],
-              },
-              properties: {
-                bearing: svBearing - 90,
-              },
-            },
-          ],
+          features: [],
         });
       });
     })
@@ -85,7 +73,7 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
       }
     })
 
-  }, []);
+  }, [setClicked]);
 
   useEffect(() => {
     if (theMap && clicked.type && clicked.id && !loading) {
@@ -132,10 +120,10 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
         theMap.setFilter(layers[o].link, filter)
       })
     }
-  }, [theMap, linked, loading])
+  }, [theMap, linked, loading, clicked.type])
 
   useEffect(() => {
-    theMap && showSv &&
+    theMap && showSv && svCoords &&
       theMap.getSource("mapillary").setData({
         type: "FeatureCollection",
         // we'll make the map data here
@@ -157,7 +145,7 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
         type: "FeatureCollection", features: []
       })
     }
-  }, [svCoords, svBearing, loading]);
+  }, [svCoords, svBearing, loading, theMap, showSv]);
 
   useEffect(() => {
     if (theMap && showSv) {
@@ -166,7 +154,7 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
     if (theMap && !showSv) {
       theMap.setLayoutProperty("mapillary-location", "visibility", "none")
     }
-  }, [showSv, loading])
+  }, [showSv, loading, theMap])
 
   useEffect(() => {
     if (theMap) {

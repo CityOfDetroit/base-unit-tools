@@ -111,7 +111,7 @@ const Explorer = () => {
           setFeature(d.features[0])
         })
     }
-  }, [clicked])
+  }, [clicked, history, options.streetView])
 
   return (
     <>

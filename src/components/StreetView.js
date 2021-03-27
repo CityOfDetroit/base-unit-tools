@@ -109,7 +109,6 @@ const StreetView = ({ feature, setSvBearing, setSvCoords, children }) => {
 
   // show full streetview on click of streetview button
   useEffect(() => {
-
     let mapillaryView = new Mapillary.Viewer({
       apiClient: clientid,
       container: 'mly',
@@ -129,27 +128,13 @@ const StreetView = ({ feature, setSvBearing, setSvCoords, children }) => {
 
     mapillaryView.on("nodechanged", (n) => {
       setSvCoords(n.latLon);
+      setLoading(false);
     });
 
     mapillaryView.on("bearingchanged", (b) => {
       setSvBearing(b);
     });
-
-    // if (coords !== currentCoords) {
-    //   setCurrentCoords(coords);
-    fetchImageKey(featureToCentroidCoords(feature)).then((d) => {
-      let sequences = [];
-      d.features.forEach((ik) => {
-        if (sequences.map((s) => s.properties.captured_at.slice(0, 10)).indexOf(ik.properties.captured_at.slice(0, 10)) === -1) {
-          sequences.push(ik);
-        }
-      });
-      let sorted = sequences.sort((a, b) => moment(a.properties.captured_at) - moment(b.properties.captured_at));
-      setImageKeys(sorted);
-      setCurrentKey(sorted[sorted.length - 1]);
-    });
-    // }
-  }, []);
+  }, [setSvBearing, setSvCoords, setLoading]);
 
   useEffect(() => {
     setLoading(true);
@@ -157,10 +142,10 @@ const StreetView = ({ feature, setSvBearing, setSvCoords, children }) => {
       let coords = featureToCentroidCoords(feature);
       mapillary.moveToKey(currentKey.properties.key).then((node) => {
         setBearing(node, mapillary, currentKey.geometry.coordinates, [coords.lng || coords.x, coords.lat || coords.y]);
-        setLoading(false);
+        setLoading(false)
       });
     }
-  }, [currentKey, mapillary]);
+  }, [currentKey, mapillary, feature]);
 
   useEffect(() => {
     if (mapillary) {  

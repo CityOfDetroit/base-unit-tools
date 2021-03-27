@@ -56,7 +56,7 @@ const MailerLayerSelector = ({ geom, setGeom }) => {
     <select className="p-2 m-2 text-xs w-1/3" onChange={(e) => {setCurrentLayer(e.target.value); setLayerFeatures([])}} value={currentLayer} >
       <option value=''>Please choose a layer</option>
       {Object.keys(presets).map(l => (
-        <option value={l}>{presets[l].name}</option>
+        <option value={l} key={l}>{presets[l].name}</option>
       ))}
     </select>
 
@@ -67,7 +67,7 @@ const MailerLayerSelector = ({ geom, setGeom }) => {
     }}>
       <option value=''>Please choose a {presets[currentLayer].singular}</option>
       {layerFeatures.map(ft => (
-        <option value={ft.id}>{ft.properties[presets[currentLayer].pickColumn].slice(0,40)}</option>
+        <option value={ft.id} key={ft.id}>{ft.properties[presets[currentLayer].pickColumn].slice(0,40)}</option>
       ))}
     </select>}
 

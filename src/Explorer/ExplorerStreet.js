@@ -4,16 +4,13 @@ import ExplorerFeature from './ExplorerFeature';
 
 const ExplorerStreet = ({ feature, clicked, setClicked, linked, setLinked }) => {
 
-    let { geometry: geom, attributes: attr } = feature;
+    let { attributes: attr } = feature;
 
     let attributes = {
         "Street direction": attr.street_prefix,
         "Street name": attr.street_name,
         "Street type": attr.street_type,
         "Length of segment": attr.segment_length ? `${attr.segment_length.toFixed(0)} ft`: `?`
-    }
-
-    let parcelAttributes = {
     }
 
     let [addresses, setAddresses] = useState([])
@@ -54,7 +51,7 @@ const ExplorerStreet = ({ feature, clicked, setClicked, linked, setLinked }) => 
                 }
             })
 
-    }, [attr.objectid_1])
+    }, [attr.objectid_1, setLinked])
 
     return (
         <>

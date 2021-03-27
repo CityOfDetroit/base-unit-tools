@@ -1,9 +1,8 @@
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Button from '../components/Button'
-
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import Button from '../components/Button';
 import { geocoders } from '../data/geocoders';
+
 
 // we call this function when we actually want to geocode the user input
 const geocode = (value, setClicked, setFound) => {

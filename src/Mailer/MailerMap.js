@@ -46,7 +46,7 @@ const MailerMap = ({ geom, setGeom }) => {
         Draw.delete(Draw.getAll().features[0].id);
       }
     });
-  }, []);
+  }, [setGeom]);
 
   useEffect(() => {
     if (theMap && theDraw && geom) {
@@ -57,9 +57,11 @@ const MailerMap = ({ geom, setGeom }) => {
       theDraw.changeMode("simple_select");
     }
     if (theMap && theDraw && !geom) {
-      theDraw.delete(theDraw.getAll().features[0].id);
+      if(theDraw.getAll().features.length > 0) {
+        theDraw.delete(theDraw.getAll().features[0].id);
+      }
     }
-  }, [geom]);
+  }, [geom, theDraw, theMap]);
 
   return (
     <div id="map" className="explorer-map" />

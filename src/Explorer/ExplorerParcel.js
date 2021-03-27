@@ -1,9 +1,9 @@
 
 import React, { useEffect, useState } from 'react';
-import AddressesHere from './AddressesHere'
+import layers from '../data/layers';
+import AddressesHere from './AddressesHere';
 import BuildingsHere from './BuildingsHere';
 import ExplorerFeature from './ExplorerFeature';
-import layers from '../data/layers'
 
 const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => {
 
@@ -13,9 +13,6 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
         "Parcel address": attr.assessor_address,
         "Assessor's property class": attr.propclassdesc,
         "Taxable status": attr.taxstatus
-    }
-
-    let parcelAttributes = {
     }
 
     let [addresses, setAddresses] = useState([])
@@ -53,7 +50,7 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
                 }
             })
 
-    }, [attr.parcel_id])
+    }, [attr.parcel_id, setLinked])
     
     useEffect(() => {
         let url = layers.buildings.endpoint + `/query?`

@@ -1,4 +1,4 @@
-import { faAtlas, faCheckSquare, faHome, faMailBulk, faPlusCircle, faTasks, faWrench } from '@fortawesome/free-solid-svg-icons';
+import { faAtlas, faCheckSquare, faHome, faMailBulk, faTasks, faWrench } from '@fortawesome/free-solid-svg-icons';
 
 export const apps = {
     '/': {

@@ -41,7 +41,7 @@ const MailerBuffer = ({ geom, setGeom }) => {
         >
 
         {Object.keys(units).map(u => (
-          <option value={u}>{u}</option>
+          <option value={u} key={u}>{u}</option>
           ))}
 
       </select>
