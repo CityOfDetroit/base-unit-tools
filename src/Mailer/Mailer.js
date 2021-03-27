@@ -58,6 +58,7 @@ const Mailer = ({ session }) => {
         httpMethod: "POST",
         authentication: session
       }).then(d => {
+        console.log(d.objectIds[0])
         setResultIds(d)
       })
     }
@@ -65,29 +66,33 @@ const Mailer = ({ session }) => {
 
 
   const fetchAddresses = () => {
-    let addresses = []
     const chunkSize = 500
     let breakpoints = resultIds.objectIds.filter((oid, i) => i % chunkSize === 0)
     breakpoints.push(resultIds.objectIds.slice(-1,)[0])
-    breakpoints.forEach((b, i) => {
-      if(i > 0) {
-        queryFeatures({
-          url: url,
-          orderByFields: "OBJECTID",
-          where: `OBJECTID between ${i === 1 ? breakpoints[i-1] : (breakpoints[i-1] + 1)} and ${b}`,
-          geometry: geojsonToArcGIS(geom)[0].geometry,
-          geometryType: "esriGeometryPolygon",
-          spatialRel: "esriSpatialRelIntersects",
-          httpMethod: "POST",
-          resultRecordCount: chunkSize,
-          authentication: session
-        }).then(d => {
-          addresses = addresses.concat(d.features)
-        }
-        )
+    let promises = breakpoints.slice(1).map((b, i) => {
+
+      let params = {
+        url: url,
+        orderByFields: "OBJECTID",
+        where: `OBJECTID between ${i === 0 ? (breakpoints[0] - 1) : (breakpoints[i] + 1)} and ${b}`,
+        geometry: geojsonToArcGIS(geom)[0].geometry,
+        geometryType: "esriGeometryPolygon",
+        spatialRel: "esriSpatialRelIntersects",
+        httpMethod: "POST",
+        resultRecordCount: chunkSize,
+        authentication: session
       }
+      console.log(params)
+      return queryFeatures(params)
     })
-    console.log(addresses)
+    Promise.all(promises)
+      .then(resps => {
+        let allAddresses = []
+        resps.forEach(r => {
+          allAddresses = allAddresses.concat(r.features)
+        })
+        console.log(allAddresses)
+      })
   }
 
   return (
