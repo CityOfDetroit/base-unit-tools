@@ -1,4 +1,4 @@
-import layers from '../data/layers.json'
+import layers from '../data/layers'
 import _ from 'lodash';
 
 export const baseStyle = {

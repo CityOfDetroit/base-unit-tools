@@ -1,5 +1,5 @@
 
-import layers from '../data/layers.json'
+import layers from '../data/layers'
 import IdBadge from '../Explorer/IdBadge';
 
 const IssueReporterExtantAddress = ({ response }) => {

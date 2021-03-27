@@ -1,12 +1,10 @@
 
-import React, { useEffect } from 'react';
-
+import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowAltCircleRight, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
-
+import React, { useEffect } from 'react';
+import layers from '../data/layers';
 import ExplorerFeature from './ExplorerFeature';
-import IdBadge from './IdBadge'
-import layers from '../data/layers.json'
+import IdBadge from './IdBadge';
 
 const ExplorerAddress = ({ feature, clicked, setClicked, linked, setLinked }) => {
 
@@ -25,7 +23,7 @@ const ExplorerAddress = ({ feature, clicked, setClicked, linked, setLinked }) =>
 
 
   useEffect(() => {
-    if(feature) {
+    if (feature) {
       setLinked({
         addresses: [],
         parcels: [attr.parcel_id],

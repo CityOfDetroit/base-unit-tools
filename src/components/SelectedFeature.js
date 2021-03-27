@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import layers from '../data/layers.json'
+import layers from '../data/layers'
 
 let SERVER_ROOT = `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/`
 

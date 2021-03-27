@@ -5,7 +5,7 @@ import centroid from '@turf/centroid';
 import IdBadge from '../Explorer/IdBadge';
 
 import { baseStyle } from '../styles/mapstyle'
-import layers from '../data/layers.json'
+import layers from '../data/layers'
 
 const IssueReporterMap = ({ response, target, feature, center, setCenter }) => {
 

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useHistory, useLocation } from "react-router-dom";
 import Button from '../components/Button';
 import StreetView from '../components/StreetView';
-import layers from '../data/layers.json';
+import layers from '../data/layers';
 import SiteSidebar from '../layout/SiteSidebar';
 import ExplorerAddress from './ExplorerAddress';
 import ExplorerBuilding from './ExplorerBuilding';
@@ -77,7 +77,6 @@ const Explorer = () => {
       let layer = layers[clicked.type]
       let url = layer.endpoint
       let fullUrl;
-      let SERVER_ROOT = `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/`
       if (clicked.type === 'parcels') {
         let params = {
           'where': `parcel_id='${clicked.id}'`,
@@ -90,7 +89,7 @@ const Explorer = () => {
           return encodeURIComponent(key) + '=' + encodeURIComponent(params[key])
         }).join('&');
 
-        fullUrl = SERVER_ROOT + url + `/query?` + queryString
+        fullUrl = url + `/query?` + queryString
       }
       else {
         let params = {
@@ -103,7 +102,7 @@ const Explorer = () => {
         let queryString = Object.keys(params).map((key) => {
           return encodeURIComponent(key) + '=' + encodeURIComponent(params[key])
         }).join('&');
-        fullUrl = SERVER_ROOT + url + `/query?` + queryString
+        fullUrl = url + `/query?` + queryString
       }
 
       // TODO ... and then our function would return the fullUrl here.
@@ -126,18 +125,21 @@ const Explorer = () => {
         {/* Options area */}
         <section className="sidebar-section">   
           <h2>Map options</h2>       
-          <div className="mt-2 flex">
+          <div className="mt-1 flex">
             <Button
               onClick={() => setOptions({ ...options, streetView: !options.streetView })}
               icon={faStreetView}
               text="Street view"
               active={options.streetView}
+              className="mr-2"
+              small
               />
             <Button
               onClick={() => setOptions({ ...options, satellite: !options.satellite })}
               icon={faSatellite}
               text="Satellite imagery"
               active={options.satellite}
+              small
               />
           </div>
         </section>

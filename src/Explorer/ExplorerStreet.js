@@ -21,7 +21,7 @@ const ExplorerStreet = ({ feature, clicked, setClicked, linked, setLinked }) => 
     useEffect(() => {
         let url = `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/AddressPoints/FeatureServer/0/query?`
         let params = {
-            where: `street_id = ${attr.objectid}`,
+            where: `street_id = ${attr.objectid_1}`,
             outFields: `*`,
             outSR: 4326,
             f: `pjson`
@@ -54,7 +54,7 @@ const ExplorerStreet = ({ feature, clicked, setClicked, linked, setLinked }) => 
                 }
             })
 
-    }, [attr.objectid])
+    }, [attr.objectid_1])
 
     return (
         <>

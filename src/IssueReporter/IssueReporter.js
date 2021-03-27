@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from "react-router-dom";
 import { geocoders } from '../data/geocoders';
-import layers from '../data/layers.json';
+import layers from '../data/layers';
 import IdBadge from '../Explorer/IdBadge';
 import SiteSidebar from '../layout/SiteSidebar';
 import IssueReporterExtantAddress from './IssueReporterExtantAddress';

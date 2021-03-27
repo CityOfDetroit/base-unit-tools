@@ -218,11 +218,6 @@ a {
     sans-serif;
 }
 
-button {
-  @apply py-2;
-  @apply px-4;
-}
-
 .btn-disabled {
   @apply opacity-50;
   @apply bg-blue-100;

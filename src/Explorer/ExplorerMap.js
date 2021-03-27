@@ -6,7 +6,7 @@ import centroid from '@turf/centroid';
 import { baseStyle, satelliteStyle } from '../styles/mapstyle'
 import videoIcon from '../images/video.png'
 
-import layers from '../data/layers.json'
+import layers from '../data/layers'
 
 console.log(baseStyle)
 
@@ -126,7 +126,7 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
           filter = ["==", layers[o].filter_id, ""]
         }
         else {
-          filter = ["in", layers[o].filter_id].concat(linked[o]) 
+          filter = ["in", layers[o].filter_id].concat(linked[o])
         }
         console.log(filter)
         theMap.setFilter(layers[o].link, filter)
@@ -161,17 +161,17 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
   }, [svCoords, svBearing]);
 
   useEffect(() => {
-    if(theMap && showSv) {
+    if (theMap && showSv) {
       theMap.setLayoutProperty("mapillary-location", "visibility", "visible")
     }
-    if(theMap && !showSv) {
+    if (theMap && !showSv) {
       theMap.setLayoutProperty("mapillary-location", "visibility", "none")
     }
   }, [showSv])
 
   useEffect(() => {
-    if(theMap) {
-      if(showSatellite) {
+    if (theMap) {
+      if (showSatellite) {
         console.log(`show ze satellite`)
         theMap.setStyle(satelliteStyle())
         setLoading(true)

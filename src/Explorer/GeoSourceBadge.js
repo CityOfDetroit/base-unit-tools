@@ -1,5 +1,5 @@
 
-import layers from '../data/layers.json';
+import layers from '../data/layers';
 
 const GeoSourceBadge = ({ layer }) => {
 
