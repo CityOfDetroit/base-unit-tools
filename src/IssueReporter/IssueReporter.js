@@ -1,8 +1,8 @@
 import { addFeatures } from '@esri/arcgis-rest-feature-layer';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch, faWrench } from '@fortawesome/free-solid-svg-icons';
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation } from "react-router-dom";
+import Button from '../components/Button';
 import { geocoders } from '../data/geocoders';
 import layers from '../data/layers';
 import IdBadge from '../Explorer/IdBadge';
@@ -14,17 +14,17 @@ function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
 
-const addFeature = ({session, formText, address, x, y, targetType, targetId, setAddResponse}) => {
+const addFeature = ({ session, formText, address, x, y, targetType, targetId, setAddResponse }) => {
 
   addFeatures({
     url: "https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/address_issues/FeatureServer/0",
     features: [{
       geometry: { x: x, y: y, spatialReference: { wkid: 4326 } },
-      attributes: { 
+      attributes: {
         address_string: address,
         target_unit: targetType,
         target_id: targetId ? targetId.toString() : null,
-        notes: formText 
+        notes: formText
       }
     }],
     authentication: session ? session : null
@@ -37,16 +37,16 @@ const IssueReporterFeature = ({ attr, clicked }) => {
   let layer = layers[clicked.type]
 
   return (
-      <section className='sidebar-section feature' style={{borderLeft: `8px solid ${layer.color}`}}>
-          <div className="flex items-center justify-between text-lg">
-              <h2>{layer.label}</h2>
-              <div className="flex items-center">
-              {/* {hasSource && <span className="font-semibold text-gray-500 bg-gray-300 py-1 px-2 mx-3 text-sm">{attr.geo_source}</span>} */}
-              <IdBadge id={attr[layer.id_column]} layer={layer} link={false} />
-              {/* <pre className="font-bold" style={{background: '#feb70d'}}>{clicked.type === 'parcels' ? null : `#`}{attr[layer.id_column]}</pre> */}
-              </div>
-          </div>
-      </section>
+    <section className='sidebar-section feature' style={{ borderLeft: `8px solid ${layer.color}` }}>
+      <div className="flex items-center justify-between text-lg">
+        <h2>{layer.label}</h2>
+        <div className="flex items-center">
+          {/* {hasSource && <span className="font-semibold text-gray-500 bg-gray-300 py-1 px-2 mx-3 text-sm">{attr.geo_source}</span>} */}
+          <IdBadge id={attr[layer.id_column]} layer={layer} link={false} />
+          {/* <pre className="font-bold" style={{background: '#feb70d'}}>{clicked.type === 'parcels' ? null : `#`}{attr[layer.id_column]}</pre> */}
+        </div>
+      </div>
+    </section>
   )
 }
 
@@ -67,7 +67,7 @@ const IssueReporter = ({ session }) => {
   })
 
   // detroit bbox
-  let [xMin, yMin, xMax, yMax] = [-83.237803,42.355192,-82.910451,42.45023];
+  let [xMin, yMin, xMax, yMax] = [-83.237803, 42.355192, -82.910451, 42.45023];
   let xRandomOffset = (xMax - xMin) * Math.random()
   let yRandomOffset = (yMax - yMin) * Math.random()
   let xRandomCenter = xMin + xRandomOffset
@@ -183,7 +183,7 @@ const IssueReporter = ({ session }) => {
               Address
             </h3>
             <input
-              className="p-2 w-2/3"
+              className="p-2 py-3 w-2/3"
               type="text"
               name="address"
               disabled={targetType === 'base_unit'}
@@ -191,15 +191,17 @@ const IssueReporter = ({ session }) => {
               onChange={(e) => setValue(e.target.value) && setReturned(false)}
               onKeyPress={(e) => e.code === 'Enter' && geocode(value, setResponse)}
             />
-            <button
-              className={value !== '' && targetType === 'address' ? 'btn-enabled' : 'btn-disabled'}
-              onClick={() => geocode(value, setResponse)}>
-              <FontAwesomeIcon icon={faSearch} />
-            </button>
+            <Button
+              active={value !== '' && targetType === 'address'}
+              onClick={() => geocode(value, setResponse)}
+              icon={faSearch}
+              text='Search'
+              small
+            />
           </div>
 
           <div className="flex items-center justify-between my-2">
-            <h3 className="text-sm w-1/4 flex items-center justify-start" onClick={() => {setTargetType('base_unit'); setValue('');}}>
+            <h3 className="text-sm w-1/4 flex items-center justify-start" onClick={() => { setTargetType('base_unit'); setValue(''); }}>
               <input type="radio" id="base_unit" name="type" value="base_unit"
                 className="mx-1"
                 readOnly
@@ -208,7 +210,7 @@ const IssueReporter = ({ session }) => {
               </h3>
             <div className="w-2/3 flex items-center justify-between">
               <select
-                className="p-2"
+                className="p-2 py-3"
                 disabled={targetType === 'address'}
                 value={target.type || 'addresses'}
                 onChange={(e) => setTarget({ ...target, type: e.target.value })}
@@ -219,7 +221,7 @@ const IssueReporter = ({ session }) => {
               </select>
 
               <input
-                className="p-2 w-40"
+                className="p-2 py-3 w-40"
                 type="text"
                 name="address"
                 value={target.id ? target.id : ''}
@@ -228,12 +230,14 @@ const IssueReporter = ({ session }) => {
                 onKeyPress={(e) => e.code === 'Enter' && fetchFeature(target, setFeature)}
               />
             </div>
-            <button
-              className={target.id && target.type && targetType === 'base_unit' ? 'btn-enabled' : 'btn-disabled'}
+            <Button
+              active={target.id && target.type && targetType === 'base_unit'}
               disabled={targetType === 'address'}
-              onClick={() => fetchFeature(target, setFeature)}>
-              <FontAwesomeIcon icon={faSearch} />
-            </button>
+              onClick={() => fetchFeature(target, setFeature)}
+              icon={faSearch}
+              text='Search'
+              small
+            />
           </div>
         </section>
         {targetType === 'base_unit' && feature &&
@@ -241,18 +245,20 @@ const IssueReporter = ({ session }) => {
         }
         {targetType === 'address' && response.geocoder &&
           <section className='sidebar-section'>
-            {response.geocoder === 'point' && <IssueReporterExtantAddress {...{response}} />}
+            {response.geocoder === 'point' && <IssueReporterExtantAddress {...{ response }} />}
             {response.geocoder === 'centerline' && <h2>No address found</h2>}
           </section>
         }
-        { (feature || response.geocoder) && 
-            <section className="sidebar-section">
+        {(feature || response.geocoder) &&
+          <section className="sidebar-section">
             <h2>What is the issue?</h2>
             <textarea type="text" cols="40" rows="8" className="p-2 m-1" value={formText} onChange={(e) => { setFormText(e.target.value); setSent(false) }}></textarea>
-            <button
-              className={formText !== '' && !sent ? "btn-enabled w-full" : 'btn-disabled w-full'}
+            <Button
+              active={formText !== '' && !sent}
               disabled={formText === ''}
-              onClick={() => {      
+              text={`Submit`}
+              icon={faWrench}
+              onClick={() => {
                 addFeature({
                   session: session,
                   formText: formText,
@@ -265,9 +271,7 @@ const IssueReporter = ({ session }) => {
                 });
                 setSent(true);
               }}
-            >
-              Submit
-          </button>
+            />
           </section>
         }
         {

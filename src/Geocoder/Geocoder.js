@@ -1,10 +1,11 @@
-import { faWrench } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faWrench } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
 import { CSVLink } from 'react-csv';
 import { Link } from 'react-router-dom';
 import { geocoders } from '../data/geocoders';
 import SiteSidebar from '../layout/SiteSidebar';
+import Button from '../components/Button'
 
 const Geocoder = () => {
 
@@ -105,28 +106,28 @@ const Geocoder = () => {
             <h2>3. Geocode!</h2>
             <p className="text-sm">Match addresses to locations</p>
           </div>
-          <button
-            className={addresses.length === 0 ? "btn-disabled" : "btn-enabled"}
+          <Button
+            active={addresses.length > 0}
+            small
             disabled={addresses.length === 0}
-            onClick={() => { addresses.length > 0 && setPayload(addresses) }}>
-            {addresses.length > 0 ? 'Go!' : 'No addresses'}
-          </button>
+            onClick={() => { addresses.length > 0 && setPayload(addresses) }}
+            text={addresses.length > 0 ? 'Go!' : 'No addresses'}
+            />
         </section>
-        <section className="sidebar-section flex justify-between">
+        {formattedData.length > 0 && <section className="sidebar-section flex justify-between">
           <div>
-
             <h2>4. Export</h2>
-            <p className="text-sm">Export to .csv</p>
           </div>
-          <button
-            className={results.length === 0 ? "btn-disabled" : "btn-enabled"}
-            disabled={results.length === 0}
-          > 
-            <CSVLink data={formattedData} filename={`geocode_results_${new Date().getTime()}.csv`}>
-              <span>.csv</span>
-            </CSVLink>
-          </button>
-        </section>
+          <CSVLink data={formattedData} filename={`geocode_results_${new Date().getTime()}.csv`}>
+            <Button
+              active={results.length > 0}
+              disabled={results.length === 0}
+              icon={faDownload}
+              small
+              text='Export to .csv'
+            /> 
+          </CSVLink>
+        </section>}
       </SiteSidebar>
       <main>
         {results.length > 0 &&

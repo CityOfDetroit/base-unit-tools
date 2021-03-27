@@ -1,5 +1,6 @@
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Button from '../components/Button'
 
 import React, { useState, useEffect } from 'react';
 import { geocoders } from '../data/geocoders';
@@ -53,20 +54,22 @@ const ExplorerSearch = ({ clicked, setClicked }) => {
   return (
     <>
       <h2>Search for an address:</h2>
-      <div className="flex items-end justify-start text-sm mt-1">
+      <div className="flex items-center justify-start text-sm mt-1">
         <input
-          className="p-2 w-full bg-gray-200"
+          className="p-2 py-3 w-full bg-gray-200"
           type="text"
           value={value}
           onChange={(e) => {setValue(e.target.value); setFound(null);}} 
           onKeyPress={(e) => e.code === 'Enter' && geocode(value, setClicked, setFound)}
           />
-        <button
-          className={value !== '' ? 'btn-enabled' : 'btn-disabled'}
+        <Button
+          active={value !== ''}
           disabled={value === ''}
-          onClick={() => geocode(value, setClicked, setFound)}>
-          <FontAwesomeIcon icon={faSearch} />
-        </button>
+          small
+          className="py-2"
+          onClick={() => geocode(value, setClicked, setFound)}
+          text='Search'
+          icon={faSearch} />
       </div>
       {/* what if we couldn't find it? */}
       {found === false && 

@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-const Button = ({ text, icon, onClick, disabled=false, active=true, small=false, className=''}) => {
+const Button = ({ text, icon, onClick, disabled=false, active=true, small=false, className='', children}) => {
   return (
     <button 
       className={
@@ -11,7 +11,8 @@ const Button = ({ text, icon, onClick, disabled=false, active=true, small=false,
         disabled={disabled}
     >
       <FontAwesomeIcon className={small ? "text-sm mr-2" : "text-lg mr-2"} icon={icon} />
-      <p className={small ? "text-sm" : "text-lg"}>{text}</p>
+      {text && <p className={small ? "text-sm" : "text-lg"}>{text}</p>}
+      {children}
     </button>
   )
 }
