@@ -128,7 +128,6 @@ const StreetView = ({ feature, setSvBearing, setSvCoords, children }) => {
 
     mapillaryView.on("nodechanged", (n) => {
       setSvCoords(n.latLon);
-      setLoading(false);
     });
 
     mapillaryView.on("bearingchanged", (b) => {
