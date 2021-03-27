@@ -18,4 +18,13 @@ Initial release, with geocoder tool, cloned from https://cityofdetroit.github.io
 
 - Issue reporter will thank you for submitting an issue
 
-## 1.2.0 - 2021-03-26
+## 1.2.0 - 2021-03-29
+
+### Added
+
+- Mailer tool
+- Satellite imagery available in explorer
+
+### Fixed
+
+- ArcGIS Online login is available from any tool without interruption.
