@@ -6642,6 +6642,43 @@ export const baseStyle = {
         }
       },
       {
+        "id": "parcel-linked",
+        "type": "fill",
+        "source": "parcels",
+        "source-layer": "parcels",
+        "minzoom": 11,
+        "filter": ["==", "parcelno", "02004940."],
+        "layout": {
+          "visibility": "visible"
+        },
+        "paint": {
+          "fill-color": layers['parcels'].color,
+          "fill-opacity": {
+            "base": 1,
+            "stops": [
+              [12, 0],
+              [12.1, 0.1],
+              [12.5, 0.25],
+              [22, 0.25]
+            ]
+          }
+        }
+      },
+      {
+        "id": "parcel-fill",
+        "type": "fill",
+        "source": "parcels",
+        "source-layer": "parcels",
+        "interactive": true,
+        "minzoom": 12,
+        "layout": {
+          "visibility": "visible"
+        },
+        "paint": {
+          "fill-color": "rgba(0,0,0,0)"
+        }
+      },
+      {
         "id": "streets-highlight",
         "type": "line",
         "source": "streets",
@@ -16459,43 +16496,6 @@ export const baseStyle = {
               [22, 1]
             ]
           }
-        }
-      },
-      {
-        "id": "parcel-linked",
-        "type": "fill",
-        "source": "parcels",
-        "source-layer": "parcels",
-        "minzoom": 11,
-        "filter": ["==", "parcelno", "02004940."],
-        "layout": {
-          "visibility": "visible"
-        },
-        "paint": {
-          "fill-color": layers['parcels'].color,
-          "fill-opacity": {
-            "base": 1,
-            "stops": [
-              [12, 0],
-              [12.1, 0.1],
-              [12.5, 0.25],
-              [22, 0.25]
-            ]
-          }
-        }
-      },
-      {
-        "id": "parcel-fill",
-        "type": "fill",
-        "source": "parcels",
-        "source-layer": "parcels",
-        "interactive": true,
-        "minzoom": 12,
-        "layout": {
-          "visibility": "visible"
-        },
-        "paint": {
-          "fill-color": "rgba(0,0,0,0)"
         }
       },
       {
