@@ -10,29 +10,29 @@ const SiteHeader = ({ session, setSession, login, setLogin }) => {
     return (
       <header>
         <div className="flex items-center justify-between">
-          <img src={logo} className="h-10 mt-2 ml-2 mr-2" alt={"City logo"} />
+          <img src={logo} className="h-12 mt-1 ml-1 mr-1" alt={"City logo"} />
           <h1 className="w-full font-black">
             Base Unit Tools
-        </h1>
+          </h1>
         </div>
 
         {session ?
           // If user is logged in, display this div
-          <div className="w-100 flex flex-row-reverse ml-3 items-center">
-            <span className="leading-tight text-base text-gray-500 font-semibold ml-2" onClick={() => setSession(null)}>
+          <div className="w-100 flex flex-row-reverse ml-3 items-center -mt-1">
+            <span className="leading-none text-base text-gray-500 font-base ml-2" onClick={() => setSession(null)}>
               <FontAwesomeIcon icon={faSignOutAlt} />
             </span>
-            <span className="leading-tight text-sm text-gray-500 font-semibold">
+            <span className="leading-none text-sm text-gray-500 font-base">
               logged in as: <b>{session.username}</b>
             </span>
           </div>
           :
           // Else, this div.
-          <div className="w-100 flex flex-row-reverse ml-3 items-center" onClick={() => setLogin(true)}>
-            <span className="leading-none text-base text-gray-500 font-semibold ml-2" >
+          <div className="w-100 flex flex-row-reverse ml-3 items-center -mt-1" onClick={() => setLogin(true)}>
+            <span className="leading-none text-base text-gray-500 font-base ml-2" >
               <FontAwesomeIcon icon={faSignInAlt} />
             </span>
-            <span className="leading-none text-sm text-gray-500 font-semibold">
+            <span className="leading-none text-sm text-gray-500 font-base">
               Log in to ArcGIS Online
             </span>
           </div>
