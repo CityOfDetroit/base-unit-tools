@@ -10,16 +10,17 @@ A collection of public-facing apps to enable upkeep and use of the city of Detro
 
 ## About this site
 
-This site is built with the following libraries:
+This site is built primarily using React, with the following libraries:
 
 - [create-react-app]()
+- [react-router-dom]()
 - [tailwindcss]()
 - [mapbox-gl-js]() (soon: maplibre.js) 
 - [mapillary-js]()
 - [esri-arcgis-rest]()
 - [turf.js]()
 
-## The tools
+## Tools
 
 ### Explorer
 
@@ -37,7 +38,7 @@ This tool accepts URL parameters!
 - `id`: the ID of the feature
 - `streetview`: should be `true` if you want Mapillary to automatically display.
 
-Example URL: http://localhost:3000/base-unit-tools/explorer?type=buildings&id=653 will hotlink you to CAYMC.
+Example URL: http://localhost:3000/base-unit-tools/explorer?type=buildings&id=653&streetview=true will link directly to CAYMC, with the `StreetView` component activated.
 
 ### Issue Reporter
 
@@ -110,6 +111,10 @@ const NewTool = () => {
   )
 }
 ```
+
+Logging in is controlled in `src/layout/SiteHeader`, since that is rendered everywhere. That renders a `Login` component which does the work of input and using the esri-arcgis-rest authentication methods.
+
+Most components are styled in-line using Tailwind CSS, but there are a fair number of styles in `src/styles/index.css` as well.
 
 ### Sitewide config files
 
