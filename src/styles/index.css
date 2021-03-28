@@ -109,7 +109,7 @@ footer {
 
 @media only screen and (min-width: 769px) {
   .explorer-map {
-    height: calc(100vh - 60px - 10rem);
+    height: calc(100vh - 60px - 11rem);
   }
 
   .issue-reporter-map {

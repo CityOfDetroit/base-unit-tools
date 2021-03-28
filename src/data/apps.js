@@ -1,4 +1,4 @@
-import { faAtlas, faCheckSquare, faHome, faMailBulk, faTasks, faWrench } from '@fortawesome/free-solid-svg-icons';
+import { faAtlas, faCheckSquare, faEnvelope, faHome, faMailBulk, faTasks, faWrench } from '@fortawesome/free-solid-svg-icons';
 
 export const apps = {
     '/': {
@@ -55,7 +55,7 @@ export const apps = {
         questions: [
             `I'd like to send a mailing to all owner-occupants in a historic district.`
         ],
-        icon: faMailBulk,
+        icon: faEnvelope,
         private: true
     }
     // 'assignment': {

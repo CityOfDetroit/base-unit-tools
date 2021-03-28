@@ -8,17 +8,19 @@ const AppIntro = ({ app, children }) => {
   let [show, setShow] = useState(true)
   if(show) {
     return (
-    <section className='p-4 bg-gray-300 mb-2'>
+    <section className='pl-4 pr-2 pb-4 pt-2 bg-gray-300 mb-2'>
       <div className="flex items-center justify-between">
         <div className="flex items-center justify-between">
-          <FontAwesomeIcon icon={app.icon} className="text-3xl mr-3 mt-1"/>
-          <h2 className="text-xl"><b>{app.name}</b></h2>
+          <FontAwesomeIcon icon={app.icon} className="text-2xl mr-2 mt-1"/>
+          <h2 className="text-lg"><b>{app.name}</b></h2>
         </div>
         <div className="hover:bg-gray-500 hover:bg-opacity-20 px-3 py-2 rounded" onClick={() => setShow(false)}>
           <FontAwesomeIcon icon={faWindowClose}  className="text-gray-500 text-lg" />
         </div>
       </div>
-      {children}
+      <div className="mx-2">
+        {children}
+      </div>
     </section>
     )
   }

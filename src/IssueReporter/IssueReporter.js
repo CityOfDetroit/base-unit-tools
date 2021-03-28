@@ -164,9 +164,13 @@ const IssueReporter = ({ session }) => {
     }
   }, [targetType, target])
 
+  console.log()
   let featureCentroid;
   if(feature) {
     featureCentroid = centroid(arcgisToGeoJSON(feature))
+  }
+  if(response && response.candidates.length > 0) {
+    featureCentroid = [response.candidates[0].location.y, response.candidates[0].location.x]
   }
     return (
     <>
