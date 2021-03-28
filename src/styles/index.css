@@ -213,6 +213,10 @@ a {
   @apply px-3;
 }
 
+.focus {
+  @apply bg-green-100;
+}
+
 .sidebar-section h1, h2, h3, h4 {
   @apply font-bold;
   @apply text-lg;

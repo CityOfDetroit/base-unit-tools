@@ -3,13 +3,13 @@ import { geojsonToArcGIS } from '@esri/arcgis-to-geojson-utils';
 import { faDownload, faLock, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
-import area from '@turf/area';
 import React, { useEffect, useState } from 'react';
 import Button from '../components/Button';
 import SiteSidebar from '../layout/SiteSidebar';
 import MailerBuffer from './MailerBuffer';
 import MailerLayerSelector from './MailerLayerSelector';
 import MailerMap from './MailerMap';
+import MailerSelection from './MailerSelection'
 
 // object to track filters
 const filters = {
@@ -25,9 +25,10 @@ const Mailer = ({ session }) => {
   // use this boolean to see if the user has access to the mailing list layer
   const [access, setAccess] = useState(false)
 
-  // store the selection area object IDs and the actual results, respectively.
+  // store the selection area object IDs, all addresses, and the filtered addresses.
   const [resultIds, setResultIds] = useState(null)
   const [addresses, setAddresses] = useState([])
+  const [filtered, setFiltered] = useState([])
 
   // mailing list layer.
   // theoretically we can put any layer here to make a generalized selection tool.
@@ -139,35 +140,24 @@ const Mailer = ({ session }) => {
         {/* Boundary picker */}
         <MailerLayerSelector {...{ geom, setGeom }} />
 
-        {/* If we have a shape, display the Buffer tool */}
+        {/* If we have a shape, display buffer tool, current selection */}
         {geom && <MailerBuffer {...{ geom, setGeom }} />}
+        {geom && resultIds && <MailerSelection {...{ geom, setGeom, resultIds }} />}
 
-        {/* If we have a shape, display information about the selection */}
         {geom &&
-          <section className='sidebar-section'>
-            <h2>Current selection:</h2>
-            <ul className="list-disc list-inside">
-              <li>
-                {(area(geom) * 0.000000386102).toFixed(3)} square miles
-              </li>
-              {resultIds && <li>
-                {resultIds.objectIds.length} addresses in the selection area
-              </li>}
-            </ul>
-            <h3 className="text-sm mt-3">Filter addresses by:</h3>
-            {
-              Object.keys(filters).map(f => (
-                <div className="p-1" key={f}>
-                  <input type="checkbox" name={f} checked={false} readOnly></input>
-                  <label htmlFor={f} className="ml-2">{f}</label>
-                </div>
-              ))
-            }
-            <div className="flex flex-row-reverse">
-              <Button icon={faTrash} onClick={() => setGeom(null)} text="Delete current selection" />
-            </div>
+        <section className='sidebar-section'>
+          <h3 className="text-sm mt-3">Filter addresses by:</h3>
+          {
+            Object.keys(filters).map(f => (
+              <div className="p-1" key={f}>
+                <input type="checkbox" name={f} checked={false} readOnly></input>
+                <label htmlFor={f} className="ml-2">{f}</label>
+              </div>
+            ))
+          }
           </section>
         }
+
 
         {/* If there's a shape and access to the layer */}
         {geom && access &&

@@ -33,9 +33,9 @@ function App() {
             <Route path="/validator">
               <Validator />
             </Route>
-            <Route path="/mailer">
+            {session && <Route path="/mailer">
               <Mailer {...{ session }} />
-            </Route>
+            </Route>}
             {/* {session && <Route path="/assignment">
               <Assignment />
             </Route>} */}
