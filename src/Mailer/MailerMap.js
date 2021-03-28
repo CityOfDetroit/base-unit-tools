@@ -3,8 +3,9 @@ import mapboxgl from "mapbox-gl";
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import bbox from '@turf/bbox';
 import mapStyle from '../styles/mailerstyle.json';
+import {arcgisToGeoJSON} from '@esri/arcgis-to-geojson-utils'
 
-const MailerMap = ({ geom, setGeom }) => {
+const MailerMap = ({ geom, setGeom, filtered }) => {
 
   let [theMap, setTheMap] = useState(null);
   let [theDraw, setTheDraw] = useState(null);
@@ -27,6 +28,31 @@ const MailerMap = ({ geom, setGeom }) => {
     map.on("load", e => {
       setTheMap(map);
       map.resize();
+      map.addSource("filtered", {
+        type: 'geojson',
+        data: {
+          type: "FeatureCollection",
+          features: []
+        }
+      })
+
+      map.addLayer({
+        "id": "filtered-addresses",
+        "source": "filtered",
+        "type": "circle",
+        "paint": {
+          "circle-radius": {
+            "base": 1,
+            "stops": [[10.5, 0.2], [13.5, 1], [16.5, 3], [19, 12]]
+          },
+          "circle-color": 'yellow',
+          "circle-stroke-color": '#333',
+          "circle-stroke-width": {
+            "base": 1,
+            "stops": [[10.5, 0.2], [13.5, 0.5], [16.5, 1], [19, 3]]
+          },
+        }
+      })
     });
 
     map.on("draw.create", e => {
@@ -62,6 +88,15 @@ const MailerMap = ({ geom, setGeom }) => {
       }
     }
   }, [geom, theDraw, theMap]);
+
+  useEffect(() => {
+    if(theMap && filtered) {
+      theMap.getSource("filtered").setData({
+        "type": "FeatureCollection",
+        "features": filtered.map(f => arcgisToGeoJSON(f))
+      })
+    }
+  })
 
   return (
     <div id="map" className="explorer-map" />

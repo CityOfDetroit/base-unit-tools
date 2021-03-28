@@ -15,7 +15,11 @@ const MailerSelection = ({ geom, setGeom, resultIds }) => {
       </li>}
     </ul>
     <div className="flex flex-row-reverse">
-      <Button icon={faTrash} onClick={() => setGeom(null)} text="Delete current selection" />
+      <Button 
+        icon={faTrash} 
+        onClick={() => setGeom(null)} 
+        text="Delete current selection"
+        small />
     </div>
   </section>
   )

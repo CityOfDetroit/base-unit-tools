@@ -13,6 +13,8 @@ import MailerMap from './MailerMap';
 import MailerSelection from './MailerSelection'
 import _ from 'lodash';
 import { CSVLink } from 'react-csv';
+import apps from '../data/apps';
+import AppIntro from '../components/AppIntro';
 
 
 const Mailer = ({ session }) => {
@@ -163,6 +165,9 @@ const Mailer = ({ session }) => {
 
       <SiteSidebar title="Mailer">
 
+        {/* <AppIntro app={apps.mailer}>
+        </AppIntro> */}
+
         {/* Show a warning if the user doesn't have access to the layer. */}
         {!access && <section className="sidebar-section caution flex items-center">
           <FontAwesomeIcon icon={faLock} className="text-xl ml-2 mr-4" />
@@ -215,7 +220,8 @@ const Mailer = ({ session }) => {
                   <CSVLink data={formattedData} filename={`mailing_list_${new Date().getTime()}.csv`}>
                     <Button 
                       icon={faDownload} 
-                      text={`Download ${filtered.length.toLocaleString()} addresses as .csv`} />
+                      text={`Download ${filtered.length.toLocaleString()} addresses as .csv`}
+                      small />
                   </CSVLink>
                 </div>
               </>

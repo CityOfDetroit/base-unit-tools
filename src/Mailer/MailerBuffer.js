@@ -51,6 +51,7 @@ const MailerBuffer = ({ geom, setGeom }) => {
         icon={faExpandArrowsAlt}
         onClick={() => setGeom(buffer(geom, distanceInMiles, { units: 'miles' }))}
         text={`${distance} ${unit}`}
+        small
         />
       </div>
 
