@@ -18,44 +18,35 @@ function App() {
 
   // we use this session to track the ArcGIS Online login
   const [session, setSession] = useState(null)
-  
+
   return (
     <Router basename='/base-unit-tools'>
       <Analytics id={trackingId} debug>
-      <SiteWrapper {...{session, setSession}} title="Explorer">
-        <Switch>
-            <Route path="/explorer/:layer/:id">
-              <Explorer/>
-            </Route>
-            <Route path="/explorer/:layer">
-              <Explorer/>
-            </Route>
+        <SiteWrapper {...{ session, setSession }}>
+          <Switch>
             <Route path="/explorer">
               <Explorer />
             </Route>
             <Route path="/issue-reporter">
-              <IssueReporter {...{session}} />
+              <IssueReporter {...{ session }} />
             </Route>
             <Route path="/validator">
               <Validator />
             </Route>
-            <Route path="/mailer">
-              <Mailer {...{session}} />
-            </Route>
+            {session && <Route path="/mailer">
+              <Mailer {...{ session }} />
+            </Route>}
             {/* {session && <Route path="/assignment">
               <Assignment />
             </Route>} */}
-            <Route path="/geocoder/:address">
-              <Geocoder />
-            </Route>
             <Route path="/geocoder">
               <Geocoder />
             </Route>
             <Route path="/">
-              <BaseUnitTools {...{session, setSession}}/>
+              <BaseUnitTools {...{ session }} />
             </Route>
-        </Switch>
-      </SiteWrapper>
+          </Switch>
+        </SiteWrapper>
       </Analytics>
     </Router>
   );

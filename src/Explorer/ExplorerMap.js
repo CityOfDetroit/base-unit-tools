@@ -6,23 +6,22 @@ import centroid from '@turf/centroid';
 import { baseStyle, satelliteStyle } from '../styles/mapstyle'
 import videoIcon from '../images/video.png'
 
-import layers from '../data/layers.json'
-
-console.log(baseStyle)
+import layers from '../data/layers'
 
 const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, svBearing, showSatellite }) => {
   const [theMap, setTheMap] = useState(null);
-
   const [loading, setLoading] = useState(false)
 
-  // detroit bbox
-  let [xMin, yMin, xMax, yMax] = [-83.237803, 42.355192, -82.910451, 42.45023];
-  let xRandomOffset = (xMax - xMin) * Math.random()
-  let yRandomOffset = (yMax - yMin) * Math.random()
-  let xRandomCenter = xMin + xRandomOffset
-  let yRandomCenter = yMin + yRandomOffset
-
+  // this effect runs once, when the component loads
   useEffect(() => {
+
+    // detroit bbox
+    let [xMin, yMin, xMax, yMax] = [-83.237803, 42.355192, -82.910451, 42.45023];
+    let xRandomOffset = (xMax - xMin) * Math.random()
+    let yRandomOffset = (yMax - yMin) * Math.random()
+    let xRandomCenter = xMin + xRandomOffset
+    let yRandomCenter = yMin + yRandomOffset
+
     var map = new mapboxgl.Map({
       container: "map", // container id
       style: baseStyle, // stylesheet location
@@ -37,31 +36,22 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
       setTheMap(map);
     });
 
+    // when a new style loaders after the user switches styles
     map.on('style.load', () => {
       setLoading(false)
+
+      // load our mapillary video icon in
       map.loadImage(videoIcon, (error, image) => {
         if (error) throw error;
         map.addImage("video", image);
-        svCoords && map.getSource("mapillary").setData({
+
+        // set the Mapillary data
+        map.getSource("mapillary").setData({
           type: "FeatureCollection",
           // we'll make the map data here
-          features: [
-            {
-              type: "Feature",
-              geometry: {
-                type: "Point",
-                coordinates: [svCoords.lon, svCoords.lat],
-              },
-              properties: {
-                bearing: svBearing - 90,
-              },
-            },
-          ],
+          features: [],
         });
       });
-    })
-
-    map.on('style.load', () => {
     })
 
     map.on('moveend', (e) => {
@@ -83,7 +73,7 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
       }
     })
 
-  }, []);
+  }, [setClicked]);
 
   useEffect(() => {
     if (theMap && clicked.type && clicked.id && !loading) {
@@ -112,7 +102,6 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
 
   useEffect(() => {
     if (theMap && linked && clicked.type && !loading) {
-      console.log(linked)
       let layer = layers[clicked.type]
       let others = Object.keys(layers).filter(l => l !== clicked.type && l !== 'units')
 
@@ -126,17 +115,15 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
           filter = ["==", layers[o].filter_id, ""]
         }
         else {
-          filter = ["in", layers[o].filter_id].concat(linked[o]) 
+          filter = ["in", layers[o].filter_id].concat(linked[o])
         }
-        console.log(filter)
         theMap.setFilter(layers[o].link, filter)
       })
     }
-  }, [theMap, linked, loading])
+  }, [theMap, linked, loading, clicked.type])
 
   useEffect(() => {
-    console.log(svCoords, svBearing);
-    theMap && showSv &&
+    theMap && showSv && svCoords &&
       theMap.getSource("mapillary").setData({
         type: "FeatureCollection",
         // we'll make the map data here
@@ -158,26 +145,24 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
         type: "FeatureCollection", features: []
       })
     }
-  }, [svCoords, svBearing]);
+  }, [svCoords, svBearing, loading, theMap, showSv]);
 
   useEffect(() => {
-    if(theMap && showSv) {
+    if (theMap && showSv) {
       theMap.setLayoutProperty("mapillary-location", "visibility", "visible")
     }
-    if(theMap && !showSv) {
+    if (theMap && !showSv) {
       theMap.setLayoutProperty("mapillary-location", "visibility", "none")
     }
-  }, [showSv])
+  }, [showSv, loading, theMap])
 
   useEffect(() => {
-    if(theMap) {
-      if(showSatellite) {
-        console.log(`show ze satellite`)
+    if (theMap) {
+      if (showSatellite) {
         theMap.setStyle(satelliteStyle())
         setLoading(true)
       }
       else {
-        console.log(`do not show ze satellite`)
         theMap.setStyle(baseStyle)
         setLoading(true)
       }

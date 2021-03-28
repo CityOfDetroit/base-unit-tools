@@ -4,7 +4,7 @@ import ExplorerFeature from './ExplorerFeature';
 
 const ExplorerStreet = ({ feature, clicked, setClicked, linked, setLinked }) => {
 
-    let { geometry: geom, attributes: attr } = feature;
+    let { attributes: attr } = feature;
 
     let attributes = {
         "Street direction": attr.street_prefix,
@@ -13,15 +13,12 @@ const ExplorerStreet = ({ feature, clicked, setClicked, linked, setLinked }) => 
         "Length of segment": attr.segment_length ? `${attr.segment_length.toFixed(0)} ft`: `?`
     }
 
-    let parcelAttributes = {
-    }
-
     let [addresses, setAddresses] = useState([])
 
     useEffect(() => {
         let url = `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/AddressPoints/FeatureServer/0/query?`
         let params = {
-            where: `street_id = ${attr.objectid}`,
+            where: `street_id = ${attr.objectid_1}`,
             outFields: `*`,
             outSR: 4326,
             f: `pjson`
@@ -54,7 +51,7 @@ const ExplorerStreet = ({ feature, clicked, setClicked, linked, setLinked }) => 
                 }
             })
 
-    }, [attr.objectid])
+    }, [attr.objectid_1, setLinked])
 
     return (
         <>

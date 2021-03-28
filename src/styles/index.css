@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Roboto+Condensed:wght@300;400;700&family=Lora:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Roboto+Condensed:wght@300;400;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* ./src/index.css */
 @tailwind base;
@@ -47,7 +47,7 @@ h4 {
       "h a"
       "s m"
       "f f";
-    grid-template-rows: 70px auto 40px;
+    grid-template-rows: 3.5rem auto 40px;
     grid-template-columns: 1fr 2fr;
     height: 100vh;
     grid-gap: 0.75rem;
@@ -109,7 +109,7 @@ footer {
 
 @media only screen and (min-width: 769px) {
   .explorer-map {
-    height: calc(100vh - 60px);
+    height: calc(100vh - 60px - 11rem);
   }
 
   .issue-reporter-map {
@@ -204,9 +204,17 @@ a {
   @apply px-3;
 }
 
+.caution {
+  @apply bg-yellow-200;
+}
+
 .info {
   @apply bg-blue-100;
   @apply px-3;
+}
+
+.focus {
+  @apply bg-green-100;
 }
 
 .sidebar-section h1, h2, h3, h4 {
@@ -218,19 +226,12 @@ a {
     sans-serif;
 }
 
-button {
-  @apply py-2;
-  @apply px-4;
-}
-
 .btn-disabled {
   @apply opacity-50;
-  @apply bg-blue-100;
 }
 
 .btn-enabled {
   @apply font-semibold;
-  @apply bg-blue-300;
 }
 
 #mly {

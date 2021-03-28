@@ -1,8 +1,12 @@
-{
+// support two different servers
+let SERVER_ROOT = `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/`
+let HOSTED_ROOT = `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitMetrics/FeatureServer/`
+
+const layers = {
   "addresses": {
     "name": "addresses",
     "label": "Address Point",
-    "endpoint": "AddressPoints/FeatureServer/0",
+    "endpoint": HOSTED_ROOT + '5',
     "id_column": "addr_id",
     "click": "id",
     "interaction": "address-point",
@@ -15,7 +19,7 @@
   "buildings": {
     "name": "buildings",
     "label": "Building",
-    "endpoint": "BuildingMetrics/FeatureServer/0",
+    "endpoint": SERVER_ROOT + "BuildingMetrics/FeatureServer/0",
     "id_column": "bldg_id",
     "interaction": "building-fill",
     "click": "id",
@@ -28,7 +32,7 @@
   "parcels": {
     "name": "parcels",
     "label": "Parcel",
-    "endpoint": "ParcelMetrics/FeatureServer/0",
+    "endpoint": HOSTED_ROOT + "2",
     "id_column": "parcel_id",
     "interaction": "parcel-fill",
     "click": "parcel_id",
@@ -41,8 +45,8 @@
   "streets": {
     "name": "streets",
     "label": "Street",
-    "endpoint": "StreetsMetrics/MapServer/0",
-    "id_column": "objectid",
+    "endpoint": HOSTED_ROOT + "3",
+    "id_column": "objectid_1",
     "interaction": "streets-line",
     "click": "street_id",
     "highlight": "streets-highlight",
@@ -54,7 +58,7 @@
   "units": {
     "name": "units",
     "label": "Unit",
-    "endpoint": "UnitMetrics/MapServer/0",
+    "endpoint": HOSTED_ROOT + "4",
     "id_column": "objectid",
     "interaction": "units-point",
     "click": "unit_id",
@@ -64,3 +68,5 @@
     "text_color": "#eee"
   }
 }
+
+export default layers;

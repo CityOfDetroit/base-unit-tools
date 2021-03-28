@@ -1,4 +1,4 @@
-import layers from '../data/layers.json'
+import layers from '../data/layers'
 import _ from 'lodash';
 
 export const baseStyle = {
@@ -6639,6 +6639,43 @@ export const baseStyle = {
         },
         "paint": {
           "icon-color": "#B2B2B2"
+        }
+      },
+      {
+        "id": "parcel-linked",
+        "type": "fill",
+        "source": "parcels",
+        "source-layer": "parcels",
+        "minzoom": 11,
+        "filter": ["==", "parcelno", "02004940."],
+        "layout": {
+          "visibility": "visible"
+        },
+        "paint": {
+          "fill-color": layers['parcels'].color,
+          "fill-opacity": {
+            "base": 1,
+            "stops": [
+              [12, 0],
+              [12.1, 0.1],
+              [12.5, 0.25],
+              [22, 0.25]
+            ]
+          }
+        }
+      },
+      {
+        "id": "parcel-fill",
+        "type": "fill",
+        "source": "parcels",
+        "source-layer": "parcels",
+        "interactive": true,
+        "minzoom": 12,
+        "layout": {
+          "visibility": "visible"
+        },
+        "paint": {
+          "fill-color": "rgba(0,0,0,0)"
         }
       },
       {
@@ -16462,43 +16499,6 @@ export const baseStyle = {
         }
       },
       {
-        "id": "parcel-linked",
-        "type": "fill",
-        "source": "parcels",
-        "source-layer": "parcels",
-        "minzoom": 11,
-        "filter": ["==", "parcelno", "02004940."],
-        "layout": {
-          "visibility": "visible"
-        },
-        "paint": {
-          "fill-color": layers['parcels'].color,
-          "fill-opacity": {
-            "base": 1,
-            "stops": [
-              [12, 0],
-              [12.1, 0.1],
-              [12.5, 0.25],
-              [22, 0.25]
-            ]
-          }
-        }
-      },
-      {
-        "id": "parcel-fill",
-        "type": "fill",
-        "source": "parcels",
-        "source-layer": "parcels",
-        "interactive": true,
-        "minzoom": 12,
-        "layout": {
-          "visibility": "visible"
-        },
-        "paint": {
-          "fill-color": "rgba(0,0,0,0)"
-        }
-      },
-      {
         "id": "building-fill",
         "type": "fill",
         "source": "buildings",
@@ -16666,14 +16666,11 @@ export const satelliteStyle = () => {
   // or if they're a road line layer
   // lazy hack for invisible'ing all the layers which are in the way of the satellite
   satStyle.layers.slice(0,200).forEach((l, i) => {
-    console.log(l.id)
-    if (l.type === 'fill') {
+    if (l.type === 'fill' && l.id.indexOf("parcel") === -1) {
       satStyle.layers[i].layout['visibility'] = 'none'
-      console.log('off')
     }
     if (l.type === 'line' && l.id.indexOf("Road") === 0) {
       satStyle.layers[i].layout['visibility'] = 'none'
-      console.log('off')
     }
   })
 

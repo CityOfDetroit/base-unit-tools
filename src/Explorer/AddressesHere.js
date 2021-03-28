@@ -1,5 +1,5 @@
 import React from 'react';
-import layers from '../data/layers.json';
+import layers from '../data/layers';
 import GeoSourceBadge from './GeoSourceBadge';
 import IdBadge from './IdBadge';
 

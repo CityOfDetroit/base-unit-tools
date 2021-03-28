@@ -1,18 +1,14 @@
 
-import React, { useEffect } from 'react';
-
+import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowAltCircleRight, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
-
+import React, { useEffect } from 'react';
+import layers from '../data/layers';
 import ExplorerFeature from './ExplorerFeature';
-import IdBadge from './IdBadge'
-import layers from '../data/layers.json'
+import IdBadge from './IdBadge';
 
 const ExplorerAddress = ({ feature, clicked, setClicked, linked, setLinked }) => {
 
   let { attributes: attr } = feature;
-
-  console.log(attr)
 
   let attributes = {
     "Street Number": attr.street_number,
@@ -23,17 +19,16 @@ const ExplorerAddress = ({ feature, clicked, setClicked, linked, setLinked }) =>
     "Unit Number": attr.unit_number
   }
 
-
   useEffect(() => {
-    if(feature) {
+    if (feature) {
       setLinked({
         addresses: [],
-        parcels: [attr.parcel_id],
-        buildings: [attr.bldg_id],
-        streets: [attr.street_id],
+        parcels: [feature.attributes.parcel_id],
+        buildings: [feature.attributes.bldg_id],
+        streets: [feature.attributes.street_id],
       })
     }
-  }, [feature])
+  }, [feature, setLinked])
 
   return (
     <>

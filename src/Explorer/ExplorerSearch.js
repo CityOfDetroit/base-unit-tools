@@ -1,8 +1,8 @@
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import Button from '../components/Button';
 import { geocoders } from '../data/geocoders';
+
 
 // we call this function when we actually want to geocode the user input
 const geocode = (value, setClicked, setFound) => {
@@ -51,30 +51,35 @@ const ExplorerSearch = ({ clicked, setClicked }) => {
   }, [clicked])
 
   return (
-    <>
-      <h2>Search for an address:</h2>
-      <div className="flex items-end justify-start text-sm mt-1">
+    <section className="bg-gray-200 p-3 w-1/2">
+      <h2 className="text-base flex items-center justify-between">
+        Search for an address:
+        {/* what if we couldn't find it? */}
+        {found === false && 
+          <div className="flex items-end justify-start text-xs font-semibold bg-red-400 text-gray-700 px-4 py-1">
+            No results found!
+          </div>
+        }
+      </h2>
+      <div className="flex items-center justify-start text-sm mt-1 w-4/5">
         <input
-          className="p-2 w-full bg-gray-200"
+          className="p-2 w-full bg-"
           type="text"
           value={value}
           onChange={(e) => {setValue(e.target.value); setFound(null);}} 
           onKeyPress={(e) => e.code === 'Enter' && geocode(value, setClicked, setFound)}
           />
-        <button
-          className={value !== '' ? 'btn-enabled' : 'btn-disabled'}
+        <Button
+          active={value !== ''}
           disabled={value === ''}
-          onClick={() => geocode(value, setClicked, setFound)}>
-          <FontAwesomeIcon icon={faSearch} />
-        </button>
+          small
+          className="py-2"
+          onClick={() => geocode(value, setClicked, setFound)}
+          text='Search'
+          icon={faSearch} />
       </div>
-      {/* what if we couldn't find it? */}
-      {found === false && 
-        <div className="flex items-end justify-start text-xs font-semibold bg-red-200 text-gray-700 p-1">
-          We couldn't locate that address... please try again.
-        </div>
-      }
-    </>
+
+    </section>
   )
 }
 

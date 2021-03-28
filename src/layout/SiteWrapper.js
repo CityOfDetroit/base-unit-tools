@@ -24,23 +24,22 @@ const SiteWrapper = ({ session, setSession, children }) => {
         <nav className="">
           {isDesktop ?
             // desktop nav
-            <ul className="flex items-center justify-start">
+            <div className="flex items-center justify-start">
               {Object.keys(apps).map((k, i) => {
                 if ((apps[k].private && session) || !apps[k].private) {
                   return (
-                  <Link key={k} to={`.${apps[k].url}`}>
-                    <li className={`p-6`}
+                  <Link key={k} to={`.${apps[k].url}`}
+                    className={`p-4 h-full`}
                       style={location.pathname === apps[k].url ? { background: "#feb70d" } : {}}
                     >
                       <FontAwesomeIcon icon={apps[k].icon} className="mr-2" />
                       <span className={location.pathname === apps[k].url ? 'font-bold text-gray-900' : `text-gray-700`}>{apps[k].name}</span>
-                    </li>
                   </Link>
                 )
                 }
                 else {return null;}
               })}
-            </ul>
+            </div>
             :
             // hacky mobile navigation
             <div className="flex items-center justify-around text-xs">

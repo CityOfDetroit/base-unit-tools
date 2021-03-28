@@ -1,25 +1,24 @@
-import mapboxgl from "mapbox-gl";
-import React, { useEffect, useState } from "react";
 import { arcgisToGeoJSON } from '@esri/arcgis-to-geojson-utils';
 import centroid from '@turf/centroid';
-import IdBadge from '../Explorer/IdBadge';
+import mapboxgl from "mapbox-gl";
+import React, { useEffect, useState } from "react";
+import layers from '../data/layers';
+import { baseStyle } from '../styles/mapstyle';
 
-import { baseStyle } from '../styles/mapstyle'
-import layers from '../data/layers.json'
+const IssueReporterMap = ({ response, target, feature }) => {
 
-const IssueReporterMap = ({ response, target, feature, center, setCenter }) => {
-
+  console.log(response, target, feature)
   let {candidates, geocoder} = response
-
+  
+  const [theMap, setTheMap] = useState(null);
+  
+  let center;
   if(candidates.length > 0 && geocoder === 'point') {
     center = [candidates[0].attributes.X, candidates[0].attributes.Y]
   }
-
   if(candidates.length > 0 && geocoder === 'centerline') {
     center = [candidates[0].location.x, candidates[0].location.y]
   }
-
-  const [theMap, setTheMap] = useState(null);
 
   useEffect(() => {
     var map = new mapboxgl.Map({
@@ -35,17 +34,6 @@ const IssueReporterMap = ({ response, target, feature, center, setCenter }) => {
     map.on("load", () => {
       setTheMap(map);
     });
-
-    map.on('moveend', () => {
-      setCenter(map.getCenter())
-    })
-
-    map.on('click', e => {
-      let features = map.queryRenderedFeatures(e.point, {
-        layers: ['address-point', 'building-fill', 'parcel-fill'],
-      });
-    })
-
   }, []);
 
   useEffect(() => {
@@ -70,7 +58,7 @@ const IssueReporterMap = ({ response, target, feature, center, setCenter }) => {
         theMap.setFilter("parcel-highlight", ["==", "parcel_id", ""])
         theMap.setFilter("address-highlight", ["==", "$id", ""])
     }
-  }, [theMap, candidates])
+  }, [theMap, candidates, geocoder])
 
   useEffect(() => {
     if(theMap) {

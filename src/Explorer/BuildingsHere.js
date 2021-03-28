@@ -1,4 +1,4 @@
-import layers from '../data/layers.json'
+import layers from '../data/layers'
 import IdBadge from './IdBadge'
 
 const BuildingsHere = ({ buildings, setClicked }) => {

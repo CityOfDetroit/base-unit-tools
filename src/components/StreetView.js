@@ -109,7 +109,6 @@ const StreetView = ({ feature, setSvBearing, setSvCoords, children }) => {
 
   // show full streetview on click of streetview button
   useEffect(() => {
-
     let mapillaryView = new Mapillary.Viewer({
       apiClient: clientid,
       container: 'mly',
@@ -135,21 +134,12 @@ const StreetView = ({ feature, setSvBearing, setSvCoords, children }) => {
       setSvBearing(b);
     });
 
-    // if (coords !== currentCoords) {
-    //   setCurrentCoords(coords);
-    fetchImageKey(featureToCentroidCoords(feature)).then((d) => {
-      let sequences = [];
-      d.features.forEach((ik) => {
-        if (sequences.map((s) => s.properties.captured_at.slice(0, 10)).indexOf(ik.properties.captured_at.slice(0, 10)) === -1) {
-          sequences.push(ik);
-        }
-      });
-      let sorted = sequences.sort((a, b) => moment(a.properties.captured_at) - moment(b.properties.captured_at));
-      setImageKeys(sorted);
-      setCurrentKey(sorted[sorted.length - 1]);
-    });
-    // }
-  }, []);
+    const cleanup = () => {
+      mapillaryView.remove()
+    }
+
+    return cleanup;
+  }, [setSvBearing, setSvCoords, setLoading]);
 
   useEffect(() => {
     setLoading(true);
@@ -157,16 +147,13 @@ const StreetView = ({ feature, setSvBearing, setSvCoords, children }) => {
       let coords = featureToCentroidCoords(feature);
       mapillary.moveToKey(currentKey.properties.key).then((node) => {
         setBearing(node, mapillary, currentKey.geometry.coordinates, [coords.lng || coords.x, coords.lat || coords.y]);
-        setLoading(false);
-        console.log('loaded')
       });
     }
-  }, [currentKey, mapillary]);
+  }, [currentKey, mapillary, feature]);
 
   useEffect(() => {
     if (mapillary) {  
       setLoading(true);
-      console.log('loading...')
       setImageKeys(null);
       let coords = featureToCentroidCoords(feature);
       let defaultMarker = new Mapillary.MarkerComponent.SimpleMarker("default-id", { lat: coords.lat, lon: coords.lng }, markerStyle);
@@ -182,6 +169,7 @@ const StreetView = ({ feature, setSvBearing, setSvCoords, children }) => {
         let sorted = sequences.sort((a, b) => moment(a.properties.captured_at) - moment(b.properties.captured_at));
         setImageKeys(sorted);
         setCurrentKey(sorted[sorted.length - 1]);
+        setLoading(false)
       });
     }
   }, [feature, mapillary]);
