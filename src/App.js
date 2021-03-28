@@ -43,7 +43,7 @@ function App() {
               <Geocoder />
             </Route>
             <Route path="/">
-              <BaseUnitTools />
+              <BaseUnitTools {...{ session }} />
             </Route>
           </Switch>
         </SiteWrapper>
