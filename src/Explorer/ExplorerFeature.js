@@ -9,15 +9,15 @@ const ExplorerFeature = ({ attr, attributes, clicked }) => {
 
   return (
     <>
-      <section className='sidebar-section feature' style={{ borderLeft: `8px solid ${layer.color}` }}>
-        <div className="flex items-center justify-between mb-2 text-lg">
-          <h2>{layer.label}</h2>
-          <div className="flex items-center">
-            {/* {hasSource && <span className="font-semibold text-gray-500 bg-gray-300 py-1 px-2 mx-3 text-sm">{attr.geo_source}</span>} */}
-            <IdBadge id={attr[layer.id_column]} layer={layer} link={false} />
-            {/* <pre className="font-bold" style={{background: '#feb70d'}}>{clicked.type === 'parcels' ? null : `#`}{attr[layer.id_column]}</pre> */}
-          </div>
-        </div>
+      <div className="bg-gray-300 p-2 text-xs font-bold flex items-center justify-between" style={{ borderLeft: `8px solid ${layer.color}` }}>
+        <h2>{layer.label}</h2>
+        <div className="flex items-center">
+          {/* {hasSource && <span className="font-semibold text-gray-500 bg-gray-300 py-1 px-2 mx-3 text-sm">{attr.geo_source}</span>} */}
+          <IdBadge id={attr[layer.id_column]} layer={layer} link={false} />
+          {/* <pre className="font-bold" style={{background: '#feb70d'}}>{clicked.type === 'parcels' ? null : `#`}{attr[layer.id_column]}</pre> */}
+        </div>      
+      </div>
+      <section className='sidebar-section' style={{ borderLeft: `8px solid ${layer.color}` }}>
         <table className="w-full">
           <tbody>
             {Object.keys(attributes).map((f, i) => (

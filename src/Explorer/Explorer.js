@@ -1,14 +1,16 @@
-import { faSatellite, faStreetView, faWrench } from '@fortawesome/free-solid-svg-icons';
+import { faArrowAltCircleRight, faWrench } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
 import { Link, useHistory, useLocation } from "react-router-dom";
-import Button from '../components/Button';
+import AppIntro from '../components/AppIntro';
 import StreetView from '../components/StreetView';
 import layers from '../data/layers';
+import apps from '../data/apps';
 import SiteSidebar from '../layout/SiteSidebar';
 import ExplorerAddress from './ExplorerAddress';
 import ExplorerBuilding from './ExplorerBuilding';
 import ExplorerMap from './ExplorerMap';
+import ExplorerMapOptions from './ExplorerMapOptions';
 import ExplorerParcel from './ExplorerParcel';
 import ExplorerSearch from './ExplorerSearch';
 import ExplorerStreet from './ExplorerStreet';
@@ -117,41 +119,28 @@ const Explorer = () => {
     <>
       <SiteSidebar title="Explorer">
 
-        {/* Search area */}
-        <section className="sidebar-section">
-          <ExplorerSearch {...{ clicked, setClicked }} />
-        </section>
+        <AppIntro app={apps.explorer}>
+          <p className="py-2">This tool is for exploring the base units and visualizing the relationships between them.</p>
+          <p className="pt-2">You can start by:</p>
+          <ul className="list-disc list-outside ml-4 pb-2">
+            <li>Searching for an address</li>
+            <li>Clicking a feature on the map</li>
+          </ul>
+          <p className="py-2">Once an address, building, parcel, or street is selected, you'll be able to see the other base units it is linked to.</p>
+          <p className="py-2">Click the <FontAwesomeIcon icon={faArrowAltCircleRight} className="mx-1 tex" /> next to a linked base unit's ID to navigate to that linked unit.</p>
+          <p className="py-2">You can also see a street view image of the currently selected feature, or turn on satellite imagery on the map.</p>
+        </AppIntro>
 
         {/* Options area */}
-        <section className="sidebar-section">   
-          <h2>Map options</h2>       
-          <div className="mt-1 flex">
-            <Button
-              onClick={() => setOptions({ ...options, streetView: !options.streetView })}
-              icon={faStreetView}
-              text="Street view"
-              active={options.streetView}
-              className="mr-2"
-              small
-              />
-            <Button
-              onClick={() => setOptions({ ...options, satellite: !options.satellite })}
-              icon={faSatellite}
-              text="Satellite imagery"
-              active={options.satellite}
-              small
-              />
-          </div>
-        </section>
-
-        {/* Street View if selected and we have a feature */}
-        {options.streetView && feature && <StreetView {...{ feature, setSvBearing, setSvCoords }} />}
 
         {/* based on type, return a specific component. */}
         {clicked.type === 'addresses' && feature && <ExplorerAddress {...{ feature, clicked, setClicked, linked, setLinked }} />}
         {clicked.type === 'buildings' && feature && <ExplorerBuilding {...{ feature, clicked, setClicked, linked, setLinked }} />}
         {clicked.type === 'parcels' && feature && <ExplorerParcel {...{ feature, clicked, setClicked, linked, setLinked }} />}
         {clicked.type === 'streets' && feature && <ExplorerStreet {...{ feature, clicked, setClicked, linked, setLinked }} />}
+
+        {/* Street View if selected and we have a feature */}
+        {options.streetView && feature && <StreetView {...{ feature, setSvBearing, setSvCoords }} />}
 
         {/* Link to issue reporter */}
         {feature &&
@@ -168,6 +157,10 @@ const Explorer = () => {
 
       {/* the main panel contains the map, and we pass it many of our useState variables */}
       <main>
+        <div className="flex items-center justify-between">
+          <ExplorerSearch {...{ clicked, setClicked }} />
+          <ExplorerMapOptions {...{options, setOptions}} />
+        </div>
         <ExplorerMap {...{ clicked, setClicked, linked, feature, history, svCoords, svBearing, showSv: options.streetView, showSatellite: options.satellite }} />
       </main>
     </>

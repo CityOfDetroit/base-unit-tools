@@ -51,11 +51,19 @@ const ExplorerSearch = ({ clicked, setClicked }) => {
   }, [clicked])
 
   return (
-    <>
-      <h2>Search for an address:</h2>
-      <div className="flex items-center justify-start text-sm mt-1">
+    <section className="bg-gray-200 p-3 w-1/2">
+      <h2 className="text-base flex items-center justify-between">
+        Search for an address:
+        {/* what if we couldn't find it? */}
+        {found === false && 
+          <div className="flex items-end justify-start text-xs font-semibold bg-red-400 text-gray-700 px-4 py-1">
+            No results found!
+          </div>
+        }
+      </h2>
+      <div className="flex items-center justify-start text-sm mt-1 w-4/5">
         <input
-          className="p-2 py-3 w-full bg-gray-200"
+          className="p-2 w-full bg-"
           type="text"
           value={value}
           onChange={(e) => {setValue(e.target.value); setFound(null);}} 
@@ -70,13 +78,8 @@ const ExplorerSearch = ({ clicked, setClicked }) => {
           text='Search'
           icon={faSearch} />
       </div>
-      {/* what if we couldn't find it? */}
-      {found === false && 
-        <div className="flex items-end justify-start text-xs font-semibold bg-red-200 text-gray-700 p-1">
-          We couldn't locate that address... please try again.
-        </div>
-      }
-    </>
+
+    </section>
   )
 }
 
