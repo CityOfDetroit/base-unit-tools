@@ -7,6 +7,7 @@ import { baseStyle } from '../styles/mapstyle';
 
 const IssueReporterMap = ({ response, target, feature }) => {
 
+  console.log(response, target, feature)
   let {candidates, geocoder} = response
   
   const [theMap, setTheMap] = useState(null);
@@ -33,7 +34,7 @@ const IssueReporterMap = ({ response, target, feature }) => {
     map.on("load", () => {
       setTheMap(map);
     });
-  }, [center]);
+  }, []);
 
   useEffect(() => {
     if(theMap && candidates.length > 0) {
@@ -89,7 +90,7 @@ const IssueReporterMap = ({ response, target, feature }) => {
         })
       }
     }
-  }, [theMap, feature, target])
+  }, [theMap, feature])
 
   return (
     <div id="map" className="issue-reporter-map" />

@@ -161,7 +161,7 @@ const IssueReporter = ({ session }) => {
       fetchFeature(target, setFeature)
       setAddResponse(null)
     }
-  }, [targetType, value, target])
+  }, [targetType, target])
 
   if(feature) {
     console.log(feature)
