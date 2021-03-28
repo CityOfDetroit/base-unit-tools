@@ -12,13 +12,18 @@ A collection of public-facing apps to enable upkeep and use of the city of Detro
 
 This site is built primarily using React, with the following libraries:
 
-- [create-react-app]()
-- [react-router-dom]()
-- [tailwindcss]()
-- [mapbox-gl-js]() (soon: maplibre.js) 
-- [mapillary-js]()
-- [esri-arcgis-rest]()
-- [turf.js]()
+- [create-react-app](https://create-react-app.dev/)
+- [react-router-dom](https://reactrouter.com/web/guides/quick-start)
+
+for styling/icons:
+- [tailwindcss](https://tailwindcss.com/)
+- [Font Awesome free icon set](https://fontawesome.com/icons?d=gallery&p=2&m=free)
+
+for mapping/spatial:
+- [mapbox-gl-js](https://docs.mapbox.com/mapbox-gl-js/api/) (soon: maplibre.js) 
+- [mapillary-js](https://mapillary.github.io/mapillary-js/)
+- [esri-arcgis-rest](https://esri.github.io/arcgis-rest-js/)
+- [turf.js](https://turfjs.org/)
 
 ## Tools
 
@@ -32,9 +37,9 @@ This tool should also serve as a jumping off point for other tools, such as the 
 
 This tool can also be easily linked to from other tools, such as the Geocoder.
 
-This tool accepts URL parameters!
+This tool accepts URL parameters:
 
-- `type`: should be one of `addresses`, `buildings`, `parcels`, `streets`
+- `type`: one of `addresses`, `buildings`, `parcels`, `streets`
 - `id`: the ID of the feature
 - `streetview`: should be `true` if you want Mapillary to automatically display.
 
@@ -42,13 +47,24 @@ Example URL: http://localhost:3000/base-unit-tools/explorer?type=buildings&id=65
 
 ### Issue Reporter
 
-This is a tool for **reporting problems** with an address or base unit.
+This is a tool for **reporting issues** with an address or base unit.
 
 Once you enter an address, or select a base unit and enter an ID, hit the Search button.
 
 You should then be able to enter the issue in a text box and submit.
 
 If you're a city employee, please **log in** so that your account can be attached to your submission.
+
+This tool accepts one of two sets of URL parameters, either:
+- `address`: representing an address string, which will be geocoded by the tools
+
+or, passed together:
+- `type`: one of `addresses`, `buildings`, `parcels`, `streets`
+- `id`: the ID of the feature
+
+which will be used to look up an existing base unit.
+
+For best use, the issue reporter should be linked from other tools using the `type` and `id` parameters.
 
 ### Geocoder
 
@@ -74,6 +90,12 @@ Eventually, it should validate an address by:
 ### Mailer
 
 This is a tool for **generating a mailing list** based on a particular selection area.
+
+You can select an area from some predetermined boundaries, or draw your own using the included tools.
+
+You can also apply a buffer to any shape to comply with distance-based mailing requirements.
+
+After filtering addresses based on their attributes, you can export a .csv of addresses for use in a mail merge.
 
 ## Installation
 

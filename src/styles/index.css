@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Roboto+Condensed:wght@300;400;700&family=Lora:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Roboto+Condensed:wght@300;400;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* ./src/index.css */
 @tailwind base;
@@ -109,7 +109,7 @@ footer {
 
 @media only screen and (min-width: 769px) {
   .explorer-map {
-    height: calc(100vh - 60px);
+    height: calc(100vh - 60px - 10rem);
   }
 
   .issue-reporter-map {

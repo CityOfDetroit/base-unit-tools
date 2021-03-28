@@ -9,6 +9,9 @@ import IdBadge from '../Explorer/IdBadge';
 import SiteSidebar from '../layout/SiteSidebar';
 import IssueReporterExtantAddress from './IssueReporterExtantAddress';
 import IssueReporterMap from './IssueReporterMap';
+import { arcgisToGeoJSON } from '@esri/arcgis-to-geojson-utils';
+import centroid from '@turf/centroid';
+
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -119,8 +122,7 @@ const IssueReporter = ({ session }) => {
           'outFields': '*',
           'resultRecordCount': 1,
           'outSR': 4326,
-          'f': 'pjson',
-          'returnCentroid': true
+          'f': 'pjson'
         }
         let queryString = Object.keys(params).map((key) => {
           return encodeURIComponent(key) + '=' + encodeURIComponent(params[key])
@@ -135,8 +137,7 @@ const IssueReporter = ({ session }) => {
           'outFields': '*',
           'resultRecordCount': 1,
           'outSR': 4326,
-          'f': 'pjson',
-          'returnCentroid': true
+          'f': 'pjson'
         }
         let queryString = Object.keys(params).map((key) => {
           return encodeURIComponent(key) + '=' + encodeURIComponent(params[key])
@@ -144,7 +145,7 @@ const IssueReporter = ({ session }) => {
         fullUrl = url + `/query?` + queryString
       }
 
-
+      console.log(fullUrl)
       fetch(fullUrl).then(r => r.json())
         .then(d => {
           setFeature(d.features[0])
@@ -163,8 +164,9 @@ const IssueReporter = ({ session }) => {
     }
   }, [targetType, target])
 
+  let featureCentroid;
   if(feature) {
-    console.log(feature)
+    featureCentroid = centroid(arcgisToGeoJSON(feature))
   }
     return (
     <>
@@ -261,8 +263,8 @@ const IssueReporter = ({ session }) => {
                   session: session,
                   formText: formText,
                   address: targetType === 'address' ? value : null,
-                  x: feature.centroid.x,
-                  y: feature.centroid.y,
+                  x: featureCentroid[1],
+                  y: featureCentroid[0],
                   targetType: targetType === 'base_unit' ? target.type.replaceAll(/[es]$/g, '') : null,
                   targetId: targetType === 'base_unit' ? target.id : null,
                   setAddResponse: setAddResponse
