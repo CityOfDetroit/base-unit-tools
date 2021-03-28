@@ -11,7 +11,7 @@ const MailerSelection = ({ geom, setGeom, resultIds }) => {
         {(area(geom) * 0.000000386102).toFixed(3)} square miles
       </li>
       {resultIds && <li>
-        {resultIds.objectIds.length} total addresses in the selection area
+        {resultIds.objectIds.length.toLocaleString()} total addresses in the selection area
       </li>}
     </ul>
     <div className="flex flex-row-reverse">

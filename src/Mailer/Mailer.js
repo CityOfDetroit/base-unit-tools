@@ -1,6 +1,7 @@
 import { getLayer, queryFeatures } from '@esri/arcgis-rest-feature-layer';
 import { geojsonToArcGIS } from '@esri/arcgis-to-geojson-utils';
-import { faDownload, faLock, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faEnvelopeOpenText, faLock, faMailBulk, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faUsps } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 import React, { useEffect, useState } from 'react';
@@ -10,13 +11,22 @@ import MailerBuffer from './MailerBuffer';
 import MailerLayerSelector from './MailerLayerSelector';
 import MailerMap from './MailerMap';
 import MailerSelection from './MailerSelection'
+import _ from 'lodash';
+import { CSVLink } from 'react-csv';
 
-// object to track filters
-const filters = {
-  'USPS-deliverable': null
-}
 
 const Mailer = ({ session }) => {
+
+  // object to track filters
+  const allFilters = {
+    'usps-deliverable': {
+      icon: faUsps,
+      activeText: 'Deliverable addresses only',
+      inactiveText: 'All addresses, even undeliverable',
+      default: true,
+      filterFunction: (a) => a.attributes.DPV_VACANT === 'N'
+    }
+  }
 
   // this tool is principally driven by this piece of state
   // which represents represents the current selection area
@@ -24,6 +34,13 @@ const Mailer = ({ session }) => {
 
   // use this boolean to see if the user has access to the mailing list layer
   const [access, setAccess] = useState(false)
+
+  // use this to set state of filter toggles
+  let defaults = {}
+  Object.keys(allFilters).forEach(f => {
+    defaults[f] = allFilters[f].default
+  })
+  const [filters, setFilters] = useState(defaults)
 
   // store the selection area object IDs, all addresses, and the filtered addresses.
   const [resultIds, setResultIds] = useState(null)
@@ -56,6 +73,8 @@ const Mailer = ({ session }) => {
   // in the fetchAddresses function
   useEffect(() => {
     setResultIds(null)
+    setAddresses([])
+    setFiltered([])
     if (geom && access) {
       queryFeatures({
         url: url,
@@ -74,50 +93,70 @@ const Mailer = ({ session }) => {
     }
   }, [geom, access, session, url])
 
+  useEffect(() => {
+    // this function is what runs when we click "Download CSV"
+    // we'll use the list of objectIDs to actually go get the addresses
+    const fetchAddresses = () => {
 
-  // this function is what runs when we click "Download CSV"
-  // we'll use the list of objectIDs to actually go get the addresses
-  const fetchAddresses = () => {
+      // fetch this many addresses at a time. we can turn this up to 2000
+      const chunkSize = 500
 
-    // fetch this many addresses at a time. we can turn this up to 2000
-    const chunkSize = 500
+      // get the "breakpoints": basically the first ID value, then every chunkSize'th value afterwards
+      let breakpoints = resultIds.objectIds.filter((oid, i) => (i === 0 || ((i) % chunkSize === 0)))
 
-    // get the "breakpoints": basically the first ID value, then every chunkSize'th value afterwards
-    let breakpoints = resultIds.objectIds.filter((oid, i) => (i === 0 || ((i) % chunkSize === 0)))
+      // push the last ObjectID plus one onto the stack -- we still need to fetch between it
+      breakpoints.push(resultIds.objectIds.slice(-1,)[0] + 1)
 
-    // push the last ObjectID plus one onto the stack -- we still need to fetch between it
-    breakpoints.push(resultIds.objectIds.slice(-1,)[0] + 1)
-
-    // create a bunch of Promises for the number of queries we need
-    let promises = breakpoints.slice(1).map((b, i) => {
-      let params = {
-        url: url,
-        orderByFields: "OBJECTID",
-        // this is confusing, but produces the correct result.
-        // it has to be weird because of how BETWEEN seems to work.
-        where: `OBJECTID between ${i === 0 ? (breakpoints[0] - 1) : (breakpoints[i])} and ${b - 1}`,
-        geometry: geojsonToArcGIS(geom)[0].geometry,
-        geometryType: "esriGeometryPolygon",
-        spatialRel: "esriSpatialRelIntersects",
-        httpMethod: "POST",
-        resultRecordCount: chunkSize,
-        authentication: session
-      }
-      return queryFeatures(params)
-    })
-
-    // execute all those Promises
-    Promise.all(promises)
-      .then(resps => {
-        // stack up each query response's features into this empty array
-        let allAddresses = []
-        resps.forEach(r => {
-          allAddresses = allAddresses.concat(r.features)
-        })
-        // store them in state
-        setAddresses(allAddresses)
+      // create a bunch of Promises for the number of queries we need
+      let promises = breakpoints.slice(1).map((b, i) => {
+        let params = {
+          url: url,
+          orderByFields: "OBJECTID",
+          // this is confusing, but produces the correct result.
+          // it has to be weird because of how BETWEEN seems to work.
+          where: `OBJECTID between ${i === 0 ? (breakpoints[0] - 1) : (breakpoints[i])} and ${b - 1}`,
+          geometry: geojsonToArcGIS(geom)[0].geometry,
+          geometryType: "esriGeometryPolygon",
+          spatialRel: "esriSpatialRelIntersects",
+          httpMethod: "POST",
+          resultRecordCount: chunkSize,
+          authentication: session
+        }
+        return queryFeatures(params)
       })
-  }
+
+      // execute all those Promises
+      Promise.all(promises)
+        .then(resps => {
+          // stack up each query response's features into this empty array
+          let allAddresses = []
+          resps.forEach(r => {
+            allAddresses = allAddresses.concat(r.features)
+          })
+          // store them in state
+          setAddresses(allAddresses)
+        })
+    }
+    if (resultIds && resultIds.objectIds.length > 0) {
+      fetchAddresses()
+    }
+  }, [resultIds])
+
+  // if our filters or addresses change,
+  // run the new addresses through the new filters
+  useEffect(() => {
+    let filteredAddresses = addresses
+    Object.keys(filters).forEach(k => {
+      if(filters[k]) {
+        filteredAddresses = filteredAddresses.filter(allFilters[k].filterFunction)
+      }
+    })
+    setFiltered(filteredAddresses)
+  }, [filters, addresses])
+
+  let formattedData = filtered.map((r, i) => {
+    return r.attributes
+  })
 
   return (
     <>
@@ -144,21 +183,6 @@ const Mailer = ({ session }) => {
         {geom && <MailerBuffer {...{ geom, setGeom }} />}
         {geom && resultIds && <MailerSelection {...{ geom, setGeom, resultIds }} />}
 
-        {geom &&
-        <section className='sidebar-section'>
-          <h3 className="text-sm mt-3">Filter addresses by:</h3>
-          {
-            Object.keys(filters).map(f => (
-              <div className="p-1" key={f}>
-                <input type="checkbox" name={f} checked={false} readOnly></input>
-                <label htmlFor={f} className="ml-2">{f}</label>
-              </div>
-            ))
-          }
-          </section>
-        }
-
-
         {/* If there's a shape and access to the layer */}
         {geom && access &&
           <section className="sidebar-section">
@@ -169,18 +193,30 @@ const Mailer = ({ session }) => {
             {/* If we have result IDs, show the export portion. */}
             {resultIds &&
               <>
-                <h2>Export mailing addresses to CSV</h2>
-                {/* <h3 className="text-sm mt-3">Include these attributes for each address:</h3>
-              {
-                Object.keys(options).map(o => (
-                  <div className="p-1">
-                  <input type="checkbox" name={o} checked={false}></input>
-                  <label for={o} className="ml-2">{o}</label>
-                  </div>
-                ))
-              } */}
+                <h2>Apply filters and download</h2>
+                <h3 className="text-sm">{resultIds && addresses.length === 0 ? `Loading all addresses...` : `Fetched ${addresses.length.toLocaleString()} addresses`}</h3>
+                {
+                  Object.keys(filters).map(f => (
+                    <Button
+                      text={filters[f] ? allFilters[f].activeText : allFilters[f].inactiveText}
+                      icon={allFilters[f].icon}
+                      key={f}
+                      small
+                      active={filters[f]}
+                      onClick={() => {
+                        let filterCopy = _.cloneDeep(filters)
+                        filterCopy[f] = !filters[f]
+                        setFilters(filterCopy)
+                      }}
+                    />
+                  ))
+                }
                 <div className="flex flex-row-reverse">
-                  <Button icon={faDownload} onClick={() => fetchAddresses()} text="Download .csv" />
+                  <CSVLink data={formattedData} filename={`mailing_list_${new Date().getTime()}.csv`}>
+                    <Button 
+                      icon={faDownload} 
+                      text={`Download ${filtered.length.toLocaleString()} addresses as .csv`} />
+                  </CSVLink>
                 </div>
               </>
             }
@@ -190,7 +226,7 @@ const Mailer = ({ session }) => {
       </SiteSidebar>
 
       <main>
-        <MailerMap {...{ geom, setGeom }} />
+        <MailerMap {...{ geom, setGeom, filtered }} />
       </main>
 
     </>
