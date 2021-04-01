@@ -13,6 +13,7 @@ import MailerMap from './MailerMap';
 import MailerSelection from './MailerSelection'
 import MailerAddressSearch from './MailerAddressSearch';
 import _ from 'lodash';
+import {ToggleButton} from '../components/ToggleButton'
 import { CSVLink } from 'react-csv';
 import apps from '../data/apps';
 import AppIntro from '../components/AppIntro';
@@ -44,7 +45,7 @@ const Mailer = ({ session }) => {
     defaults[f] = allFilters[f].default
   })
   const [filters, setFilters] = useState(defaults)
-
+  console.log(filters)
   // store the selection area object IDs, all addresses, and the filtered addresses.
   const [resultIds, setResultIds] = useState(null)
   const [addresses, setAddresses] = useState([])
@@ -221,22 +222,30 @@ const Mailer = ({ session }) => {
             {/* If we have result IDs, show the export portion. */}
             {resultIds &&
               <>
-                <h2>Apply filters and download</h2>
-                <h3 className="text-sm">{resultIds && addresses.length === 0 ? `Loading all addresses...` : `Fetched ${addresses.length.toLocaleString()} addresses`}</h3>
+                <h2>Address filtering options</h2>
+                <h3 className="text-sm text-gray-500">{resultIds && addresses.length === 0 ? `Loading all addresses...` : `Fetched ${addresses.length.toLocaleString()} total addresses`}</h3>
                 {
                   Object.keys(filters).map(f => (
-                    <Button
-                      text={filters[f] ? allFilters[f].activeText : allFilters[f].inactiveText}
-                      icon={allFilters[f].icon}
-                      key={f}
-                      small
-                      active={filters[f]}
-                      onClick={() => {
-                        let filterCopy = _.cloneDeep(filters)
-                        filterCopy[f] = !filters[f]
-                        setFilters(filterCopy)
-                      }}
-                    />
+                    <div key={f} className="flex my-4">
+                      <ToggleButton
+                        title={allFilters[f].activeText}
+                        active={filters[f]}
+                        onClick={() => {
+                          let filterCopy = _.cloneDeep(filters)
+                          filterCopy[f] = !filters[f]
+                          setFilters(filterCopy)
+                        }}
+                        />
+                      <ToggleButton
+                        title={allFilters[f].inactiveText}
+                        active={!filters[f]}
+                        onClick={() => {
+                          let filterCopy = _.cloneDeep(filters)
+                          filterCopy[f] = !filters[f]
+                          setFilters(filterCopy)
+                        }}
+                        />
+                    </div>
                   ))
                 }
                 <div className="flex flex-row-reverse">
