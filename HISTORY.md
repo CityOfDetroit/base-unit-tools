@@ -28,3 +28,14 @@ Initial release, with geocoder tool, cloned from https://cityofdetroit.github.io
 ### Fixed
 
 - ArcGIS Online login is available from any tool without interruption.
+
+## 1.2.1 - 2021-04-01
+
+### Changes
+
+- Mailer tool
+  - pull draw controls out of map into sidebar
+  - sort layer features on layer selector
+  - ability to create address
+  - move user through app flow more explicitly
+  - make a new ToggleButton for filters

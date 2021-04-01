@@ -91,7 +91,7 @@ Eventually, it should validate an address by:
 
 This is a tool for **generating a mailing list** based on a particular selection area.
 
-You can select an area from some predetermined boundaries, or draw your own using the included tools.
+You can select an area from some predetermined boundaries, draw your own shape, or input an address to start your mailing list.
 
 You can also apply a buffer to any shape to comply with distance-based mailing requirements.
 

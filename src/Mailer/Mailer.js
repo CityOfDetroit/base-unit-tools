@@ -1,7 +1,7 @@
 import { getLayer, queryFeatures } from '@esri/arcgis-rest-feature-layer';
 import { geojsonToArcGIS } from '@esri/arcgis-to-geojson-utils';
-import { faDownload, faEnvelopeOpenText, faLock, faMailBulk, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { faUsps } from '@fortawesome/free-brands-svg-icons';
+import { faDownload, faDrawPolygon, faSlash, faLock, faMailBulk, faMapMarkerAlt, faMarker, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faLine, faUsps } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 import React, { useEffect, useState } from 'react';
@@ -11,7 +11,9 @@ import MailerBuffer from './MailerBuffer';
 import MailerLayerSelector from './MailerLayerSelector';
 import MailerMap from './MailerMap';
 import MailerSelection from './MailerSelection'
+import MailerAddressSearch from './MailerAddressSearch';
 import _ from 'lodash';
+import {ToggleButton} from '../components/ToggleButton'
 import { CSVLink } from 'react-csv';
 import apps from '../data/apps';
 import AppIntro from '../components/AppIntro';
@@ -43,11 +45,15 @@ const Mailer = ({ session }) => {
     defaults[f] = allFilters[f].default
   })
   const [filters, setFilters] = useState(defaults)
-
+  console.log(filters)
   // store the selection area object IDs, all addresses, and the filtered addresses.
   const [resultIds, setResultIds] = useState(null)
   const [addresses, setAddresses] = useState([])
   const [filtered, setFiltered] = useState([])
+
+  // draw mode
+  // should be one of these: https://github.com/mapbox/mapbox-gl-draw/blob/main/docs/API.md#modes
+  const [mode, setMode] = useState('simple_select')
 
   // mailing list layer.
   // theoretically we can put any layer here to make a generalized selection tool.
@@ -160,6 +166,8 @@ const Mailer = ({ session }) => {
     return r.attributes
   })
 
+  console.log(geom)
+
   return (
     <>
 
@@ -182,7 +190,20 @@ const Mailer = ({ session }) => {
         </section>}
 
         {/* Boundary picker */}
-        <MailerLayerSelector {...{ geom, setGeom }} />
+        {!geom &&
+        <>
+          <section className="sidebar-section">
+            <h2>Draw your own shape</h2>
+            <div className="flex items-center">
+              <Button text='Draw a polygon' icon={faDrawPolygon} onClick={() => setMode('draw_polygon')} small className="mr-2" />
+              <Button text='Draw a line' icon={faSlash} onClick={() => setMode('draw_line_string')} small className="mr-2"/>
+              <Button text='Create a point' icon={faMapMarkerAlt} onClick={() => setMode('draw_point')} small />
+            </div>
+          </section>
+          <MailerAddressSearch {...{geom, setGeom}} />
+          <MailerLayerSelector {...{ geom, setGeom }} />
+        </>
+        }
 
         {/* If we have a shape, display buffer tool, current selection */}
         {geom && <MailerBuffer {...{ geom, setGeom }} />}
@@ -192,28 +213,39 @@ const Mailer = ({ session }) => {
         {geom && access &&
           <section className="sidebar-section">
 
+
+            {!resultIds && geom && geom.features[0].geometry.type === 'Polygon' && <h1>Loading...</h1>}
+
             {/* If we're waiting on result IDs, show a Loading message */}
-            {!resultIds && geom && <h1>Loading...</h1>}
+            {!resultIds && geom && (geom.features[0].geometry.type === 'Point' || geom.features[0].geometry.type === 'LineString') && <h1>Apply a buffer to this geometry to generate a mailing list area.</h1>}
 
             {/* If we have result IDs, show the export portion. */}
             {resultIds &&
               <>
-                <h2>Apply filters and download</h2>
-                <h3 className="text-sm">{resultIds && addresses.length === 0 ? `Loading all addresses...` : `Fetched ${addresses.length.toLocaleString()} addresses`}</h3>
+                <h2>Address filtering options</h2>
+                <h3 className="text-sm text-gray-500">{resultIds && addresses.length === 0 ? `Loading all addresses...` : `Fetched ${addresses.length.toLocaleString()} total addresses`}</h3>
                 {
                   Object.keys(filters).map(f => (
-                    <Button
-                      text={filters[f] ? allFilters[f].activeText : allFilters[f].inactiveText}
-                      icon={allFilters[f].icon}
-                      key={f}
-                      small
-                      active={filters[f]}
-                      onClick={() => {
-                        let filterCopy = _.cloneDeep(filters)
-                        filterCopy[f] = !filters[f]
-                        setFilters(filterCopy)
-                      }}
-                    />
+                    <div key={f} className="flex my-4">
+                      <ToggleButton
+                        title={allFilters[f].activeText}
+                        active={filters[f]}
+                        onClick={() => {
+                          let filterCopy = _.cloneDeep(filters)
+                          filterCopy[f] = !filters[f]
+                          setFilters(filterCopy)
+                        }}
+                        />
+                      <ToggleButton
+                        title={allFilters[f].inactiveText}
+                        active={!filters[f]}
+                        onClick={() => {
+                          let filterCopy = _.cloneDeep(filters)
+                          filterCopy[f] = !filters[f]
+                          setFilters(filterCopy)
+                        }}
+                        />
+                    </div>
                   ))
                 }
                 <div className="flex flex-row-reverse">
@@ -232,7 +264,7 @@ const Mailer = ({ session }) => {
       </SiteSidebar>
 
       <main>
-        <MailerMap {...{ geom, setGeom, filtered }} />
+        <MailerMap {...{ geom, setGeom, filtered, mode, setMode }} />
       </main>
 
     </>
