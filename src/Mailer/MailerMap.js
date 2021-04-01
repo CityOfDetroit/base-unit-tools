@@ -5,7 +5,7 @@ import bbox from '@turf/bbox';
 import mapStyle from '../styles/mailerstyle.json';
 import {arcgisToGeoJSON} from '@esri/arcgis-to-geojson-utils'
 
-const MailerMap = ({ geom, setGeom, filtered }) => {
+const MailerMap = ({ geom, setGeom, mode, setMode, filtered }) => {
 
   let [theMap, setTheMap] = useState(null);
   let [theDraw, setTheDraw] = useState(null);
@@ -20,7 +20,9 @@ const MailerMap = ({ geom, setGeom, filtered }) => {
       bounds: detroitBbox
     });
 
-    let Draw = new MapboxDraw();
+    let Draw = new MapboxDraw({
+      displayControlsDefault: false
+    });
     setTheDraw(Draw);
 
     map.addControl(Draw, 'top-left');
@@ -76,8 +78,16 @@ const MailerMap = ({ geom, setGeom, filtered }) => {
 
   useEffect(() => {
     if (theMap && theDraw && geom) {
+      console.log(geom)
       if (geom.features[0].geometry.type !== 'Point') {
         theMap.fitBounds(bbox(geom), { padding: 40, maxZoom: 17 });
+      }
+      else {
+        let ctr = geom.features[0].geometry.coordinates
+        theMap.easeTo({
+          center: ctr,
+          zoom: 17
+        });
       }
       theDraw.set(geom);
       theDraw.changeMode("simple_select");
@@ -88,6 +98,12 @@ const MailerMap = ({ geom, setGeom, filtered }) => {
       }
     }
   }, [geom, theDraw, theMap]);
+
+  useEffect(() => {
+    if (theMap && theDraw && mode) {
+      theDraw.changeMode(mode)
+    }
+  }, [mode])
 
   useEffect(() => {
     if(theMap && filtered) {

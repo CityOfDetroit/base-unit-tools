@@ -66,7 +66,7 @@ const MailerLayerSelector = ({ geom, setGeom }) => {
       setGeom({type: "FeatureCollection", features: [simplify(matching[0], { tolerance: 0.00005 })]})
     }}>
       <option value=''>Please choose a {presets[currentLayer].singular}</option>
-      {layerFeatures.map(ft => (
+      {layerFeatures.sort((a, b) => a.properties[presets[currentLayer].pickColumn] > b.properties[presets[currentLayer].pickColumn]).map(ft => (
         <option value={ft.id} key={ft.id}>{ft.properties[presets[currentLayer].pickColumn].slice(0,40)}</option>
       ))}
     </select>}
