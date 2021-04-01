@@ -1,7 +1,7 @@
 import { getLayer, queryFeatures } from '@esri/arcgis-rest-feature-layer';
 import { geojsonToArcGIS } from '@esri/arcgis-to-geojson-utils';
-import { faDownload, faEnvelopeOpenText, faLock, faMailBulk, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { faUsps } from '@fortawesome/free-brands-svg-icons';
+import { faDownload, faDrawPolygon, faEnvelopeOpenText, faLock, faMailBulk, faMarker, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faLine, faUsps } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 import React, { useEffect, useState } from 'react';
@@ -11,6 +11,7 @@ import MailerBuffer from './MailerBuffer';
 import MailerLayerSelector from './MailerLayerSelector';
 import MailerMap from './MailerMap';
 import MailerSelection from './MailerSelection'
+import MailerAddressSearch from './MailerAddressSearch';
 import _ from 'lodash';
 import { CSVLink } from 'react-csv';
 import apps from '../data/apps';
@@ -48,6 +49,10 @@ const Mailer = ({ session }) => {
   const [resultIds, setResultIds] = useState(null)
   const [addresses, setAddresses] = useState([])
   const [filtered, setFiltered] = useState([])
+
+  // draw mode
+  // should be one of these: https://github.com/mapbox/mapbox-gl-draw/blob/main/docs/API.md#modes
+  const [mode, setMode] = useState('simple_select')
 
   // mailing list layer.
   // theoretically we can put any layer here to make a generalized selection tool.
@@ -160,6 +165,8 @@ const Mailer = ({ session }) => {
     return r.attributes
   })
 
+  console.log(geom)
+
   return (
     <>
 
@@ -182,7 +189,20 @@ const Mailer = ({ session }) => {
         </section>}
 
         {/* Boundary picker */}
-        <MailerLayerSelector {...{ geom, setGeom }} />
+        {!geom &&
+        <>
+          <section className="sidebar-section">
+            <h2>Draw your own shape</h2>
+            <div className="flex items-center">
+              <Button text='Draw a polygon' icon={faDrawPolygon} onClick={() => setMode('draw_polygon')} small className="mr-2" />
+              <Button text='Draw a line' icon={faLine} onClick={() => setMode('draw_line_string')} small className="mr-2"/>
+              <Button text='Create a point' icon={faMarker} onClick={() => setMode('draw_point')} small />
+            </div>
+          </section>
+          <MailerAddressSearch {...{geom, setGeom}} />
+          <MailerLayerSelector {...{ geom, setGeom }} />
+        </>
+        }
 
         {/* If we have a shape, display buffer tool, current selection */}
         {geom && <MailerBuffer {...{ geom, setGeom }} />}
@@ -192,8 +212,11 @@ const Mailer = ({ session }) => {
         {geom && access &&
           <section className="sidebar-section">
 
+
+            {!resultIds && geom && geom.features[0].geometry.type === 'Polygon' && <h1>Loading...</h1>}
+
             {/* If we're waiting on result IDs, show a Loading message */}
-            {!resultIds && geom && <h1>Loading...</h1>}
+            {!resultIds && geom && (geom.features[0].geometry.type === 'Point' || geom.features[0].geometry.type === 'LineString') && <h1>Apply a buffer to this geometry to generate a mailing list area.</h1>}
 
             {/* If we have result IDs, show the export portion. */}
             {resultIds &&
@@ -232,7 +255,7 @@ const Mailer = ({ session }) => {
       </SiteSidebar>
 
       <main>
-        <MailerMap {...{ geom, setGeom, filtered }} />
+        <MailerMap {...{ geom, setGeom, filtered, mode, setMode }} />
       </main>
 
     </>
