@@ -1,6 +1,6 @@
 import { getLayer, queryFeatures } from '@esri/arcgis-rest-feature-layer';
 import { geojsonToArcGIS } from '@esri/arcgis-to-geojson-utils';
-import { faDownload, faDrawPolygon, faEnvelopeOpenText, faLock, faMailBulk, faMarker, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faDrawPolygon, faSlash, faLock, faMailBulk, faMapMarkerAlt, faMarker, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { faLine, faUsps } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
@@ -196,8 +196,8 @@ const Mailer = ({ session }) => {
             <h2>Draw your own shape</h2>
             <div className="flex items-center">
               <Button text='Draw a polygon' icon={faDrawPolygon} onClick={() => setMode('draw_polygon')} small className="mr-2" />
-              <Button text='Draw a line' icon={faLine} onClick={() => setMode('draw_line_string')} small className="mr-2"/>
-              <Button text='Create a point' icon={faMarker} onClick={() => setMode('draw_point')} small />
+              <Button text='Draw a line' icon={faSlash} onClick={() => setMode('draw_line_string')} small className="mr-2"/>
+              <Button text='Create a point' icon={faMapMarkerAlt} onClick={() => setMode('draw_point')} small />
             </div>
           </section>
           <MailerAddressSearch {...{geom, setGeom}} />
