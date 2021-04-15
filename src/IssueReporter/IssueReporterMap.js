@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import layers from '../data/layers';
 import { baseStyle } from '../styles/mapstyle';
 
-const IssueReporterMap = ({ response, target, feature }) => {
+const IssueReporterMap = ({ response, target, feature, setMode, mode }) => {
 
   console.log(response, target, feature)
   let {candidates, geocoder} = response
@@ -25,8 +25,7 @@ const IssueReporterMap = ({ response, target, feature }) => {
       container: "map", // container id
       style: baseStyle, // stylesheet location
       center: center, // starting position [lng, lat]
-      zoom: 18, // starting zoom
-      interactive: false
+      zoom: 18 // starting zoom
     });
 
     map.resize();
@@ -91,6 +90,12 @@ const IssueReporterMap = ({ response, target, feature }) => {
       }
     }
   }, [theMap, feature])
+
+  useEffect(() => {
+    if(theMap) {
+      console.log('new mode: ', mode)
+    }
+  }, [theMap, mode])
 
   return (
     <div id="map" className="issue-reporter-map" />

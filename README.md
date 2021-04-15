@@ -107,7 +107,7 @@ After filtering addresses based on their attributes, you can export a .csv of ad
 
 ### Routing
 
-App/URL routing is primarilly controlled in `src/App.js`, with `react-router-dom`.
+App/URL routing is primarily controlled in `src/App.js`, with `react-router-dom`.
 
 There is a route for each tool which renders that tool. 
 

@@ -22,7 +22,7 @@ const ExplorerFeature = ({ attr, attributes, clicked }) => {
           <tbody>
             {Object.keys(attributes).map((f, i) => (
               <tr key={i} className={i < Object.keys(attributes).length - 1 ? 'border-b-2 border-gray-400 h-10' : 'h-10'}>
-                <td className="w-1/2 font-bold text-sm">{f}</td>
+                <td className="w-2/5 font-bold text-sm">{f}</td>
                 <td className="">{attributes[f]}</td>
               </tr>
             ))}

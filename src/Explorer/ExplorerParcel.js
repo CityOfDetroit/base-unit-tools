@@ -5,6 +5,8 @@ import AddressesHere from './AddressesHere';
 import BuildingsHere from './BuildingsHere';
 import ExplorerFeature from './ExplorerFeature';
 
+import { queryFeatures } from '@esri/arcgis-rest-feature-layer'
+
 const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => {
 
     let { attributes: attr } = feature;
@@ -17,6 +19,30 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
 
     let [addresses, setAddresses] = useState([])
     let [buildings, setBuildings] = useState([])
+
+    console.log(attr.parcel_id)
+
+    let [legalDesc, setLegalDesc] = useState(null)
+
+    useEffect(() => {
+
+      queryFeatures({
+        url: `https://opengis.detroitmi.gov/opengis/rest/services/Assessors/Parcels/FeatureServer/0`,
+        where: `parcel_number = '${attr.parcel_id}'`,
+        returnGeometry: false,
+        outFields: ['legal_description']
+      })
+        .then(d => {
+          if(d.features.length > 0) {
+            let feature = d.features[0]
+            setLegalDesc(feature.attributes.legal_description)
+          }
+        })
+    }, [attr.parcel_id])
+
+    if(legalDesc) {
+      attributes['Legal description'] = legalDesc
+    };
 
     useEffect(() => {
         let url = layers.addresses.endpoint + `/query?`
