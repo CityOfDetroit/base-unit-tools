@@ -45,7 +45,6 @@ const Mailer = ({ session }) => {
     defaults[f] = allFilters[f].default
   })
   const [filters, setFilters] = useState(defaults)
-  console.log(filters)
   // store the selection area object IDs, all addresses, and the filtered addresses.
   const [resultIds, setResultIds] = useState(null)
   const [addresses, setAddresses] = useState([])
@@ -165,8 +164,6 @@ const Mailer = ({ session }) => {
   let formattedData = filtered.map((r, i) => {
     return r.attributes
   })
-
-  console.log(geom)
 
   return (
     <>
