@@ -17,6 +17,9 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
         "Taxable status": attr.taxstatus
     }
 
+    let longAttributes = {
+    }
+
     let [addresses, setAddresses] = useState([])
     let [buildings, setBuildings] = useState([])
 
@@ -41,7 +44,7 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
     }, [attr.parcel_id])
 
     if(legalDesc) {
-      attributes['Legal description'] = legalDesc
+      longAttributes['Legal description'] = legalDesc
     };
 
     useEffect(() => {
@@ -109,7 +112,7 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
 
     return (
         <>
-            <ExplorerFeature {...{attr, attributes, clicked}} />
+            <ExplorerFeature {...{attr, attributes,longAttributes, clicked}} />
             {/* <section className='sidebar-section'>
                 <div className="flex items-center justify-between py-2">
                     <h2 className="text-xl">Linked parcel:</h2>

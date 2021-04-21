@@ -1,11 +1,13 @@
 import layers from '../data/layers'
 import IdBadge from './IdBadge'
 
-const ExplorerFeature = ({ attr, attributes, clicked }) => {
+const ExplorerFeature = ({ attr, attributes, longAttributes={}, clicked }) => {
 
   // let hasSource = Object.keys(attr).indexOf('geo_source') > -1
 
   let layer = layers[clicked.type]
+
+  console.log(layer)
 
   return (
     <>
@@ -21,13 +23,23 @@ const ExplorerFeature = ({ attr, attributes, clicked }) => {
         <table className="w-full">
           <tbody>
             {Object.keys(attributes).map((f, i) => (
-              <tr key={i} className={i < Object.keys(attributes).length - 1 ? 'border-b-2 border-gray-400 h-10' : 'h-10'}>
+              <tr key={i} className={(i + 1 === Object.keys(attributes).length) ? 'h-10' : 'border-b-2 border-gray-400 h-10'}>
                 <td className="w-2/5 font-bold text-sm">{f}</td>
                 <td className="">{attributes[f]}</td>
               </tr>
+
             ))}
           </tbody>
         </table>
+        {Object.keys(longAttributes).length > 0 && Object.keys(longAttributes).map((f,i) => (
+          <div key={i}>
+          <h3 className={i === 0 ? 'border-t-2 border-gray-400 text-sm py-2' : 'text-sm py-2'}>
+            {f}
+          </h3>
+          <p className="px-2 text-sm"> {longAttributes[f]}</p>
+          </div>
+
+        ))}
       </section>
     </>
   )

@@ -14,6 +14,7 @@ import ExplorerMapOptions from './ExplorerMapOptions';
 import ExplorerParcel from './ExplorerParcel';
 import ExplorerSearch from './ExplorerSearch';
 import ExplorerStreet from './ExplorerStreet';
+import { queryFeatures } from '@esri/arcgis-rest-feature-layer';
 
 // a very tiny helper function
 // that i don't fully understand
@@ -77,38 +78,17 @@ const Explorer = () => {
 
       // TODO all this can probably be extracted into a function
       let layer = layers[clicked.type]
-      let url = layer.endpoint
-      let fullUrl;
-      if (clicked.type === 'parcels') {
-        let params = {
-          'where': `parcel_id='${clicked.id}'`,
-          'outFields': '*',
-          'resultRecordCount': 1,
-          'outSR': 4326,
-          'f': 'pjson',
-        }
-        let queryString = Object.keys(params).map((key) => {
-          return encodeURIComponent(key) + '=' + encodeURIComponent(params[key])
-        }).join('&');
+      let where = clicked.type === 'parcels' 
+                    ? `${layer.id_column} = '${clicked.id}'`
+                    : `${layer.id_column} = ${clicked.id}`
 
-        fullUrl = url + `/query?` + queryString
-      }
-      else {
-        let params = {
-          'where': `${layer.id_column}=${clicked.id}`,
-          'outFields': '*',
-          'resultRecordCount': 1,
-          'outSR': 4326,
-          'f': 'pjson',
-        }
-        let queryString = Object.keys(params).map((key) => {
-          return encodeURIComponent(key) + '=' + encodeURIComponent(params[key])
-        }).join('&');
-        fullUrl = url + `/query?` + queryString
-      }
-
-      // TODO ... and then our function would return the fullUrl here.
-      fetch(fullUrl).then(r => r.json())
+      queryFeatures({
+        url: layer.endpoint,
+         'where': where,
+         'outFields': '*',
+         'resultRecordCount': 1,
+         'outSR': 4326
+      })
         .then(d => {
           setFeature(d.features[0])
         })
