@@ -3,19 +3,19 @@ import React, { useEffect, useState } from 'react';
 import Button from '../components/Button';
 import useGeocoder from '../hooks/useGeocoder';
 
-const ExplorerSearch = ({ clicked, setClicked }) => {
+const ExplorerSearch = ({ setClicked }) => {
 
   let [value, setValue] = useState('')
   let [searchValue, setSearchValue] = useState(null)
-  let [features, type] = useGeocoder(searchValue)
+  let [featureCollection, type] = useGeocoder(searchValue)
 
   // when we get a new clicked feature, reset.
   useEffect(() => {
     type === 'point' && setClicked({
       type: "addresses",
-      id: features[0].properties.address_id
+      id: featureCollection.features[0].properties.address_id
     })
-  }, [features])
+  }, [featureCollection, type])
 
   return (
     <section className="bg-gray-200 p-3 w-1/2">
