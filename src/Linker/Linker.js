@@ -51,13 +51,13 @@ const Linker = ({ session }) => {
 
 
         </section>
-          {feature &&
+          {feature && links.bldg_id &&
             <Link type={`buildings`} id={links.bldg_id}/>
           }
-          {feature &&
+          {feature && links.parcel_id &&
             <Link type={`parcels`} id={links.parcel_id}/>
           }
-          {feature &&
+          {feature && links.street_id > 0 &&
             <Link type={`streets`} id={links.street_id}/>
           }
 
