@@ -1,4 +1,4 @@
-import { faArrowAltCircleRight, faWrench } from '@fortawesome/free-solid-svg-icons';
+import { faArrowAltCircleRight, faLink, faWrench } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
 import { Link, useHistory } from "react-router-dom";
@@ -111,7 +111,7 @@ const Explorer = ({ session }) => {
         {feature && clicked.type === 'addresses' && session &&
           <section className="sidebar-section caution">
             <Link to={`/linker?type=${clicked.type}&id=${clicked.id}`}>
-              <FontAwesomeIcon icon={faWrench} />
+              <FontAwesomeIcon icon={faLink} />
               <span className="text-semibold text-sm ml-2">
                 Edit address links
             </span>
