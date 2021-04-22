@@ -8,6 +8,7 @@ import SiteSidebar from '../layout/SiteSidebar';
 import Button from '../components/Button'
 import AppIntro from '../components/AppIntro';
 import apps from '../data/apps';
+import { bulkGeocode } from '@esri/arcgis-rest-geocoding';
 
 const Geocoder = () => {
 
@@ -34,24 +35,19 @@ const Geocoder = () => {
 
   useEffect(() => {
     if (payload.length > 0) {
-      let dataToSend = {
-        records: addresses.map((a, i) => {
-          return {
-            "attributes": { "OBJECTID": i, "SingleLine": a }
-          }
+      let dataToSend = addresses.map((a, i) => {
+          return { "OBJECTID": i + 1, "SingleLine": a }
         })
-      }
 
-      let bodyFormData = new FormData();
-      bodyFormData.set('addresses', JSON.stringify(dataToSend));
-      bodyFormData.set('f', 'json');
-      bodyFormData.set('outFields', '*');
-      bodyFormData.set('outSR', 4326);
-
-      fetch(`${geocoder.url}/geocodeAddresses`, {
-        body: bodyFormData,
-        method: 'POST'
-      }).then(r => r.json()).then(d => {
+      bulkGeocode({
+        addresses: dataToSend,
+        endpoint: geocoder.url,
+        params: {
+          'outSR': 4326,
+          'outFields': '*'
+        }
+      }).
+      then(d => {
         setResults(d.locations.sort((a,b) => a.attributes.ResultID - b.attributes.ResultID))
       })
     }
