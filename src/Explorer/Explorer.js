@@ -15,6 +15,7 @@ import ExplorerParcel from './ExplorerParcel';
 import ExplorerSearch from './ExplorerSearch';
 import ExplorerStreet from './ExplorerStreet';
 import { queryFeatures } from '@esri/arcgis-rest-feature-layer';
+import useFeature from '../hooks/useFeature';
 
 // a very tiny helper function
 // that i don't fully understand
@@ -41,9 +42,7 @@ const Explorer = () => {
     type: queryType ? queryType : null,
     id: queryId ? queryId : null
   })
-
-  // this stores the fetched feature
-  let [feature, setFeature] = useState(null)
+  let feature = useFeature(clicked)
 
   // this stores IDs of linked features, to be highlighted on the map.
   let [linked, setLinked] = useState({
@@ -65,33 +64,13 @@ const Explorer = () => {
   const [svCoords, setSvCoords] = useState(null);
   const [svBearing, setSvBearing] = useState(null);
 
+
   // this effect triggers when the user clicks on a new feature in the map
   useEffect(() => {
-
-    // a big hunk of code which constructs the proper URL to go fetch
-    // TODO extract this into a function.
     if (clicked.type && clicked.id) {
-
       // push new params to our browser URL
       // TODO see if we can make this work with the back button
       history.push(`?type=${clicked.type}&id=${clicked.id}${options.streetView ? `&streetview=true` : ``}`);
-
-      // TODO all this can probably be extracted into a function
-      let layer = layers[clicked.type]
-      let where = clicked.type === 'parcels' 
-                    ? `${layer.id_column} = '${clicked.id}'`
-                    : `${layer.id_column} = ${clicked.id}`
-
-      queryFeatures({
-        url: layer.endpoint,
-         'where': where,
-         'outFields': '*',
-         'resultRecordCount': 1,
-         'outSR': 4326
-      })
-        .then(d => {
-          setFeature(d.features[0])
-        })
     }
   }, [clicked, history, options.streetView])
 
