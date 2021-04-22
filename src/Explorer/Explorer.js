@@ -1,10 +1,9 @@
 import { faArrowAltCircleRight, faWrench } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
-import { Link, useHistory, useLocation } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import AppIntro from '../components/AppIntro';
 import StreetView from '../components/StreetView';
-import layers from '../data/layers';
 import apps from '../data/apps';
 import SiteSidebar from '../layout/SiteSidebar';
 import ExplorerAddress from './ExplorerAddress';
@@ -14,14 +13,9 @@ import ExplorerMapOptions from './ExplorerMapOptions';
 import ExplorerParcel from './ExplorerParcel';
 import ExplorerSearch from './ExplorerSearch';
 import ExplorerStreet from './ExplorerStreet';
-import { queryFeatures } from '@esri/arcgis-rest-feature-layer';
 import useFeature from '../hooks/useFeature';
+import useQuery from '../hooks/useQuery';
 
-// a very tiny helper function
-// that i don't fully understand
-function useQuery() {
-  return new URLSearchParams(useLocation().search);
-}
 
 const Explorer = () => {
 

@@ -1,7 +1,6 @@
 import { arcgisToGeoJSON } from '@esri/arcgis-to-geojson-utils';
 import centroid from '@turf/centroid';
 import React, { useEffect, useState } from 'react';
-import { useLocation } from "react-router-dom";
 import layers from '../data/layers';
 import SiteSidebar from '../layout/SiteSidebar';
 import IssueReporterExtantAddress from './IssueReporterExtantAddress';
@@ -9,12 +8,8 @@ import { IssueReporterFeature } from './IssueReporterFeature';
 import IssueReporterMap from './IssueReporterMap';
 import { IssueReporterSelector } from './IssueReporterSelector';
 import IssueReporterSubmission from './IssueReporterSubmission';
-
+import useQuery from '../hooks/useQuery';
 import useGeocoder from '../hooks/useGeocoder';
-
-function useQuery() {
-  return new URLSearchParams(useLocation().search);
-}
 
 const IssueReporter = ({ session }) => {
 
