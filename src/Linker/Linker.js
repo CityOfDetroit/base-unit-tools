@@ -2,41 +2,11 @@ import React, { useEffect, useState } from 'react';
 import SiteSidebar from '../layout/SiteSidebar'
 import useQuery from '../hooks/useQuery'
 import useFeature from '../hooks/useFeature'
-import layers from '../data/layers'
 import LinkerMap from './LinkerMap';
-import IdBadge from '../Explorer/IdBadge';
-import Button from '../components/Button';
+import LinkerSubmission from './LinkerSubmission';
+import { Link } from './Link';
 
-const Link = ({ type, id }) => {
-  let feature = useFeature({
-    type: type,
-    id: id,
-    f: 'geojson'
-  })
-
-  if (feature) {
-
-    let layer = layers[type]
-
-    return (
-      <section className='sidebar-section'>
-      <h3 className="flex items-center justify-between">
-        {layer.label}
-        <IdBadge layer={layer} id={id} link={false} />
-      </h3>
-      <pre className="text-xs h-24 overflow-y-auto px-4 bg-white">
-        {JSON.stringify(feature.properties, null, 2)}
-      </pre>
-      </section>
-    )
-  }
-
-  else {
-    return <div>Loading...</div>
-  }
-}
-
-const Linker = () => {
+const Linker = ({ session }) => {
 
   // get some URL params
   let query = useQuery()
@@ -90,6 +60,8 @@ const Linker = () => {
           {feature &&
             <Link type={`streets`} id={links.street_id}/>
           }
+
+        {feature && <LinkerSubmission {...{session, feature, links}} />}
       </SiteSidebar>
       <main>
         {feature && links.fetched && <LinkerMap center={feature.geometry.coordinates} feature={feature} {...{links, setLinks}} />}
