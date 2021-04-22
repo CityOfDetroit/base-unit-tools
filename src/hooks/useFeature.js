@@ -2,6 +2,15 @@ import { useState, useEffect } from 'react'
 import { queryFeatures } from '@esri/arcgis-rest-feature-layer';
 import layers from '../data/layers.js'
 
+/**
+ * useFeature
+ * 
+ * takes a object with type (addresses, parcels, streets, buildings) and an ID
+ * returns the ArcJSON item
+ * 
+ * @param {type: string, id: *}
+ * @returns an ArcJSON item
+ */
 const useFeature = ({ type, id }) => {
   let [data, setData] = useState(null)
 
