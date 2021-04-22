@@ -13,6 +13,8 @@ import IssueReporterMap from './IssueReporterMap';
 import { IssueReporterSelector } from './IssueReporterSelector';
 import IssueReporterSubmission from './IssueReporterSubmission';
 
+import useGeocoder from '../hooks/useGeocoder';
+
 function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
@@ -24,9 +26,11 @@ const IssueReporter = ({ session }) => {
   // get an address string from the URL parameters
   let queryAddress = query.get("address")
   let [value, setValue] = useState(queryAddress ? decodeURIComponent(queryAddress) : '')
+  let [searchValue, setSearchValue] = useState(queryAddress ? decodeURIComponent(queryAddress) : null)
+  let [featureCollection, type] = useGeocoder(searchValue)
 
   // ...or we can get type/id from params.
-  let queryType = query.get("type") || "addresses"
+  let queryType = query.get("type") || null
   let queryId = query.get("id") || null
   let [target, setTarget] = useState({
     type: queryType,
@@ -42,36 +46,17 @@ const IssueReporter = ({ session }) => {
     match: {}
   })
 
-  let [feature, setFeature] = useState(null)
-  let [mode, setMode] = useState('static')
-
-  const geocode = (value, setResponse) => {
-    let spacesRe = /\s/g
-    let url = `${geocoders[3].url}/findAddressCandidates?SingleLine=${value.replace(spacesRe, '+')}&outFields=*&f=pjson`
-    fetch(url)
-      .then(r => r.json())
-      .then(d => {
-        if (d.candidates.length > 0) {
-          setResponse({
-            geocoder: 'point',
-            candidates: d.candidates,
-            match: d.candidates[0].attributes
-          })
-        }
-        else {
-          let centerlineUrl = `https://gis.detroitmi.gov/arcgis/rest/services/DoIT/StreetCenterlineGeocoder/GeocodeServer/findAddressCandidates?Single+Line+Input=${value.replace(spacesRe, '+')}&outFields=*&outSR=4326&f=pjson`
-          fetch(centerlineUrl)
-            .then(r => r.json())
-            .then(d => {
-              setResponse({
-                geocoder: 'centerline',
-                candidates: d.candidates,
-                match: d.candidates[0].attributes
-              })
-            })
-        }
+  useEffect(() => {
+    if(featureCollection && type) {
+      setResponse({
+        geocoder: type,
+        candidates: featureCollection.features,
+        match: featureCollection.features[0].properties
       })
-  }
+    }
+  }, [type, featureCollection])
+
+  let [feature, setFeature] = useState(null)
 
   const fetchFeature = (target, setFeature) => {
     if (target.type && target.id) {
@@ -113,9 +98,8 @@ const IssueReporter = ({ session }) => {
   }
 
   useEffect(() => {
-    
     if (value && targetType === 'address') {
-      geocode(value, setResponse)
+      setSearchValue(value)
     }
     if (target.type && target.id && targetType === 'base_unit') {
       fetchFeature(target, setFeature)
@@ -127,7 +111,7 @@ const IssueReporter = ({ session }) => {
     featureCentroid = centroid(arcgisToGeoJSON(feature))
   }
   if(response && response.candidates.length > 0) {
-    featureCentroid = [response.candidates[0].location.y, response.candidates[0].location.x]
+    featureCentroid = response.candidates[0].geometry.coordinates
   }
     return (
     <>
@@ -136,26 +120,26 @@ const IssueReporter = ({ session }) => {
           <h2>Report an issue</h2>
           <p>You can report an issue about an address or a specific base unit.</p>
 
-          <IssueReporterSelector {...{setTargetType, targetType, geocode, value, setValue, setResponse, fetchFeature, feature, setFeature, target, setTarget}} />
+          <IssueReporterSelector {...{setTargetType, targetType, setSearchValue, value, setValue, fetchFeature, feature, setFeature, target, setTarget}} />
           
         </section>
 
         {targetType === 'base_unit' && feature &&
-          <IssueReporterFeature clicked={target} attr={feature.attributes} {...{mode, setMode}} />
+          <IssueReporterFeature clicked={target} attr={feature.attributes} />
         }
 
-        {targetType === 'address' && response.geocoder &&
+        {targetType === 'address' && type &&
           <section className='sidebar-section'>
-            {response.geocoder === 'point' && <IssueReporterExtantAddress {...{ response }} />}
-            {response.geocoder === 'centerline' && <h2>No address found</h2>}
+            {type === 'point' && <IssueReporterExtantAddress {...{ response }} />}
+            {type === 'centerline' && <h2>No address found</h2>}
           </section>
         }
 
-        {(feature || response.geocoder) && <IssueReporterSubmission {...{value, target, session, targetType, featureCentroid}} />}
+        {(feature || featureCollection) && <IssueReporterSubmission {...{value, target, session, targetType, featureCentroid}} />}
 
       </SiteSidebar>
       <main>
-        {(response.geocoder || feature) && <IssueReporterMap {...{ response, target, feature, mode, setMode }} />}
+        {((response.candidates.length > 0) || feature) && <IssueReporterMap {...{ response, target, feature }} />}
       </main>
     </>
   )

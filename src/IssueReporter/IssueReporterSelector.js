@@ -4,7 +4,7 @@ import Button from '../components/Button';
 import _ from 'lodash';
 import layers from '../data/layers';
 
-export const IssueReporterSelector = ({ setTargetType, targetType, geocode, value, setValue, setResponse, fetchFeature, feature, setFeature, target, setTarget }) => {
+export const IssueReporterSelector = ({ setTargetType, targetType, setSearchValue, value, setValue, setResponse, fetchFeature, feature, setFeature, target, setTarget }) => {
   return (
     <>
       <div className="flex items-center justify-between my-2">
@@ -21,10 +21,10 @@ export const IssueReporterSelector = ({ setTargetType, targetType, geocode, valu
           disabled={targetType === 'base_unit'}
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          onKeyPress={(e) => e.code === 'Enter' && geocode(value, setResponse)} />
+          onKeyPress={(e) => e.code === 'Enter' && setSearchValue(value)} />
         <Button
           active={value !== '' && targetType === 'address'}
-          onClick={() => geocode(value, setResponse)}
+          onClick={() => setSearchValue(value)}
           icon={faSearch}
           text='Search'
           small />

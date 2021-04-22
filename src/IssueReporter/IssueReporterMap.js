@@ -7,18 +7,10 @@ import { baseStyle } from '../styles/mapstyle';
 
 const IssueReporterMap = ({ response, target, feature, setMode, mode }) => {
 
-  console.log(response, target, feature)
+  console.log(response)
   let {candidates, geocoder} = response
-  
   const [theMap, setTheMap] = useState(null);
-  
-  let center;
-  if(candidates.length > 0 && geocoder === 'point') {
-    center = [candidates[0].attributes.X, candidates[0].attributes.Y]
-  }
-  if(candidates.length > 0 && geocoder === 'centerline') {
-    center = [candidates[0].location.x, candidates[0].location.y]
-  }
+  let center = candidates[0].geometry.coordinates;
 
   useEffect(() => {
     var map = new mapboxgl.Map({
@@ -39,17 +31,17 @@ const IssueReporterMap = ({ response, target, feature, setMode, mode }) => {
     if(theMap && candidates.length > 0) {
         let c = candidates[0]
         if(geocoder === 'point') {
-          theMap.setFilter("building-highlight", ["==", "$id", c.attributes.building_id])
-          theMap.setFilter("parcel-highlight", ["==", "parcel_id", c.attributes.parcel_id])
-          theMap.setFilter("address-highlight", ["==", "$id", c.attributes.address_id])
-          theMap.setFilter("streets-highlight", ["==", "street_id", c.attributes.street_id])
-          theMap.setCenter([c.attributes.X, c.attributes.Y])
+          theMap.setFilter("building-highlight", ["==", "$id", c.properties.building_id])
+          theMap.setFilter("parcel-highlight", ["==", "parcel_id", c.properties.parcel_id])
+          theMap.setFilter("address-highlight", ["==", "$id", c.properties.address_id])
+          theMap.setFilter("streets-highlight", ["==", "street_id", c.properties.street_id])
+          theMap.setCenter(c.geometry.coordinates)
         }
         if(geocoder === 'centerline') {
           theMap.setFilter("building-highlight", ["==", "$id", ""])
           theMap.setFilter("parcel-highlight", ["==", "parcel_id", ""])
           theMap.setFilter("address-highlight", ["==", "$id", ""])
-          theMap.setCenter([c.location.x, c.location.y])
+          theMap.setCenter(c.geometry.coordinates)
         }
     }
     if(theMap && candidates.length === 0) {
@@ -90,12 +82,6 @@ const IssueReporterMap = ({ response, target, feature, setMode, mode }) => {
       }
     }
   }, [theMap, feature])
-
-  useEffect(() => {
-    if(theMap) {
-      console.log('new mode: ', mode)
-    }
-  }, [theMap, mode])
 
   return (
     <div id="map" className="issue-reporter-map" />
