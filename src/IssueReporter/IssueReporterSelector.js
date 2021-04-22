@@ -59,14 +59,14 @@ export const IssueReporterSelector = ({ setTargetType, targetType, setSearchValu
             onKeyPress={(e) => e.code === 'Enter' && fetchFeature(target, setFeature)}
           />
         </div>
-        {/* <Button
+        <Button
           active={target.id && target.type && targetType === 'base_unit'}
           disabled={targetType === 'address'}
           onClick={() => fetchFeature(target, setFeature)}
           icon={faSearch}
           text='Search'
           small
-        /> */}
+        />
       </div>
     </>
   );

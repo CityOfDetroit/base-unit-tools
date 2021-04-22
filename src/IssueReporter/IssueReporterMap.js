@@ -5,11 +5,16 @@ import React, { useEffect, useState } from "react";
 import layers from '../data/layers';
 import { baseStyle } from '../styles/mapstyle';
 
-const IssueReporterMap = ({ featureCollection, type, target, feature, setMode, mode }) => {
+const IssueReporterMap = ({ featureCollection, type, target, feature, featureCentroid, setMode, mode }) => {
 
+  console.log(feature, featureCentroid)
 
   const [theMap, setTheMap] = useState(null);
-  let center = featureCollection.features[0].geometry.coordinates;
+  let center = featureCentroid.geometry.coordinates;
+
+  if(!featureCollection) {
+    featureCollection = {type: "FeatureCollection", features: []}
+  }
 
   useEffect(() => {
     var map = new mapboxgl.Map({

@@ -92,7 +92,7 @@ const IssueReporter = ({ session }) => {
     featureCentroid = centroid(arcgisToGeoJSON(feature))
   }
   if(featureCollection && featureCollection.features.length > 0) {
-    featureCentroid = featureCollection.features[0].geometry.coordinates
+    featureCentroid = featureCollection.features[0]
   }
     return (
     <>
@@ -120,7 +120,7 @@ const IssueReporter = ({ session }) => {
 
       </SiteSidebar>
       <main>
-        {((featureCollection && featureCollection.features.length > 0) || feature) && <IssueReporterMap {...{ type, featureCollection, target, feature }} />}
+        {((featureCollection && featureCollection.features.length > 0) || feature) && <IssueReporterMap {...{ type, featureCollection, target, feature, featureCentroid }} />}
       </main>
     </>
   )
