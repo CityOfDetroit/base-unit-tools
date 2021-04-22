@@ -32,11 +32,11 @@ const ExplorerFeature = ({ attr, attributes, longAttributes={}, clicked }) => {
           </tbody>
         </table>
         {Object.keys(longAttributes).length > 0 && Object.keys(longAttributes).map((f,i) => (
-          <div key={i}>
+          <div key={i} style={{paddingLeft: 2}}>
           <h3 className={i === 0 ? 'border-t-2 border-gray-400 text-sm py-2' : 'text-sm py-2'}>
             {f}
           </h3>
-          <p className="px-2 text-sm"> {longAttributes[f]}</p>
+          <p className="px-2 text-sm leading-tight"> {longAttributes[f]}</p>
           </div>
 
         ))}
