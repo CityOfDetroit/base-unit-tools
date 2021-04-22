@@ -5,12 +5,11 @@ import React, { useEffect, useState } from "react";
 import layers from '../data/layers';
 import { baseStyle } from '../styles/mapstyle';
 
-const IssueReporterMap = ({ response, target, feature, setMode, mode }) => {
+const IssueReporterMap = ({ featureCollection, type, target, feature, setMode, mode }) => {
 
-  console.log(response)
-  let {candidates, geocoder} = response
+
   const [theMap, setTheMap] = useState(null);
-  let center = candidates[0].geometry.coordinates;
+  let center = featureCollection.features[0].geometry.coordinates;
 
   useEffect(() => {
     var map = new mapboxgl.Map({
@@ -28,28 +27,28 @@ const IssueReporterMap = ({ response, target, feature, setMode, mode }) => {
   }, []);
 
   useEffect(() => {
-    if(theMap && candidates.length > 0) {
-        let c = candidates[0]
-        if(geocoder === 'point') {
+    if(theMap && featureCollection.features.length > 0) {
+        let c = featureCollection.features[0]
+        if(type === 'point') {
           theMap.setFilter("building-highlight", ["==", "$id", c.properties.building_id])
           theMap.setFilter("parcel-highlight", ["==", "parcel_id", c.properties.parcel_id])
           theMap.setFilter("address-highlight", ["==", "$id", c.properties.address_id])
           theMap.setFilter("streets-highlight", ["==", "street_id", c.properties.street_id])
           theMap.setCenter(c.geometry.coordinates)
         }
-        if(geocoder === 'centerline') {
+        if(type === 'centerline') {
           theMap.setFilter("building-highlight", ["==", "$id", ""])
           theMap.setFilter("parcel-highlight", ["==", "parcel_id", ""])
           theMap.setFilter("address-highlight", ["==", "$id", ""])
           theMap.setCenter(c.geometry.coordinates)
         }
     }
-    if(theMap && candidates.length === 0) {
+    if(theMap && featureCollection.features.length === 0) {
         theMap.setFilter("building-highlight", ["==", "$id", ""])
         theMap.setFilter("parcel-highlight", ["==", "parcel_id", ""])
         theMap.setFilter("address-highlight", ["==", "$id", ""])
     }
-  }, [theMap, candidates, geocoder])
+  }, [theMap, featureCollection, type])
 
   useEffect(() => {
     if(theMap) {

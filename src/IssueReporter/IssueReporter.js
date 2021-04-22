@@ -1,10 +1,7 @@
 import { arcgisToGeoJSON } from '@esri/arcgis-to-geojson-utils';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import centroid from '@turf/centroid';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from "react-router-dom";
-import Button from '../components/Button';
-import { geocoders } from '../data/geocoders';
 import layers from '../data/layers';
 import SiteSidebar from '../layout/SiteSidebar';
 import IssueReporterExtantAddress from './IssueReporterExtantAddress';
@@ -39,22 +36,6 @@ const IssueReporter = ({ session }) => {
 
   // this is how we track which type of issue is currently being reported
   let [targetType, setTargetType] = useState(target.type ? 'base_unit' : 'address')
-
-  let [response, setResponse] = useState({
-    geocoder: null,
-    candidates: [],
-    match: {}
-  })
-
-  useEffect(() => {
-    if(featureCollection && type) {
-      setResponse({
-        geocoder: type,
-        candidates: featureCollection.features,
-        match: featureCollection.features[0].properties
-      })
-    }
-  }, [type, featureCollection])
 
   let [feature, setFeature] = useState(null)
 
@@ -110,8 +91,8 @@ const IssueReporter = ({ session }) => {
   if(feature) {
     featureCentroid = centroid(arcgisToGeoJSON(feature))
   }
-  if(response && response.candidates.length > 0) {
-    featureCentroid = response.candidates[0].geometry.coordinates
+  if(featureCollection && featureCollection.features.length > 0) {
+    featureCentroid = featureCollection.features[0].geometry.coordinates
   }
     return (
     <>
@@ -130,7 +111,7 @@ const IssueReporter = ({ session }) => {
 
         {targetType === 'address' && type &&
           <section className='sidebar-section'>
-            {type === 'point' && <IssueReporterExtantAddress {...{ response }} />}
+            {type === 'point' && <IssueReporterExtantAddress {...{ type, featureCollection }} />}
             {type === 'centerline' && <h2>No address found</h2>}
           </section>
         }
@@ -139,7 +120,7 @@ const IssueReporter = ({ session }) => {
 
       </SiteSidebar>
       <main>
-        {((response.candidates.length > 0) || feature) && <IssueReporterMap {...{ response, target, feature }} />}
+        {((featureCollection && featureCollection.features.length > 0) || feature) && <IssueReporterMap {...{ type, featureCollection, target, feature }} />}
       </main>
     </>
   )
