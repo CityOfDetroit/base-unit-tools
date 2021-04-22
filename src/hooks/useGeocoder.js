@@ -4,6 +4,14 @@ import {geocoders } from '../data/geocoders'
 
 const geocoderUrl = geocoders[0].url
 
+/**
+ * useGeocoder custom hook.
+ * Returns a 2-element array, where the first element is a GeoJSON FeatureCollection, and the second is the match type.
+ * 
+ * @param {string} input 
+ *        The single-line address input to the geocoder.
+ * @returns {[]}
+ */
 const useGeocoder = (input) => {
 
   let [data, setData] = useState(null)
