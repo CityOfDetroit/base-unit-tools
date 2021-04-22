@@ -7,8 +7,6 @@ const ExplorerFeature = ({ attr, attributes, longAttributes={}, clicked }) => {
 
   let layer = layers[clicked.type]
 
-  console.log(layer)
-
   return (
     <>
       <div className="bg-gray-300 p-2 text-xs font-bold flex items-center justify-between" style={{ borderLeft: `8px solid ${layer.color}` }}>

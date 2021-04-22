@@ -7,7 +7,7 @@ import layers from '../data/layers';
 export const IssueReporterSelector = ({ setTargetType, targetType, geocode, value, setValue, setResponse, fetchFeature, feature, setFeature, target, setTarget }) => {
   return (
     <>
-      {/* <div className="flex items-center justify-between my-2">
+      <div className="flex items-center justify-between my-2">
         <h3 className="text-sm w-1/4 flex items-center justify-start" onClick={() => setTargetType('address')}>
           <input type="radio" id="address" name="type" value="address" readOnly
             className="mx-1"
@@ -28,7 +28,7 @@ export const IssueReporterSelector = ({ setTargetType, targetType, geocode, valu
           icon={faSearch}
           text='Search'
           small />
-      </div> */}
+      </div>
       <div className="flex items-center justify-between my-2">
         <h3 className="text-sm w-1/4 flex items-center justify-start" onClick={() => { setTargetType('base_unit'); setValue(''); }}>
           <input type="radio" id="base_unit" name="type" value="base_unit"

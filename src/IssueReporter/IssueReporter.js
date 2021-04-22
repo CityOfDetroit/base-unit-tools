@@ -35,11 +35,13 @@ const IssueReporter = ({ session }) => {
 
   // this is how we track which type of issue is currently being reported
   let [targetType, setTargetType] = useState(target.type ? 'base_unit' : 'address')
+
   let [response, setResponse] = useState({
     geocoder: null,
     candidates: [],
     match: {}
   })
+
   let [feature, setFeature] = useState(null)
   let [mode, setMode] = useState('static')
 
@@ -89,7 +91,6 @@ const IssueReporter = ({ session }) => {
         }).join('&');
 
         fullUrl = url + `/query?` + queryString
-        console.log(fullUrl)
       }
       else {
         let params = {
@@ -104,8 +105,6 @@ const IssueReporter = ({ session }) => {
         }).join('&');
         fullUrl = url + `/query?` + queryString
       }
-
-      console.log(fullUrl)
       fetch(fullUrl).then(r => r.json())
         .then(d => {
           setFeature(d.features[0])

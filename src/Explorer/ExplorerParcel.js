@@ -22,9 +22,6 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
 
     let [addresses, setAddresses] = useState([])
     let [buildings, setBuildings] = useState([])
-
-    console.log(attr.parcel_id)
-
     let [legalDesc, setLegalDesc] = useState(null)
 
     useEffect(() => {
