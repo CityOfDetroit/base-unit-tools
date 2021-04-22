@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { queryFeatures } from '@esri/arcgis-rest-feature-layer';
 import layers from '../data/layers.js'
+import { arcgisToGeoJSON } from '@esri/arcgis-to-geojson-utils';
 
 /**
  * useFeature
@@ -11,7 +12,7 @@ import layers from '../data/layers.js'
  * @param {type: string, id: *}
  * @returns an ArcJSON item
  */
-const useFeature = ({ type, id }) => {
+const useFeature = ({ type, id, f='arcjson' }) => {
 
   // we store the returned data here
   let [data, setData] = useState(null)
@@ -41,7 +42,12 @@ const useFeature = ({ type, id }) => {
         'resultRecordCount': 1,
         'outSR': 4326
       }).then(d => {
-        setData(d.features[0])
+        if(f === 'arcjson') {
+          setData(d.features[0])
+        }
+        else { 
+          setData(arcgisToGeoJSON(d.features[0]))
+        }
       })
     }
   }, [type, id])
