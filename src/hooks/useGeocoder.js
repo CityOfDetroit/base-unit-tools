@@ -6,7 +6,8 @@ const geocoderUrl = geocoders[0].url
 
 /**
  * useGeocoder custom hook.
- * Returns a 2-element array, where the first element is a GeoJSON FeatureCollection, and the second is the match type.
+ * Returns a 2-element array, where the first element is a GeoJSON FeatureCollection representing the geocoding matches, and the second is the match type.
+ * The match type can be either 'point' or 'centerline'.
  * 
  * @param {string} input 
  *        The single-line address input to the geocoder.
