@@ -43,9 +43,9 @@ function App() {
             <Route path="/geocoder">
               <Geocoder />
             </Route>
-            <Route path="/linker">
+            {session && <Route path="/linker">
               <Linker {...{ session }} />
-            </Route>
+            </Route>}
             <Route path="/">
               <BaseUnitTools {...{ session }} />
             </Route>

@@ -63,10 +63,10 @@ export const apps = {
         url: `/linker`,
         description: 'Create or edit links for an existing address',
         questions: [
-            `I need to assign new addresses for a row of townhouses.`
+            `All these unlinked addresses are driving me crazy?`
         ],
         icon: faLink,
-        private: false
+        private: true
     }
     // 'assignment': {
     //     name: 'Assignment',
