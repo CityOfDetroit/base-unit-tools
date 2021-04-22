@@ -26,7 +26,7 @@ function App() {
         <SiteWrapper {...{ session, setSession }}>
           <Switch>
             <Route path="/explorer">
-              <Explorer />
+              <Explorer {...{session}} />
             </Route>
             <Route path="/issue-reporter">
               <IssueReporter {...{ session }} />

@@ -17,7 +17,7 @@ import useFeature from '../hooks/useFeature';
 import useQuery from '../hooks/useQuery';
 
 
-const Explorer = () => {
+const Explorer = ({ session }) => {
 
   // query parameters
   let query = useQuery()
@@ -102,6 +102,18 @@ const Explorer = () => {
               <FontAwesomeIcon icon={faWrench} />
               <span className="text-semibold text-sm ml-2">
                 Report an issue here
+            </span>
+            </Link>
+          </section>
+        }
+
+        {/* Link to, uh, Linker */}
+        {feature && clicked.type === 'addresses' && session &&
+          <section className="sidebar-section caution">
+            <Link to={`/linker?type=${clicked.type}&id=${clicked.id}`}>
+              <FontAwesomeIcon icon={faWrench} />
+              <span className="text-semibold text-sm ml-2">
+                Edit address links
             </span>
             </Link>
           </section>
