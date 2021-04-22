@@ -53,14 +53,18 @@ const LinkerMap = ({ center, feature, links, setLinks }) => {
   }, []);
 
   useEffect(() => {
-    if(parcel) {
+    if(parcel && theMap) {
       links.parcel_id = parcel
+      theMap.setFilter("parcel-highlight", ["==", "parcel_id", parcel])
+
     }
-    if(building) {
+    if(building && theMap) {
+      theMap.setFilter("building-highlight", ["==", "$id", building])
       links.bldg_id = building
     }
-    if(street) {
+    if(street && theMap) {
       links.street_id = street
+      theMap.setFilter("streets-highlight", ["==", "street_id", street])
     }
     setLinks({
       ...links
