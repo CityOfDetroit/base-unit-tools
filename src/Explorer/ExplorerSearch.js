@@ -18,7 +18,7 @@ const ExplorerSearch = ({ setClicked }) => {
   }, [featureCollection, type])
 
   return (
-    <section className="bg-gray-200 p-3 w-1/2">
+    <section className="my-1">
       <h2 className="text-base flex items-center justify-between">
         Search for an address:
         {/* what if we couldn't find it? */}

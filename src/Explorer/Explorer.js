@@ -2,7 +2,7 @@ import { faArrowAltCircleRight, faLink, faWrench } from '@fortawesome/free-solid
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
 import { Link, useHistory } from "react-router-dom";
-import AppIntro from '../components/AppIntro';
+import AppHeader from '../components/AppHeader';
 import StreetView from '../components/StreetView';
 import apps from '../data/apps';
 import SiteSidebar from '../layout/SiteSidebar';
@@ -68,21 +68,29 @@ const Explorer = ({ session }) => {
     }
   }, [clicked, history, options.streetView])
 
+  let introduction = (
+    <>
+      <p className="py-2">This tool is for exploring the base units and visualizing the relationships between them.</p>
+      <p className="pt-2">You can start by:</p>
+      <ul className="list-disc list-outside ml-4 pb-2">
+        <li>Searching for an address</li>
+        <li>Clicking a feature on the map</li>
+      </ul>
+      <p className="py-2">Once an address, building, parcel, or street is selected, you'll be able to see the other base units it is linked to.</p>
+      <p className="py-2">Click the <FontAwesomeIcon icon={faArrowAltCircleRight} className="mx-1 tex" /> next to a linked base unit's ID to navigate to that linked unit.</p>
+      <p className="py-2">You can also see a street view image of the currently selected feature, or turn on satellite imagery on the map.</p>
+    </>
+  )
+
   return (
     <>
       <SiteSidebar title="Explorer">
 
-        <AppIntro app={apps.explorer}>
-          <p className="py-2">This tool is for exploring the base units and visualizing the relationships between them.</p>
-          <p className="pt-2">You can start by:</p>
-          <ul className="list-disc list-outside ml-4 pb-2">
-            <li>Searching for an address</li>
-            <li>Clicking a feature on the map</li>
-          </ul>
-          <p className="py-2">Once an address, building, parcel, or street is selected, you'll be able to see the other base units it is linked to.</p>
-          <p className="py-2">Click the <FontAwesomeIcon icon={faArrowAltCircleRight} className="mx-1 tex" /> next to a linked base unit's ID to navigate to that linked unit.</p>
-          <p className="py-2">You can also see a street view image of the currently selected feature, or turn on satellite imagery on the map.</p>
-        </AppIntro>
+        <AppHeader app={apps.explorer} introduction={introduction}>
+          <ExplorerSearch {...{ setClicked }} />
+          <ExplorerMapOptions {...{options, setOptions}} />
+        </AppHeader>
+
 
         {/* Options area */}
 
@@ -123,8 +131,6 @@ const Explorer = ({ session }) => {
       {/* the main panel contains the map, and we pass it many of our useState variables */}
       <main>
         <div className="flex items-center justify-between mb-2">
-          <ExplorerSearch {...{ setClicked }} />
-          <ExplorerMapOptions {...{options, setOptions}} />
         </div>
         <ExplorerMap {...{ clicked, setClicked, linked, feature, history, svCoords, svBearing, showSv: options.streetView, showSatellite: options.satellite }} />
       </main>
