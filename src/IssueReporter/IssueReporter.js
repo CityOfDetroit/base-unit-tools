@@ -10,6 +10,8 @@ import { IssueReporterSelector } from './IssueReporterSelector';
 import IssueReporterSubmission from './IssueReporterSubmission';
 import useQuery from '../hooks/useQuery';
 import useGeocoder from '../hooks/useGeocoder';
+import AppHeader from '../components/AppHeader';
+import apps from '../data/apps';
 
 const IssueReporter = ({ session }) => {
 
@@ -92,6 +94,7 @@ const IssueReporter = ({ session }) => {
     return (
     <>
       <SiteSidebar title="Issue Reporter">
+        <AppHeader app={apps['issue-reporter']} />
         <section className="sidebar-section">
           <h2>Report an issue</h2>
           <p>You can report an issue about an address or a specific base unit.</p>
