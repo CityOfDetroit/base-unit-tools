@@ -28,7 +28,7 @@ const Linker = ({ session }) => {
 
   // new feature? refresh links.
   useEffect(() => {
-    if(feature) {
+    if (feature) {
       setLinks({
         fetched: true,
         bldg_id: feature.properties.bldg_id,
@@ -37,34 +37,34 @@ const Linker = ({ session }) => {
       })
     }
   }, [feature])
-  
+
   return (
     <>
       <SiteSidebar title="Linker">
-        <section className="sidebar-section">
-          <h2>Creating links to feature ... {queryType}: {queryId}</h2>
 
-          {feature && 
-            <pre className="text-xs"> 
+        {feature &&
+          <section className="sidebar-section">
+            <h2>Creating links to feature ... {queryType}: {queryId}</h2>
+            <pre className="text-xs">
               {JSON.stringify(feature.properties, null, 2)}
-            </pre>}
+            </pre>
+          </section>}
 
 
-        </section>
-          {feature && links.bldg_id &&
-            <Link type={`buildings`} id={links.bldg_id}/>
-          }
-          {feature && links.parcel_id &&
-            <Link type={`parcels`} id={links.parcel_id}/>
-          }
-          {feature && links.street_id > 0 &&
-            <Link type={`streets`} id={links.street_id}/>
-          }
+        {feature && links.bldg_id &&
+          <Link type={`buildings`} id={links.bldg_id} />
+        }
+        {feature && links.parcel_id &&
+          <Link type={`parcels`} id={links.parcel_id} />
+        }
+        {feature && links.street_id > 0 &&
+          <Link type={`streets`} id={links.street_id} />
+        }
 
-        {feature && <LinkerSubmission {...{session, feature, links}} />}
+        {feature && <LinkerSubmission {...{ session, feature, links }} />}
       </SiteSidebar>
       <main>
-        {feature && links.fetched && <LinkerMap center={feature.geometry.coordinates} feature={feature} {...{links, setLinks}} />}
+        {feature && links.fetched && <LinkerMap center={feature.geometry.coordinates} feature={feature} {...{ links, setLinks }} />}
       </main>
     </>
   )
