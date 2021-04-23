@@ -13,7 +13,7 @@ import MailerMap from './MailerMap';
 import MailerSelection from './MailerSelection'
 import MailerAddressSearch from './MailerAddressSearch';
 import _ from 'lodash';
-import {ToggleButton} from '../components/ToggleButton'
+import { ToggleButton } from '../components/ToggleButton'
 import { CSVLink } from 'react-csv';
 import apps from '../data/apps';
 import AppHeader from '../components/AppHeader';
@@ -155,6 +155,7 @@ const Mailer = ({ session }) => {
       })
 
       // execute all those Promises
+
       Promise.all(promises)
         .then(resps => {
           // stack up each query response's features into this empty array
@@ -176,7 +177,7 @@ const Mailer = ({ session }) => {
   useEffect(() => {
     let filteredAddresses = addresses
     Object.keys(filters).forEach(k => {
-      if(filters[k]) {
+      if (filters[k]) {
         filteredAddresses = filteredAddresses.filter(allFilters[k].filterFunction)
       }
     })
@@ -191,7 +192,7 @@ const Mailer = ({ session }) => {
   let features = filtered.map(f => {
     return {
       type: "Feature",
-      properties: {...f.attributes},
+      properties: { ...f.attributes },
       geometry: {
         type: "Point",
         coordinates: [parseFloat(f[prop].y.toFixed(6)), parseFloat(f[prop].x.toFixed(6))]
@@ -205,13 +206,19 @@ const Mailer = ({ session }) => {
 
   let gjDownload = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(featureCollection))
 
+
+  let introduction = (
+    <>
+      <p>Use this tool to generate a mailing list.</p>
+      <p>First, choose a selection area.</p>
+      <p>Next, you can select filtering options.</p>
+      <p>Finally, you can export your selected addresses to .csv or GeoJSON.</p>
+    </>
+  )
   return (
     <>
 
       <SiteSidebar title="Mailer">
-
-        <AppHeader app={apps.mailer} />
-
 
         {/* Show a warning if the user doesn't have access to the layer. */}
         {!access && <section className="sidebar-section caution flex items-center">
@@ -226,37 +233,37 @@ const Mailer = ({ session }) => {
           </div>
         </section>}
 
-        <section className="sidebar-section">
 
-        <div className="flex w-3/4 items-center justify-around">
-
-        <ToggleButton
-          title={`Centroid mode (fast)`}
-          active={layer === 'centroid'}
-          onClick={() => setLayer('centroid') && setResultIds(null) && setAddresses([]) && setFiltered([])}
-          />
-        <ToggleButton
-          title={`Parcel mode (slower)`}
-          active={layer === 'parcel'}
-          onClick={() => setLayer('parcel') && setResultIds(null) && setAddresses([]) && setFiltered([])}
-          />
+        <AppHeader app={apps.mailer} introduction={introduction}>
+          <div className="flex items-center justify-around">
+            <p className="w-1/3 text-sm">Select by address point/underlying parcel</p>
+            <ToggleButton
+              title={`Centroid mode (fast)`}
+              active={layer === 'centroid'}
+              onClick={() => setLayer('centroid') && setResultIds(null) && setAddresses([]) && setFiltered([])}
+            />
+            <ToggleButton
+              title={`Parcel mode (slower)`}
+              active={layer === 'parcel'}
+              onClick={() => setLayer('parcel') && setResultIds(null) && setAddresses([]) && setFiltered([])}
+            />
           </div>
-          </section>
+        </AppHeader>
 
         {/* Boundary picker */}
         {!geom &&
-        <>
-          <section className="sidebar-section">
-            <h2>Draw your own shape</h2>
-            <div className="flex items-center">
-              <Button text='Draw a polygon' icon={faDrawPolygon} onClick={() => setMode('draw_polygon')} small className="mr-2" />
-              <Button text='Draw a line' icon={faSlash} onClick={() => setMode('draw_line_string')} small className="mr-2"/>
-              <Button text='Create a point' icon={faMapMarkerAlt} onClick={() => setMode('draw_point')} small />
-            </div>
-          </section>
-          <MailerAddressSearch {...{geom, setGeom}} />
-          <MailerLayerSelector {...{ geom, setGeom }} />
-        </>
+          <>
+            <section className="sidebar-section">
+              <h2>Draw your own shape</h2>
+              <div className="flex items-center">
+                <Button text='Draw a polygon' icon={faDrawPolygon} onClick={() => setMode('draw_polygon')} small className="mr-2" />
+                <Button text='Draw a line' icon={faSlash} onClick={() => setMode('draw_line_string')} small className="mr-2" />
+                <Button text='Create a point' icon={faMapMarkerAlt} onClick={() => setMode('draw_point')} small />
+              </div>
+            </section>
+            <MailerAddressSearch {...{ geom, setGeom }} />
+            <MailerLayerSelector {...{ geom, setGeom }} />
+          </>
         }
 
         {/* If we have a shape, display buffer tool, current selection */}
@@ -289,7 +296,7 @@ const Mailer = ({ session }) => {
                           filterCopy[f] = !filters[f]
                           setFilters(filterCopy)
                         }}
-                        />
+                      />
                       <ToggleButton
                         title={allFilters[f].inactiveText}
                         active={!filters[f]}
@@ -298,25 +305,25 @@ const Mailer = ({ session }) => {
                           filterCopy[f] = !filters[f]
                           setFilters(filterCopy)
                         }}
-                        />
+                      />
                     </div>
                   ))
                 }
-                  <h2>Downloading {filtered.length.toLocaleString()} addresses</h2>
+                <h2>Downloading {filtered.length.toLocaleString()} addresses</h2>
                 <div className="flex flex-row">
                   <CSVLink data={formattedData} filename={`mailing_list_${new Date().getTime()}.csv`} className="mr-2">
-                    <Button 
-                      icon={faDownload} 
+                    <Button
+                      icon={faDownload}
                       text={`Download .csv`}
                       small />
                   </CSVLink>
                   <a href={`data: '${gjDownload}`} download={`mailing_list_${new Date().getTime()}.json`}>
 
-                  <Button
-                    icon={faGlobe}
-                    text={`Download GeoJSON`}
-                    small />
-                    </a>
+                    <Button
+                      icon={faGlobe}
+                      text={`Download GeoJSON`}
+                      small />
+                  </a>
                 </div>
 
 
