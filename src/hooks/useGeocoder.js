@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { geocode } from '@esri/arcgis-rest-geocoding';
 import {geocoders } from '../data/geocoders'
 
-const geocoderUrl = geocoders[0].url
+const geocoderUrl = geocoders[3].url
 
 /**
  * useGeocoder custom hook.
