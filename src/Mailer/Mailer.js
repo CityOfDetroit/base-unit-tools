@@ -47,16 +47,6 @@ const Mailer = ({ session }) => {
   ]
   const [layer, setLayer] = useState('centroid')
 
-  // mailing list layer.
-  // theoretically we can put any layer here to make a generalized selection tool.
-  let url = mailerLayers[1]
-  let prop = 'geometry'
-  // we have to grab slightly different stuff, working with parcel centroid.
-  if (layer === 'parcel') {
-    url = mailerLayers[0]
-    prop = 'centroid'
-  }
-
   // use this to set state of filter toggles
   let defaults = {}
   Object.keys(allFilters).forEach(f => {
@@ -72,7 +62,8 @@ const Mailer = ({ session }) => {
   // should be one of these: https://github.com/mapbox/mapbox-gl-draw/blob/main/docs/API.md#modes
   const [mode, setMode] = useState('simple_select')
 
-
+  const [formattedData, setFormattedData] = useState(null)
+  const [gjDownload, setGjDownload] = useState(null)
 
   // this effect runs if the user logs in or out.
   // it tests access to the mailing list layer
@@ -81,14 +72,14 @@ const Mailer = ({ session }) => {
       setAccess(false)
     }
     getLayer({
-      url: url,
+      url: mailerLayers[0],
       authentication: session
     }).then(d => {
       setAccess(d)
     }).catch(err => {
       setAccess(false)
     })
-  }, [session, url])
+  }, [session])
 
   // this effect runs when the geom changes (or if there's a change in access)
   // it gets the objectids for all the features in the selection -- 
@@ -100,7 +91,7 @@ const Mailer = ({ session }) => {
     setFiltered([])
     if (geom && access) {
       queryFeatures({
-        url: url,
+        url: layer === 'parcel' ? mailerLayers[0] : mailerLayers[1],
         // the key bit
         returnIdsOnly: true,
         orderByFields: "OBJECTID",
@@ -117,7 +108,7 @@ const Mailer = ({ session }) => {
         setResultIds(d)
       })
     }
-  }, [geom, access, session, url, layer])
+  }, [geom, access, session, layer])
 
   useEffect(() => {
     // this function is what runs when we click "Download CSV"
@@ -136,7 +127,7 @@ const Mailer = ({ session }) => {
       // create a bunch of Promises for the number of queries we need
       let promises = breakpoints.slice(1).map((b, i) => {
         let params = {
-          url: url,
+          url: layer === 'parcel' ? mailerLayers[0] : mailerLayers[1],
           orderByFields: "OBJECTID",
           // this is confusing, but produces the correct result.
           // it has to be weird because of how BETWEEN seems to work.
@@ -182,29 +173,34 @@ const Mailer = ({ session }) => {
       }
     })
     setFiltered(filteredAddresses)
-  }, [filters, addresses])
 
-  let formattedData = filtered.map((r, i) => {
-    return r.attributes
-  })
 
-  console.log(filtered)
-  let features = filtered.map(f => {
-    return {
-      type: "Feature",
-      properties: { ...f.attributes },
-      geometry: {
-        type: "Point",
-        coordinates: [parseFloat(f[prop].y.toFixed(6)), parseFloat(f[prop].x.toFixed(6))]
+    let formattedData = filtered.map((r, i) => {
+      return r.attributes
+    })
+    setFormattedData(formattedData)
+
+    let features = filtered.map(f => {
+      let prop = layer === 'parcel' ? 'centroid' : 'geometry'
+  
+      return {
+        type: "Feature",
+        properties: { ...f.attributes },
+        geometry: {
+          type: "Point",
+          coordinates: [parseFloat(f[prop].y.toFixed(6)), parseFloat(f[prop].x.toFixed(6))]
+        }
       }
-    }
-  })
-  let featureCollection = {
-    type: "FeatureCollection",
-    features: features
-  }
+    })
 
-  let gjDownload = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(featureCollection))
+    let featureCollection = {
+      type: "FeatureCollection",
+      features: features
+    }
+  
+    setGjDownload("text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(featureCollection)))
+
+  }, [filters, addresses])
 
   let introduction = (
        <>
