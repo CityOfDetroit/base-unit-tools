@@ -1,57 +1,17 @@
-import { addFeatures } from '@esri/arcgis-rest-feature-layer';
-import { faSearch, faWrench } from '@fortawesome/free-solid-svg-icons';
-import React, { useEffect, useState } from 'react';
-import { Link, useLocation } from "react-router-dom";
-import Button from '../components/Button';
-import { geocoders } from '../data/geocoders';
-import layers from '../data/layers';
-import IdBadge from '../Explorer/IdBadge';
-import SiteSidebar from '../layout/SiteSidebar';
-import IssueReporterExtantAddress from './IssueReporterExtantAddress';
-import IssueReporterMap from './IssueReporterMap';
 import { arcgisToGeoJSON } from '@esri/arcgis-to-geojson-utils';
 import centroid from '@turf/centroid';
-
-
-function useQuery() {
-  return new URLSearchParams(useLocation().search);
-}
-
-const addFeature = ({ session, formText, address, x, y, targetType, targetId, setAddResponse }) => {
-
-  addFeatures({
-    url: "https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/address_issues/FeatureServer/0",
-    features: [{
-      geometry: { x: x, y: y, spatialReference: { wkid: 4326 } },
-      attributes: {
-        address_string: address,
-        target_unit: targetType,
-        target_id: targetId ? targetId.toString() : null,
-        notes: formText
-      }
-    }],
-    authentication: session ? session : null
-  })
-    .then(d => setAddResponse(d))
-}
-
-const IssueReporterFeature = ({ attr, clicked }) => {
-
-  let layer = layers[clicked.type]
-
-  return (
-    <section className='sidebar-section feature' style={{ borderLeft: `8px solid ${layer.color}` }}>
-      <div className="flex items-center justify-between text-lg">
-        <h2>{layer.label}</h2>
-        <div className="flex items-center">
-          {/* {hasSource && <span className="font-semibold text-gray-500 bg-gray-300 py-1 px-2 mx-3 text-sm">{attr.geo_source}</span>} */}
-          <IdBadge id={attr[layer.id_column]} layer={layer} link={false} />
-          {/* <pre className="font-bold" style={{background: '#feb70d'}}>{clicked.type === 'parcels' ? null : `#`}{attr[layer.id_column]}</pre> */}
-        </div>
-      </div>
-    </section>
-  )
-}
+import React, { useEffect, useState } from 'react';
+import layers from '../data/layers';
+import SiteSidebar from '../layout/SiteSidebar';
+import IssueReporterExtantAddress from './IssueReporterExtantAddress';
+import { IssueReporterFeature } from './IssueReporterFeature';
+import IssueReporterMap from './IssueReporterMap';
+import { IssueReporterSelector } from './IssueReporterSelector';
+import IssueReporterSubmission from './IssueReporterSubmission';
+import useQuery from '../hooks/useQuery';
+import useGeocoder from '../hooks/useGeocoder';
+import AppHeader from '../components/AppHeader';
+import apps from '../data/apps';
 
 const IssueReporter = ({ session }) => {
 
@@ -60,6 +20,8 @@ const IssueReporter = ({ session }) => {
   // get an address string from the URL parameters
   let queryAddress = query.get("address")
   let [value, setValue] = useState(queryAddress ? decodeURIComponent(queryAddress) : '')
+  let [searchValue, setSearchValue] = useState(queryAddress ? decodeURIComponent(queryAddress) : null)
+  let [featureCollection, type] = useGeocoder(searchValue)
 
   // ...or we can get type/id from params.
   let queryType = query.get("type") || null
@@ -69,47 +31,10 @@ const IssueReporter = ({ session }) => {
     id: queryId
   })
 
+  // this is how we track which type of issue is currently being reported
   let [targetType, setTargetType] = useState(target.type ? 'base_unit' : 'address')
-  // let [returned, setReturned] = useState(false)
-  let [formText, setFormText] = useState('')
 
-  let [response, setResponse] = useState({
-    geocoder: null,
-    candidates: [],
-    match: {}
-  })
-
-  let [sent, setSent] = useState(false)
-  let [addResponse, setAddResponse] = useState(null)
   let [feature, setFeature] = useState(null)
-
-  const geocode = (value, setResponse) => {
-    let spacesRe = /\s/g
-    let url = `${geocoders[3].url}/findAddressCandidates?SingleLine=${value.replace(spacesRe, '+')}&outFields=*&f=pjson`
-    fetch(url)
-      .then(r => r.json())
-      .then(d => {
-        if (d.candidates.length > 0) {
-          setResponse({
-            geocoder: 'point',
-            candidates: d.candidates,
-            match: d.candidates[0].attributes
-          })
-        }
-        else {
-          let centerlineUrl = `https://gis.detroitmi.gov/arcgis/rest/services/DoIT/StreetCenterlineGeocoder/GeocodeServer/findAddressCandidates?Single+Line+Input=${value.replace(spacesRe, '+')}&outFields=*&outSR=4326&f=pjson`
-          fetch(centerlineUrl)
-            .then(r => r.json())
-            .then(d => {
-              setResponse({
-                geocoder: 'centerline',
-                candidates: d.candidates,
-                match: d.candidates[0].attributes
-              })
-            })
-        }
-      })
-  }
 
   const fetchFeature = (target, setFeature) => {
     if (target.type && target.id) {
@@ -129,7 +54,6 @@ const IssueReporter = ({ session }) => {
         }).join('&');
 
         fullUrl = url + `/query?` + queryString
-        console.log(fullUrl)
       }
       else {
         let params = {
@@ -144,8 +68,6 @@ const IssueReporter = ({ session }) => {
         }).join('&');
         fullUrl = url + `/query?` + queryString
       }
-
-      console.log(fullUrl)
       fetch(fullUrl).then(r => r.json())
         .then(d => {
           setFeature(d.features[0])
@@ -155,138 +77,48 @@ const IssueReporter = ({ session }) => {
 
   useEffect(() => {
     if (value && targetType === 'address') {
-      geocode(value, setResponse)
-      setAddResponse(null)
+      setSearchValue(value)
     }
     if (target.type && target.id && targetType === 'base_unit') {
       fetchFeature(target, setFeature)
-      setAddResponse(null)
     }
   }, [targetType, target])
 
-  console.log()
   let featureCentroid;
   if(feature) {
     featureCentroid = centroid(arcgisToGeoJSON(feature))
   }
-  if(response && response.candidates.length > 0) {
-    featureCentroid = [response.candidates[0].location.y, response.candidates[0].location.x]
+  if(featureCollection && featureCollection.features.length > 0) {
+    featureCentroid = featureCollection.features[0]
   }
     return (
     <>
       <SiteSidebar title="Issue Reporter">
+        <AppHeader app={apps['issue-reporter']} />
         <section className="sidebar-section">
           <h2>Report an issue</h2>
           <p>You can report an issue about an address or a specific base unit.</p>
 
-          <div className="flex items-center justify-between my-2">
-            <h3 className="text-sm w-1/4 flex items-center justify-start" onClick={() => setTargetType('address')}>
-              <input type="radio" id="address" name="type" value="address" readOnly
-                className="mx-1"
-                checked={targetType === 'address'} />
-              Address
-            </h3>
-            <input
-              className="p-2 py-3 w-2/3"
-              type="text"
-              name="address"
-              disabled={targetType === 'base_unit'}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              onKeyPress={(e) => e.code === 'Enter' && geocode(value, setResponse)}
-            />
-            <Button
-              active={value !== '' && targetType === 'address'}
-              onClick={() => geocode(value, setResponse)}
-              icon={faSearch}
-              text='Search'
-              small
-            />
-          </div>
-
-          <div className="flex items-center justify-between my-2">
-            <h3 className="text-sm w-1/4 flex items-center justify-start" onClick={() => { setTargetType('base_unit'); setValue(''); }}>
-              <input type="radio" id="base_unit" name="type" value="base_unit"
-                className="mx-1"
-                readOnly
-                checked={targetType === 'base_unit'} />
-              Base Unit
-              </h3>
-            <div className="w-2/3 flex items-center justify-between">
-              <select
-                className="p-2 py-3"
-                disabled={targetType === 'address'}
-                value={target.type || 'addresses'}
-                onChange={(e) => setTarget({ ...target, type: e.target.value })}
-              >
-                {Object.keys(layers).map(l => (
-                  <option value={l} key={l}>{layers[l].label}</option>
-                ))}
-              </select>
-
-              <input
-                className="p-2 py-3 w-40"
-                type="text"
-                name="address"
-                value={target.id ? target.id : ''}
-                disabled={targetType === 'address'}
-                onChange={(e) => setTarget({ ...target, id: e.target.value })}
-                onKeyPress={(e) => e.code === 'Enter' && fetchFeature(target, setFeature)}
-              />
-            </div>
-            <Button
-              active={target.id && target.type && targetType === 'base_unit'}
-              disabled={targetType === 'address'}
-              onClick={() => fetchFeature(target, setFeature)}
-              icon={faSearch}
-              text='Search'
-              small
-            />
-          </div>
+          <IssueReporterSelector {...{setTargetType, targetType, setSearchValue, value, setValue, fetchFeature, feature, setFeature, target, setTarget}} />
+          
         </section>
+
         {targetType === 'base_unit' && feature &&
           <IssueReporterFeature clicked={target} attr={feature.attributes} />
         }
-        {targetType === 'address' && response.geocoder &&
+
+        {targetType === 'address' && type &&
           <section className='sidebar-section'>
-            {response.geocoder === 'point' && <IssueReporterExtantAddress {...{ response }} />}
-            {response.geocoder === 'centerline' && <h2>No address found</h2>}
+            {type === 'point' && <IssueReporterExtantAddress {...{ type, featureCollection }} />}
+            {type === 'centerline' && <h2>No address found</h2>}
           </section>
         }
-        {(feature || response.geocoder) &&
-          <section className="sidebar-section">
-            <h2>What is the issue?</h2>
-            <textarea type="text" cols="40" rows="8" className="p-2 m-1" value={formText} onChange={(e) => { setFormText(e.target.value); setSent(false) }}></textarea>
-            <Button
-              active={formText !== '' && !sent}
-              disabled={formText === ''}
-              text={`Submit`}
-              icon={faWrench}
-              onClick={() => {
-                addFeature({
-                  session: session,
-                  formText: formText,
-                  address: targetType === 'address' ? value : null,
-                  x: featureCentroid[1],
-                  y: featureCentroid[0],
-                  targetType: targetType === 'base_unit' ? target.type.replaceAll(/[es]$/g, '') : null,
-                  targetId: targetType === 'base_unit' ? target.id : null,
-                  setAddResponse: setAddResponse
-                });
-                setSent(true);
-              }}
-            />
-          </section>
-        }
-        {
-          addResponse && addResponse.addResults[0].success &&
-          <section className="sidebar-section">
-            Thanks for your input! <Link to={`/explorer?type=${target.type}&id=${target.id}`}>Jump back to the explorer</Link>
-          </section>
-        }
+
+        {(feature || featureCollection) && <IssueReporterSubmission {...{value, target, session, targetType, featureCentroid}} />}
+
       </SiteSidebar>
       <main>
-        {(response.geocoder || feature) && <IssueReporterMap {...{ response, target, feature }} />}
+        {((featureCollection && featureCollection.features.length > 0) || feature) && <IssueReporterMap {...{ type, featureCollection, target, feature, featureCentroid }} />}
       </main>
     </>
   )

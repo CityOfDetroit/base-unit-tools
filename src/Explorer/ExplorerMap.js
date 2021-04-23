@@ -14,19 +14,15 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
 
   // this effect runs once, when the component loads
   useEffect(() => {
-
-    // detroit bbox
-    let [xMin, yMin, xMax, yMax] = [-83.237803, 42.355192, -82.910451, 42.45023];
-    let xRandomOffset = (xMax - xMin) * Math.random()
-    let yRandomOffset = (yMax - yMin) * Math.random()
-    let xRandomCenter = xMin + xRandomOffset
-    let yRandomCenter = yMin + yRandomOffset
-
+    
+    const detroitBbox = [-83.287803, 42.255192, -82.910451, 42.45023];
     var map = new mapboxgl.Map({
       container: "map", // container id
       style: baseStyle, // stylesheet location
-      center: [xRandomCenter, yRandomCenter], // starting position [lng, lat]
-      zoom: 16.25, // starting zoom
+      bounds: detroitBbox,
+      fitBoundsOptions: {
+        padding: 50
+      },
       maxZoom: 19.99
     });
 
@@ -175,7 +171,8 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
         let geojsonFeature = arcgisToGeoJSON(feature)
         let coords = centroid(geojsonFeature.geometry).geometry.coordinates
         theMap.easeTo({
-          center: coords
+          center: coords,
+          zoom: 17
         })
       }
     }

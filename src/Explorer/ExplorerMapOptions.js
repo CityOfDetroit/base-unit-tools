@@ -3,7 +3,7 @@ import Button from '../components/Button';
 
 const ExplorerMapOptions = ({ options, setOptions }) => {
   return (
-    <section className="bg-gray-200 p-3 w-1/2">   
+    <>   
     <h2 className="text-base">Map options</h2>       
     <div className="mt-1 flex">
       <Button
@@ -22,7 +22,7 @@ const ExplorerMapOptions = ({ options, setOptions }) => {
         small
         />
     </div>
-  </section>
+  </>
   )
 }
 

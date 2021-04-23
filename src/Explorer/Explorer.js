@@ -1,10 +1,9 @@
-import { faArrowAltCircleRight, faWrench } from '@fortawesome/free-solid-svg-icons';
+import { faArrowAltCircleRight, faLink, faWrench } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
-import { Link, useHistory, useLocation } from "react-router-dom";
-import AppIntro from '../components/AppIntro';
+import { Link, useHistory } from "react-router-dom";
+import AppHeader from '../components/AppHeader';
 import StreetView from '../components/StreetView';
-import layers from '../data/layers';
 import apps from '../data/apps';
 import SiteSidebar from '../layout/SiteSidebar';
 import ExplorerAddress from './ExplorerAddress';
@@ -14,14 +13,11 @@ import ExplorerMapOptions from './ExplorerMapOptions';
 import ExplorerParcel from './ExplorerParcel';
 import ExplorerSearch from './ExplorerSearch';
 import ExplorerStreet from './ExplorerStreet';
+import useFeature from '../hooks/useFeature';
+import useQuery from '../hooks/useQuery';
 
-// a very tiny helper function
-// that i don't fully understand
-function useQuery() {
-  return new URLSearchParams(useLocation().search);
-}
 
-const Explorer = () => {
+const Explorer = ({ session }) => {
 
   // query parameters
   let query = useQuery()
@@ -40,9 +36,7 @@ const Explorer = () => {
     type: queryType ? queryType : null,
     id: queryId ? queryId : null
   })
-
-  // this stores the fetched feature
-  let [feature, setFeature] = useState(null)
+  let feature = useFeature(clicked)
 
   // this stores IDs of linked features, to be highlighted on the map.
   let [linked, setLinked] = useState({
@@ -64,72 +58,39 @@ const Explorer = () => {
   const [svCoords, setSvCoords] = useState(null);
   const [svBearing, setSvBearing] = useState(null);
 
+
   // this effect triggers when the user clicks on a new feature in the map
   useEffect(() => {
-
-    // a big hunk of code which constructs the proper URL to go fetch
-    // TODO extract this into a function.
     if (clicked.type && clicked.id) {
-
       // push new params to our browser URL
       // TODO see if we can make this work with the back button
       history.push(`?type=${clicked.type}&id=${clicked.id}${options.streetView ? `&streetview=true` : ``}`);
-
-      // TODO all this can probably be extracted into a function
-      let layer = layers[clicked.type]
-      let url = layer.endpoint
-      let fullUrl;
-      if (clicked.type === 'parcels') {
-        let params = {
-          'where': `parcel_id='${clicked.id}'`,
-          'outFields': '*',
-          'resultRecordCount': 1,
-          'outSR': 4326,
-          'f': 'pjson',
-        }
-        let queryString = Object.keys(params).map((key) => {
-          return encodeURIComponent(key) + '=' + encodeURIComponent(params[key])
-        }).join('&');
-
-        fullUrl = url + `/query?` + queryString
-      }
-      else {
-        let params = {
-          'where': `${layer.id_column}=${clicked.id}`,
-          'outFields': '*',
-          'resultRecordCount': 1,
-          'outSR': 4326,
-          'f': 'pjson',
-        }
-        let queryString = Object.keys(params).map((key) => {
-          return encodeURIComponent(key) + '=' + encodeURIComponent(params[key])
-        }).join('&');
-        fullUrl = url + `/query?` + queryString
-      }
-
-      // TODO ... and then our function would return the fullUrl here.
-      fetch(fullUrl).then(r => r.json())
-        .then(d => {
-          setFeature(d.features[0])
-        })
     }
   }, [clicked, history, options.streetView])
+
+  let introduction = (
+    <>
+      <p className="py-2">This tool is for exploring the base units and visualizing the relationships between them.</p>
+      <p className="pt-2">You can start by:</p>
+      <ul className="list-disc list-outside ml-4 pb-2">
+        <li>Searching for an address</li>
+        <li>Clicking a feature on the map</li>
+      </ul>
+      <p className="py-2">Once an address, building, parcel, or street is selected, you'll be able to see the other base units it is linked to.</p>
+      <p className="py-2">Click the <FontAwesomeIcon icon={faArrowAltCircleRight} className="mx-1 tex" /> next to a linked base unit's ID to navigate to that linked unit.</p>
+      <p className="py-2">You can also see a street view image of the currently selected feature, or turn on satellite imagery on the map.</p>
+    </>
+  )
 
   return (
     <>
       <SiteSidebar title="Explorer">
 
-        <AppIntro app={apps.explorer}>
-          <p className="py-2">This tool is for exploring the base units and visualizing the relationships between them.</p>
-          <p className="pt-2">You can start by:</p>
-          <ul className="list-disc list-outside ml-4 pb-2">
-            <li>Searching for an address</li>
-            <li>Clicking a feature on the map</li>
-          </ul>
-          <p className="py-2">Once an address, building, parcel, or street is selected, you'll be able to see the other base units it is linked to.</p>
-          <p className="py-2">Click the <FontAwesomeIcon icon={faArrowAltCircleRight} className="mx-1 tex" /> next to a linked base unit's ID to navigate to that linked unit.</p>
-          <p className="py-2">You can also see a street view image of the currently selected feature, or turn on satellite imagery on the map.</p>
-        </AppIntro>
+        <AppHeader app={apps.explorer} introduction={introduction}>
+          <ExplorerSearch {...{ setClicked }} />
+          <ExplorerMapOptions {...{options, setOptions}} />
+        </AppHeader>
+
 
         {/* Options area */}
 
@@ -153,13 +114,23 @@ const Explorer = () => {
             </Link>
           </section>
         }
+
+        {/* Link to, uh, Linker */}
+        {feature && clicked.type === 'addresses' && session &&
+          <section className="sidebar-section caution">
+            <Link to={`/linker?type=${clicked.type}&id=${clicked.id}`}>
+              <FontAwesomeIcon icon={faLink} />
+              <span className="text-semibold text-sm ml-2">
+                Edit address links
+            </span>
+            </Link>
+          </section>
+        }
       </SiteSidebar>
 
       {/* the main panel contains the map, and we pass it many of our useState variables */}
       <main>
         <div className="flex items-center justify-between mb-2">
-          <ExplorerSearch {...{ clicked, setClicked }} />
-          <ExplorerMapOptions {...{options, setOptions}} />
         </div>
         <ExplorerMap {...{ clicked, setClicked, linked, feature, history, svCoords, svBearing, showSv: options.streetView, showSatellite: options.satellite }} />
       </main>

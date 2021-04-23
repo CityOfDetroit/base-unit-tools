@@ -5,19 +5,15 @@ import React, { useEffect, useState } from "react";
 import layers from '../data/layers';
 import { baseStyle } from '../styles/mapstyle';
 
-const IssueReporterMap = ({ response, target, feature }) => {
+const IssueReporterMap = ({ featureCollection, type, target, feature, featureCentroid, setMode, mode }) => {
 
-  console.log(response, target, feature)
-  let {candidates, geocoder} = response
-  
+  console.log(feature, featureCentroid)
+
   const [theMap, setTheMap] = useState(null);
-  
-  let center;
-  if(candidates.length > 0 && geocoder === 'point') {
-    center = [candidates[0].attributes.X, candidates[0].attributes.Y]
-  }
-  if(candidates.length > 0 && geocoder === 'centerline') {
-    center = [candidates[0].location.x, candidates[0].location.y]
+  let center = featureCentroid.geometry.coordinates;
+
+  if(!featureCollection) {
+    featureCollection = {type: "FeatureCollection", features: []}
   }
 
   useEffect(() => {
@@ -25,8 +21,7 @@ const IssueReporterMap = ({ response, target, feature }) => {
       container: "map", // container id
       style: baseStyle, // stylesheet location
       center: center, // starting position [lng, lat]
-      zoom: 18, // starting zoom
-      interactive: false
+      zoom: 18 // starting zoom
     });
 
     map.resize();
@@ -37,28 +32,28 @@ const IssueReporterMap = ({ response, target, feature }) => {
   }, []);
 
   useEffect(() => {
-    if(theMap && candidates.length > 0) {
-        let c = candidates[0]
-        if(geocoder === 'point') {
-          theMap.setFilter("building-highlight", ["==", "$id", c.attributes.building_id])
-          theMap.setFilter("parcel-highlight", ["==", "parcel_id", c.attributes.parcel_id])
-          theMap.setFilter("address-highlight", ["==", "$id", c.attributes.address_id])
-          theMap.setFilter("streets-highlight", ["==", "street_id", c.attributes.street_id])
-          theMap.setCenter([c.attributes.X, c.attributes.Y])
+    if(theMap && featureCollection.features.length > 0) {
+        let c = featureCollection.features[0]
+        if(type === 'point') {
+          theMap.setFilter("building-highlight", ["==", "$id", c.properties.building_id])
+          theMap.setFilter("parcel-highlight", ["==", "parcel_id", c.properties.parcel_id])
+          theMap.setFilter("address-highlight", ["==", "$id", c.properties.address_id])
+          theMap.setFilter("streets-highlight", ["==", "street_id", c.properties.street_id])
+          theMap.setCenter(c.geometry.coordinates)
         }
-        if(geocoder === 'centerline') {
+        if(type === 'centerline') {
           theMap.setFilter("building-highlight", ["==", "$id", ""])
           theMap.setFilter("parcel-highlight", ["==", "parcel_id", ""])
           theMap.setFilter("address-highlight", ["==", "$id", ""])
-          theMap.setCenter([c.location.x, c.location.y])
+          theMap.setCenter(c.geometry.coordinates)
         }
     }
-    if(theMap && candidates.length === 0) {
+    if(theMap && featureCollection.features.length === 0) {
         theMap.setFilter("building-highlight", ["==", "$id", ""])
         theMap.setFilter("parcel-highlight", ["==", "parcel_id", ""])
         theMap.setFilter("address-highlight", ["==", "$id", ""])
     }
-  }, [theMap, candidates, geocoder])
+  }, [theMap, featureCollection, type])
 
   useEffect(() => {
     if(theMap) {

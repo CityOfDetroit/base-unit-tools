@@ -5,6 +5,8 @@ import AddressesHere from './AddressesHere';
 import BuildingsHere from './BuildingsHere';
 import ExplorerFeature from './ExplorerFeature';
 
+import { queryFeatures } from '@esri/arcgis-rest-feature-layer'
+
 const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => {
 
     let { attributes: attr } = feature;
@@ -15,8 +17,32 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
         "Taxable status": attr.taxstatus
     }
 
+    let longAttributes = {
+    }
+
     let [addresses, setAddresses] = useState([])
     let [buildings, setBuildings] = useState([])
+    let [legalDesc, setLegalDesc] = useState(null)
+
+    useEffect(() => {
+
+      queryFeatures({
+        url: `https://opengis.detroitmi.gov/opengis/rest/services/Assessors/Parcels/FeatureServer/0`,
+        where: `parcel_number = '${attr.parcel_id}'`,
+        returnGeometry: false,
+        outFields: ['legal_description']
+      })
+        .then(d => {
+          if(d.features.length > 0) {
+            let feature = d.features[0]
+            setLegalDesc(feature.attributes.legal_description)
+          }
+        })
+    }, [attr.parcel_id])
+
+    if(legalDesc) {
+      longAttributes['Legal description'] = legalDesc
+    };
 
     useEffect(() => {
         let url = layers.addresses.endpoint + `/query?`
@@ -83,7 +109,7 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
 
     return (
         <>
-            <ExplorerFeature {...{attr, attributes, clicked}} />
+            <ExplorerFeature {...{attr, attributes,longAttributes, clicked}} />
             {/* <section className='sidebar-section'>
                 <div className="flex items-center justify-between py-2">
                     <h2 className="text-xl">Linked parcel:</h2>

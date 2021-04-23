@@ -112,7 +112,7 @@ footer {
     height: calc(100vh - 60px - 11rem);
   }
 
-  .issue-reporter-map {
+  .issue-reporter-map, .linker-map {
     height: calc(100vh - 100px - 1.5rem);
   }
 }
@@ -122,7 +122,7 @@ footer {
     height: calc(50vh - 60px);
   }
 
-  .issue-reporter-map {
+  .issue-reporter-map, .linker-map {
     height: calc(50vh - 100px);
   }
 }

@@ -1214,6 +1214,16 @@
     "@esri/arcgis-rest-types" "^3.0.2"
     tslib "^1.13.0"
 
+"@esri/arcgis-rest-geocoding@^3.0.5":
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/@esri/arcgis-rest-geocoding/-/arcgis-rest-geocoding-3.0.5.tgz#46b11cd0e28c71fefe4a5ef59f9d10df338b3c96"
+  integrity sha512-zHX6DepAnDZq4d7ObGqX/HPvkNRynIJhxFwrDaizVkRz9Pj8vVXA+XUBevqp5752Z2J4i0R72LJCru2Jws9aAA==
+  dependencies:
+    "@esri/arcgis-rest-types" "^3.0.5"
+    "@terraformer/arcgis" "^2.0.7"
+    "@types/terraformer__arcgis" "^2.0.0"
+    tslib "^1.13.0"
+
 "@esri/arcgis-rest-request@^3.0.0":
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/@esri/arcgis-rest-request/-/arcgis-rest-request-3.0.2.tgz#885a0737cac830b4af60fdb4cd93fa699705aa9d"
@@ -1225,6 +1235,11 @@
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/@esri/arcgis-rest-types/-/arcgis-rest-types-3.0.2.tgz#588a22fba740b0039a7aad9b994143f896a068b1"
   integrity sha512-fBR03uitOVssOACk/OlSglAZv0ububh3yg0bIYgkM0BJvds+NONgxBregYxvX8uznldTjPl66cv+NN9VxNivzw==
+
+"@esri/arcgis-rest-types@^3.0.5":
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/@esri/arcgis-rest-types/-/arcgis-rest-types-3.0.5.tgz#db0e354efd697d10f12f4bf45be23937d3bb2a3a"
+  integrity sha512-//44U03ObT3YBJO3mWaPyzu9p+UUWR+/hLBU3zekIKejjm/pHlma9NsHtwWOYALRswUIfTTmtVZBeDaeWG5QHA==
 
 "@esri/arcgis-to-geojson-utils@^1.3.0":
   version "1.3.0"
@@ -1965,6 +1980,11 @@
   resolved "https://registry.yarnpkg.com/@types/anymatch/-/anymatch-1.3.1.tgz#336badc1beecb9dacc38bea2cf32adf627a8421a"
   integrity sha512-/+CRPXpBDpo2RK9C68N3b2cOvO0Cf5B9aPijHsoDQTHivnGSObdOF2BRQOYjojWTDy6nQvMjmqRXIxH55VjxxA==
 
+"@types/arcgis-rest-api@*":
+  version "10.4.4"
+  resolved "https://registry.yarnpkg.com/@types/arcgis-rest-api/-/arcgis-rest-api-10.4.4.tgz#c84b26ac7f01deb2829bff10ebbe544c2310fbcd"
+  integrity sha512-5NwSfj4po+03fauyr4F5AxYzu8pbbqmxay+pNr5ef2V3Mj+7OylvV48VKuVoO9m799jhZdH3EQgQBHm3Y6q1Sw==
+
 "@types/aria-query@^4.2.0":
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/@types/aria-query/-/aria-query-4.2.1.tgz#78b5433344e2f92e8b306c06a5622c50c245bf6b"
@@ -2020,6 +2040,11 @@
   version "0.0.39"
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.39.tgz#e177e699ee1b8c22d23174caaa7422644389509f"
   integrity sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==
+
+"@types/geojson@*":
+  version "7946.0.7"
+  resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.7.tgz#c8fa532b60a0042219cdf173ca21a975ef0666ad"
+  integrity sha512-wE2v81i4C4Ol09RtsWFAqg3BUitWbHSpSlIo+bNdsCJijO9sjme+zm+73ZMCa/qMC8UEERxzGbvmr1cffo2SiQ==
 
 "@types/glob@^7.1.1":
   version "7.1.3"
@@ -2129,6 +2154,14 @@
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/@types/tapable/-/tapable-1.0.6.tgz#a9ca4b70a18b270ccb2bc0aaafefd1d486b7ea74"
   integrity sha512-W+bw9ds02rAQaMvaLYxAbJ6cvguW/iJXNT6lTssS1ps6QdrMKttqEAMEG/b5CR8TZl3/L7/lH0ZV5nNR1LXikA==
+
+"@types/terraformer__arcgis@^2.0.0":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@types/terraformer__arcgis/-/terraformer__arcgis-2.0.2.tgz#023f61c83471c066bd5d736045fc89b862d8930d"
+  integrity sha512-0B1Y2LqGJbinZ/cF/5sZwY+1EfrsAJ/M80BVl49I/1m7Y6cO5+3kzwU/pksdJWQgmbpfAk03JHb0EgUYd9R87w==
+  dependencies:
+    "@types/arcgis-rest-api" "*"
+    "@types/geojson" "*"
 
 "@types/testing-library__jest-dom@^5.9.1":
   version "5.9.5"
@@ -3619,6 +3652,11 @@ class-utils@^0.3.5:
     define-property "^0.2.5"
     isobject "^3.0.0"
     static-extend "^0.1.1"
+
+classnames@^2.2.5:
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.3.1.tgz#dfcfa3891e306ec1dad105d0e88f4417b8535e8e"
+  integrity sha512-OlQdbZ7gLfGarSqxesMesDa5uz7KFbID8Kpq/SxIoNGDqY8lSYs0D+hhtBXhcdB3rcbXArFr7vlHheLk1voeNA==
 
 clean-css@^4.2.3:
   version "4.2.3"
@@ -9641,7 +9679,7 @@ prompts@2.4.0, prompts@^2.0.1:
     kleur "^3.0.3"
     sisteransi "^1.0.5"
 
-prop-types@^15.6.2, prop-types@^15.7.2:
+prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
@@ -9831,6 +9869,14 @@ rbush@^3.0.1:
   integrity sha512-XRaVO0YecOpEuIvbhbpTrZgoiI6xBlz6hnlr6EHhd+0x9ase6EmeN+hdwwUaJvLcsFFQ8iWVF1GAK1yB0BWi0w==
   dependencies:
     quickselect "^2.0.0"
+
+react-animate-height@^2.0.23:
+  version "2.0.23"
+  resolved "https://registry.yarnpkg.com/react-animate-height/-/react-animate-height-2.0.23.tgz#2e14ac707b20ae67b87766ccfd581e693e0e7ec7"
+  integrity sha512-DucSC/1QuxWEFzR9IsHMzrf2nrcZ6qAmLIFoENa2kLK7h72XybcMA9o073z7aHccFzdMEW0/fhAdnQG7a4rDow==
+  dependencies:
+    classnames "^2.2.5"
+    prop-types "^15.6.1"
 
 react-app-polyfill@^2.0.0:
   version "2.0.0"

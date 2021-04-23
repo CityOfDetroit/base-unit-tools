@@ -11,6 +11,7 @@ import IssueReporter from './IssueReporter/IssueReporter';
 import SiteWrapper from './layout/SiteWrapper';
 import Validator from './Validator/Validator';
 import Mailer from './Mailer/Mailer';
+import Linker from './Linker/Linker';
 
 const trackingId = 'UA-107915075-11'
 
@@ -25,7 +26,7 @@ function App() {
         <SiteWrapper {...{ session, setSession }}>
           <Switch>
             <Route path="/explorer">
-              <Explorer />
+              <Explorer {...{session}} />
             </Route>
             <Route path="/issue-reporter">
               <IssueReporter {...{ session }} />
@@ -42,6 +43,9 @@ function App() {
             <Route path="/geocoder">
               <Geocoder />
             </Route>
+            {session && <Route path="/linker">
+              <Linker {...{ session }} />
+            </Route>}
             <Route path="/">
               <BaseUnitTools {...{ session }} />
             </Route>
