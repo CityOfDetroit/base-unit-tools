@@ -8,13 +8,15 @@ import { Link } from './Link';
 import Button from '../components/Button'
 import useGeocoder from '../hooks/useGeocoder';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import AppHeader from '../components/AppHeader';
+import apps from '../data/apps';
 
 const LinkerSearch = ({ setSearchValue, type }) => {
 
   let [value, setValue] = useState('')
 
   return (
-    <section className="bg-gray-200 p-3 w-1/2">
+    <>
       <h2 className="text-base flex items-center justify-between">
         Search for an address:
         {/* what if we couldn't find it? */}
@@ -42,7 +44,7 @@ const LinkerSearch = ({ setSearchValue, type }) => {
           icon={faSearch} />
       </div>
 
-    </section>
+    </>
   )
 }
 
@@ -93,9 +95,9 @@ const Linker = ({ session }) => {
     <>
       <SiteSidebar title="Linker">
 
-        {!feature && 
+        <AppHeader app={apps.linker}>
           <LinkerSearch {...{setSearchValue, type}} />
-        }
+        </AppHeader>
 
         {feature &&
           <section className="sidebar-section">

@@ -81,6 +81,16 @@ const LinkerMap = ({ center, feature, links, setLinks }) => {
     })
   }, [parcel, building, street])
 
+  useEffect(() => {
+    if(theMap) {
+      theMap.setFilter("building-highlight", ["==", "$id", feature.properties.bldg_id])
+      theMap.setFilter("parcel-highlight", ["==", "parcel_id", feature.properties.parcel_id])
+      theMap.setFilter("address-highlight", ["==", "$id", feature.properties.addr_id])
+      theMap.setFilter("streets-highlight", ["==", "street_id", feature.properties.street_id]) 
+      theMap.setCenter(feature.geometry.coordinates)
+    }
+  }, [feature])
+
   return (
     <div id="map" className="linker-map" />
   );
