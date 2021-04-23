@@ -17,8 +17,6 @@ import {ToggleButton} from '../components/ToggleButton'
 import { CSVLink } from 'react-csv';
 import apps from '../data/apps';
 import AppIntro from '../components/AppIntro';
-import { download } from 'shp-write';
-
 
 const Mailer = ({ session }) => {
 
