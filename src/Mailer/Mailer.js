@@ -63,6 +63,7 @@ const Mailer = ({ session }) => {
   const [mode, setMode] = useState('simple_select')
 
   const [formattedData, setFormattedData] = useState(null)
+  const [features, setFeatures] = useState(null)
   const [gjDownload, setGjDownload] = useState(null)
 
   // this effect runs if the user logs in or out.
@@ -155,6 +156,7 @@ const Mailer = ({ session }) => {
             allAddresses = allAddresses.concat(r.features)
           })
           // store them in state
+          console.log(allAddresses)
           setAddresses(allAddresses)
         })
     }
@@ -175,12 +177,13 @@ const Mailer = ({ session }) => {
     setFiltered(filteredAddresses)
 
 
-    let formattedData = filtered.map((r, i) => {
+    let formattedData = filteredAddresses.map((r, i) => {
       return r.attributes
     })
     setFormattedData(formattedData)
 
-    let features = filtered.map(f => {
+    console.log(filteredAddresses)
+    let features = filteredAddresses.map(f => {
       let prop = layer === 'parcel' ? 'centroid' : 'geometry'
   
       return {
@@ -188,7 +191,7 @@ const Mailer = ({ session }) => {
         properties: { ...f.attributes },
         geometry: {
           type: "Point",
-          coordinates: [parseFloat(f[prop].y.toFixed(6)), parseFloat(f[prop].x.toFixed(6))]
+          coordinates: [parseFloat(f[prop].x.toFixed(6)), parseFloat(f[prop].y.toFixed(6))]
         }
       }
     })
@@ -197,6 +200,10 @@ const Mailer = ({ session }) => {
       type: "FeatureCollection",
       features: features
     }
+
+    console.log(featureCollection)
+
+    setFeatures(featureCollection)
   
     setGjDownload("text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(featureCollection)))
 
@@ -336,7 +343,7 @@ const Mailer = ({ session }) => {
       </SiteSidebar>
 
       <main>
-        <MailerMap {...{ geom, setGeom, filtered, mode, setMode }} />
+        <MailerMap {...{ geom, setGeom, filtered, mode, setMode, features }} />
       </main>
 
     </>

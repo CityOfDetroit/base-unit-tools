@@ -3,9 +3,10 @@ import mapboxgl from "mapbox-gl";
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import bbox from '@turf/bbox';
 import mapStyle from '../styles/mailerstyle.json';
+import centroid from '@turf/centroid'
 import {arcgisToGeoJSON} from '@esri/arcgis-to-geojson-utils'
 
-const MailerMap = ({ geom, setGeom, mode, setMode, filtered }) => {
+const MailerMap = ({ geom, setGeom, mode, setMode, features }) => {
 
   let [theMap, setTheMap] = useState(null);
   let [theDraw, setTheDraw] = useState(null);
@@ -105,13 +106,11 @@ const MailerMap = ({ geom, setGeom, mode, setMode, filtered }) => {
   }, [mode])
 
   useEffect(() => {
-    if(theMap && filtered) {
-      theMap.getSource("filtered").setData({
-        "type": "FeatureCollection",
-        "features": filtered.map(f => arcgisToGeoJSON(f))
-      })
+    if(theMap && features) {
+      console.log(features)
+      theMap.getSource("filtered").setData(features)
     }
-  })
+  }, [features])
 
   return (
     <div id="map" className="explorer-map" />
