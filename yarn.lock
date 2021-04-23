@@ -1814,18 +1814,6 @@
     "@svgr/plugin-svgo" "^5.4.0"
     loader-utils "^2.0.0"
 
-"@terraformer/arcgis@^2.0.7":
-  version "2.0.7"
-  resolved "https://registry.yarnpkg.com/@terraformer/arcgis/-/arcgis-2.0.7.tgz#617e6056a64b7328d4827702d64d0ccfc2e96d17"
-  integrity sha512-7jIQcnd8RnKsDt1IxmEjq9t7l5fnf0e5c+c1+1GjG4NR+TY0XkJcWtrBv0DWd65uAlDiQYMlEG8ls5dz1GQiuA==
-  dependencies:
-    "@terraformer/common" "^2.0.7"
-
-"@terraformer/common@^2.0.7":
-  version "2.0.7"
-  resolved "https://registry.yarnpkg.com/@terraformer/common/-/common-2.0.7.tgz#bec626f331b9f0cc3aefb16f9f88e2d3684107ff"
-  integrity sha512-8bl+/JT0Rw6FYe2H3FfJS8uQwgzGl+UHs+8JX0TQLHgA4sMDEwObbMwo0iP3FVONwPXrPHEpC5YH7Grve0cl9A==
-
 "@testing-library/dom@^7.28.1":
   version "7.30.0"
   resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-7.30.0.tgz#53697851f7708a1448cc30b74a2ea056dd709cd6"
@@ -4337,6 +4325,13 @@ data-urls@^2.0.0:
     abab "^2.0.3"
     whatwg-mimetype "^2.3.0"
     whatwg-url "^8.0.0"
+
+dbf@0.1.4:
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/dbf/-/dbf-0.1.4.tgz#162f0d8fd1db37c976458ac6fe6f55b48c72f466"
+  integrity sha1-Fi8Nj9HbN8l2RYrG/m9VtIxy9GY=
+  dependencies:
+    jdataview "~2.5.0"
 
 debug@2.6.9, debug@^2.2.0, debug@^2.3.3, debug@^2.6.0, debug@^2.6.9:
   version "2.6.9"
@@ -6859,6 +6854,11 @@ istanbul-reports@^3.0.2:
     html-escaper "^2.0.0"
     istanbul-lib-report "^3.0.0"
 
+jdataview@~2.5.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/jdataview/-/jdataview-2.5.0.tgz#3081b3fea651f9317ec6bd4feb2ddc98aa41d595"
+  integrity sha1-MIGz/qZR+TF+xr1P6y3cmKpB1ZU=
+
 jest-changed-files@^26.6.2:
   version "26.6.2"
   resolved "https://registry.yarnpkg.com/jest-changed-files/-/jest-changed-files-26.6.2.tgz#f6198479e1cc66f22f9ae1e22acaa0b429c042d0"
@@ -7449,6 +7449,13 @@ jsprim@^1.2.2:
   dependencies:
     array-includes "^3.1.2"
     object.assign "^4.1.2"
+
+jszip@2.5.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/jszip/-/jszip-2.5.0.tgz#7444fd8551ddf3e5da7198fea0c91bc8308cc274"
+  integrity sha1-dET9hVHd8+XacZj+oMkbyDCMwnQ=
+  dependencies:
+    pako "~0.2.5"
 
 kdbush@^3.0.0:
   version "3.0.0"
@@ -8618,6 +8625,11 @@ pako@^1.0.11, pako@~1.0.5:
   version "1.0.11"
   resolved "https://registry.yarnpkg.com/pako/-/pako-1.0.11.tgz#6c9599d340d54dfd3946380252a35705a6b992bf"
   integrity sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==
+
+pako@~0.2.5:
+  version "0.2.9"
+  resolved "https://registry.yarnpkg.com/pako/-/pako-0.2.9.tgz#f3f7522f4ef782348da8161bad9ecfd51bf83a75"
+  integrity sha1-8/dSL073gjSNqBYbrZ7P1Rv4OnU=
 
 parallel-transform@^1.1.0:
   version "1.2.0"
@@ -10822,6 +10834,14 @@ shellwords@^0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/shellwords/-/shellwords-0.1.1.tgz#d6b9181c1a48d397324c84871efbcfc73fc0654b"
   integrity sha512-vFwSUfQvqybiICwZY5+DAWIPLKsWO31Q91JSKl3UYv+K5c2QRPzn0qzec6QPu1Qc9eHYItiP3NdJqNVqetYAww==
+
+shp-write@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/shp-write/-/shp-write-0.3.2.tgz#cac3e84bcfdc953c4fc273a1b2f2843d6db8f69d"
+  integrity sha1-ysPoS8/clTxPwnOhsvKEPW249p0=
+  dependencies:
+    dbf "0.1.4"
+    jszip "2.5.0"
 
 side-channel@^1.0.4:
   version "1.0.4"
