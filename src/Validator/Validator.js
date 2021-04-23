@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import AppIntro from '../components/AppIntro';
+import AppHeader from '../components/AppHeader';
 import apps from '../data/apps';
 import SiteSidebar from '../layout/SiteSidebar';
 import parse from '../parser.js'
@@ -19,16 +19,21 @@ const Validator = () => {
     ['unitnum', 'Unit number'],
   ]
 
+
+  let introduction = (
+    <>
+      <p className="py-2">Use this tool to see how our address parser breaks down a full address into its component parts,
+      like street number and street name.</p>
+      <p className="py-2">Enter one address in the box below and you'll see the output of the parser.</p>
+      <p className="py-2">The Rules Applied section will show you how the tool is working. 
+      For example, if you enter <i>123 St Aubin</i> you'll see that the <i>St</i> has been expanded to <i>Saint.</i></p>
+    </>
+  )
   return (
     <>
       <SiteSidebar title="Validator">
-      <AppIntro app={apps.validator}>
-          <p className="py-2">Use this tool to see how our address parser breaks down a full address into its component parts,
-          like street number and street name.</p>
-          <p className="py-2">Enter one address in the box below and you'll see the output of the parser.</p>
-          <p className="py-2">The Rules Applied section will show you how the tool is working. 
-          For example, if you enter <i>123 St Aubin</i> you'll see that the <i>St</i> has been expanded to <i>Saint.</i></p>
-        </AppIntro>
+      <AppHeader app={apps.validator} introduction={introduction}>
+      </AppHeader>
         <section className="sidebar-section">
           <h2>Address to parse</h2>
           <div className="flex items-center justify-between">

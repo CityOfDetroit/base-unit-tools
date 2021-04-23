@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { geocoders } from '../data/geocoders';
 import SiteSidebar from '../layout/SiteSidebar';
 import Button from '../components/Button'
-import AppIntro from '../components/AppIntro';
+import AppHeader from '../components/AppHeader';
 import apps from '../data/apps';
 import { bulkGeocode } from '@esri/arcgis-rest-geocoding';
 
@@ -75,8 +75,7 @@ const Geocoder = () => {
       <SiteSidebar title="Geocoder">
         {/* <p className="opacity-50 text-xs mb-2">currently using: <a href={geocoder.url}><strong>{geocoder.name}</strong></a></p> */}
 
-        {/* <AppIntro app={apps.geocoder}>
-        </AppIntro> */}
+        <AppHeader app={apps.geocoder} />
         <section className="sidebar-section">
           <h2>1. Enter your list of addresses</h2>
           <p className="text-sm">Please put one address on each line</p>

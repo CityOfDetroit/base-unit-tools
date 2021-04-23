@@ -16,7 +16,7 @@ import _ from 'lodash';
 import {ToggleButton} from '../components/ToggleButton'
 import { CSVLink } from 'react-csv';
 import apps from '../data/apps';
-import AppIntro from '../components/AppIntro';
+import AppHeader from '../components/AppHeader';
 
 const Mailer = ({ session }) => {
 
@@ -210,8 +210,8 @@ const Mailer = ({ session }) => {
 
       <SiteSidebar title="Mailer">
 
-        {/* <AppIntro app={apps.mailer}>
-        </AppIntro> */}
+        <AppHeader app={apps.mailer} />
+
 
         {/* Show a warning if the user doesn't have access to the layer. */}
         {!access && <section className="sidebar-section caution flex items-center">
