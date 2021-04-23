@@ -97,6 +97,10 @@ You can also apply a buffer to any shape to comply with distance-based mailing r
 
 After filtering addresses based on their attributes, you can export a .csv of addresses for use in a mail merge.
 
+### Linker
+
+This is a tool for **editing address links.**
+
 ## Installation
 
 1. Clone the repository
