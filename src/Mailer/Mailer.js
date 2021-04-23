@@ -206,14 +206,19 @@ const Mailer = ({ session }) => {
 
   let gjDownload = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(featureCollection))
 
-
   let introduction = (
-    <>
-      <p>Use this tool to generate a mailing list.</p>
-      <p>First, choose a selection area.</p>
-      <p>Next, you can select filtering options.</p>
-      <p>Finally, you can export your selected addresses to .csv or GeoJSON.</p>
-    </>
+       <>
+        <p className="py-2">This tool is for creating a mailing list, based on a selection area.</p>
+        <p className="pt-2">You can start by creating a selection area:</p>
+        <ul className="list-disc list-outside ml-4 pb-2">
+          <li>Search for an address</li>
+          <li>Draw a line, point, or polygon</li>
+          <li>Choose from common city boundaries</li>
+        </ul>
+        <p className="py-2">Once the selection area is defined, the addresses within will appear on the map.</p>
+        <p className="py-2">Select filters on those addresses, such as deliverability status.</p>
+        <p className="py-2">Finally, you can export those addresses into a .csv file or a GeoJSON.</p>
+      </>
   )
   return (
     <>
@@ -235,15 +240,15 @@ const Mailer = ({ session }) => {
 
 
         <AppHeader app={apps.mailer} introduction={introduction}>
-          <div className="flex items-center justify-around">
-            <p className="w-1/3 text-sm">Select by address point/underlying parcel</p>
+          <h3 className="mb-2 text-base">Select by address point/underlying parcel</h3>
+          <div className="flex items-center">
             <ToggleButton
-              title={`Centroid mode (fast)`}
+              title={`Address point within selection area`}
               active={layer === 'centroid'}
               onClick={() => setLayer('centroid') && setResultIds(null) && setAddresses([]) && setFiltered([])}
             />
             <ToggleButton
-              title={`Parcel mode (slower)`}
+              title={`Address linked parcel within selection area`}
               active={layer === 'parcel'}
               onClick={() => setLayer('parcel') && setResultIds(null) && setAddresses([]) && setFiltered([])}
             />
