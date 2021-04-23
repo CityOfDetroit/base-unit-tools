@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Linker tool to visually edit address links on the map
 - Each app now has a header on the sidebar where instruction and settings can be hidden/unfurled
+- custom React Hooks in `/src/hooks`: `useFeature`, `useGeocoder`, `useQuery`. These mostly wrap Esri's library and some of our own logic.
 
 ### Changes
 
