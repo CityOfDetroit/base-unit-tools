@@ -171,7 +171,8 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
         let geojsonFeature = arcgisToGeoJSON(feature)
         let coords = centroid(geojsonFeature.geometry).geometry.coordinates
         theMap.easeTo({
-          center: coords
+          center: coords,
+          zoom: 17
         })
       }
     }
