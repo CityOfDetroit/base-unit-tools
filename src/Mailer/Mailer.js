@@ -1,6 +1,6 @@
 import { getLayer, queryFeatures } from '@esri/arcgis-rest-feature-layer';
 import { geojsonToArcGIS } from '@esri/arcgis-to-geojson-utils';
-import { faDownload, faDrawPolygon, faSlash, faLock, faMailBulk, faMapMarkerAlt, faMarker, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faDrawPolygon, faSlash, faLock, faMailBulk, faMapMarkerAlt, faMarker, faTrash, faGlobe } from '@fortawesome/free-solid-svg-icons';
 import { faLine, faUsps } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
@@ -17,6 +17,7 @@ import {ToggleButton} from '../components/ToggleButton'
 import { CSVLink } from 'react-csv';
 import apps from '../data/apps';
 import AppIntro from '../components/AppIntro';
+import { download } from 'shp-write';
 
 
 const Mailer = ({ session }) => {
@@ -39,13 +40,31 @@ const Mailer = ({ session }) => {
   // use this boolean to see if the user has access to the mailing list layer
   const [access, setAccess] = useState(false)
 
+  // keep track of mailer mode here:
+  // mode 1 is centroid
+  // mode 2 is parcel
+  let mailerLayers = [
+    `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/MailerLayers/FeatureServer/0`, // parcels
+    `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/MailerLayers/FeatureServer/1` // centroids
+  ]
+  const [layer, setLayer] = useState('centroid')
+
+  // mailing list layer.
+  // theoretically we can put any layer here to make a generalized selection tool.
+  let url = mailerLayers[1]
+  let prop = 'geometry'
+  // we have to grab slightly different stuff, working with parcel centroid.
+  if (layer === 'parcel') {
+    url = mailerLayers[0]
+    prop = 'centroid'
+  }
+
   // use this to set state of filter toggles
   let defaults = {}
   Object.keys(allFilters).forEach(f => {
     defaults[f] = allFilters[f].default
   })
   const [filters, setFilters] = useState(defaults)
-  console.log(filters)
   // store the selection area object IDs, all addresses, and the filtered addresses.
   const [resultIds, setResultIds] = useState(null)
   const [addresses, setAddresses] = useState([])
@@ -55,9 +74,7 @@ const Mailer = ({ session }) => {
   // should be one of these: https://github.com/mapbox/mapbox-gl-draw/blob/main/docs/API.md#modes
   const [mode, setMode] = useState('simple_select')
 
-  // mailing list layer.
-  // theoretically we can put any layer here to make a generalized selection tool.
-  let url = `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/AddrPoints_USPS_Jan2021/FeatureServer/0`
+
 
   // this effect runs if the user logs in or out.
   // it tests access to the mailing list layer
@@ -93,13 +110,16 @@ const Mailer = ({ session }) => {
         geometry: geojsonToArcGIS(geom)[0].geometry,
         geometryType: "esriGeometryPolygon",
         spatialRel: "esriSpatialRelIntersects",
+        inSR: 4326,
+        outSR: 4326,
         httpMethod: "POST",
+        returnCentroid: layer === 'parcel' ? true : false,
         authentication: session
       }).then(d => {
         setResultIds(d)
       })
     }
-  }, [geom, access, session, url])
+  }, [geom, access, session, url, layer])
 
   useEffect(() => {
     // this function is what runs when we click "Download CSV"
@@ -127,6 +147,9 @@ const Mailer = ({ session }) => {
           geometryType: "esriGeometryPolygon",
           spatialRel: "esriSpatialRelIntersects",
           httpMethod: "POST",
+          returnCentroid: layer === 'parcel' ? true : false,
+          inSR: 4326,
+          outSR: 4326,
           resultRecordCount: chunkSize,
           authentication: session
         }
@@ -166,7 +189,23 @@ const Mailer = ({ session }) => {
     return r.attributes
   })
 
-  console.log(geom)
+  console.log(filtered)
+  let features = filtered.map(f => {
+    return {
+      type: "Feature",
+      properties: {...f.attributes},
+      geometry: {
+        type: "Point",
+        coordinates: [parseFloat(f[prop].y.toFixed(6)), parseFloat(f[prop].x.toFixed(6))]
+      }
+    }
+  })
+  let featureCollection = {
+    type: "FeatureCollection",
+    features: features
+  }
+
+  let gjDownload = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(featureCollection))
 
   return (
     <>
@@ -188,6 +227,23 @@ const Mailer = ({ session }) => {
             </p>
           </div>
         </section>}
+
+        <section className="sidebar-section">
+
+        <div className="flex w-3/4 items-center justify-around">
+
+        <ToggleButton
+          title={`Centroid mode (fast)`}
+          active={layer === 'centroid'}
+          onClick={() => setLayer('centroid') && setResultIds(null) && setAddresses([]) && setFiltered([])}
+          />
+        <ToggleButton
+          title={`Parcel mode (slower)`}
+          active={layer === 'parcel'}
+          onClick={() => setLayer('parcel') && setResultIds(null) && setAddresses([]) && setFiltered([])}
+          />
+          </div>
+          </section>
 
         {/* Boundary picker */}
         {!geom &&
@@ -248,14 +304,24 @@ const Mailer = ({ session }) => {
                     </div>
                   ))
                 }
-                <div className="flex flex-row-reverse">
-                  <CSVLink data={formattedData} filename={`mailing_list_${new Date().getTime()}.csv`}>
+                  <h2>Downloading {filtered.length.toLocaleString()} addresses</h2>
+                <div className="flex flex-row">
+                  <CSVLink data={formattedData} filename={`mailing_list_${new Date().getTime()}.csv`} className="mr-2">
                     <Button 
                       icon={faDownload} 
-                      text={`Download ${filtered.length.toLocaleString()} addresses as .csv`}
+                      text={`Download .csv`}
                       small />
                   </CSVLink>
+                  <a href={`data: '${gjDownload}`} download={`mailing_list_${new Date().getTime()}.json`}>
+
+                  <Button
+                    icon={faGlobe}
+                    text={`Download GeoJSON`}
+                    small />
+                    </a>
                 </div>
+
+
               </>
             }
           </section>
