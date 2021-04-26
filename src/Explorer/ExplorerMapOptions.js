@@ -28,7 +28,7 @@ const ExplorerMapOptions = ({ options, setOptions }) => {
         active={options.satellite}
         small
         />
-      <select onSelect={(e) => setOptions({...options, basemap: e.target.value})}>
+      <select onChange={(e) => setOptions({...options, basemap: e.target.value})}>
         {Object.entries(basemaps).map((k, v) => (
           <option value={k[0]}>{k[1]}</option>
         ))}
