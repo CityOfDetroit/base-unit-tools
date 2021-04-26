@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { arcgisToGeoJSON } from '@esri/arcgis-to-geojson-utils';
 import centroid from '@turf/centroid';
 
-import { baseStyle, satelliteStyle } from '../styles/mapstyle'
+import { baseStyle, satelliteStyle, linenStyle } from '../styles/mapstyle'
 import videoIcon from '../images/video.png'
 
 import layers from '../data/layers'
