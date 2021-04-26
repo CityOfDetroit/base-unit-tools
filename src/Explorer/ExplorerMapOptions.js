@@ -1,6 +1,13 @@
 import { faSatellite, faStreetView } from '@fortawesome/free-solid-svg-icons';
 import Button from '../components/Button';
 
+// possible map layers
+let basemaps = {
+  'default': 'Streets', 
+  'satellite': 'Satellite', 
+  'linen-map': 'Linen Map'
+}
+
 const ExplorerMapOptions = ({ options, setOptions }) => {
   return (
     <>   
@@ -21,6 +28,11 @@ const ExplorerMapOptions = ({ options, setOptions }) => {
         active={options.satellite}
         small
         />
+      <select onSelect={(e) => setOptions({...options, basemap: e.target.value})}>
+        {Object.entries(basemaps).map((k, v) => (
+          <option value={k[0]}>{k[1]}</option>
+        ))}
+      </select>
     </div>
   </>
   )
