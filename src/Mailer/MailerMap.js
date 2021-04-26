@@ -6,7 +6,7 @@ import mapStyle from '../styles/mailerstyle.json';
 import centroid from '@turf/centroid'
 import {arcgisToGeoJSON} from '@esri/arcgis-to-geojson-utils'
 
-const MailerMap = ({ geom, setGeom, mode, setMode, features }) => {
+const MailerMap = ({ geom, setGeom, mode, setMode, features, filtered }) => {
 
   let [theMap, setTheMap] = useState(null);
   let [theDraw, setTheDraw] = useState(null);
@@ -45,6 +45,12 @@ const MailerMap = ({ geom, setGeom, mode, setMode, features }) => {
           type: "FeatureCollection",
           features: []
         }   
+      })
+
+      map.addLayer({
+        "id": "filtered-parcels",
+        "source": "filtered-parcels",
+        "type": "line"
       })
 
       map.addLayer({
@@ -112,12 +118,18 @@ const MailerMap = ({ geom, setGeom, mode, setMode, features }) => {
       theDraw.changeMode(mode)
     }
   }, [mode])
-
+  
   useEffect(() => {
     if(theMap && features) {
       theMap.getSource("filtered").setData(features)
     }
   }, [features])
+
+  useEffect(() => {
+    if(theMap && filtered) {
+      theMap.getSource("filtered-parcels").setData({type: "FeatureCollection", features: filtered.map(f => arcgisToGeoJSON(f))})
+    }
+  }, [filtered])
 
   return (
     <div id="map" className="explorer-map" />
