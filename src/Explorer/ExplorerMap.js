@@ -8,7 +8,7 @@ import videoIcon from '../images/video.png'
 
 import layers from '../data/layers'
 
-const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, svBearing, showSatellite }) => {
+const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, svBearing, basemap }) => {
   const [theMap, setTheMap] = useState(null);
   const [loading, setLoading] = useState(false)
 
@@ -154,16 +154,20 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
 
   useEffect(() => {
     if (theMap) {
-      if (showSatellite) {
+      if (basemap === 'satellite') {
         theMap.setStyle(satelliteStyle())
         setLoading(true)
       }
-      else {
+      if (basemap === 'linen-map') {
+        theMap.setStyle(linenStyle())
+        setLoading(true)
+      }
+      if (basemap === 'default') {
         theMap.setStyle(baseStyle)
         setLoading(true)
       }
     }
-  }, [showSatellite])
+  }, [basemap])
 
   useEffect(() => {
     if (theMap) {
