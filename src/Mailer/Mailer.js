@@ -156,7 +156,6 @@ const Mailer = ({ session }) => {
             allAddresses = allAddresses.concat(r.features)
           })
           // store them in state
-          console.log(allAddresses)
           setAddresses(allAddresses)
         })
     }
@@ -182,7 +181,6 @@ const Mailer = ({ session }) => {
     })
     setFormattedData(formattedData)
 
-    console.log(filteredAddresses)
     let features = filteredAddresses.map(f => {
       let prop = layer === 'parcel' ? 'centroid' : 'geometry'
   
@@ -200,8 +198,6 @@ const Mailer = ({ session }) => {
       type: "FeatureCollection",
       features: features
     }
-
-    console.log(featureCollection)
 
     setFeatures(featureCollection)
   
