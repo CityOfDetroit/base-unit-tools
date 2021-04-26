@@ -32,6 +32,12 @@ export const baseStyle = {
           "https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/Detroit_RGB_projFix_sid/MapServer/tile/{z}/{y}/{x}"
         ]
       },
+      "linen-map": {
+        "type": "raster",
+        "tiles": [
+          "https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/Linen_Map_Mosaic/MapServer/tile/{z}/{y}/{x}"
+        ]
+      },
       "mapillary": {
         "type": "geojson",
         "data": {
@@ -45,6 +51,20 @@ export const baseStyle = {
         "id": "satellite",
         "type": "raster",
         "source": "satellite",
+        "minzoom": 0,
+        "maxzoom": 22,
+        "paint": {
+          "raster-opacity": 1,
+          "raster-saturation": -0.75
+        },
+        "layout": {
+          "visibility": "none"
+        }
+      },
+      {
+        "id": "linen-map",
+        "type": "raster",
+        "source": "linen-map",
         "minzoom": 0,
         "maxzoom": 22,
         "paint": {
@@ -16661,6 +16681,7 @@ export const satelliteStyle = () => {
 
   // set the satellite layer, which is first, to visible
   satStyle.layers[0].layout.visibility = 'visible'
+  satStyle.layers[1].layout.visibility = 'none'
 
   // run through the first 200 layers and turn them off if they're a fill
   // or if they're a road line layer
@@ -16673,9 +16694,32 @@ export const satelliteStyle = () => {
       satStyle.layers[i].layout['visibility'] = 'none'
     }
   })
-
-
   
   // return the object
   return satStyle;
+}
+
+export const linenStyle = () => {
+
+  // clone the baseStyle into a new object to we can make changes
+  let linenStyle = _.cloneDeep(baseStyle)
+
+  // set the linenmap layer, which is second, to visible
+  linenStyle.layers[0].layout.visibility = 'none'
+  linenStyle.layers[1].layout.visibility = 'visible'
+
+  // run through the first 200 layers and turn them off if they're a fill
+  // or if they're a road line layer
+  // lazy hack for invisible'ing all the layers which are in the way of the satellite
+  linenStyle.layers.slice(0,200).forEach((l, i) => {
+    if (l.type === 'fill' && l.id.indexOf("parcel") === -1) {
+      linenStyle.layers[i].layout['visibility'] = 'none'
+    }
+    if (l.type === 'line' && l.id.indexOf("Road") === 0) {
+      linenStyle.layers[i].layout['visibility'] = 'none'
+    }
+  })
+
+  // return the object
+  return linenStyle;
 }

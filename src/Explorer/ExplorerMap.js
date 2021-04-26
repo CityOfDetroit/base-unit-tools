@@ -3,18 +3,22 @@ import React, { useEffect, useState } from "react";
 import { arcgisToGeoJSON } from '@esri/arcgis-to-geojson-utils';
 import centroid from '@turf/centroid';
 
-import { baseStyle, satelliteStyle } from '../styles/mapstyle'
+import { baseStyle, satelliteStyle, linenStyle } from '../styles/mapstyle'
 import videoIcon from '../images/video.png'
 
 import layers from '../data/layers'
 
-const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, svBearing, showSatellite }) => {
+const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, svBearing, basemap }) => {
+
+  // keep a reference to the map object here
   const [theMap, setTheMap] = useState(null);
+  // keep track of whether the style is loaded or not
+  // we switch styles when the underlying basemap changes
   const [loading, setLoading] = useState(false)
 
   // this effect runs once, when the component loads
   useEffect(() => {
-    
+
     const detroitBbox = [-83.287803, 42.255192, -82.910451, 42.45023];
     var map = new mapboxgl.Map({
       container: "map", // container id
@@ -40,17 +44,7 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
       map.loadImage(videoIcon, (error, image) => {
         if (error) throw error;
         map.addImage("video", image);
-
-        // set the Mapillary data
-        map.getSource("mapillary").setData({
-          type: "FeatureCollection",
-          // we'll make the map data here
-          features: [],
-        });
       });
-    })
-
-    map.on('moveend', (e) => {
     })
 
     map.on('click', e => {
@@ -71,6 +65,7 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
 
   }, [setClicked]);
 
+  // fires when we get a new clicked feature
   useEffect(() => {
     if (theMap && clicked.type && clicked.id && !loading) {
       let layer = layers[clicked.type]
@@ -96,6 +91,7 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
     }
   }, [theMap, clicked, loading])
 
+  // fires when we get linked features
   useEffect(() => {
     if (theMap && linked && clicked.type && !loading) {
       let layer = layers[clicked.type]
@@ -118,52 +114,61 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
     }
   }, [theMap, linked, loading, clicked.type])
 
+  // effect fires when svCoords or svBearing changes
   useEffect(() => {
-    theMap && showSv && svCoords &&
-      theMap.getSource("mapillary").setData({
-        type: "FeatureCollection",
-        // we'll make the map data here
-        features: [
-          {
-            type: "Feature",
-            geometry: {
-              type: "Point",
-              coordinates: [svCoords.lon, svCoords.lat],
+    if (theMap && !loading) {
+      if (showSv && svCoords) {
+        theMap.getSource("mapillary").setData({
+          type: "FeatureCollection",
+          // we'll make the map data here
+          features: [
+            {
+              type: "Feature",
+              geometry: {
+                type: "Point",
+                coordinates: [svCoords.lon, svCoords.lat],
+              },
+              properties: {
+                bearing: svBearing - 90,
+              },
             },
-            properties: {
-              bearing: svBearing - 90,
-            },
-          },
-        ],
-      });
-    if (theMap && !showSv) {
-      theMap.getSource("mapillary").setData({
-        type: "FeatureCollection", features: []
-      })
+          ],
+        });
+      }
+      if (!showSv) {
+        theMap.getSource("mapillary").setData({
+          type: "FeatureCollection", features: []
+        })
+      }
     }
   }, [svCoords, svBearing, loading, theMap, showSv]);
 
+  // effect fires when the showSv property changes
   useEffect(() => {
-    if (theMap && showSv) {
-      theMap.setLayoutProperty("mapillary-location", "visibility", "visible")
-    }
-    if (theMap && !showSv) {
-      theMap.setLayoutProperty("mapillary-location", "visibility", "none")
+    if(theMap && !loading) {
+      if (showSv) {
+        theMap.setLayoutProperty("mapillary-location", "visibility", showSv ? "visible" : "none")
+      }
     }
   }, [showSv, loading, theMap])
 
+  // effect fires when we switch the basemap
   useEffect(() => {
     if (theMap) {
-      if (showSatellite) {
+      if (basemap === 'satellite') {
         theMap.setStyle(satelliteStyle())
         setLoading(true)
       }
-      else {
+      if (basemap === 'linen-map') {
+        theMap.setStyle(linenStyle())
+        setLoading(true)
+      }
+      if (basemap === 'default') {
         theMap.setStyle(baseStyle)
         setLoading(true)
       }
     }
-  }, [showSatellite])
+  }, [basemap])
 
   useEffect(() => {
     if (theMap) {
