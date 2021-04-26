@@ -39,6 +39,14 @@ const MailerMap = ({ geom, setGeom, mode, setMode, features }) => {
         }
       })
 
+      map.addSource("filtered-parcels", {
+        type: 'geojson',
+        data: {
+          type: "FeatureCollection",
+          features: []
+        }   
+      })
+
       map.addLayer({
         "id": "filtered-addresses",
         "source": "filtered",
@@ -107,7 +115,6 @@ const MailerMap = ({ geom, setGeom, mode, setMode, features }) => {
 
   useEffect(() => {
     if(theMap && features) {
-      console.log(features)
       theMap.getSource("filtered").setData(features)
     }
   }, [features])
