@@ -49,7 +49,6 @@ const Explorer = ({ session }) => {
   // an options object
   let [options, setOptions] = useState({
     streetView: querySv === 'true' ? true : false,
-    satellite: false,
     basemap: 'default'
   })
   
@@ -133,7 +132,7 @@ const Explorer = ({ session }) => {
       <main>
         <div className="flex items-center justify-between mb-2">
         </div>
-        <ExplorerMap {...{ clicked, setClicked, linked, feature, history, svCoords, svBearing, basemap: options.basemap, showSv: options.streetView, showSatellite: options.satellite }} />
+        <ExplorerMap {...{ clicked, setClicked, linked, feature, history, svCoords, svBearing, basemap: options.basemap, showSv: options.streetView }} />
       </main>
     </>
   )
