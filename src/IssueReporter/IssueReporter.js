@@ -9,7 +9,7 @@ import IssueReporterMap from './IssueReporterMap';
 import { IssueReporterSelector } from './IssueReporterSelector';
 import IssueReporterSubmission from './IssueReporterSubmission';
 import useQuery from '../hooks/useQuery';
-import useGeocoder from '../hooks/useGeocoder';
+import { useGeocoder } from '../hooks/useGeocoder';
 import AppHeader from '../components/AppHeader';
 import apps from '../data/apps';
 

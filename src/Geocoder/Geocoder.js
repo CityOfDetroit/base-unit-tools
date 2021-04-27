@@ -3,12 +3,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
 import { CSVLink } from 'react-csv';
 import { Link } from 'react-router-dom';
-import { geocoders } from '../data/geocoders';
 import SiteSidebar from '../layout/SiteSidebar';
 import Button from '../components/Button'
 import AppHeader from '../components/AppHeader';
 import apps from '../data/apps';
 import { bulkGeocode } from '@esri/arcgis-rest-geocoding';
+import {geocoderUrl} from '../hooks/useGeocoder';
 
 const Geocoder = () => {
 
@@ -16,9 +16,6 @@ const Geocoder = () => {
   let [value, setValue] = useState('')
   // and split on a newline to get a list of addresses to geocode
   let addresses = value.split("\n").filter(a => a !== "")
-
-  // TODO: let the user pick from a number of geocoders
-  let [geocoder, setGeocoder] = useState(geocoders[3])
 
   // options for geocoding
   let [matched, setMatched] = useState(true)
@@ -41,7 +38,7 @@ const Geocoder = () => {
 
       bulkGeocode({
         addresses: dataToSend,
-        endpoint: geocoder.url,
+        endpoint: geocoderUrl,
         params: {
           'outSR': 4326,
           'outFields': '*'

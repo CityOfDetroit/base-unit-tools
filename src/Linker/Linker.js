@@ -6,7 +6,7 @@ import LinkerMap from './LinkerMap';
 import LinkerSubmission from './LinkerSubmission';
 import { Link } from './Link';
 import Button from '../components/Button'
-import useGeocoder from '../hooks/useGeocoder';
+import {useGeocoder} from '../hooks/useGeocoder';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import AppHeader from '../components/AppHeader';
 import apps from '../data/apps';
