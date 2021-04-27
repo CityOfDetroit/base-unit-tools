@@ -237,3 +237,7 @@ a {
 #mly {
   height: 30vh;
 }
+
+.app-intro p {
+  @apply py-2;
+}
