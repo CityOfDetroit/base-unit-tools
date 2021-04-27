@@ -7,9 +7,10 @@ import LinkerSubmission from './LinkerSubmission';
 import { Link } from './Link';
 import Button from '../components/Button'
 import {useGeocoder} from '../hooks/useGeocoder';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faExclamationTriangle, faSearch } from '@fortawesome/free-solid-svg-icons';
 import AppHeader from '../components/AppHeader';
 import apps from '../data/apps';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const LinkerSearch = ({ setSearchValue, type }) => {
 
@@ -47,6 +48,13 @@ const LinkerSearch = ({ setSearchValue, type }) => {
     </>
   )
 }
+
+let linkerIntro = (
+  <>
+    <p className='flex items-center justify-between caution px-4'><FontAwesomeIcon icon={faExclamationTriangle} /> This tool is still under construction!</p>
+    <p>Use this tool to edit an address's links to the other base units.</p>
+  </>
+)
 
 const Linker = ({ session }) => {
 
@@ -95,7 +103,7 @@ const Linker = ({ session }) => {
     <>
       <SiteSidebar title="Linker">
 
-        <AppHeader app={apps.linker}>
+        <AppHeader app={apps.linker} introduction={linkerIntro}>
           <LinkerSearch {...{setSearchValue, type}} />
         </AppHeader>
 
