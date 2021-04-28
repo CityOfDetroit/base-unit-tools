@@ -27,7 +27,7 @@ const ExplorerMapOptions = ({ options, setOptions }) => {
 
         {/* Basemap selector */}
         <div className="flex items-center my-2">
-          <div className="h-9 px-2 font-semibold text-gray-900 text-sm flex items-center bg-blue-300">
+          <div className="h-9 px-3 font-semibold text-gray-900 text-sm flex items-center bg-blue-300">
             <FontAwesomeIcon icon={faMapMarked} className="mr-2" />
             <span>Basemap</span>
           </div>

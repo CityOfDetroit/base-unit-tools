@@ -130,8 +130,6 @@ const Explorer = ({ session }) => {
 
       {/* the main panel contains the map, and we pass it many of our useState variables */}
       <main>
-        <div className="flex items-center justify-between mb-2">
-        </div>
         <ExplorerMap {...{ clicked, setClicked, linked, feature, history, svCoords, svBearing, basemap: options.basemap, showSv: options.streetView }} />
       </main>
     </>
