@@ -6,6 +6,7 @@ const ExplorerStreet = ({ feature, clicked, setClicked, linked, setLinked }) => 
 
     let { attributes: attr } = feature;
 
+    // lookup for legalsystem attribute
     let legalSystems = {
       0: `Non-Act 51 certified`,
       1: `State trunkline`,
@@ -32,7 +33,7 @@ const ExplorerStreet = ({ feature, clicked, setClicked, linked, setLinked }) => 
     useEffect(() => {
         let url = `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/AddressPoints/FeatureServer/0/query?`
         let params = {
-            where: `street_id = ${attr.objectid_1}`,
+            where: `street_id = ${attr.street_id}`,
             outFields: `*`,
             outSR: 4326,
             f: `pjson`
@@ -45,12 +46,13 @@ const ExplorerStreet = ({ feature, clicked, setClicked, linked, setLinked }) => 
             .then(d => {
                 if (Object.keys(d).indexOf('features') > -1) {
                     if (d.features.length > 0) {
+                      console.log(Array.from(new Set(d.features.map(f => f.attributes.parcel_id))))
                         setAddresses(d.features.map(f => f.attributes))
                         setLinked({
                           addresses: d.features.map(f => f.attributes.addr_id), 
                           streets: [],
-                          buildings: Array.from(new Set(d.features.map(f => f.attributes.bldg_id))).filter(a => a !== null),
-                          parcels: Array.from(new Set(d.features.map(f => f.attributes.parcel_id)))
+                          buildings: Array.from(new Set(d.features.map(f => f.attributes.bldg_id))).filter(n => n !== null),
+                          parcels: Array.from(new Set(d.features.map(f => f.attributes.parcel_id))).filter(n => n !== null)
                         })
                     }
                     else {
@@ -65,7 +67,7 @@ const ExplorerStreet = ({ feature, clicked, setClicked, linked, setLinked }) => 
                 }
             })
 
-    }, [attr.objectid_1, setLinked])
+    }, [attr.street_id, setLinked])
 
     return (
         <>
