@@ -172,7 +172,7 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
 
   useEffect(() => {
     if (theMap) {
-      if (feature) {
+      if (feature && feature.geometry) {
         let geojsonFeature = arcgisToGeoJSON(feature)
         let coords = centroid(geojsonFeature.geometry).geometry.coordinates
         theMap.easeTo({
