@@ -16492,7 +16492,7 @@ export const baseStyle = {
         "source": "parcels",
         "source-layer": "parcels",
         "minzoom": 11,
-        "filter": ["==", "parcelno", "02004940."],
+        "filter": ["==", "parcelno", ""],
         "layout": {
           "visibility": "visible"
         },
