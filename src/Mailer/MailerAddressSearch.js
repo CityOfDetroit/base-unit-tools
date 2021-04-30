@@ -1,8 +1,7 @@
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import React, { useEffect, useState } from 'react';
 import Button from '../components/Button';
-import { geocoders } from '../data/geocoders';
-import useGeocoder from '../hooks/useGeocoder';
+import {useGeocoder} from '../hooks/useGeocoder';
 
 const MailerAddressSearch = ({ geom, setGeom }) => {
 

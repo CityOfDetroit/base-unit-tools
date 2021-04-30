@@ -29,7 +29,7 @@ const AppHeader = ({ app, introduction, children }) => {
         duration={250}
         height={showIntro ? 'auto' : 0}
       >
-        <section className={'px-4 pt-3 pb-4 bg-gray-100'}>
+        <section className={'px-4 pt-3 pb-4 bg-gray-100 app-intro'}>
         {introduction}
         </section>
       </AnimateHeight>
