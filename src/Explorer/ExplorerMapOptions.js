@@ -6,10 +6,15 @@ import Button from '../components/Button';
 let basemaps = {
   'default': 'Streets',
   'satellite': 'Satellite',
-  'linen-map': 'Linen Map'
 }
 
-const ExplorerMapOptions = ({ options, setOptions }) => {
+const ExplorerMapOptions = ({ options, setOptions, session }) => {
+
+  // add to obj on session
+  if(session) {
+    basemaps['linen-map'] = 'Linen Map'
+  }
+
   return (
     <>
       <h2 className="text-base">Map options</h2>

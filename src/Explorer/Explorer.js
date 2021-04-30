@@ -88,7 +88,7 @@ const Explorer = ({ session }) => {
 
         <AppHeader app={apps.explorer} introduction={introduction}>
           <ExplorerSearch {...{ setClicked }} />
-          <ExplorerMapOptions {...{options, setOptions}} />
+          <ExplorerMapOptions {...{options, setOptions, session}} />
         </AppHeader>
 
 
