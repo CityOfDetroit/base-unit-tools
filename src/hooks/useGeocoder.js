@@ -1,6 +1,13 @@
 import { useState, useEffect } from 'react'
 import { geocode } from '@esri/arcgis-rest-geocoding';
-export const geocoderUrl = `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoderBeta/GeocodeServer`
+
+let geocoders = {
+  org: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitsGeocoder/GeocodeServer`,
+  prod: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoderWUnitsTest/GeocodeServer`,
+  dev: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoderGamma/GeocodeServer`
+}
+
+export const geocoderUrl = geocoders.dev
 
 /**
  * useGeocoder custom hook.

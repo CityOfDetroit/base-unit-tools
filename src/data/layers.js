@@ -1,12 +1,13 @@
 // support two different servers
 let SERVER_ROOT = `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/`
 let HOSTED_ROOT = `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitMetrics/FeatureServer/`
+let HOSTED_ROOT_DEV = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/ExtendedTables/FeatureServer/`
 
 const layers = {
   "addresses": {
     "name": "addresses",
     "label": "Address Point",
-    "endpoint": HOSTED_ROOT + '5',
+    "endpoint": `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/BaseUnitMetrics/FeatureServer/5`,
     "id_column": "addr_id",
     "click": "id",
     "interaction": "address-point",
@@ -19,7 +20,7 @@ const layers = {
   "buildings": {
     "name": "buildings",
     "label": "Building",
-    "endpoint": SERVER_ROOT + "BuildingMetrics/FeatureServer/0",
+    "endpoint": HOSTED_ROOT_DEV + '4',
     "id_column": "bldg_id",
     "interaction": "building-fill",
     "click": "id",
@@ -32,7 +33,7 @@ const layers = {
   "parcels": {
     "name": "parcels",
     "label": "Parcel",
-    "endpoint": HOSTED_ROOT + "2",
+    "endpoint": HOSTED_ROOT_DEV + "2",
     "id_column": "parcel_id",
     "interaction": "parcel-fill",
     "click": "parcel_id",
@@ -45,7 +46,7 @@ const layers = {
   "streets": {
     "name": "streets",
     "label": "Street",
-    "endpoint": HOSTED_ROOT + "3",
+    "endpoint": HOSTED_ROOT_DEV + "3",
     "id_column": "objectid_1",
     "interaction": "streets-line",
     "click": "street_id",
@@ -58,7 +59,7 @@ const layers = {
   "units": {
     "name": "units",
     "label": "Unit",
-    "endpoint": HOSTED_ROOT + "4",
+    "endpoint": HOSTED_ROOT_DEV + "1",
     "id_column": "objectid",
     "interaction": "units-point",
     "click": "unit_id",
