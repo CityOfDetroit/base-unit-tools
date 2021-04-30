@@ -6,10 +6,24 @@ const ExplorerStreet = ({ feature, clicked, setClicked, linked, setLinked }) => 
 
     let { attributes: attr } = feature;
 
+    let legalSystems = {
+      0: `Non-Act 51 certified`,
+      1: `State trunkline`,
+      2: `County primary`,
+      3: `County local`,
+      4: `City major`,
+      5: `City minor`,
+      7: `Other public entity`
+    }
+
     let attributes = {
         "Street direction": attr.street_prefix,
         "Street name": attr.street_name,
         "Street type": attr.street_type,
+        "MGF - Left range": `${attr.fraddl}-${attr.toaddl}`,
+        "MGF - Right range": `${attr.fraddr}-${attr.toaddr}`,
+        "Jurisdiction": legalSystems[attr.legalsystem],
+        "Functional class code": attr.fcc,
         "Length of segment": attr.segment_length ? `${attr.segment_length.toFixed(0)} ft`: `?`
     }
 
