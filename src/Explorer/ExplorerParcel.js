@@ -4,6 +4,7 @@ import layers from '../data/layers';
 import AddressesHere from './AddressesHere';
 import BuildingsHere from './BuildingsHere';
 import ExplorerFeature from './ExplorerFeature';
+import moment from 'moment'
 
 import { queryFeatures } from '@esri/arcgis-rest-feature-layer'
 
@@ -22,7 +23,7 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
 
     let [addresses, setAddresses] = useState([])
     let [buildings, setBuildings] = useState([])
-    let [legalDesc, setLegalDesc] = useState(null)
+    let [extendedAttribs, setExtendedAttribs] = useState(null)
 
     useEffect(() => {
 
@@ -30,18 +31,39 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
         url: `https://opengis.detroitmi.gov/opengis/rest/services/Assessors/Parcels/FeatureServer/0`,
         where: `parcel_number = '${attr.parcel_id}'`,
         returnGeometry: false,
-        outFields: ['legal_description']
+        outFields: ['*']
       })
         .then(d => {
           if(d.features.length > 0) {
             let feature = d.features[0]
-            setLegalDesc(feature.attributes.legal_description)
+            setExtendedAttribs(feature.attributes)
           }
         })
     }, [attr.parcel_id])
 
-    if(legalDesc) {
-      longAttributes['Legal description'] = legalDesc
+    if(extendedAttribs) {
+      console.log(extendedAttribs)
+      longAttributes['Legal description'] = extendedAttribs.legal_description
+      attributes['Taxpayer'] = extendedAttribs.taxpayer_1
+      extendedAttribs.taxpayer_2 && (attributes['Taxpayer (ext)'] = extendedAttribs.taxpayer_2)
+      attributes['Taxpayer Address'] = `${extendedAttribs.taxpayer_street}, ${extendedAttribs.taxpayer_city}, ${extendedAttribs.taxpayer_state}`
+      extendedAttribs.sale_date && (attributes['Sale Date'] = moment(extendedAttribs.sale_date).format("LL"))
+      extendedAttribs.sale_date && (attributes['Sale Price'] = parseInt(extendedAttribs.sale_price).toLocaleString())
+      attributes['PRE %'] = extendedAttribs.homestead_pre
+      extendedAttribs.nez && (attributes['NEZ'] = extendedAttribs.nez)
+      attributes['Is Improved?'] = extendedAttribs.is_improved === "1" ? `Yes` : `No`
+      attributes['Property Class'] = `${extendedAttribs.property_class} - ${extendedAttribs.property_class_desc}`
+      attributes['Property Use'] = `${extendedAttribs.use_code} - ${extendedAttribs.use_code_desc}`
+      extendedAttribs.total_floor_area && (attributes['Total Floor Area'] = `${extendedAttribs.total_floor_area}`)
+      extendedAttribs.style && (attributes['Style'] = `${extendedAttribs.style}`)
+      attributes['Tax Status'] = extendedAttribs.tax_status
+      attributes['Assessed Value'] = parseInt(extendedAttribs.assessed_value).toLocaleString()
+      attributes['Taxable Value'] = parseInt(extendedAttribs.taxable_value).toLocaleString()
+      attributes['Total Acreage'] = extendedAttribs.total_acreage
+      attributes['Total Square Footage'] = extendedAttribs.total_square_footage
+      attributes['Depth x Frontage (ft)'] = `${extendedAttribs.depth} x ${extendedAttribs.frontage}`
+
+
     };
 
     useEffect(() => {
