@@ -4,12 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 1.3.1
+## 1.3.1 - 2021-04-30
 
 ### Added
 
 - Linen map mosaic as basemap option for Explorer map
 - Display parcel lines for parcel-based Mailer output
+
+### Changes
+
+- Migrate to a new hosted feature service, which should be snappier with indexes on ID fields
+- Migrate to a new geocoder which should be more reliable
+- Explorer: more information on the Streets layer will display
 
 ## 1.3.0 - 2021-04-23
 
