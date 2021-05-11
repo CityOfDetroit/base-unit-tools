@@ -4,7 +4,7 @@ import { geocode } from '@esri/arcgis-rest-geocoding';
 let geocoders = {
   org: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitsGeocoder/GeocodeServer`,
   prod: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoderWUnitsTest/GeocodeServer`,
-  dev: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BUGeocoderShp/GeocodeServer`
+  dev: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BUGeocoderShp2/GeocodeServer`
 }
 
 export const geocoderUrl = geocoders.dev
