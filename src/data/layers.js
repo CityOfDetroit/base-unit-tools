@@ -23,10 +23,10 @@ const layers = {
     "endpoint": HOSTED_ROOT_DEV + '3',
     "id_column": "bldg_id",
     "interaction": "building-fill",
-    "click": "id",
+    "click": "bldg_id",
     "color": "rgb(203, 77, 79)",
     "text_color": "#eee",
-    "filter_id": "$id",
+    "filter_id": "bldg_id",
     "highlight": "building-highlight",
     "link": "building-linked"
   },

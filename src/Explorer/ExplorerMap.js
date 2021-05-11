@@ -74,6 +74,9 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
       if (clicked.type === 'parcels') {
         filter[1] = 'parcel_id'
       }
+      if (clicked.type === 'buildings') {
+        filter[1] = 'bldg_id'
+      }
       if (clicked.type === 'streets') {
         filter[1] = 'street_id'
         filter[2] = parseInt(clicked.id)
