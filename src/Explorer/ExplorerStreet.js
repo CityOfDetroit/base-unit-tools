@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import AddressesHere from './AddressesHere';
 import ExplorerFeature from './ExplorerFeature';
+import layers from '../data/layers'
 
 const ExplorerStreet = ({ feature, clicked, setClicked, linked, setLinked }) => {
 
@@ -31,7 +32,7 @@ const ExplorerStreet = ({ feature, clicked, setClicked, linked, setLinked }) => 
     let [addresses, setAddresses] = useState([])
 
     useEffect(() => {
-        let url = `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/AddressPoints/FeatureServer/0/query?`
+        let url = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/ExtendedTablesWithIndices/FeatureServer/4/query?`
         let params = {
             where: `street_id = ${attr.street_id}`,
             outFields: `*`,
