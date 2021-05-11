@@ -12,7 +12,7 @@ export const baseStyle = {
       },
       "buildings": {
         "type": "vector",
-        "tiles": ["https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/BuildingTiles/VectorTileServer/tile/{z}/{y}/{x}.pbf"]
+        "tiles": ["https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/BuildingVectorTiles/VectorTileServer/tile/{z}/{y}/{x}.pbf"]
       },
       "addresses": {
         "type": "vector",
