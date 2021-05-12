@@ -1,4 +1,4 @@
-import { faAtlas, faCheckSquare, faEnvelope, faHome, faLink, faMailBulk, faTasks, faWrench } from '@fortawesome/free-solid-svg-icons';
+import { faAtlas, faCheckSquare, faEnvelope, faHome, faLink, faMailBulk, faTasks, faWrench, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 
 export const apps = {
     '/': {
@@ -67,17 +67,17 @@ export const apps = {
         ],
         icon: faLink,
         private: true
+    },
+    'assignment': {
+        name: 'Assignment',
+        url: `/assignment`,
+        description: 'Assign a new address',
+        questions: [
+            `I need to assign new addresses for a row of townhouses.`
+        ],
+        icon: faPlusCircle,
+        private: false
     }
-    // 'assignment': {
-    //     name: 'Assignment',
-    //     url: `/assignment`,
-    //     description: 'Assign a new address',
-    //     questions: [
-    //         `I need to assign new addresses for a row of townhouses.`
-    //     ],
-    //     icon: faPlusCircle,
-    //     private: true
-    // }
 }
 
 export default apps;
