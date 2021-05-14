@@ -13,7 +13,7 @@ const layers = {
     "interaction": "address-point",
     "highlight": "address-highlight",
     "link": "address-linked",
-    "filter_id": "$id",
+    "filter_id": "addr_id",
     "text_color": "#555",
     "color": "rgb(170, 200, 221)"
   },
