@@ -64,7 +64,7 @@ const Explorer = ({ session }) => {
     if (clicked.type && clicked.id) {
       // push new params to our browser URL
       // TODO see if we can make this work with the back button
-      history.push(`?type=${clicked.type}&id=${clicked.id}${options.streetView ? `&streetview=true` : ``}`);
+      history.push(`?id=${clicked.id}&type=${clicked.type}${options.streetView ? `&streetview=true` : ``}`);
     }
   }, [clicked, history, options.streetView])
 
