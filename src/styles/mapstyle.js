@@ -10,26 +10,14 @@ export const baseStyle = {
         "type": "vector",
         "tiles": ["https://basemaps.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer/tile/{z}/{y}/{x}.pbf"]
       },
-      "buildings": {
+      "baseunits": {
         "type": "vector",
-        "tiles": ["https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/BuildingVectorTiles/VectorTileServer/tile/{z}/{y}/{x}.pbf"]
-      },
-      "addresses": {
-        "type": "vector",
-        "tiles": ["https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/AddressVectorTiles/VectorTileServer/tile/{z}/{y}/{x}.pbf"]
-      },
-      "parcels": {
-        "type": "vector",
-        "tiles": ["https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/ParcelVectorTiles/VectorTileServer/tile/{z}/{y}/{x}.pbf"]
-      },
-      "streets": {
-        "type": "vector",
-        "tiles": ["https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/StreetVectorTiles/VectorTileServer/tile/{z}/{y}/{x}.pbf"]
+        "tiles": ["https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitVectorTiles/VectorTileServer/tile/{z}/{y}/{x}.pbf"]
       },
       "satellite": {
         "type": "raster",
         "tiles": [
-          "https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/Detroit_RGB_projFix_sid/MapServer/tile/{z}/{y}/{x}"
+          "https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/MiSAIL_2020_6in_Clip_webMerc/MapServer/tile/{z}/{y}/{x}"
         ]
       },
       "linen-map": {
@@ -6664,7 +6652,7 @@ export const baseStyle = {
       {
         "id": "parcel-linked",
         "type": "fill",
-        "source": "parcels",
+        "source": "baseunits",
         "source-layer": "parcels",
         "minzoom": 11,
         "filter": ["==", "parcelno", "02004940."],
@@ -6687,7 +6675,7 @@ export const baseStyle = {
       {
         "id": "parcel-fill",
         "type": "fill",
-        "source": "parcels",
+        "source": "baseunits",
         "source-layer": "parcels",
         "interactive": true,
         "minzoom": 12,
@@ -6701,7 +6689,7 @@ export const baseStyle = {
       {
         "id": "streets-highlight",
         "type": "line",
-        "source": "streets",
+        "source": "baseunits",
         "source-layer": "streets",
         "filter": ["==", "$id", ""],
         "minzoom": 14,
@@ -6719,7 +6707,7 @@ export const baseStyle = {
       {
         "id": "streets-linked",
         "type": "line",
-        "source": "streets",
+        "source": "baseunits",
         "source-layer": "streets",
         "filter": ["==", "$id", ""],
         "minzoom": 14,
@@ -6737,7 +6725,7 @@ export const baseStyle = {
       {
         "id": "streets-line",
         "type": "line",
-        "source": "streets",
+        "source": "baseunits",
         "source-layer": "streets",
         "minzoom": 11,
         "layout": {
@@ -16452,7 +16440,7 @@ export const baseStyle = {
       {
         "id": "parcel-line",
         "type": "line",
-        "source": "parcels",
+        "source": "baseunits",
         "source-layer": "parcels",
         "minzoom": 11,
         "layout": {
@@ -16489,7 +16477,7 @@ export const baseStyle = {
       {
         "id": "parcel-highlight",
         "type": "line",
-        "source": "parcels",
+        "source": "baseunits",
         "source-layer": "parcels",
         "minzoom": 11,
         "filter": ["==", "parcelno", ""],
@@ -16521,7 +16509,7 @@ export const baseStyle = {
       {
         "id": "building-fill",
         "type": "fill",
-        "source": "buildings",
+        "source": "baseunits",
         "source-layer": "buildings",
         "interactive": true,
         "minzoom": 12,
@@ -16546,7 +16534,7 @@ export const baseStyle = {
       {
         "id": "building-linked",
         "type": "fill",
-        "source": "buildings",
+        "source": "baseunits",
         "source-layer": "buildings",
         "minzoom": 11,
         "filter": ["==", "id", ""],
@@ -16569,7 +16557,7 @@ export const baseStyle = {
       {
         "id": "building-highlight",
         "type": "line",
-        "source": "buildings",
+        "source": "baseunits",
         "source-layer": "buildings",
         "minzoom": 11,
         "filter": ["==", "id", ""],
@@ -16601,7 +16589,7 @@ export const baseStyle = {
       {
         "id": "address-highlight",
         "type": "circle",
-        "source": "addresses",
+        "source": "baseunits",
         "source-layer": "addresses",
         "minzoom": 11,
         "filter": ["==", "id", ""],
@@ -16621,7 +16609,7 @@ export const baseStyle = {
       {
         "id": "address-linked",
         "type": "circle",
-        "source": "addresses",
+        "source": "baseunits",
         "source-layer": "addresses",
         "minzoom": 11,
         "filter": ["==", "id", ""],
@@ -16641,7 +16629,7 @@ export const baseStyle = {
       {
         "id": "address-point",
         "type": "circle",
-        "source": "addresses",
+        "source": "baseunits",
         "source-layer": "addresses",
         "minzoom": 13,
         "layout": {
