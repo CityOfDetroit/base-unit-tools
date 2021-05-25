@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import mapboxgl from "mapbox-gl";
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import bbox from '@turf/bbox';
-import mapStyle from '../styles/mailerstyle.json';
+import {baseStyle} from '../styles/mapstyle.js';
 import centroid from '@turf/centroid'
-import {arcgisToGeoJSON} from '@esri/arcgis-to-geojson-utils'
+import { arcgisToGeoJSON } from '@esri/arcgis-to-geojson-utils'
 
 const MailerMap = ({ geom, setGeom, mode, setMode, features, filtered }) => {
 
@@ -17,7 +17,7 @@ const MailerMap = ({ geom, setGeom, mode, setMode, features, filtered }) => {
 
     var map = new mapboxgl.Map({
       container: "map",
-      style: mapStyle,
+      style: baseStyle,
       bounds: detroitBbox
     });
 
@@ -31,6 +31,17 @@ const MailerMap = ({ geom, setGeom, mode, setMode, features, filtered }) => {
     map.on("load", e => {
       setTheMap(map);
       map.resize();
+
+      // fade in parcel line very faintly at z14
+      map.setPaintProperty("parcel-line", "line-opacity", {
+        "base": 1,
+        "stops": [
+          [14, 0],
+          [14.1, 0.15]
+        ]
+      })
+
+      // add a new empty source for the result-address data
       map.addSource("filtered", {
         type: 'geojson',
         data: {
@@ -39,20 +50,23 @@ const MailerMap = ({ geom, setGeom, mode, setMode, features, filtered }) => {
         }
       })
 
+      // new empty source for the result-address parcels
       map.addSource("filtered-parcels", {
         type: 'geojson',
         data: {
           type: "FeatureCollection",
           features: []
-        }   
+        }
       })
 
+      // layer for result-address parcels
       map.addLayer({
         "id": "filtered-parcels",
         "source": "filtered-parcels",
         "type": "line"
       })
 
+      // layer for result address
       map.addLayer({
         "id": "filtered-addresses",
         "source": "filtered",
@@ -89,6 +103,7 @@ const MailerMap = ({ geom, setGeom, mode, setMode, features, filtered }) => {
         Draw.delete(Draw.getAll().features[0].id);
       }
     });
+
   }, [setGeom]);
 
   useEffect(() => {
@@ -107,7 +122,7 @@ const MailerMap = ({ geom, setGeom, mode, setMode, features, filtered }) => {
       theDraw.changeMode("simple_select");
     }
     if (theMap && theDraw && !geom) {
-      if(theDraw.getAll().features.length > 0) {
+      if (theDraw.getAll().features.length > 0) {
         theDraw.delete(theDraw.getAll().features[0].id);
       }
     }
@@ -118,16 +133,16 @@ const MailerMap = ({ geom, setGeom, mode, setMode, features, filtered }) => {
       theDraw.changeMode(mode)
     }
   }, [mode])
-  
+
   useEffect(() => {
-    if(theMap && features) {
+    if (theMap && features) {
       theMap.getSource("filtered").setData(features)
     }
   }, [features])
 
   useEffect(() => {
-    if(theMap && filtered) {
-      theMap.getSource("filtered-parcels").setData({type: "FeatureCollection", features: filtered.map(f => arcgisToGeoJSON(f))})
+    if (theMap && filtered) {
+      theMap.getSource("filtered-parcels").setData({ type: "FeatureCollection", features: filtered.map(f => arcgisToGeoJSON(f)) })
     }
   }, [filtered])
 
