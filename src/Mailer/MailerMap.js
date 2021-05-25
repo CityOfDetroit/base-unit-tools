@@ -47,7 +47,10 @@ const MailerMap = ({ geom, setGeom, mode, setMode, features, filtered }) => {
         data: {
           type: "FeatureCollection",
           features: []
-        }
+        },
+        cluster: true,
+        clusterMaxZoom: 22,
+        clusterRadius: 0
       })
 
       // new empty source for the result-address parcels
@@ -68,9 +71,10 @@ const MailerMap = ({ geom, setGeom, mode, setMode, features, filtered }) => {
 
       // layer for result address
       map.addLayer({
-        "id": "filtered-addresses",
+        "id": "filtered-addresses-single",
         "source": "filtered",
         "type": "circle",
+        "filter": ["!", ["has", "point_count"]],
         "paint": {
           "circle-radius": {
             "base": 1,
@@ -84,7 +88,40 @@ const MailerMap = ({ geom, setGeom, mode, setMode, features, filtered }) => {
           },
         }
       })
+
+      // layer for result address
+      map.addLayer({
+        "id": "filtered-addresses-cluster",
+        "source": "filtered",
+        "type": "circle",
+        "filter": ["has", "point_count"],
+        "paint": {
+          "circle-radius": {
+            "base": 1,
+            "stops": [[10.5, 0.2], [13.5, 8], [16.5, 10], [19, 18]]
+          },
+          "circle-color": 'yellow',
+          "circle-stroke-color": '#333',
+          "circle-stroke-width": {
+            "base": 1,
+            "stops": [[10.5, 0.2], [13.5, 0.5], [16.5, 1], [19, 3]]
+          },
+        }
+      })
+
+      map.addLayer({
+        "id": "clustered-address-labels",
+        "source": "filtered",
+        "type": "symbol",
+        "filter": ["has", "point_count"],
+        "layout": {
+          'text-field': '{point_count_abbreviated}',
+          'text-font': ["Avenir Next LT Pro Bold"],
+          'text-size': 11
+        }
+      })
     });
+
 
     map.on("draw.create", e => {
       let geometry = Draw.getAll();
