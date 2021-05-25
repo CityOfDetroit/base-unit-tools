@@ -38,6 +38,7 @@
     "react-router-dom": "^5.2.0",
     "react-router-ga": "^1.2.3",
     "react-scripts": "4.0.1",
+    "react-table": "^7.7.0",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat",
     "web-vitals": "^0.2.4"
   },

@@ -11,6 +11,7 @@ import MailerBuffer from './MailerBuffer';
 import MailerLayerSelector from './MailerLayerSelector';
 import MailerMap from './MailerMap';
 import MailerSelection from './MailerSelection'
+import MailerTable from './MailerTable';
 import MailerAddressSearch from './MailerAddressSearch';
 import _ from 'lodash';
 import { ToggleButton } from '../components/ToggleButton'
@@ -219,6 +220,8 @@ const Mailer = ({ session }) => {
         <p className="py-2">Finally, you can export those addresses into a .csv file or a GeoJSON.</p>
       </>
   )
+
+  console.log(filtered)
   return (
     <>
 
@@ -340,6 +343,7 @@ const Mailer = ({ session }) => {
 
       <main>
         <MailerMap {...{ geom, setGeom, filtered, mode, setMode, features }} />
+        {filtered && <MailerTable {...{filtered}} />}
       </main>
 
     </>

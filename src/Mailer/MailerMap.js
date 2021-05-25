@@ -50,7 +50,8 @@ const MailerMap = ({ geom, setGeom, mode, setMode, features, filtered }) => {
         },
         cluster: true,
         clusterMaxZoom: 22,
-        clusterRadius: 2
+        clusterRadius: 1,
+        clusterMinPoints: 5
       })
 
       // new empty source for the result-address parcels
