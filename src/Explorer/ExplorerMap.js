@@ -53,9 +53,9 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
       });
       if (features.length > 0) {
         let f = features[0]
-        let l = layers[f.source]
+        let l = layers[f.sourceLayer]
         setClicked({
-          type: f.source,
+          type: f.sourceLayer,
           id: l.click === 'id' ? f.id : f.properties[l.click]
         })
       }
@@ -70,23 +70,7 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
     if (theMap && clicked.type && clicked.id && !loading) {
       let layer = layers[clicked.type]
       let others = Object.keys(layers).filter(l => l !== clicked.type && l !== 'units')
-      let filter = ["==", "$id", clicked.id]
-      if (clicked.type === 'parcels') {
-        filter[1] = 'parcel_id'
-      }
-      if (clicked.type === 'buildings') {
-        filter[1] = 'bldg_id'
-      }
-      if (clicked.type === 'streets') {
-        filter[1] = 'street_id'
-        filter[2] = parseInt(clicked.id)
-      }
-      if (clicked.type === 'buildings') {
-        filter[2] = parseInt(clicked.id)
-      }
-      if (clicked.type === 'addresses') {
-        filter[2] = parseInt(clicked.id)
-      }
+      let filter = ["==", layer.filter_id, clicked.id]
       theMap.setFilter(layer.highlight, filter)
       others.forEach(o => {
         theMap.setFilter(layers[o].highlight, ["==", "$id", ""])
