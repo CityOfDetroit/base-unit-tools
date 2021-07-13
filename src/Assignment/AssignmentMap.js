@@ -2,20 +2,23 @@ import mapboxgl from 'mapbox-gl';
 import { useEffect, useState } from 'react';
 import { baseStyle } from '../styles/mapstyle';
 
-const AssignmentMap = ({ geocodeResult, buildingToAssign, setBuildingToAssign }) => {
+const AssignmentMap = ({ geocodeResult, setBuilding, setParcel, setStreet, selectableLayer }) => { 
 
-  let feature = geocodeResult.features[0]
+    let feature;
+  if(geocodeResult) {
+      feature = geocodeResult.features[0]
+  }
 
   let [theMap, setTheMap] = useState(null)
 
   useEffect(() => {
 
-    // const detroitBbox = [-83.287803, 42.255192, -82.910451, 42.45023];
+    const detroitBbox = [-83.287803, 42.255192, -82.910451, 42.45023];
 
     var map = new mapboxgl.Map({
       container: "map", // container id
       style: baseStyle, // stylesheet location
-      center: feature.geometry.coordinates,
+      bounds: detroitBbox,
       zoom: 17
     });
 
@@ -37,20 +40,20 @@ const AssignmentMap = ({ geocodeResult, buildingToAssign, setBuildingToAssign })
         }
       })
 
-      map.addLayer({
-        id: "address-label",
-        "source": "addresses",
-        "source-layer": "addresses",
-        type: "symbol",
-        minzoom: 18,
-        layout: {
-          "text-field": ["get", "parcel_id"],
-          "text-font": ["Montserrat Regular"]
-        }
+    //   map.addLayer({
+    //     id: "address-label",
+    //     "source": "addresses",
+    //     "source-layer": "addresses",
+    //     type: "symbol",
+    //     minzoom: 18,
+    //     layout: {
+    //       "text-field": ["get", "parcel_id"],
+    //       "text-font": ["Montserrat Regular"]
+    //     }
+    //   })
 
-      })
-
-      map.setLayoutProperty("address-point", "visibility", "visible")
+    //   map.setLayoutProperty("address-point", "visibility", "visible")
+    
     })
 
     map.on('click', e => {
@@ -59,10 +62,9 @@ const AssignmentMap = ({ geocodeResult, buildingToAssign, setBuildingToAssign })
       });
       if (features.length > 0) {
         let clicked = features[0]
-        setBuildingToAssign(clicked.properties.bldg_id)
-
+        console.log(clicked.properties.bldg_id)
+        setBuilding(clicked.properties.bldg_id)
         map.setFilter("building-highlight", ['==', "bldg_id", clicked.properties.bldg_id])
-
       }
       else {
       }
@@ -70,9 +72,13 @@ const AssignmentMap = ({ geocodeResult, buildingToAssign, setBuildingToAssign })
   }, [])
 
   useEffect(() => {
-    if(theMap) {
+    if(theMap && geocodeResult && feature) {
 
-      theMap.panTo(feature.geometry.coordinates)
+      theMap.flyTo({
+          center: feature.geometry.coordinates,
+          zoom: 17
+        })
+
 
       theMap.getSource("result").setData(geocodeResult)
 

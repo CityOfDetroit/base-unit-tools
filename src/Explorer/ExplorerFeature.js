@@ -1,7 +1,7 @@
 import layers from '../data/layers'
 import IdBadge from './IdBadge'
 
-const ExplorerFeature = ({ attr, attributes, longAttributes={}, clicked }) => {
+const ExplorerFeature = ({ attr, attributes, longAttributes={}, clicked=null }) => {
 
   // let hasSource = Object.keys(attr).indexOf('geo_source') > -1
 

@@ -1,48 +1,83 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useGeocoder } from '../hooks/useGeocoder';
 import SiteSidebar from '../layout/SiteSidebar'
-
+import AppHeader from '../components/AppHeader';
+import apps from '../data/apps';
 import AssignmentMap from './AssignmentMap';
+import AssignmentSearch from './AssignmentSearch';
+import NewBuildingAddress from './NewBuildingAddress'
+import NewUtilityPole from './NewUtilityPole';
 
 const Assignment = () => {
 
-  const [address, setAddress] = useState('')
-
-  const [addressToSearch, setAddressToSearch] = useState('134 Calvert')
-
-  const [data, resultType] = useGeocoder(addressToSearch)
-
-  const [buildingToAssign, setBuildingToAssign] = useState(null)
+  const [searchValue, setSearchValue] = useState(null)
+  const [data, resultType] = useGeocoder(searchValue)
+  const [building, setBuilding] = useState(null)
+  const [parcel, setParcel] = useState(null)
+  const [street, setStreet] = useState(null)
+  const [modelAddress, setModelAddress] = useState(null)
+  const [selectableLayer, setSelectableLayer] = useState(null)
 
   console.log(data, resultType)
+
+  let introduction = (
+    <>
+      <p className="py-2">This tool is for assigning new addresses.</p>
+    </>
+  )
+
+  let modes = [
+    {
+      type: "Basic",
+      name: "New building address",
+      description: "Use this to add a new address to an existing building.",
+    },
+    {
+      type: "Utility",
+      name: "New utility pole",
+      description: "Use this to add a new utility pole address, not linked to any parcel or building.",
+    }
+  ]
+
+  let [mode, setMode] = useState(modes[0])
+
+  useEffect(() => {
+    console.log(searchValue)
+  }, [searchValue])
+
 
   return (
     <>
       <SiteSidebar title="Assignment">
 
-        <section className="sidebar-section">
-          <h2>Type in the address</h2>
-          <input type="text" value={address} onChange={(e) => setAddress(e.target.value)}/>
-          <button onClick={() => setAddressToSearch(address)}>
-            Search
-          </button>
+        <AppHeader app={apps['assignment']} introduction={introduction}>
+        </AppHeader>
 
-          {resultType === 'point' 
-            && 
-          <div>This address already exists. <Link to={`/explorer?type=addresses&id=${data.features[0].properties.address_id}`}>Go to this address in the explorer.</Link></div>}
-          {resultType === 'centerline' && <div>This address doesn't yet exist. Centerline match.</div>}
+        <section className="sidebar-section">
+          <AssignmentSearch setSearchValue={setSearchValue} />
         </section>
 
-        {resultType === 'centerline' && <section className="sidebar-section">
+        <section className="sidebar-section">
+          <div className="flex items-center justify-between mb-4">
+            <h2>Choose an assignment scenario:</h2>
+            <select className="px-4 py-3" onChange={(e) => setMode(modes.filter(m => m.name === e.target.value)[0])}>
+              {modes.map(m => (
+                <option value={m.name}>{m.name}</option>
+              ))}
+            </select>
+          </div>
 
-          <h2>Click a building to assign new address to building.</h2>
-        </section>}
+          <h2>{mode.name}</h2>
+          <p>{mode.description}</p>
+        </section>
 
+        {mode.name === 'New building address' && <NewBuildingAddress {...{ building, setSelectableLayer, setModelAddress }} />}
+        {mode.name === 'New utility pole' && <NewUtilityPole {...{ street, setSelectableLayer }} />}
       </SiteSidebar>
 
       <main>
-        {data && <AssignmentMap geocodeResult={data} {...{buildingToAssign, setBuildingToAssign}} />}
+        <AssignmentMap geocodeResult={data} {...{ building, parcel, street, setBuilding, setParcel, setStreet, selectableLayer }} />
       </main>
     </>
   )
