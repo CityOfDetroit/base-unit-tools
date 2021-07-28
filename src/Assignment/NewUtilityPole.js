@@ -1,11 +1,17 @@
+import AssignmentStreet from "./AssignmentStreet";
+
 const NewUtilityPole = ({ street, setStreet }) => {
       return (
-      <>
-        <section className='sidebar-section'>
-          {!street && <h2>Click a street segment for the new utility address.</h2>}
-          {street && <h2>Selected street segment: {street}</h2>}
-        </section>
-      </>
+        <>
+          {!street && <section className='sidebar-section'>
+            <h2>Click a street segment for the new utility address.</h2>
+          </section>}
+          {street && <AssignmentStreet {...{street}} />}
+          {street && <section className='sidebar-section'>
+            <h2>Click the map to drop a pin where the utility pole should be placed.</h2>
+          </section>}
+          
+        </>
     )
   }
 

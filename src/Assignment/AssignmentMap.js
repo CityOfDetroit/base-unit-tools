@@ -1,8 +1,9 @@
 import mapboxgl from 'mapbox-gl';
 import { useEffect, useState } from 'react';
 import { baseStyle } from '../styles/mapstyle';
+import layers from '../data/layers.js'
 
-const AssignmentMap = ({ geocodeResult, setBuilding, setParcel, setStreet, selectableLayer }) => { 
+const AssignmentMap = ({ mode, geocodeResult, setBuilding, setParcel, setStreet, selectableLayers, building, parcel, street }) => { 
 
     let feature;
   if(geocodeResult) {
@@ -18,7 +19,8 @@ const AssignmentMap = ({ geocodeResult, setBuilding, setParcel, setStreet, selec
     var map = new mapboxgl.Map({
       container: "map", // container id
       style: baseStyle, // stylesheet location
-      bounds: detroitBbox,
+      // bounds: detroitBbox,
+      center: [-83.1, 42.35],
       zoom: 17
     });
 
@@ -58,13 +60,19 @@ const AssignmentMap = ({ geocodeResult, setBuilding, setParcel, setStreet, selec
 
     map.on('click', e => {
       let features = map.queryRenderedFeatures(e.point, {
-        layers: ['building-fill'],
+        layers: [layers.buildings.interaction, layers.streets.interaction, layers.parcels.interaction],
       });
       if (features.length > 0) {
         let clicked = features[0]
-        console.log(clicked.properties.bldg_id)
-        setBuilding(clicked.properties.bldg_id)
-        map.setFilter("building-highlight", ['==', "bldg_id", clicked.properties.bldg_id])
+        if(clicked.sourceLayer === 'parcels') {
+          setParcel(clicked.properties[layers.parcels.click])
+        }
+        if(clicked.sourceLayer === 'buildings') {
+          setBuilding(clicked.properties[layers.buildings.click])
+        }
+        if(clicked.sourceLayer === 'streets') {
+          setStreet(clicked.properties[layers.streets.click])
+        }
       }
       else {
       }
@@ -84,6 +92,28 @@ const AssignmentMap = ({ geocodeResult, setBuilding, setParcel, setStreet, selec
 
     }
   }, [geocodeResult])
+
+  useEffect(() => {
+    if(theMap) {
+      let layerValues = {
+        'buildings': building,
+        'streets': street,
+        'parcels': parcel
+      }
+      Object.keys(layerValues).forEach(l => {
+        if(selectableLayers.indexOf(layers[l].interaction) > -1) {
+          theMap.setFilter(layers[l].highlight, ['==', layers[l].id_column, layerValues[l]])
+        }
+        else{
+          theMap.setFilter(layers[l].highlight, [
+            '==',
+            layers[l].id_column,
+            ''
+          ])
+        }
+      })
+    }
+  }, [building, parcel, street, mode, selectableLayers])
 
   return (
     <div id="map" className="explorer-map"></div>

@@ -8,18 +8,16 @@ import AssignmentMap from './AssignmentMap';
 import AssignmentSearch from './AssignmentSearch';
 import NewBuildingAddress from './NewBuildingAddress'
 import NewUtilityPole from './NewUtilityPole';
+import layers from '../data/layers.js'
 
 const Assignment = () => {
 
   const [searchValue, setSearchValue] = useState(null)
   const [data, resultType] = useGeocoder(searchValue)
-  const [building, setBuilding] = useState(null)
-  const [parcel, setParcel] = useState(null)
-  const [street, setStreet] = useState(null)
-  const [modelAddress, setModelAddress] = useState(null)
-  const [selectableLayer, setSelectableLayer] = useState(null)
-
-  console.log(data, resultType)
+  const [building, setBuilding] = useState('')
+  const [parcel, setParcel] = useState('')
+  const [street, setStreet] = useState('')
+  const [selectableLayers, setSelectableLayers] = useState([layers.buildings.interaction])
 
   let introduction = (
     <>
@@ -31,7 +29,7 @@ const Assignment = () => {
     {
       type: "Basic",
       name: "New building address",
-      description: "Use this to add a new address to an existing building.",
+      description: "Use this to add a new primary address OR new unit addresses to an existing building.",
     },
     {
       type: "Utility",
@@ -43,8 +41,20 @@ const Assignment = () => {
   let [mode, setMode] = useState(modes[0])
 
   useEffect(() => {
-    console.log(searchValue)
   }, [searchValue])
+
+  useEffect(() => {
+    setBuilding('')
+    setParcel('')
+    setStreet('')
+
+    if(mode.name === 'New building address') {
+      setSelectableLayers([layers.buildings.interaction, layers.streets.interaction])
+    }
+    if(mode.name === 'New utility pole') {
+      setSelectableLayers([layers.streets.interaction])
+    }
+  }, [mode])
 
 
   return (
@@ -53,10 +63,6 @@ const Assignment = () => {
 
         <AppHeader app={apps['assignment']} introduction={introduction}>
         </AppHeader>
-
-        <section className="sidebar-section">
-          <AssignmentSearch setSearchValue={setSearchValue} />
-        </section>
 
         <section className="sidebar-section">
           <div className="flex items-center justify-between mb-4">
@@ -72,12 +78,13 @@ const Assignment = () => {
           <p>{mode.description}</p>
         </section>
 
-        {mode.name === 'New building address' && <NewBuildingAddress {...{ building, setSelectableLayer, setModelAddress }} />}
-        {mode.name === 'New utility pole' && <NewUtilityPole {...{ street, setSelectableLayer }} />}
+        {mode.name === 'New building address' && <NewBuildingAddress {...{ building, street, setStreet, setSelectableLayers }} />}
+        {mode.name === 'New utility pole' && <NewUtilityPole {...{ street, setSelectableLayers }} />}
       </SiteSidebar>
 
       <main>
-        <AssignmentMap geocodeResult={data} {...{ building, parcel, street, setBuilding, setParcel, setStreet, selectableLayer }} />
+        <AssignmentSearch setSearchValue={setSearchValue} />
+        <AssignmentMap geocodeResult={data} {...{ mode, building, parcel, street, setBuilding, setParcel, setStreet, selectableLayers }} />
       </main>
     </>
   )

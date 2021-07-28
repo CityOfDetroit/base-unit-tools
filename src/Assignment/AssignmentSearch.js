@@ -8,7 +8,7 @@ const AssignmentSearch = ({ setSearchValue, type }) => {
     let [value, setValue] = useState('')
   
     return (
-      <>
+      <section className='sidebar-section'>
         <h2 className="text-base flex items-center justify-between">
           Search for an address:
           {/* what if we couldn't find it? */}
@@ -36,7 +36,7 @@ const AssignmentSearch = ({ setSearchValue, type }) => {
             icon={faSearch} />
         </div>
   
-      </>
+      </section>
     )
   }
 
