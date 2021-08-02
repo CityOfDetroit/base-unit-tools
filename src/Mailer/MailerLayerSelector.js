@@ -1,7 +1,7 @@
 import simplify from '@turf/simplify'
 import {useEffect, useState} from 'react';
 import { queryFeatures } from '@esri/arcgis-rest-feature-layer'
-
+import Select from 'react-select';
 
 const presets = {
   "census_tracts": {
@@ -61,7 +61,10 @@ const MailerLayerSelector = ({ geom, setGeom }) => {
         geometryPrecision: 5,
         f: 'geojson'
       }).then(d => {
-        setLayerFeatures(d.features)
+        // setLayerFeatures(d.features)
+        let features = d.features
+          .sort((a, b) => a.properties[presets[currentLayer].pickColumn] > b.properties[presets[currentLayer].pickColumn])
+        setLayerFeatures(features)
       })
     }
   }, [currentLayer])
@@ -69,6 +72,14 @@ const MailerLayerSelector = ({ geom, setGeom }) => {
   useEffect(() => {
     setCurrentFeature(null)
   }, [geom])
+
+  useEffect(() => {
+    if(currentFeature) {
+      let matching = layerFeatures.filter(ft => { return ft.id === parseInt(currentFeature.value) })
+      let simplified = simplify(matching[0], { tolerance: 0.0001 })
+      setGeom({type: "FeatureCollection", features: [simplified]})
+    }
+  }, [currentFeature])
 
   return (
     <section className="sidebar-section">
@@ -84,7 +95,7 @@ const MailerLayerSelector = ({ geom, setGeom }) => {
       ))}
     </select>
 
-    {layerFeatures.length > 0 && <select className="p-2 m-2 text-xs" onChange={(e) => {
+    {/* {layerFeatures.length > 0 && <select className="p-2 m-2 text-xs" onChange={(e) => {
       let matching = layerFeatures.filter(ft => { return ft.id === parseInt(e.target.value) })
       setCurrentFeature(simplify(matching[0], { tolerance: 0.0001 }))
       setGeom({type: "FeatureCollection", features: [simplify(matching[0], { tolerance: 0.00005 })]})
@@ -94,7 +105,14 @@ const MailerLayerSelector = ({ geom, setGeom }) => {
         return (
         <option value={ft.id} key={ft.id}>{ft.properties[presets[currentLayer].pickColumn].slice(0,40)}</option>
       )})}
-    </select>}
+    </select>} */}
+
+    {layerFeatures.length > 0 &&
+    <Select options={layerFeatures.map(ft => { 
+      return {
+        value: ft.id, 
+        label: ft.properties[presets[currentLayer].pickColumn].slice(0,40)
+      }})} defaultValue={null} onChange={setCurrentFeature} />}
 
   </section>
   )

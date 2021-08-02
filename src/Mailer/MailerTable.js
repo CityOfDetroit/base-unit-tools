@@ -13,9 +13,6 @@ const MailerTable = ({ filtered }) => {
 
   let data = useMemo(() => filtered.map(f => f.attributes), [filtered])
 
-  console.log(columns)
-  console.log(data)
-
   const {
     getTableProps,
     getTableBodyProps,
