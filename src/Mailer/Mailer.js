@@ -11,6 +11,7 @@ import MailerBuffer from './MailerBuffer';
 import MailerLayerSelector from './MailerLayerSelector';
 import MailerMap from './MailerMap';
 import MailerSelection from './MailerSelection'
+import MailerTable from './MailerTable';
 import MailerAddressSearch from './MailerAddressSearch';
 import _ from 'lodash';
 import { ToggleButton } from '../components/ToggleButton'
@@ -64,7 +65,6 @@ const Mailer = ({ session }) => {
 
   const [formattedData, setFormattedData] = useState(null)
   const [features, setFeatures] = useState(null)
-  const [gjDownload, setGjDownload] = useState(null)
 
   // this effect runs if the user logs in or out.
   // it tests access to the mailing list layer
@@ -201,8 +201,6 @@ const Mailer = ({ session }) => {
 
     setFeatures(featureCollection)
   
-    setGjDownload("text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(featureCollection)))
-
   }, [filters, addresses])
 
   let introduction = (
@@ -321,13 +319,6 @@ const Mailer = ({ session }) => {
                       text={`Download .csv`}
                       small />
                   </CSVLink>
-                  <a href={`data: '${gjDownload}`} download={`mailing_list_${new Date().getTime()}.json`}>
-
-                    <Button
-                      icon={faGlobe}
-                      text={`Download GeoJSON`}
-                      small />
-                  </a>
                 </div>
 
 
@@ -340,6 +331,7 @@ const Mailer = ({ session }) => {
 
       <main>
         <MailerMap {...{ geom, setGeom, filtered, mode, setMode, features }} />
+        {filtered.length > 0 && <MailerTable {...{ filtered }}/>}
       </main>
 
     </>

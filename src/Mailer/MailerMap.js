@@ -132,7 +132,7 @@ const MailerMap = ({ geom, setGeom, mode, setMode, features, filtered }) => {
   }, [filtered])
 
   return (
-    <div id="map" className="explorer-map" />
+    <div id="map" className="mailer-map" />
   );
 };
 

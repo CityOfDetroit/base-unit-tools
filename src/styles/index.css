@@ -112,6 +112,10 @@ footer {
     height: calc(100vh - 60px - 11rem);
   }
 
+  .mailer-map {
+    height: calc(80vh - 100px - 350px);
+  }
+
   .issue-reporter-map, .linker-map {
     height: calc(100vh - 100px - 1.5rem);
   }
@@ -120,6 +124,10 @@ footer {
 @media only screen and (max-width: 768px) {
   .explorer-map {
     height: calc(50vh - 60px);
+  }
+
+  .mailer-map {
+    height: calc(80vh - 100px - 350px);
   }
 
   .issue-reporter-map, .linker-map {
