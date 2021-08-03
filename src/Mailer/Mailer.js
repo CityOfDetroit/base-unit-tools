@@ -16,6 +16,7 @@ import MailerAddressSearch from './MailerAddressSearch';
 import _ from 'lodash';
 import { ToggleButton } from '../components/ToggleButton'
 import { CSVLink } from 'react-csv';
+import { Promise } from 'bluebird'
 import apps from '../data/apps';
 import AppHeader from '../components/AppHeader';
 
@@ -116,6 +117,8 @@ const Mailer = ({ session }) => {
     // we'll use the list of objectIDs to actually go get the addresses
     const fetchAddresses = () => {
 
+      let allAddresses = []
+
       // fetch this many addresses at a time. we can turn this up to 2000
       const chunkSize = 500
 
@@ -126,7 +129,7 @@ const Mailer = ({ session }) => {
       breakpoints.push(resultIds.objectIds.slice(-1,)[0] + 1)
 
       // create a bunch of Promises for the number of queries we need
-      let promises = breakpoints.slice(1).map((b, i) => {
+      let queryParams = breakpoints.slice(1).map((b, i) => {
         let params = {
           url: layer === 'parcel' ? mailerLayers[0] : mailerLayers[1],
           orderByFields: "OBJECTID",
@@ -143,21 +146,27 @@ const Mailer = ({ session }) => {
           resultRecordCount: chunkSize,
           authentication: session
         }
-        return queryFeatures(params)
+        return params
+        // return queryFeatures(params)
       })
 
-      // execute all those Promises
+      Promise.map(queryParams, (params) => {
+        return queryFeatures(params)
+      }, {concurrency: 2}).each((f) => {
+        allAddresses = allAddresses.concat(f.features) 
+      }).then(() => setAddresses(allAddresses))
 
-      Promise.all(promises)
-        .then(resps => {
-          // stack up each query response's features into this empty array
-          let allAddresses = []
-          resps.forEach(r => {
-            allAddresses = allAddresses.concat(r.features)
-          })
-          // store them in state
-          setAddresses(allAddresses)
-        })
+      // execute all those Promises
+      // Promise.all(promises)
+      //   .then(resps => {
+      //     // stack up each query response's features into this empty array
+      //     let allAddresses = []
+      //     resps.forEach(r => {
+      //       allAddresses = allAddresses.concat(r.features)
+      //     })
+      //     // store them in state
+      //     setAddresses(allAddresses)
+      //   })
     }
     if (resultIds && resultIds.objectIds.length > 0) {
       fetchAddresses()
