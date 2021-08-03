@@ -27,28 +27,29 @@ const LinkerMap = ({ center, feature, links, setLinks }) => {
       setTheMap(map);
       
       // set the initial map filters based on the feature's properties.
-      map.setFilter("building-highlight", ["==", "$id", feature.properties.bldg_id])
-      map.setFilter("parcel-highlight", ["==", "parcel_id", feature.properties.parcel_id])
-      map.setFilter("address-highlight", ["==", "$id", feature.properties.addr_id])
-      map.setFilter("streets-highlight", ["==", "street_id", feature.properties.street_id])
+      map.setFilter(layers.buildings.highlight, ["==", "bldg_id", feature.properties.bldg_id])
+      map.setFilter(layers.parcels.highlight, ["==", "parcel_id", feature.properties.parcel_id])
+      map.setFilter(layers.addresses.highlight, ["==", "$id", feature.properties.addr_id])
+      map.setFilter(layers.streets.highlight, ["==", "street_id", feature.properties.street_id])
     });
 
     map.on('click', e => {
       // get all the features in these layers
       let features = map.queryRenderedFeatures(e.point, {
-        layers: ['building-fill', 'parcel-fill', 'streets-line'],
+        layers: [layers.buildings.interaction, layers.parcels.interaction, layers.streets.interaction],
       });
       // if we have clicked on any features..
       if (features.length > 0) {
         let ft = features[0]
+        console.log(ft)
         // depending the type, set a new state.
-        if(ft.source === 'buildings') {
-          setBuilding(ft.id)
+        if(ft.sourceLayer === 'buildings') {
+          setBuilding(ft.properties.bldg_id)
         }
-        if(ft.source === 'parcels') {
+        if(ft.sourceLayer === 'parcels') {
           setParcel(ft.properties.parcel_id)
         }
-        if(ft.source === 'streets') {
+        if(ft.sourceLayer === 'streets') {
           setStreet(ft.properties.street_id)
         }
       }
@@ -64,15 +65,15 @@ const LinkerMap = ({ center, feature, links, setLinks }) => {
       // set the links object to the new parcel ID
       links.parcel_id = parcel
       // set the new filter on the map layer
-      theMap.setFilter("parcel-highlight", ["==", "parcel_id", parcel])
+      theMap.setFilter(layers.parcels.highlight, ["==", "parcel_id", parcel])
     }
     if(building && theMap) {
-      theMap.setFilter("building-highlight", ["==", "$id", building])
+      theMap.setFilter(layers.buildings.highlight, ["==", "bldg_id", building])
       links.bldg_id = building
     }
     if(street && theMap) {
       links.street_id = street
-      theMap.setFilter("streets-highlight", ["==", "street_id", street])
+      theMap.setFilter(layers.streets.highlight, ["==", "street_id", street])
     }
 
     // finally, set the new links.
@@ -83,10 +84,10 @@ const LinkerMap = ({ center, feature, links, setLinks }) => {
 
   useEffect(() => {
     if(theMap) {
-      theMap.setFilter("building-highlight", ["==", "$id", feature.properties.bldg_id])
-      theMap.setFilter("parcel-highlight", ["==", "parcel_id", feature.properties.parcel_id])
-      theMap.setFilter("address-highlight", ["==", "$id", feature.properties.addr_id])
-      theMap.setFilter("streets-highlight", ["==", "street_id", feature.properties.street_id]) 
+      theMap.setFilter(layers.buildings.highlight, ["==", layers.buildings.id_column, feature.properties.bldg_id])
+      theMap.setFilter(layers.parcels.highlight, ["==", "parcel_id", feature.properties.parcel_id])
+      theMap.setFilter(layers.addresses.highlight, ["==", "$id", feature.properties.addr_id])
+      theMap.setFilter(layers.streets.highlight, ["==", "street_id", feature.properties.street_id]) 
       theMap.setCenter(feature.geometry.coordinates)
     }
   }, [feature])

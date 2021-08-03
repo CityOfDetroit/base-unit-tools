@@ -129,7 +129,7 @@ const Linker = ({ session }) => {
         {feature && <LinkerSubmission {...{ session, feature, links }} />}
       </SiteSidebar>
       <main>
-        {feature && links.fetched && <LinkerMap center={feature.geometry.coordinates} feature={feature} {...{ links, setLinks }} />}
+        {feature && feature.geometry && links.fetched && <LinkerMap center={feature.geometry.coordinates} feature={feature} {...{ links, setLinks }} />}
       </main>
     </>
   )
