@@ -107,6 +107,7 @@ footer {
   background: #ddd;
 }
 
+/* desktop styling */
 @media only screen and (min-width: 769px) {
   .explorer-map {
     height: calc(100vh - 60px - 11rem);
@@ -125,6 +126,7 @@ footer {
   }
 }
 
+/* mobile styling */
 @media only screen and (max-width: 768px) {
   .explorer-map {
     height: calc(50vh - 60px);

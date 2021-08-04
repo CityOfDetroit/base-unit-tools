@@ -226,6 +226,8 @@ const Mailer = ({ session }) => {
         <p className="py-2">Finally, you can export those addresses into a .csv file or a GeoJSON.</p>
       </>
   )
+
+  console.log(filtered)
   return (
     <>
 

@@ -99,4 +99,4 @@ const MailerTable = ({ filtered }) => {
   )
 }
 
-export default MailerTable
+export default MailerTable;
