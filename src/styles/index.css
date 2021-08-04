@@ -114,7 +114,11 @@ footer {
   }
 
   .mailer-map {
-    height: 60vh;
+    height: calc(80vh - 100px - 350px);
+  }
+
+  .assignment-map {
+    height: calc(100vh - 250px);
   }
 
   .issue-reporter-map, .linker-map {
@@ -129,7 +133,11 @@ footer {
   }
 
   .mailer-map {
-    height: calc(50vh - 60px);
+    height: calc(80vh - 100px - 350px);
+  }
+
+  .assignment-map {
+    height: calc(50vh - 250px);
   }
 
   .issue-reporter-map, .linker-map {
