@@ -1,18 +1,16 @@
 import useFeature from '../hooks/useFeature';
-import ExplorerFeature from '../Explorer/ExplorerFeature';
-import AddressesHere from '../Explorer/AddressesHere';
 import layers from '../data/layers';
 import { useState, useEffect } from 'react';
+import AssignmentAddressesHere from './AssignmentAddressesHere';
+import AssignmentFeature from './AssignmentFeature';
 
-const AssignmentStreet = ({ street }) => {
+const AssignmentStreet = ({ street, addresses, setAddresses }) => {
 
   let feature = useFeature({
     type: 'streets',
     id: street,
     f: 'geojson'
   })
-
-  let [addresses, setAddresses] = useState([])
 
   useEffect(() => {
     let url = layers.addresses.endpoint + `/query?`
@@ -63,8 +61,8 @@ const AssignmentStreet = ({ street }) => {
         "Street type": attr.street_type,
         "MGF - Left range": `${attr.fraddl}-${attr.toaddl}`,
         "MGF - Right range": `${attr.fraddr}-${attr.toaddr}`,
-        "Jurisdiction": legalSystems[attr.legalsystem],
-        "Functional class code": attr.fcc,
+        // "Jurisdiction": legalSystems[attr.legalsystem],
+        // "Functional class code": attr.fcc,
         "Length of segment": attr.segment_length ? `${attr.segment_length.toFixed(0)} ft`: `?`
     }
   }
@@ -78,8 +76,8 @@ const AssignmentStreet = ({ street }) => {
 
   return (
     <>
-      {feature && <ExplorerFeature {...{ attr: feature.properties, attributes, clicked: clicked }} />}
-      {addresses.length > 0 && <AddressesHere {...{ addresses, title: "primary" }} />}
+      {feature && <AssignmentFeature {...{ attr: feature.properties, attributes, clicked: clicked }} />}
+      {addresses.length > 0 && <AssignmentAddressesHere {...{ addresses, title: "primary" }} />}
     </>
   )
 }

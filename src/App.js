@@ -38,9 +38,9 @@ function App() {
             {session && <Route path="/mailer">
               <Mailer {...{ session }} />
             </Route>}
-            <Route path="/assignment">
-              <Assignment />
-            </Route>
+            {session && <Route path="/assignment">
+              <Assignment {...{ session }}/>
+            </Route>}
             <Route path="/geocoder">
               <Geocoder />
             </Route>

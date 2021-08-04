@@ -76,7 +76,7 @@ export const apps = {
             `I need to assign new addresses for a row of townhouses.`
         ],
         icon: faPlusCircle,
-        private: false
+        private: true
     }
 }
 

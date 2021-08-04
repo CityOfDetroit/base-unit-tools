@@ -8,10 +8,9 @@ const AssignmentSearch = ({ setSearchValue, type }) => {
     let [value, setValue] = useState('')
   
     return (
-      <section className="bg-gray-300 py-2 px-3">
         <div className="flex items-center justify-start text-sm mt-1">
           <h2 className="text-base flex items-center justify-between">
-            Search for an address:
+            Search for an address on the map:
             {/* what if we couldn't find it? */}
             {type && type === 'none' && 
               <div className="flex items-end justify-start text-xs font-semibold bg-red-400 text-gray-700 px-4 py-1">
@@ -35,9 +34,7 @@ const AssignmentSearch = ({ setSearchValue, type }) => {
             text='Search'
             icon={faSearch} />
         </div>
-  
-      </section>
-    )
+      )
   }
 
   export default AssignmentSearch;
