@@ -7,7 +7,7 @@ let geocoders = {
   dev2: `https://opengis.detroitmi.gov/opengis/rest/services/Geocoders/TestingJoinIDHypothesisBetaCOmposite/GeocodeServer/`
 }
 
-export const geocoderUrl = geocoders.dev2
+export const geocoderUrl = geocoders.prod
 
 /**
  * useGeocoder custom hook.
