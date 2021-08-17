@@ -3,10 +3,11 @@ import { geocode } from '@esri/arcgis-rest-geocoding';
 
 let geocoders = {
   prod: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoder/GeocodeServer`,
-  dev: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoder_DEV/GeocodeServer`
+  dev: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoder_DEV/GeocodeServer`,
+  dev2: `https://opengis.detroitmi.gov/opengis/rest/services/Geocoders/TestingJoinIDHypothesisBetaCOmposite/GeocodeServer/`
 }
 
-export const geocoderUrl = geocoders.prod
+export const geocoderUrl = geocoders.dev2
 
 /**
  * useGeocoder custom hook.
