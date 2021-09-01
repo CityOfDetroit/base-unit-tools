@@ -1,7 +1,7 @@
 import layers from '../data/layers'
-import IdBadge from './IdBadge'
+import IdBadge from '../Explorer/IdBadge'
 
-const ExplorerFeature = ({ attr, attributes, longAttributes={}, clicked=null }) => {
+const AssignmentFeature = ({ attr, attributes, longAttributes={}, clicked=null }) => {
 
   // let hasSource = Object.keys(attr).indexOf('geo_source') > -1
 
@@ -43,4 +43,4 @@ const ExplorerFeature = ({ attr, attributes, longAttributes={}, clicked=null }) 
   )
 }
 
-export default ExplorerFeature;
+export default AssignmentFeature;

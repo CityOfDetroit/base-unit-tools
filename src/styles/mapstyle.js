@@ -6698,7 +6698,7 @@ export const baseStyle = {
         },
         "paint": {
           "line-width": {
-            "stops": [[14, 2], [20, 25]]
+            "stops": [[11, 3], [15, 5.5], [20, 42]]
           },
           "line-color": layers['streets'].color,
           "line-opacity": 0.75
@@ -6716,10 +6716,10 @@ export const baseStyle = {
         },
         "paint": {
           "line-width": {
-            "stops": [[14, 5], [20, 20]]
+            "stops": [[11, 3], [15, 5.5], [20, 42]]
           },
           "line-color": layers['streets'].color,
-          "line-opacity": 0.35
+          "line-opacity": 0.65
         }
       },
       {
@@ -6733,10 +6733,10 @@ export const baseStyle = {
         },
         "paint": {
           "line-width": {
-            "stops": [[11, 1], [15, 2], [20, 15]]
+            "stops": [[11, 1], [15, 2], [20, 25]]
           },
-          "line-color": "#ddd",
-          "line-opacity": 0.8
+          "line-color": "#bbb",
+          "line-opacity": 1
         }
       },
       {
@@ -16520,7 +16520,7 @@ export const baseStyle = {
           "fill-color": {
             "stops": [
               [14, "#aaa"],
-              [19, "#ddd"]
+              [19, "#bbb"]
             ]
           },
           "fill-opacity": {
