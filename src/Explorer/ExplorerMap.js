@@ -8,7 +8,7 @@ import videoIcon from '../images/video.png'
 
 import layers from '../data/layers'
 
-const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, svBearing, basemap }) => {
+const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, svBearing, basemap, setSvImageKey, svImageKey }) => {
 
   // keep a reference to the map object here
   const [theMap, setTheMap] = useState(null);
@@ -63,6 +63,19 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
       }
     })
 
+    map.on('click', e => {
+      let features = map.queryRenderedFeatures(e.point, {
+        layers: ['mapillary-images'],
+      });
+      if (features.length > 0) {
+        let f = features[0]
+        console.log(f.properties)
+        setSvImageKey(f.properties.id)
+      }
+      else {
+      }
+    })
+
   }, [setClicked]);
 
   // fires when we get a new clicked feature
@@ -101,6 +114,12 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
     }
   }, [theMap, linked, loading, clicked.type])
 
+  useEffect(() => {
+    if(theMap && svImageKey) {
+      theMap.setFilter('mapillary-images-highlight', ["==", "id", svImageKey])
+    }
+  }, [svImageKey])
+
   // effect fires when svCoords or svBearing changes
   useEffect(() => {
     if (theMap && !loading) {
@@ -134,7 +153,13 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
   useEffect(() => {
     if(theMap && !loading) {
       if (showSv) {
+        theMap.setLayoutProperty("mapillary-images", "visibility", "visible")
+        theMap.setLayoutProperty("mapillary-images-highlight", "visibility", "visible")
         theMap.setLayoutProperty("mapillary-location", "visibility", showSv ? "visible" : "none")
+      }
+      else {
+        theMap.setLayoutProperty("mapillary-images", "visibility", "none")
+        theMap.setLayoutProperty("mapillary-images-highlight", "visibility", "none")
       }
     }
   }, [showSv, loading, theMap])

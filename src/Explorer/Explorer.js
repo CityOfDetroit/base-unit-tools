@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
 import { Link, useHistory } from "react-router-dom";
 import AppHeader from '../components/AppHeader';
-import StreetView from '../components/StreetView';
 import apps from '../data/apps';
 import SiteSidebar from '../layout/SiteSidebar';
 import ExplorerAddress from './ExplorerAddress';
@@ -15,6 +14,7 @@ import ExplorerSearch from './ExplorerSearch';
 import ExplorerStreet from './ExplorerStreet';
 import useFeature from '../hooks/useFeature';
 import useQuery from '../hooks/useQuery';
+import MapillarySv from '../components/MapillarySv';
 
 
 const Explorer = ({ session }) => {
@@ -24,6 +24,7 @@ const Explorer = ({ session }) => {
   let queryType = query.get("type")
   let queryId = query.get("id")
   let querySv = query.get("streetview")
+  let querySvImgKey = query.get("image")
 
   // we use the history to push params on click
   let history = useHistory()
@@ -57,6 +58,7 @@ const Explorer = ({ session }) => {
   // svBearing is the current camera bearing
   const [svCoords, setSvCoords] = useState(null);
   const [svBearing, setSvBearing] = useState(null);
+  const [svImageKey, setSvImageKey] = useState(null)
 
 
   // this effect triggers when the user clicks on a new feature in the map
@@ -101,7 +103,8 @@ const Explorer = ({ session }) => {
         {clicked.type === 'streets' && feature && <ExplorerStreet {...{ feature, clicked, setClicked, linked, setLinked }} />}
 
         {/* Street View if selected and we have a feature */}
-        {options.streetView && feature && <StreetView {...{ feature, setSvBearing, setSvCoords }} />}
+        {/* {options.streetView && feature && <StreetView {...{ feature, setSvBearing, setSvCoords }} />} */}
+        {options.streetView && svImageKey && <MapillarySv {...{svImageKey, setSvImageKey}} />}
 
         {/* Link to issue reporter */}
         {feature &&
@@ -130,7 +133,7 @@ const Explorer = ({ session }) => {
 
       {/* the main panel contains the map, and we pass it many of our useState variables */}
       <main>
-        <ExplorerMap {...{ clicked, setClicked, linked, feature, history, svCoords, svBearing, basemap: options.basemap, showSv: options.streetView }} />
+        <ExplorerMap {...{ clicked, setClicked, linked, feature, history, svImageKey, setSvImageKey, svCoords, svBearing, basemap: options.basemap, showSv: options.streetView }} />
       </main>
     </>
   )

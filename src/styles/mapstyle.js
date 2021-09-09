@@ -32,6 +32,12 @@ export const baseStyle = {
           "type": "FeatureCollection",
           "features": []
         }
+      },
+      "mly": {
+        "type": "vector",
+        "tiles": ["https://tiles.mapillary.com/maps/vtp/mly1_computed_public/2/{z}/{x}/{y}?access_token=MLY|4690399437648324|de87555bb6015affa20c3df794ebab15"],
+        "maxzoom": 14,
+        "minzoom": 14
       }
     },
     "layers": [
@@ -16651,6 +16657,48 @@ export const baseStyle = {
           "icon-rotate": ["get", "bearing"],
           "icon-rotation-alignment": "map",
           "icon-image": "video"
+        }
+      },
+      {
+        'id': 'mapillary-images-highlight',
+        'type': 'circle',
+        'source': 'mly',
+        'source-layer': 'image',
+        "maxzoom": 22,
+        "minzoom": 17,
+        "filter": ["==", "id", true],
+        "layout": {
+          "visibility": "none"
+        },
+        "paint": {
+          "circle-radius": {
+            "base": 1,
+            "stops": [[13, 0.15], [14, 1.5], [17, 5], [19, 15]]
+          },
+          "circle-color": "green"
+        }
+      },
+      {
+        'id': 'mapillary-images',
+        'type': 'circle',
+        'source': 'mly',
+        'source-layer': 'image',
+        "maxzoom": 22,
+        "minzoom": 17,
+        "filter": [
+          "all",
+          ["==", "is_pano", true],
+          ["==", "organization_id", 518073312556755]
+        ],
+        "layout": {
+          "visibility": "none"
+        },
+        "paint": {
+          "circle-radius": {
+            "base": 1,
+            "stops": [[13, 0.1], [14, 1], [17, 4], [19, 12]]
+          },
+          "circle-color": "#aaa"
         }
       }
     ],
