@@ -26,13 +26,6 @@ export const baseStyle = {
           "https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/Linen_Map_Mosaic/MapServer/tile/{z}/{y}/{x}"
         ]
       },
-      "mapillary": {
-        "type": "geojson",
-        "data": {
-          "type": "FeatureCollection",
-          "features": []
-        }
-      },
       "mly": {
         "type": "vector",
         "tiles": ["https://tiles.mapillary.com/maps/vtp/mly1_computed_public/2/{z}/{x}/{y}?access_token=MLY|4690399437648324|de87555bb6015affa20c3df794ebab15"],
@@ -16650,41 +16643,12 @@ export const baseStyle = {
         }
       },
       {
-        "id": "mapillary-location",
-        "type": "symbol",
-        "source": "mapillary",
-        "layout": {
-          "icon-rotate": ["get", "bearing"],
-          "icon-rotation-alignment": "map",
-          "icon-image": "video"
-        }
-      },
-      {
-        'id': 'mapillary-images-highlight',
-        'type': 'circle',
-        'source': 'mly',
-        'source-layer': 'image',
-        "maxzoom": 22,
-        "minzoom": 17,
-        "filter": ["==", "id", true],
-        "layout": {
-          "visibility": "none"
-        },
-        "paint": {
-          "circle-radius": {
-            "base": 1,
-            "stops": [[13, 0.15], [14, 1.5], [17, 5], [19, 15]]
-          },
-          "circle-color": "green"
-        }
-      },
-      {
         'id': 'mapillary-images',
         'type': 'circle',
         'source': 'mly',
         'source-layer': 'image',
         "maxzoom": 22,
-        "minzoom": 17,
+        "minzoom": 14,
         "filter": [
           "all",
           ["==", "is_pano", true],
@@ -16696,9 +16660,50 @@ export const baseStyle = {
         "paint": {
           "circle-radius": {
             "base": 1,
-            "stops": [[13, 0.1], [14, 1], [17, 4], [19, 12]]
+            "stops": [[13, 0.1], [14, 0.5], [17, 2], [19, 4]]
           },
-          "circle-color": "#aaa"
+          "circle-color": "rgba(20,20,120,0.3)"
+        }
+      },
+      {
+        'id': 'mapillary-images-highlight',
+        'type': 'circle',
+        'source': 'mly',
+        'source-layer': 'image',
+        "maxzoom": 22,
+        "minzoom": 14,
+        "filter": ["==", "id", true],
+        "layout": {
+          "visibility": "none"
+        },
+        "paint": {
+          "circle-radius": {
+            "base": 1,
+            "stops": [[13, 2], [14, 6.5], [17, 9.5], [19, 16]]
+          },
+          "circle-stroke-color": "black",
+          "circle-stroke-width": 1,
+          "circle-color": "rgba(255,255,0,0.7)"
+        }
+      },
+      {
+        "id": "mapillary-location",
+        "type": "symbol",
+        'source': 'mly',
+        'source-layer': 'image',
+        "filter": ["==", "id", true],
+        "layout": {
+          "icon-rotate": 0,
+          "icon-rotation-alignment": "map",
+          "icon-image": "video",
+          "icon-anchor": "center",
+          "icon-size": {
+            "base": 1,
+            "stops": [[13, 0.1], [14, 0.4], [17, 0.6], [19, 0.9]]
+          },
+        },
+        "paint": {
+          "icon-opacity": 0.65
         }
       }
     ],
