@@ -28,7 +28,7 @@
     "bluebird": "^3.7.2",
     "gh-pages": "^3.1.0",
     "mapbox-gl": "^1.13.0",
-    "mapillary-js": "^3.1.0",
+    "mapillary-js": "^4.0.0",
     "moment": "^2.29.1",
     "postcss": "^7",
     "react": "^17.0.1",

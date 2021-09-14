@@ -69,21 +69,6 @@ function setBearing(node, mly, start, end) {
   mly.setCenter(center);
 }
 
-/**
- * Promise-returning function to fetch a new Mapillary imageKey based on some coordinates
- */
-const fetchImageKey = (coords) => {
-  let lnglat;
-  if (coords.lng && coords.lat) {
-    lnglat = `${coords.lng},${coords.lat}`;
-  }
-  if (coords.x && coords.y) {
-    lnglat = `${coords.x},${coords.y}`;
-  }
-  let url = `https://a.mapillary.com/v3/images?client_id=${clientid}&closeto=${lnglat}&radius=40&usernames=codgis&start_time=2018-07-01`;
-  return fetch(url).then((r) => r.json());
-};
-
 const featureToCentroidCoords = (feature) => {
   let geojsonFeature = arcgisToGeoJSON(feature)
   let featureCentroid = centroid(geojsonFeature.geometry).geometry.coordinates
@@ -100,12 +85,10 @@ let markerStyle = {
   radius: 2,
 };
 
-const StreetView = ({ feature, setSvBearing, setSvCoords, children }) => {
+const StreetView = ({ feature, setSvBearing, svImageKey, children }) => {
   // local state to store the mapillary viewer
   const [mapillary, setMapillary] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentKey, setCurrentKey] = useState(null);
-  const [imageKeys, setImageKeys] = useState(null);
 
   // show full streetview on click of streetview button
   useEffect(() => {
@@ -127,7 +110,6 @@ const StreetView = ({ feature, setSvBearing, setSvCoords, children }) => {
     setMapillary(mapillaryView);
 
     mapillaryView.on("nodechanged", (n) => {
-      setSvCoords(n.latLon);
     });
 
     mapillaryView.on("bearingchanged", (b) => {
@@ -139,7 +121,7 @@ const StreetView = ({ feature, setSvBearing, setSvCoords, children }) => {
     }
 
     return cleanup;
-  }, [setSvBearing, setSvCoords, setLoading]);
+  }, [setSvBearing, setLoading]);
 
   useEffect(() => {
     setLoading(true);
