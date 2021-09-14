@@ -85,7 +85,7 @@ let markerStyle = {
   radius: 2,
 };
 
-const StreetView = ({ feature, setSvBearing, setSvCoords, svImageKey, children }) => {
+const StreetView = ({ feature, setSvBearing, svImageKey, children }) => {
   // local state to store the mapillary viewer
   const [mapillary, setMapillary] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -110,7 +110,6 @@ const StreetView = ({ feature, setSvBearing, setSvCoords, svImageKey, children }
     setMapillary(mapillaryView);
 
     mapillaryView.on("nodechanged", (n) => {
-      setSvCoords(n.latLon);
     });
 
     mapillaryView.on("bearingchanged", (b) => {
@@ -122,7 +121,7 @@ const StreetView = ({ feature, setSvBearing, setSvCoords, svImageKey, children }
     }
 
     return cleanup;
-  }, [setSvBearing, setSvCoords, setLoading]);
+  }, [setSvBearing, setLoading]);
 
   useEffect(() => {
     setLoading(true);
