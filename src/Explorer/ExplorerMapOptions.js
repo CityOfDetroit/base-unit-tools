@@ -41,7 +41,7 @@ const ExplorerMapOptions = ({ options, setOptions, session }) => {
             onChange={(e) => setOptions({ ...options, basemap: e.target.value })}
             >
             {Object.keys(basemaps).map((k) => (
-              <option className="text-base" value={k}>{basemaps[k]}</option>
+              <option className="text-base" key={k} value={k}>{basemaps[k]}</option>
             ))}
           </select>
         </div>
