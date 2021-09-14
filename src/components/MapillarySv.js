@@ -3,6 +3,64 @@ import { useEffect, useState } from "react";
 import moment from "moment";
 import { arcgisToGeoJSON } from '@esri/arcgis-to-geojson-utils';
 import centroid from '@turf/centroid';
+import bearing from "@turf/bearing";
+
+
+/**
+ * Wrap a value on the interval [min, max].
+ */
+ function wrap(value, min, max) {
+  var interval = max - min;
+
+  while (value > max || value < min) {
+    if (value > max) {
+      value = value - interval;
+    } else if (value < min) {
+      value = value + interval;
+    }
+  }
+
+  return value;
+}
+
+/**
+ * Convert a desired bearing to a basic X image coordinate for
+ * a specific node bearing.
+ *
+ * Works only for a full 360 panorama.
+ */
+function bearingToBasic(desiredBearing, nodeBearing) {
+  // 1. Take difference of desired bearing and node bearing in degrees.
+  // 2. Scale to basic coordinates.
+  // 3. Add 0.5 because node bearing corresponds to the center
+  //    of the image. See
+  //    https://mapillary.github.io/mapillary-js/classes/viewer.html
+  //    for explanation of the basic coordinate system of an image.
+  var basic = (desiredBearing - nodeBearing) / 360 + 0.5;
+
+  // Wrap to a valid basic coordinate (on the [0, 1] interval).
+  // Needed when difference between desired bearing and node
+  // bearing is more than 180 degrees.
+  return wrap(basic, 0, 1);
+}
+
+/**
+ * Function to set the mapillary viewer's center by computing bearing
+ */
+function setBearing(node, mly, start, end) {
+  var nodeBearing = node.computedCompassAngle; // Computed node compass angle (equivalent
+  // to bearing) is used by mjs when placing
+  // the node in 3D space.
+
+  // compute this with @turf/bearing
+  var desiredBearing = bearing(start, end); // Your desired bearing.
+  var basicX = bearingToBasic(desiredBearing, nodeBearing);
+  var basicY = 0.45; // tilt slightly up
+
+  var center = [basicX, basicY];
+
+  mly.setCenter(center);
+}
 
 const featureToCentroidCoords = (feature) => {
   let geojsonFeature = arcgisToGeoJSON(feature)
@@ -76,6 +134,11 @@ const MapillarySv = ({ svKeys, svImageKey, setSvImageKey, setSvBearing, feature 
       let defaultMarker = new SimpleMarker("default-id", { lat: coords.lat, lng: coords.lng }, markerStyle);
       let markerComponent = streetview.getComponent("marker");
       markerComponent.add([defaultMarker]);
+
+      streetview.getImage().then(i => {
+        console.log(i)
+        setBearing(i, streetview, [i.originalLngLat.lng, i.originalLngLat.lat], [coords.lng || coords.x, coords.lat || coords.y]);
+      })
     }
   }, [feature])
 
