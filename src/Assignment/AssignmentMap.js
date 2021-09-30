@@ -1,9 +1,9 @@
 import mapboxgl from 'mapbox-gl';
 import { useEffect, useState } from 'react';
-import { baseStyle } from '../styles/mapstyle';
 import layers from '../data/layers.js'
+import { baseStyle, satelliteStyle, linenStyle } from '../styles/mapstyle'
 
-const AssignmentMap = ({ mode, geocodeResult, setBuilding, setParcel, setStreet, selectableLayers, building, parcel, street, addresses, setCenter }) => {
+const AssignmentMap = ({ mode, geocodeResult, setBuilding, setParcel, setStreet, selectableLayers, building, parcel, street, addresses, setCenter, basemap }) => {
 
   let feature;
   if (geocodeResult) {
@@ -11,6 +11,10 @@ const AssignmentMap = ({ mode, geocodeResult, setBuilding, setParcel, setStreet,
   }
 
   let [theMap, setTheMap] = useState(null)
+
+  // keep track of whether the style is loaded or not
+  // we switch styles when the underlying basemap changes
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
 
@@ -126,6 +130,24 @@ const AssignmentMap = ({ mode, geocodeResult, setBuilding, setParcel, setStreet,
       theMap.setFilter(layers.addresses.highlight, ['in', layers.addresses.id_column].concat(addresses.map(a => a.addr_id)))
     }
   }, [addresses])
+
+  // effect fires when we switch the basemap
+  useEffect(() => {
+    if (theMap) {
+      if (basemap === 'satellite') {
+        theMap.setStyle(satelliteStyle())
+        setLoading(true)
+      }
+      if (basemap === 'linen-map') {
+        theMap.setStyle(linenStyle())
+        setLoading(true)
+      }
+      if (basemap === 'default') {
+        theMap.setStyle(baseStyle)
+        setLoading(true)
+      }
+    }
+  }, [basemap])
 
   return (
     <div id="map" className="assignment-map"></div>
