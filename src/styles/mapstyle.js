@@ -16637,9 +16637,26 @@ export const baseStyle = {
         "paint": {
           "circle-radius": {
             "base": 1,
-            "stops": [[13, 0.1], [14, 1], [17, 4], [19, 12]]
+            "stops": [[13, 0.1], [14, 1], [17, 4], [19, 8]]
           },
           "circle-color": "#aaa"
+        }
+      },
+      {
+        "id": "address-point-label",
+        "source": "baseunits",
+        "source-layer": "addresses",
+        "type": "symbol",
+        "minzoom": 18,
+        "layout": {
+          "text-field": ["get", "street_number"],
+          "text-font": ["Noto Sans Bold"],
+          "text-offset": [0, -1],
+          "visibility": "none"
+        },
+        "paint": {
+          "text-halo-color": "white",
+          "text-halo-width": 2
         }
       },
       {

@@ -48,17 +48,8 @@ const AssignmentMap = ({ mode, geocodeResult, setBuilding, setParcel, setStreet,
         }
       })
 
-      //   map.addLayer({
-      //     id: "address-label",
-      //     "source": "addresses",
-      //     "source-layer": "addresses",
-      //     type: "symbol",
-      //     minzoom: 18,
-      //     layout: {
-      //       "text-field": ["get", "parcel_id"],
-      //       "text-font": ["Montserrat Regular"]
-      //     }
-      //   })
+      map.setLayoutProperty("address-point", "visibility", "visible")
+      map.setLayoutProperty("address-point-label", "visibility", "visible")
 
       //   map.setLayoutProperty("address-point", "visibility", "visible")
 
@@ -66,7 +57,7 @@ const AssignmentMap = ({ mode, geocodeResult, setBuilding, setParcel, setStreet,
 
     map.on('click', e => {
       let features = map.queryRenderedFeatures(e.point, {
-        layers: [layers.buildings.interaction, layers.streets.interaction, layers.parcels.interaction],
+        layers: [layers.buildings.interaction, layers.streets.interaction, layers.parcels.interaction, layers.addresses.interaction],
       });
       if (features.length > 0) {
         let clicked = features[0]
@@ -78,6 +69,8 @@ const AssignmentMap = ({ mode, geocodeResult, setBuilding, setParcel, setStreet,
         }
         if (clicked.sourceLayer === 'streets') {
           setStreet(clicked.properties[layers.streets.click])
+        }
+        if (clicked.sourceLayer === 'addresses') {
         }
       }
       else {
