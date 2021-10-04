@@ -1,16 +1,16 @@
 import layers from '../data/layers'
 import IdBadge from '../Explorer/IdBadge'
 
-const AssignmentFeature = ({ attr, attributes, longAttributes={}, clicked=null }) => {
+const AssignmentFeature = ({ attr, attributes, longAttributes={}, clicked=null, label=null }) => {
 
   // let hasSource = Object.keys(attr).indexOf('geo_source') > -1
-
+  console.log(attr)
   let layer = layers[clicked.type]
 
   return (
     <>
       <div className="bg-gray-300 p-2 text-xs font-bold flex items-center justify-between" style={{ borderLeft: `8px solid ${layer.color}` }}>
-        <h2>{layer.label}</h2>
+        <h2>{label || layer.label}</h2>
         <div className="flex items-center">
           {/* {hasSource && <span className="font-semibold text-gray-500 bg-gray-300 py-1 px-2 mx-3 text-sm">{attr.geo_source}</span>} */}
           <IdBadge id={attr[layer.id_column]} layer={layer} link={false} />

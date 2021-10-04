@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Button from '../components/Button';
 import layers from '../data/layers';
 import AssignmentBuilding from './AssignmentBuilding';
+import AssignmentParcel from './AssignmentParcel';
 import useFeature from '../hooks/useFeature';
 import { addFeatures } from '@esri/arcgis-rest-feature-layer';
 
@@ -174,6 +175,7 @@ const NewBuildingAddress = ({ building, setBuilding, street, setStreet, setSelec
       {building &&
         <>
           <AssignmentBuilding {...{ building, setModelAddress, setStreet }} />
+          {modelAddress && modelAddress.attributes.parcel_id && <AssignmentParcel parcel={modelAddress.attributes.parcel_id} />}
           {modelAddress && <NewAddressToSubmit {...{ modelAddress, building, street, session, certNumber }} />}
         </>
       }
