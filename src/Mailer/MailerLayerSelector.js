@@ -46,6 +46,12 @@ const presets = {
     url: "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/CBO_Impact_Areas/FeatureServer/0/",
     pickColumn: "Name",
   },
+  "pdd_planning_areas": {
+    name: "PDD Planning Projects",
+    singular: "Planning project",
+    url: `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/PDD_Planning_Projects/FeatureServer/1/`,
+    pickColumn: "Proj_NAME"
+  }
 }
 
 const MailerLayerSelector = ({ geom, setGeom }) => {

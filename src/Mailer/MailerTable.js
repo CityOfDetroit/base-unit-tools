@@ -6,7 +6,7 @@ const MailerTable = ({ filtered }) => {
   let cols = [
     { accessor: 'FNL_PRIADR', Header: 'Address' },
     { accessor: 'FNL_SECADR', Header: 'Unit' },
-    { accessor: 'DPV_VACANT', Header: 'Is Deliverable?' }
+    { accessor: 'DPV_VACANT', Header: 'Is Vacant?' }
   ]
 
   let columns = useMemo(() => cols, [filtered])
