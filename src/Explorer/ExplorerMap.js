@@ -76,7 +76,6 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svBearing, 
       });
       if (features.length > 0) {
         let f = features[0]
-        console.log(f.properties)
         setSvImageKey({captured_at: f.properties.captured_at, id: f.properties.id})
         setSvKeys(features.map(f => f.properties))
       }

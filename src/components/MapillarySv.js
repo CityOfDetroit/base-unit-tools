@@ -136,7 +136,6 @@ const MapillarySv = ({ svKeys, svImageKey, setSvImageKey, setSvBearing, feature 
       markerComponent.add([defaultMarker]);
 
       streetview.getImage().then(i => {
-        console.log(i)
         setBearing(i, streetview, [i.originalLngLat.lng, i.originalLngLat.lat], [coords.lng || coords.x, coords.lat || coords.y]);
       })
     }

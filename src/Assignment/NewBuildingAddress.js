@@ -8,8 +8,6 @@ import useFeature from '../hooks/useFeature';
 import { addFeatures } from '@esri/arcgis-rest-feature-layer';
 
 const handleSubmit = (data, session, certNumber) => {
-
-  console.log(session)
   let integromatBody = {
     "addresses": data,
     "list_of_addresses": data.map(ad => ad.full_address).join("\n"),

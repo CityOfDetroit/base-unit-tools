@@ -66,7 +66,6 @@ const Linker = ({ session }) => {
   // search
   let [searchValue, setSearchValue] = useState(null)
   let [gcResult, type] = useGeocoder(searchValue)
-  console.log(gcResult)
 
   let id = queryId
   if (gcResult) {

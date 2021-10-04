@@ -227,7 +227,6 @@ const Mailer = ({ session }) => {
       </>
   )
 
-  console.log(filtered)
   return (
     <>
 

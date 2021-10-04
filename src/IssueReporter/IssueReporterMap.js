@@ -7,8 +7,6 @@ import { baseStyle } from '../styles/mapstyle';
 
 const IssueReporterMap = ({ featureCollection, type, target, feature, featureCentroid, setMode, mode }) => {
 
-  console.log(feature, featureCentroid)
-
   const [theMap, setTheMap] = useState(null);
   let center = featureCentroid.geometry.coordinates;
 

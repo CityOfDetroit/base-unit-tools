@@ -30,7 +30,6 @@ const LinkerSubmission = ({ session, feature, links }) => {
   let [formText, setFormText] = useState('')
   let [sent, setSent] = useState(false)
   let [addResponse, setAddResponse] = useState(null)
-  console.log(links)
   return (
     <section className="sidebar-section">
     <div className="flex items-center justify-between">

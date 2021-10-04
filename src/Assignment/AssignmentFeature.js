@@ -3,8 +3,6 @@ import IdBadge from '../Explorer/IdBadge'
 
 const AssignmentFeature = ({ attr, attributes, longAttributes={}, clicked=null, label=null }) => {
 
-  // let hasSource = Object.keys(attr).indexOf('geo_source') > -1
-  console.log(attr)
   let layer = layers[clicked.type]
 
   return (
