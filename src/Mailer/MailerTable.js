@@ -4,9 +4,11 @@ import { usePagination, useTable } from 'react-table'
 const MailerTable = ({ filtered }) => {
 
   let cols = [
-    { accessor: 'FNL_PRIADR', Header: 'Address' },
-    { accessor: 'FNL_SECADR', Header: 'Unit' },
-    { accessor: 'DPV_VACANT', Header: 'Is Deliverable?' }
+    { accessor: 'fnl_priadr', Header: 'Address' },
+    // { accessor: 'city_state_zip', Header: 'CSZ'},
+    { accessor: 'fnl_secadr', Header: 'Unit' },
+    { accessor: 'usps_status', Header: 'USPS Status' },
+    // { accessor: 'usps_database_month', Header: 'Month' }
   ]
 
   let columns = useMemo(() => cols, [filtered])

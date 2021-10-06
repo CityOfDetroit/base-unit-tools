@@ -8,13 +8,13 @@ import videoIcon from '../images/video.png'
 
 import layers from '../data/layers'
 
-const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, svBearing, basemap }) => {
+const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svBearing, basemap, setSvImageKey, svImageKey, setSvKeys }) => {
 
   // keep a reference to the map object here
   const [theMap, setTheMap] = useState(null);
   // keep track of whether the style is loaded or not
   // we switch styles when the underlying basemap changes
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   // this effect runs once, when the component loads
   useEffect(() => {
@@ -63,6 +63,26 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
       }
     })
 
+    map.on('click', e => {
+
+      const width = 10;
+      const height = 10;
+
+      let features = map.queryRenderedFeatures([
+        [e.point.x - width / 2, e.point.y - height / 2],
+        [e.point.x + width / 2, e.point.y + height / 2]
+      ], {
+        layers: ['mapillary-images'],
+      });
+      if (features.length > 0) {
+        let f = features[0]
+        setSvImageKey({captured_at: f.properties.captured_at, id: f.properties.id})
+        setSvKeys(features.map(f => f.properties))
+      }
+      else {
+      }
+    })
+
   }, [setClicked]);
 
   // fires when we get a new clicked feature
@@ -70,7 +90,7 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
     if (theMap && clicked.type && clicked.id && !loading) {
       let layer = layers[clicked.type]
       let others = Object.keys(layers).filter(l => l !== clicked.type && l !== 'units')
-      let filter = ["==", layer.filter_id, clicked.id]
+      let filter = ["==", layer.filter_id, clicked.type === 'parcels' ? clicked.id : parseInt(clicked.id)]
       theMap.setFilter(layer.highlight, filter)
       others.forEach(o => {
         theMap.setFilter(layers[o].highlight, ["==", "$id", ""])
@@ -101,40 +121,29 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svCoords, s
     }
   }, [theMap, linked, loading, clicked.type])
 
-  // effect fires when svCoords or svBearing changes
   useEffect(() => {
-    if (theMap && !loading) {
-      if (showSv && svCoords) {
-        theMap.getSource("mapillary").setData({
-          type: "FeatureCollection",
-          // we'll make the map data here
-          features: [
-            {
-              type: "Feature",
-              geometry: {
-                type: "Point",
-                coordinates: [svCoords.lon, svCoords.lat],
-              },
-              properties: {
-                bearing: svBearing - 90,
-              },
-            },
-          ],
-        });
-      }
-      if (!showSv) {
-        theMap.getSource("mapillary").setData({
-          type: "FeatureCollection", features: []
-        })
-      }
+    if (theMap && svImageKey) {
+      theMap.setFilter('mapillary-images-highlight', ["==", "id", parseInt(svImageKey.id)])
+      theMap.setFilter('mapillary-location', ["==", "id", parseInt(svImageKey.id)])
+      theMap.setLayoutProperty('mapillary-location', 'icon-rotate', (svBearing - 90))
     }
-  }, [svCoords, svBearing, loading, theMap, showSv]);
+  }, [svImageKey, svBearing])
 
   // effect fires when the showSv property changes
   useEffect(() => {
-    if(theMap && !loading) {
+    if (theMap && !loading) {
       if (showSv) {
-        theMap.setLayoutProperty("mapillary-location", "visibility", showSv ? "visible" : "none")
+        theMap.setLayoutProperty("mapillary-images", "visibility", "visible")
+        theMap.setLayoutProperty("mapillary-images-highlight", "visibility", "visible")
+        theMap.setLayoutProperty("mapillary-location", "visibility", "visible")
+        theMap.flyTo({
+          zoom: 19
+        })
+      }
+      else {
+        theMap.setLayoutProperty("mapillary-images", "visibility", "none")
+        theMap.setLayoutProperty("mapillary-images-highlight", "visibility", "none")
+        theMap.setLayoutProperty("mapillary-location", "visibility", "none")
       }
     }
   }, [showSv, loading, theMap])

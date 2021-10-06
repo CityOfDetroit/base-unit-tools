@@ -6,8 +6,6 @@ export const IssueReporterFeature = ({ attr, clicked }) => {
 
   let layer = layers[clicked.type];
 
-  console.log(attr)
-
   return (
     <section className='sidebar-section feature' style={{ borderLeft: `8px solid ${layer.color}` }}>
       <div className="flex items-center justify-between text-lg">

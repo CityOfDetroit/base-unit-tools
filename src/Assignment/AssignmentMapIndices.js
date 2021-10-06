@@ -19,9 +19,6 @@ const AssignmentMapIndices = ({ center, session }) => {
         }
       }
 
-
-  console.log(geojsonToArcGIS(geojson).geometry)
-
   useEffect(() => {
     queryFeatures({
       url: `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/Address_Map_Index/FeatureServer/0`,
@@ -36,7 +33,6 @@ const AssignmentMapIndices = ({ center, session }) => {
       else(
         setAddrMapIndex(null)
       )
-      console.log(d)
     })
   }, [center])
 

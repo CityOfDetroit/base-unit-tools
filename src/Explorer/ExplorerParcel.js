@@ -28,7 +28,7 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
     useEffect(() => {
 
       queryFeatures({
-        url: `https://opengis.detroitmi.gov/opengis/rest/services/Assessors/Parcels/FeatureServer/0`,
+        url: `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Parcels_2021/FeatureServer/0`,
         where: `parcel_number = '${attr.parcel_id}'`,
         returnGeometry: false,
         outFields: ['*']
@@ -42,7 +42,6 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
     }, [attr.parcel_id])
 
     if(extendedAttribs) {
-      console.log(extendedAttribs)
       longAttributes['Legal description'] = extendedAttribs.legal_description
       attributes['Taxpayer'] = extendedAttribs.taxpayer_1
       extendedAttribs.taxpayer_2 && (attributes['Taxpayer (ext)'] = extendedAttribs.taxpayer_2)

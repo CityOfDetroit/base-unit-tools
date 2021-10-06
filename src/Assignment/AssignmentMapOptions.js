@@ -8,7 +8,7 @@ let basemaps = {
   'satellite': 'Satellite',
 }
 
-const ExplorerMapOptions = ({ options, setOptions, session }) => {
+const AssignmentMapOptions = ({ options, setOptions, session }) => {
 
   // add to obj on session
   if(session) {
@@ -20,15 +20,6 @@ const ExplorerMapOptions = ({ options, setOptions, session }) => {
       <h2 className="text-base">Map options</h2>
 
       <div className="mt-1 flex">
-        {/* Street view toggle */}
-        <Button
-          onClick={() => setOptions({ ...options, streetView: !options.streetView })}
-          icon={faStreetView}
-          text="Street view"
-          active={options.streetView}
-          className="mr-2"
-          small
-        />
 
         {/* Basemap selector */}
         <div className="flex items-center my-2">
@@ -50,4 +41,4 @@ const ExplorerMapOptions = ({ options, setOptions, session }) => {
   )
 }
 
-export default ExplorerMapOptions;
+export default AssignmentMapOptions;

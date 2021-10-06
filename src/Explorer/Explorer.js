@@ -1,9 +1,8 @@
-import { faArrowAltCircleRight, faLink, faWrench } from '@fortawesome/free-solid-svg-icons';
+import { faArrowAltCircleRight, faLink, faStreetView, faWrench } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
 import { Link, useHistory } from "react-router-dom";
 import AppHeader from '../components/AppHeader';
-import StreetView from '../components/StreetView';
 import apps from '../data/apps';
 import SiteSidebar from '../layout/SiteSidebar';
 import ExplorerAddress from './ExplorerAddress';
@@ -15,6 +14,7 @@ import ExplorerSearch from './ExplorerSearch';
 import ExplorerStreet from './ExplorerStreet';
 import useFeature from '../hooks/useFeature';
 import useQuery from '../hooks/useQuery';
+import MapillarySv from '../components/MapillarySv';
 
 
 const Explorer = ({ session }) => {
@@ -24,6 +24,7 @@ const Explorer = ({ session }) => {
   let queryType = query.get("type")
   let queryId = query.get("id")
   let querySv = query.get("streetview")
+  let querySvImgKey = query.get("image")
 
   // we use the history to push params on click
   let history = useHistory()
@@ -53,11 +54,10 @@ const Explorer = ({ session }) => {
   })
   
   // streetview-specific information
-  // svCoords is the camera location
   // svBearing is the current camera bearing
-  const [svCoords, setSvCoords] = useState(null);
   const [svBearing, setSvBearing] = useState(null);
-
+  const [svImageKey, setSvImageKey] = useState(null);
+  const [svKeys, setSvKeys] = useState([]);
 
   // this effect triggers when the user clicks on a new feature in the map
   useEffect(() => {
@@ -89,7 +89,19 @@ const Explorer = ({ session }) => {
         <AppHeader app={apps.explorer} introduction={introduction}>
           <ExplorerSearch {...{ setClicked }} />
           <ExplorerMapOptions {...{options, setOptions, session}} />
+                  {/* Street View if selected and we have a feature */}
+        {/* {options.streetView && feature && <StreetView {...{ feature, setSvBearing }} />} */}
+
         </AppHeader>
+        {options.streetView && svKeys.length > 0 && <MapillarySv {...{svKeys, svImageKey, setSvImageKey, setSvBearing, feature}} />}
+        {options.streetView && svKeys.length === 0 && 
+          <section className="sidebar-section info">
+            <FontAwesomeIcon icon={faStreetView} />
+            <span className="text-semibold text-sm ml-2">
+            Click the blue dots to pull up a street view image.
+            </span>
+          </section>
+        }
 
 
         {/* Options area */}
@@ -100,8 +112,6 @@ const Explorer = ({ session }) => {
         {clicked.type === 'parcels' && feature && <ExplorerParcel {...{ feature, clicked, setClicked, linked, setLinked }} />}
         {clicked.type === 'streets' && feature && <ExplorerStreet {...{ feature, clicked, setClicked, linked, setLinked }} />}
 
-        {/* Street View if selected and we have a feature */}
-        {options.streetView && feature && <StreetView {...{ feature, setSvBearing, setSvCoords }} />}
 
         {/* Link to issue reporter */}
         {feature &&
@@ -130,7 +140,7 @@ const Explorer = ({ session }) => {
 
       {/* the main panel contains the map, and we pass it many of our useState variables */}
       <main>
-        <ExplorerMap {...{ clicked, setClicked, linked, feature, history, svCoords, svBearing, basemap: options.basemap, showSv: options.streetView }} />
+        <ExplorerMap {...{ clicked, setClicked, linked, feature, history, svImageKey, setSvImageKey, setSvKeys, svBearing, basemap: options.basemap, showSv: options.streetView }} />
       </main>
     </>
   )

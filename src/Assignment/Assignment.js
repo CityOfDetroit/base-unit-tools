@@ -9,6 +9,7 @@ import AssignmentSearch from './AssignmentSearch';
 import AssignmentMapIndices from './AssignmentMapIndices';
 import NewBuildingAddress from './NewBuildingAddress';
 import NewUtilityPole from './NewUtilityPole';
+import AssignmentMapOptions from './AssignmentMapOptions';
 
 const Assignment = ({ session }) => {
 
@@ -27,6 +28,11 @@ const Assignment = ({ session }) => {
 
   // map attribs
   let [center, setCenter] = useState([])
+
+  // an options object
+  let [options, setOptions] = useState({
+    basemap: 'default'
+  })
 
   // define the different modes for the tool and assign one to state
   // each mode has a name, description, and set of selectableLayers
@@ -74,6 +80,8 @@ const Assignment = ({ session }) => {
       <SiteSidebar title="Assignment">
 
         <AppHeader app={apps['assignment']} introduction={introduction}>
+          <AssignmentMapOptions {...{options, setOptions, session}} />
+
         </AppHeader>
 
         <section className="sidebar-section">
@@ -100,7 +108,7 @@ const Assignment = ({ session }) => {
         <section className="bg-gray-300 py-2 px-3">
           <AssignmentSearch setSearchValue={setSearchValue} />
         </section>
-        <AssignmentMap geocodeResult={data} {...{ mode, building, parcel, street, setBuilding, setParcel, setStreet, selectableLayers, addresses, setCenter }} />
+        <AssignmentMap geocodeResult={data} {...{ mode, building, parcel, street, setBuilding, setParcel, setStreet, selectableLayers, addresses, setCenter, basemap: options.basemap }} />
         <section className="bg-gray-300 py-3 px-3">
           {session && <AssignmentMapIndices center={center} session={session} />}
           {!session && <p>Log in for additional address location information.</p>}

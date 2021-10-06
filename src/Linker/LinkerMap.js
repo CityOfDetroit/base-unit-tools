@@ -41,7 +41,6 @@ const LinkerMap = ({ center, feature, links, setLinks }) => {
       // if we have clicked on any features..
       if (features.length > 0) {
         let ft = features[0]
-        console.log(ft)
         // depending the type, set a new state.
         if(ft.sourceLayer === 'buildings') {
           setBuilding(ft.properties.bldg_id)
@@ -54,7 +53,6 @@ const LinkerMap = ({ center, feature, links, setLinks }) => {
         }
       }
       else {
-        console.log(`no features`)
       }
     })
   }, []);

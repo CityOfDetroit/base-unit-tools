@@ -3,12 +3,11 @@ import { useEffect, useState } from 'react';
 import Button from '../components/Button';
 import layers from '../data/layers';
 import AssignmentBuilding from './AssignmentBuilding';
+import AssignmentParcel from './AssignmentParcel';
 import useFeature from '../hooks/useFeature';
 import { addFeatures } from '@esri/arcgis-rest-feature-layer';
 
 const handleSubmit = (data, session, certNumber) => {
-
-  console.log(session)
   let integromatBody = {
     "addresses": data,
     "list_of_addresses": data.map(ad => ad.full_address).join("\n"),
@@ -50,9 +49,14 @@ const NewAddressToSubmit = ({ modelAddress, building, street, session, certNumbe
     '', 'Apt', 'Ste', 'Upper', 'Lower'
   ]
   let [unitType, setUnitType] = useState(unitTypes[0])
+
+  // store the current unit number state..
   let [unitNums, setUnitNums] = useState('')
-  let [addrsToAdd, setAddrsToAdd] = useState([])
+  // ..& split lines into an array
   let newUnits = unitNums.split("\n").filter(a => a !== "")
+
+  let [addrsToAdd, setAddrsToAdd] = useState([])
+  let [notes, setNotes] = useState('')
 
   let toSubmit = []
   let buttonText = null
@@ -66,7 +70,8 @@ const NewAddressToSubmit = ({ modelAddress, building, street, session, certNumbe
         unit_type: unitType,
         unit_number: nu,
         certificate_number: certNumber,
-        full_address: `${houseNumber} ${fullStreetName} ${unitType} ${nu}`.trim()
+        full_address: `${houseNumber} ${fullStreetName} ${unitType} ${nu}`.trim(),
+        notes: notes
       }
     })
     buttonText = `${toSubmit.length} new unit`
@@ -80,7 +85,8 @@ const NewAddressToSubmit = ({ modelAddress, building, street, session, certNumbe
       unit_type: unitType,
       unit_number: null,
       certificate_number: certNumber,
-      full_address: `${houseNumber} ${fullStreetName} ${unitType}`.trim()
+      full_address: `${houseNumber} ${fullStreetName} ${unitType}`.trim(),
+      notes: notes
     }]
     buttonText = `${toSubmit.length} new unit`
   }
@@ -94,7 +100,8 @@ const NewAddressToSubmit = ({ modelAddress, building, street, session, certNumbe
         unit_type: null,
         unit_number: null,
         certificate_number: certNumber,
-        full_address: `${houseNumber} ${fullStreetName}`.trim()
+        full_address: `${houseNumber} ${fullStreetName}`.trim(),
+        notes: notes
       }
     ]
     buttonText = `1 new primary`
@@ -136,6 +143,10 @@ const NewAddressToSubmit = ({ modelAddress, building, street, session, certNumbe
         <div>Unit number:</div>
         <textarea className="px-3 py-2 m-2" value={unitNums} rows={8} type="text" onChange={(e) => setUnitNums(e.target.value)} />
       </div>
+      <div className="flex items-center justify-between">
+        <div>Notes:</div>
+        <textarea className="px-3 py-2 m-2" value={notes} rows={4} type="text" onChange={(e) => setNotes(e.target.value)} />
+      </div>
       {toSubmit.length > 0 && <Button icon={faAddressBook} onClick={() => handleSubmit(toSubmit, session, certNumber)}>Submit {buttonText} address(es)</Button>}
     </section>
   )
@@ -162,6 +173,7 @@ const NewBuildingAddress = ({ building, setBuilding, street, setStreet, setSelec
       {building &&
         <>
           <AssignmentBuilding {...{ building, setModelAddress, setStreet }} />
+          {modelAddress && modelAddress.attributes.parcel_id && <AssignmentParcel parcel={modelAddress.attributes.parcel_id} />}
           {modelAddress && <NewAddressToSubmit {...{ modelAddress, building, street, session, certNumber }} />}
         </>
       }
