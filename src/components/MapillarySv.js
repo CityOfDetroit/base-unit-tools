@@ -4,6 +4,8 @@ import moment from "moment";
 import { arcgisToGeoJSON } from '@esri/arcgis-to-geojson-utils';
 import centroid from '@turf/centroid';
 import bearing from "@turf/bearing";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStreetView } from "@fortawesome/free-solid-svg-icons";
 
 
 /**
@@ -123,7 +125,7 @@ const MapillarySv = ({ svKeys, svImageKey, setSvImageKey, setSvBearing, feature 
   }, [])
 
   useEffect(() => {
-    if(streetview) {
+    if(streetview && streetview.isNavigable) {
       streetview.moveTo(svKeys[0].id.toString())
     }
   }, [svKeys])
@@ -144,8 +146,8 @@ const MapillarySv = ({ svKeys, svImageKey, setSvImageKey, setSvBearing, feature 
   return (
     <>
     <h2 className="text-lg bg-gray-200 p-2 flex items-center justify-between">
-      <span>Street view</span>
-      <span>{moment(svImageKey.captured_at).format("ll")}</span>
+      <span><FontAwesomeIcon icon={faStreetView} className="mr-2" />Street view</span>
+      <span className="font-normal">{moment(svImageKey.captured_at).format("ll")}</span>
     </h2>
     <section className="sidebar-section street-view">
     <div id="mly-viewer" style={{height: 300, width: '100%'}}/>
