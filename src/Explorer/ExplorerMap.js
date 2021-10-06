@@ -136,6 +136,9 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svBearing, 
         theMap.setLayoutProperty("mapillary-images", "visibility", "visible")
         theMap.setLayoutProperty("mapillary-images-highlight", "visibility", "visible")
         theMap.setLayoutProperty("mapillary-location", "visibility", "visible")
+        theMap.flyTo({
+          zoom: 19
+        })
       }
       else {
         theMap.setLayoutProperty("mapillary-images", "visibility", "none")

@@ -1,4 +1,4 @@
-import { faArrowAltCircleRight, faLink, faWrench } from '@fortawesome/free-solid-svg-icons';
+import { faArrowAltCircleRight, faLink, faStreetView, faWrench } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
 import { Link, useHistory } from "react-router-dom";
@@ -94,6 +94,14 @@ const Explorer = ({ session }) => {
 
         </AppHeader>
         {options.streetView && svKeys.length > 0 && <MapillarySv {...{svKeys, svImageKey, setSvImageKey, setSvBearing, feature}} />}
+        {options.streetView && svKeys.length === 0 && 
+          <section className="sidebar-section info">
+            <FontAwesomeIcon icon={faStreetView} />
+            <span className="text-semibold text-sm ml-2">
+            Click the blue dots to pull up a street view image.
+            </span>
+          </section>
+        }
 
 
         {/* Options area */}
