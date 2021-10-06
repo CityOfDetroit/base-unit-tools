@@ -29,7 +29,7 @@ const Mailer = ({ session }) => {
       activeText: 'Deliverable addresses only',
       inactiveText: 'All addresses, even undeliverable',
       default: true,
-      filterFunction: (a) => a.attributes.DPV_VACANT === 'N'
+      filterFunction: (a) => a.attributes.usps_status === 'Deliverable'
     }
   }
 
@@ -44,8 +44,10 @@ const Mailer = ({ session }) => {
   // mode 1 is centroid
   // mode 2 is parcel
   let mailerLayers = [
-    `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/MailerLayers/FeatureServer/0`, // parcels
-    `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/MailerLayers/FeatureServer/1` // centroids
+    `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/MailerParcels_Test/FeatureServer/0`,
+    `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/MailerPoints_Test/FeatureServer/0`
+    // `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/MailerLayers/FeatureServer/0`, // parcels
+    // `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/MailerLayers/FeatureServer/1` // centroids
   ]
   const [layer, setLayer] = useState('centroid')
 
@@ -96,7 +98,7 @@ const Mailer = ({ session }) => {
         url: layer === 'parcel' ? mailerLayers[0] : mailerLayers[1],
         // the key bit
         returnIdsOnly: true,
-        orderByFields: "OBJECTID",
+        orderByFields: "objectid",
         // intersects-with-selectino parameters
         geometry: geojsonToArcGIS(geom)[0].geometry,
         geometryType: "esriGeometryPolygon",
@@ -132,10 +134,10 @@ const Mailer = ({ session }) => {
       let queryParams = breakpoints.slice(1).map((b, i) => {
         let params = {
           url: layer === 'parcel' ? mailerLayers[0] : mailerLayers[1],
-          orderByFields: "OBJECTID",
+          orderByFields: "objectid",
           // this is confusing, but produces the correct result.
           // it has to be weird because of how BETWEEN seems to work.
-          where: `OBJECTID between ${i === 0 ? (breakpoints[0] - 1) : (breakpoints[i])} and ${b - 1}`,
+          where: `objectid between ${i === 0 ? (breakpoints[0] - 1) : (breakpoints[i])} and ${b - 1}`,
           geometry: geojsonToArcGIS(geom)[0].geometry,
           geometryType: "esriGeometryPolygon",
           spatialRel: "esriSpatialRelIntersects",
