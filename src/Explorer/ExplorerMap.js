@@ -14,7 +14,7 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svBearing, 
   const [theMap, setTheMap] = useState(null);
   // keep track of whether the style is loaded or not
   // we switch styles when the underlying basemap changes
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   // this effect runs once, when the component loads
   useEffect(() => {
@@ -90,7 +90,7 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svBearing, 
     if (theMap && clicked.type && clicked.id && !loading) {
       let layer = layers[clicked.type]
       let others = Object.keys(layers).filter(l => l !== clicked.type && l !== 'units')
-      let filter = ["==", layer.filter_id, clicked.id]
+      let filter = ["==", layer.filter_id, clicked.type === 'parcels' ? clicked.id : parseInt(clicked.id)]
       theMap.setFilter(layer.highlight, filter)
       others.forEach(o => {
         theMap.setFilter(layers[o].highlight, ["==", "$id", ""])
