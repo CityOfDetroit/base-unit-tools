@@ -41,7 +41,8 @@ const Geocoder = () => {
         endpoint: geocoderUrl,
         params: {
           'outSR': 4326,
-          'outFields': '*'
+          'outFields': '*',
+          // 'category': 'Point Address,Subaddress'
         }
       }).
       then(d => {

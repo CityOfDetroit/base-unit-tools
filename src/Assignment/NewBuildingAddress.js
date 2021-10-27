@@ -1,4 +1,4 @@
-import { faAddressBook } from '@fortawesome/free-solid-svg-icons';
+import { faAddressBook, faAddressCard, faLink, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from 'react';
 import Button from '../components/Button';
 import layers from '../data/layers';
@@ -6,6 +6,7 @@ import AssignmentBuilding from './AssignmentBuilding';
 import AssignmentParcel from './AssignmentParcel';
 import useFeature from '../hooks/useFeature';
 import { addFeatures } from '@esri/arcgis-rest-feature-layer';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const handleSubmit = (data, session, certNumber) => {
   let integromatBody = {
@@ -114,47 +115,85 @@ const NewAddressToSubmit = ({ modelAddress, building, street, session, certNumbe
   }, [modelAddress])
 
   return (
-    <section className='sidebar-section'>
-      <h3>New address links</h3>
-      <div className="flex items-center justify-between">
-        <div>Building ID</div>
-        <input type="text" className="px-3 py-2 m-2" value={building} readOnly={true} disabled={true} />
-      </div>
-      <div className="flex items-center justify-between">
-        <div>Street ID</div>
-        <input type="text" className="px-3 py-2 m-2" value={street} readOnly={true} disabled={true} />
-      </div>
-      <h3>New address attributes</h3>
-      <div className="flex items-center justify-between">
-        <div>House number:</div>
-        <input type="text" className="px-3 py-2 m-2" value={houseNumber} onChange={e => setHouseNumber(e.target.value)} />
-      </div>
-      <div className="flex items-center justify-between">
-        <div>Street name:</div>
-        <input type="text" className="px-3 py-2 m-2" value={fullStreetName} disabled={true} />
-      </div>
-      <div className="flex items-center justify-between">
-        <div>Unit type:</div>
-        <select type="text" className="px-3 py-2 m-2" value={unitType} onChange={(e) => setUnitType(e.target.value)}>
-          {unitTypes.map(ut => <option value={ut} key={ut}>{ut}</option>)}
-        </select>
-      </div>
-      <div className="flex items-center justify-between">
-        <div>Unit number:</div>
-        <textarea className="px-3 py-2 m-2" value={unitNums} rows={8} type="text" onChange={(e) => setUnitNums(e.target.value)} />
-      </div>
-      <div className="flex items-center justify-between">
-        <div>Notes:</div>
-        <textarea className="px-3 py-2 m-2" value={notes} rows={4} type="text" onChange={(e) => setNotes(e.target.value)} />
-      </div>
-      {toSubmit.length > 0 && <Button icon={faAddressBook} onClick={() => handleSubmit(toSubmit, session, certNumber)}>Submit {buttonText} address(es)</Button>}
-    </section>
+    <>
+      <h2 className="bg-gray-300 p-2 mt-2 text-base">Creating new addresses:</h2>
+      <section className='sidebar-section border-b-2'>
+        <div className="flex justify-start items-center my-2">
+          <FontAwesomeIcon icon={faLink} className="mr-3 text-xl" />
+          <div>
+            <h3 className="text-base font-semibold text-gray-700">Links to other base units</h3>
+            <h3 className="text-sm font-normal text-gray-700">Adjust these by clicking the map</h3>
+          </div>
+        </div>
+        <div className="flex justify-start mb-4 px-1">
+          <div className="flex flex-col w-1/3 pr-3">
+            <span className="text-sm font-semibold py-1">Building ID</span>
+            <input type="text" className="p-2 text-sm font-mono" value={building} readOnly={true} disabled={true} />
+          </div>
+          <div className="flex flex-col w-1/3 pr-3">
+            <span className="text-sm font-semibold py-1">Street ID</span>
+            <input type="text" className="p-2 text-sm font-mono" value={street} readOnly={true} disabled={true} />
+          </div>
+          <div className="flex flex-col w-1/3 pr-3">
+            <span className="text-sm font-semibold py-1">Parcel ID</span>
+            <input type="text" className="p-2 text-sm font-mono" value={modelAddress.attributes.parcel_id} readOnly={true} disabled={true} />
+          </div>
+        </div>
+
+
+        <div className="flex justify-start items-center my-2">
+          <FontAwesomeIcon icon={faAddressCard} className="mr-3 text-xl" />
+          <div>
+            <h3 className="text-base font-semibold text-gray-700">Addresses to create here</h3>
+          </div>
+        </div>
+
+        <div className="flex justify-start mb-3 px-1">
+          <div className="flex flex-col w-1/3 pr-3">
+            <span className="text-sm font-semibold py-1">House number</span>
+            <input type="text" className="p-2 text-sm" value={houseNumber} onChange={e => setHouseNumber(e.target.value)} />
+          </div>
+          <div className="flex flex-col w-2/3 pr-3">
+            <span className="text-sm font-semibold py-1">Street name</span>
+            <input type="text" className="p-2 text-sm" value={fullStreetName} disabled={true} />
+          </div>
+        </div>
+
+
+        <div className="flex items-baseline justify-between">
+          <div className="flex flex-col w-1/3 pr-3">
+            <span className="text-sm font-semibold py-1">Unit type</span>
+            <select type="text" className="p-2 text-sm" value={unitType} onChange={(e) => setUnitType(e.target.value)}>
+              {unitTypes.map(ut => <option value={ut} key={ut}>{ut}</option>)}
+            </select>
+          </div>
+          <div className="flex flex-col w-2/3 pr-3">
+            <span className="text-sm font-semibold py-1">Unit number: enter one per line</span>
+            <span className="text-xs font-semibold pb-1">Enter one unit number per line</span>
+            <textarea className="py-2 px-3 text-xs" value={unitNums} rows={6} type="text" onChange={(e) => setUnitNums(e.target.value)} />
+          </div>
+        </div>
+
+        <div className="flex items-baseline justify-between">
+        <div className="flex flex-col w-full pr-3">
+          <span className="text-sm font-semibold py-1">Additional notes</span>
+          <textarea className="px-3 py-2 text-sm" value={notes} rows={2} type="text" onChange={(e) => setNotes(e.target.value)} />
+          </div>
+        </div>
+        <div className="flex items-center justify-around">
+
+        {toSubmit.length > 0 && <Button className="w-2/3 mx-4 justify-around my-5 p-4" onClick={() => handleSubmit(toSubmit, session, certNumber)}>Submit {buttonText} address(es)</Button>}
+        </div>
+      </section>
+    </>
   )
 }
 
 const NewBuildingAddress = ({ building, setBuilding, street, setStreet, setSelectableLayers, session, certNumber }) => {
 
   let [modelAddress, setModelAddress] = useState(null)
+
+  let [open, setOpen] = useState(false)
 
   useEffect(() => {
     if (building != '') {
@@ -172,8 +211,11 @@ const NewBuildingAddress = ({ building, setBuilding, street, setStreet, setSelec
       </section>}
       {building &&
         <>
+
           <AssignmentBuilding {...{ building, setModelAddress, setStreet }} />
+
           {modelAddress && modelAddress.attributes.parcel_id && <AssignmentParcel parcel={modelAddress.attributes.parcel_id} />}
+
           {modelAddress && <NewAddressToSubmit {...{ modelAddress, building, street, session, certNumber }} />}
         </>
       }

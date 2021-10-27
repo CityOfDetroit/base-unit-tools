@@ -2,6 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import AssignmentFeature from './AssignmentFeature';
 import moment from 'moment'
+import AnimateHeight from 'react-animate-height';
+import { faChevronCircleDown, faChevronCircleRight } from '@fortawesome/free-solid-svg-icons';
+
 
 import { queryFeatures } from '@esri/arcgis-rest-feature-layer'
 
@@ -16,6 +19,7 @@ const AssignmentParcel = ({ parcel }) => {
 
     let clicked = { type: 'parcels', id: parcel }
 
+    let [open, setOpen] = useState(false)
 
     useEffect(() => {
 
@@ -43,7 +47,7 @@ const AssignmentParcel = ({ parcel }) => {
     };
 
     return (
-      extendedAttribs && <AssignmentFeature label="Underlying parcel" {...{attr: extendedAttribs, attributes, longAttributes, clicked}} />
+      extendedAttribs && <AssignmentFeature label="Underlying parcel" startOpen {...{attr: extendedAttribs, attributes, longAttributes, clicked}} />
     )
 }
 

@@ -39,7 +39,7 @@ const AssignmentMapIndices = ({ center, session }) => {
   return (
     <>
       {addrMapIndex &&
-        <h2>Current address map index: <a href={addrMapIndex.attributes.Link}>{addrMapIndex.attributes.Index_}</a></h2>
+        <h2 className="text-sm py-3 px-3">Link to current address map index page: <a href={addrMapIndex.attributes.Link}>{addrMapIndex.attributes.Index_}</a></h2>
       }
     </>
   )
