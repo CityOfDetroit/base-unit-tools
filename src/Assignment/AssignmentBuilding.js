@@ -53,7 +53,7 @@ const AssignmentBuilding = ({ building, setStreet, setModelAddress, setSelectabl
 
   return (
     <>
-      {feature && <AssignmentFeature {...{ attr: feature.properties, attributes, clicked: clicked }} />}
+      {feature && <AssignmentFeature label="Selected building" {...{ attr: feature.properties, attributes, clicked: clicked }} />}
       {addresses.length > 0 && <AssignmentAddressesHere {...{ addresses, title: "primary" }} />}
     </>
   )

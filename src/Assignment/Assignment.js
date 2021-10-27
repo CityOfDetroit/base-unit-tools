@@ -22,7 +22,7 @@ const Assignment = ({ session }) => {
   const [parcel, setParcel] = useState('')
   const [street, setStreet] = useState('')
   const [addresses, setAddresses] = useState([])
-  
+
   // house number certificate
   let [certNumber, setCertNumber] = useState('')
 
@@ -71,7 +71,7 @@ const Assignment = ({ session }) => {
   // quick intro for the Assignment tool
   let introduction = (
     <>
-      <p className="py-2">This tool is for assigning new addresses.</p>
+      <p className="py-2">This tool is for assigning or requesting new addresses.</p>
     </>
   )
 
@@ -80,37 +80,44 @@ const Assignment = ({ session }) => {
       <SiteSidebar title="Assignment">
 
         <AppHeader app={apps['assignment']} introduction={introduction}>
-          <AssignmentMapOptions {...{options, setOptions, session}} />
-
-        </AppHeader>
-
-        <section className="sidebar-section">
-      
-          
-            <h2 className="w-full">House number certificate:</h2>
-            <input type='text' className="px-3 py-2 my-2 w-full" value={certNumber} onChange={(e) => setCertNumber(e.target.value)}></input>
-            <h2 className="w-full">Choose an assignment scenario:</h2>
-            <select className="px-4 py-3 my-2 w-full" onChange={(e) => setMode(modes.filter(m => m.name === e.target.value)[0])}>
+          <div className="flex items-center justify-start">
+            <h2 className="text-base w-1/3">Choose a scenario:</h2>
+            <select className="pr-4 pl-1 font-bold py-3 my-2 w-3/5" onChange={(e) => setMode(modes.filter(m => m.name === e.target.value)[0])}>
               {modes.map(m => (
                 <option value={m.name} key={m.name}>{m.name}</option>
               ))}
             </select>
-
-          <h2>{mode.name}</h2>
+          </div>
           <p>{mode.description}</p>
-        </section>
+        </AppHeader>
+
+
 
         {mode.name === 'New building address' && <NewBuildingAddress {...{ building, street, setStreet, setSelectableLayers, certNumber, session }} />}
         {mode.name === 'New utility pole' && <NewUtilityPole {...{ street, addresses, setAddresses, setSelectableLayers, session }} />}
+        <div className="flex bg-gray-200 items-center">
+          <div className="w-1/3">
+          <h2 className="bg-gray-200 p-2 text-base">House number certificate:</h2>
+          {/* <h3 className="text-gray-700 text-sm">(optional) link this address assignment to a DPW certificate number</h3> */}
+          {/* <h2 className="bg-gray-300 p-2 text-base">This is optional.</h2> */}
+          </div>
+          <input type='text' className="px-3 py-2 my-2 w-3/5" value={certNumber} onChange={(e) => setCertNumber(e.target.value)}></input>
+        </div>
+
       </SiteSidebar>
 
       <main>
-        <section className="bg-gray-300 py-2 px-3">
-          <AssignmentSearch setSearchValue={setSearchValue} />
+        <section className="bg-gray-100 flex justify-start px-2">
+          <AssignmentMapOptions {...{ options, setOptions, session }} />
+          <AssignmentSearch setSearchValue={setSearchValue} /> 
+
+
+        </section>
+        <section className="bg-gray-100 flex justify-start text-base">
+          {session && <AssignmentMapIndices center={center} session={session} />}
         </section>
         <AssignmentMap geocodeResult={data} {...{ mode, building, parcel, street, setBuilding, setParcel, setStreet, selectableLayers, addresses, setCenter, basemap: options.basemap }} />
         <section className="bg-gray-300 py-3 px-3">
-          {session && <AssignmentMapIndices center={center} session={session} />}
           {!session && <p>Log in for additional address location information.</p>}
         </section>
       </main>
