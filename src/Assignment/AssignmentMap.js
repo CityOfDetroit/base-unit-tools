@@ -114,8 +114,8 @@ const AssignmentMap = ({ mode, geocodeResult, setBuilding, setParcel, setStreet,
         source: "new-point",
         type: "circle",
         paint: {
-          "circle-color": "blue",
-          "circle-radius": 5,
+          "circle-color": "rgba(120,0,0,0.5)",
+          "circle-radius": 10,
           "circle-stroke-color": "#ddd",
           "circle-stroke-width": 2
         }
@@ -135,7 +135,7 @@ const AssignmentMap = ({ mode, geocodeResult, setBuilding, setParcel, setStreet,
   }, [geocodeResult])
 
   useEffect(() => {
-    if (theMap && mode.name == 'New utility pole' && lngLat !== {}) {
+    if (theMap && mode.name == 'New utility pole' && lngLat.lng !== null) {
       theMap.getSource("new-point").setData({
         type: "FeatureCollection",
         features: [{

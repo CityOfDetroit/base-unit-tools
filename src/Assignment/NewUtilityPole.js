@@ -14,7 +14,7 @@ import { addFeatures } from '@esri/arcgis-rest-feature-layer';
  * @param {object} data 
  * @param {UserSession} session 
  */
- const handleSubmit = (data, session) => {
+ const handleSubmit = (data, lngLat, session) => {
   let integromatBody = {
     "addresses": data,
     "list_of_addresses": data.map(ad => ad.full_address).join("\n"),
@@ -34,7 +34,7 @@ import { addFeatures } from '@esri/arcgis-rest-feature-layer';
 
   let esriFeatures = data.map(ad => {
     return {
-      geometry: null,
+      geometry: { x: lngLat.lng, y: lngLat.lat, spatialReference: {wkid: 4326}},
       attributes: ad
     }
   })
@@ -46,59 +46,14 @@ import { addFeatures } from '@esri/arcgis-rest-feature-layer';
   }).then(r => console.log(r))
 }
 
-const NewAddressToSubmit = ({ street, session }) => {
+const NewAddressToSubmit = ({ street, lngLat, session }) => {
   let [houseNumber, setHouseNumber] = useState('')
   let streetFeature = useFeature({ type: 'streets', id: street })
   let { street_prefix, street_name, street_type } = streetFeature.attributes
   let fullStreetName = [street_prefix, street_name, street_type].join(" ").trim()
 
-  let [addrsToAdd, setAddrsToAdd] = useState([])
   let [notes, setNotes] = useState('')
   let [certNumber, setCertNumber] = useState('')
-
-  let buttonText = null
-
-  // if (newUnits.length > 0) {
-  //   toSubmit = newUnits.map(nu => {
-  //     return {
-  //       street_number: houseNumber,
-  //       street_id: street,
-  //       building_id: building,
-  //       parcel_id: parcel,
-  //       unit_number: nu,
-  //       certificate_number: certNumber,
-  //       full_address: `${houseNumber} ${fullStreetName} ${unitType} ${nu}`.trim(),
-  //       notes: notes
-  //     }
-  //   })
-  //   buttonText = `${toSubmit.length} new unit`
-  // }
-  // if (unitType === 'Upper' || unitType === 'Lower') {
-  //   toSubmit = [{
-  //     street_number: houseNumber,
-  //     street_id: street,
-  //     building_id: building,
-  //     parcel_id: parcel,
-  //     certificate_number: certNumber,
-  //     full_address: `${houseNumber} ${fullStreetName} ${unitType}`.trim(),
-  //     notes: notes
-  //   }]
-  //   buttonText = `${toSubmit.length} new unit`
-  // }
-  // if (newUnits.length === 0 && houseNumber != modelAddress.attributes.street_number) {
-  //   toSubmit = [
-  //     {
-  //       street_number: houseNumber,
-  //       street_id: street,
-  //       building_id: building,
-  //       parcel_id: parcel,
-  //       certificate_number: certNumber,
-  //       full_address: `${houseNumber} ${fullStreetName}`.trim(),
-  //       notes: notes
-  //     }
-  //   ]
-  //   buttonText = `1 new primary`
-  // }
 
   let toSubmit = [{
       street_number: houseNumber,
@@ -148,11 +103,11 @@ const NewAddressToSubmit = ({ street, session }) => {
         <div className="flex items-center justify-around">
           <Button 
             className="mx-4 justify-around my-5 p-4" 
-            onClick={() => handleSubmit(toSubmit, session)}
+            onClick={() => handleSubmit(toSubmit, lngLat, session)}
             icon={faPlusCircle}
             disabled={houseNumber === ''}
           >
-              Submit {buttonText} address(es)
+              Submit address
           </Button>
         </div>
       </section>
@@ -167,7 +122,7 @@ const NewUtilityPole = ({ street, setStreet, session, addresses, setAddresses, l
           </section>}
           {street && <AssignmentStreet {...{street, addresses, setAddresses}} />}
           {street && <section className='sidebar-section'>
-            <h2 className="p-1 my-1">Adjust the location (<span class="dot" style={{height: 15, width: 15, background: `blue`, borderRadius: `50%`, display: `inline-block`}}></span>) of the new utility pole address by clicking the map.</h2>
+            <h2 className="p-1 my-1">Adjust the location <span class="dot" style={{height: 20, width: 20, border: `2px solid #ddd`, background: `rgba(120,0,0,0.5)`, borderRadius: `50%`, display: `inline-block`, marginBottom: -3, marginLeft: 5, marginRight: 5}}></span> of the new utility pole address by clicking the map.</h2>
           </section>}
           {lngLat && <NewAddressToSubmit {...{street, session}} />}
         </>
