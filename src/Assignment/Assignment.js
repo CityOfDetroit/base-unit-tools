@@ -22,9 +22,7 @@ const Assignment = ({ session }) => {
   const [parcel, setParcel] = useState('')
   const [street, setStreet] = useState('')
   const [addresses, setAddresses] = useState([])
-
-  // house number certificate
-  let [certNumber, setCertNumber] = useState('')
+  const [lngLat, setLngLat] = useState(null)
 
   // map attribs
   let [center, setCenter] = useState([])
@@ -41,7 +39,7 @@ const Assignment = ({ session }) => {
   let modes = [
     {
       name: "New building address",
-      description: "Use this to add a new primary address OR new unit addresses to an existing building.",
+      description: "Create a new primary address assigned to a building.",
       selectableLayers: [layers.buildings.interaction]
     },
     {
@@ -63,6 +61,7 @@ const Assignment = ({ session }) => {
     setParcel('')
     setStreet('')
     setAddresses([])
+    setLngLat(null)
     // set the selectable layers on the map
     setSelectableLayers(mode.selectableLayers)
   }, [mode])
@@ -82,28 +81,17 @@ const Assignment = ({ session }) => {
         <AppHeader app={apps['assignment']} introduction={introduction}>
           <div className="flex items-center justify-start">
             <h2 className="text-base w-1/3">Choose a scenario:</h2>
-            <select className="pr-4 pl-1 font-bold py-3 my-2 w-3/5" onChange={(e) => setMode(modes.filter(m => m.name === e.target.value)[0])}>
+            <select className="p-2 font-bold w-3/5" onChange={(e) => setMode(modes.filter(m => m.name === e.target.value)[0])}>
               {modes.map(m => (
                 <option value={m.name} key={m.name}>{m.name}</option>
               ))}
             </select>
           </div>
-          <p>{mode.description}</p>
+          <p className="py-2">{mode.description}</p>
         </AppHeader>
-
-
-
-        {mode.name === 'New building address' && <NewBuildingAddress {...{ building, street, setStreet, setSelectableLayers, certNumber, session }} />}
-        {mode.name === 'New utility pole' && <NewUtilityPole {...{ street, addresses, setAddresses, setSelectableLayers, session }} />}
-        <div className="flex bg-gray-200 items-center">
-          <div className="w-1/3">
-          <h2 className="bg-gray-200 p-2 text-base">House number certificate:</h2>
-          {/* <h3 className="text-gray-700 text-sm">(optional) link this address assignment to a DPW certificate number</h3> */}
-          {/* <h2 className="bg-gray-300 p-2 text-base">This is optional.</h2> */}
-          </div>
-          <input type='text' className="px-3 py-2 my-2 w-3/5" value={certNumber} onChange={(e) => setCertNumber(e.target.value)}></input>
-        </div>
-
+        
+        {mode.name === 'New building address' && <NewBuildingAddress {...{ building, street, setStreet, parcel, setParcel, setSelectableLayers, session }} />}
+        {mode.name === 'New utility pole' && <NewUtilityPole {...{ lngLat, street, addresses, setAddresses, setSelectableLayers, session }} />}
       </SiteSidebar>
 
       <main>
@@ -116,7 +104,7 @@ const Assignment = ({ session }) => {
         <section className="bg-gray-100 flex justify-start text-base">
           {session && <AssignmentMapIndices center={center} session={session} />}
         </section>
-        <AssignmentMap geocodeResult={data} {...{ mode, building, parcel, street, setBuilding, setParcel, setStreet, selectableLayers, addresses, setCenter, basemap: options.basemap }} />
+        <AssignmentMap geocodeResult={data} {...{ mode, building, parcel, street, setBuilding, setParcel, setStreet, selectableLayers, lngLat, setLngLat, addresses, setCenter, basemap: options.basemap }} />
         <section className="bg-gray-300 py-3 px-3">
           {!session && <p>Log in for additional address location information.</p>}
         </section>

@@ -76,7 +76,7 @@ const AssignmentStreet = ({ street, addresses, setAddresses }) => {
 
   return (
     <>
-      {feature && <AssignmentFeature {...{ attr: feature.properties, attributes, clicked: clicked }} />}
+      {feature && <AssignmentFeature startOpen {...{ attr: feature.properties, attributes, clicked: clicked }} />}
       {addresses.length > 0 && <AssignmentAddressesHere {...{ addresses, title: "primary" }} />}
     </>
   )
