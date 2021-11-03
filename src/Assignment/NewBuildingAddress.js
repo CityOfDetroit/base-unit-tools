@@ -6,13 +6,23 @@ import AssignmentBuilding from './AssignmentBuilding';
 import AssignmentParcel from './AssignmentParcel';
 import useFeature from '../hooks/useFeature';
 import { addFeatures } from '@esri/arcgis-rest-feature-layer';
+import { UserSession } from '@esri/arcgis-rest-auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import FormInput from '../components/FormInput';
+import FormField from '../components/FormField';
+import FormRow from '../components/FormRow';
+import SectionSubhead from '../components/SectionSubhead';
 
-const handleSubmit = (data, session, certNumber) => {
+/**
+ * On form submission, send data to Slack, via Integromat, and add new features to ArcGIS Online.
+ * @param {object} data 
+ * @param {UserSession} session 
+ */
+const handleSubmit = (data, session) => {
   let integromatBody = {
     "addresses": data,
     "list_of_addresses": data.map(ad => ad.full_address).join("\n"),
-    "certificate_number": certNumber,
+    "certificate_number": data.certificate_number,
     "creator": session.username,
   }
 
@@ -40,7 +50,7 @@ const handleSubmit = (data, session, certNumber) => {
   }).then(r => console.log(r))
 }
 
-const NewAddressToSubmit = ({ modelAddress, building, street, session, certNumber }) => {
+const NewAddressToSubmit = ({ modelAddress, building, street, parcel, session }) => {
   let [houseNumber, setHouseNumber] = useState(modelAddress.attributes.street_number)
   let streetFeature = useFeature({ type: 'streets', id: street })
   let { street_prefix, street_name, street_type } = streetFeature.attributes
@@ -58,6 +68,7 @@ const NewAddressToSubmit = ({ modelAddress, building, street, session, certNumbe
 
   let [addrsToAdd, setAddrsToAdd] = useState([])
   let [notes, setNotes] = useState('')
+  let [certNumber, setCertNumber] = useState('')
 
   let toSubmit = []
   let buttonText = null
@@ -67,7 +78,7 @@ const NewAddressToSubmit = ({ modelAddress, building, street, session, certNumbe
         street_number: houseNumber,
         street_id: street,
         building_id: building,
-        parcel_id: modelAddress.attributes.parcel_id,
+        parcel_id: parcel,
         unit_type: unitType,
         unit_number: nu,
         certificate_number: certNumber,
@@ -82,7 +93,7 @@ const NewAddressToSubmit = ({ modelAddress, building, street, session, certNumbe
       street_number: houseNumber,
       street_id: street,
       building_id: building,
-      parcel_id: modelAddress.attributes.parcel_id,
+      parcel_id: parcel,
       unit_type: unitType,
       unit_number: null,
       certificate_number: certNumber,
@@ -97,7 +108,7 @@ const NewAddressToSubmit = ({ modelAddress, building, street, session, certNumbe
         street_number: houseNumber,
         street_id: street,
         building_id: building,
-        parcel_id: modelAddress.attributes.parcel_id,
+        parcel_id: parcel,
         unit_type: null,
         unit_number: null,
         certificate_number: certNumber,
@@ -117,79 +128,70 @@ const NewAddressToSubmit = ({ modelAddress, building, street, session, certNumbe
   return (
     <>
       <h2 className="bg-gray-300 p-2 mt-2 text-base">Creating new addresses:</h2>
-      <section className='sidebar-section border-b-2'>
-        <div className="flex justify-start items-center my-2">
-          <FontAwesomeIcon icon={faLink} className="mr-3 text-xl" />
-          <div>
-            <h3 className="text-base font-semibold text-gray-700">Links to other base units</h3>
-            <h3 className="text-sm font-normal text-gray-700">Adjust these by clicking the map</h3>
-          </div>
-        </div>
-        <div className="flex justify-start mb-4 px-1">
-          <div className="flex flex-col w-1/3 pr-3">
-            <span className="text-sm font-semibold py-1">Building ID</span>
-            <input type="text" className="p-2 text-sm font-mono" value={building} readOnly={true} disabled={true} />
-          </div>
-          <div className="flex flex-col w-1/3 pr-3">
-            <span className="text-sm font-semibold py-1">Street ID</span>
-            <input type="text" className="p-2 text-sm font-mono" value={street} readOnly={true} disabled={true} />
-          </div>
-          <div className="flex flex-col w-1/3 pr-3">
-            <span className="text-sm font-semibold py-1">Parcel ID</span>
-            <input type="text" className="p-2 text-sm font-mono" value={modelAddress.attributes.parcel_id} readOnly={true} disabled={true} />
-          </div>
-        </div>
 
+      <section className="sidebar-section border-b-2">
 
-        <div className="flex justify-start items-center my-2">
-          <FontAwesomeIcon icon={faAddressCard} className="mr-3 text-xl" />
-          <div>
-            <h3 className="text-base font-semibold text-gray-700">Addresses to create here</h3>
-          </div>
-        </div>
+        <FormField title="DPW House Number Certificate" width="3/5">
+          <input type='text' className="px-3 py-2" value={certNumber} onChange={(e) => setCertNumber(e.target.value)}></input>
+        </FormField>
 
-        <div className="flex justify-start mb-3 px-1">
-          <div className="flex flex-col w-1/3 pr-3">
-            <span className="text-sm font-semibold py-1">House number</span>
-            <input type="text" className="p-2 text-sm" value={houseNumber} onChange={e => setHouseNumber(e.target.value)} />
-          </div>
-          <div className="flex flex-col w-2/3 pr-3">
-            <span className="text-sm font-semibold py-1">Street name</span>
-            <input type="text" className="p-2 text-sm" value={fullStreetName} disabled={true} />
-          </div>
-        </div>
+        <SectionSubhead 
+          title="Links to other base units"
+          subtitle="Adjust these by clicking the map"
+          icon={faLink} 
+        />
 
+        <FormRow>
+          <FormInput title="Building ID" value={building} readOnly disabled />
+          <FormInput title="Street ID" value={street} readOnly disabled />
+          <FormInput title="Parcel ID" value={parcel} readOnly disabled />
+        </FormRow>
 
-        <div className="flex items-baseline justify-between">
-          <div className="flex flex-col w-1/3 pr-3">
-            <span className="text-sm font-semibold py-1">Unit type</span>
+        <SectionSubhead 
+          title="Addresses to create here"
+          icon={faAddressCard} 
+        />
+
+        <FormRow>
+          <FormInput title="House number" value={houseNumber} onChange={e => setHouseNumber(e.target.value)} />
+          <FormInput title="Street name" value={fullStreetName} disabled width="2/3" />
+        </FormRow>
+
+        <FormRow>
+
+          <FormField title="Unit type" width="1/3">
             <select type="text" className="p-2 text-sm" value={unitType} onChange={(e) => setUnitType(e.target.value)}>
               {unitTypes.map(ut => <option value={ut} key={ut}>{ut}</option>)}
             </select>
-          </div>
-          <div className="flex flex-col w-2/3 pr-3">
-            <span className="text-sm font-semibold py-1">Unit number: enter one per line</span>
-            <span className="text-xs font-semibold pb-1">Enter one unit number per line</span>
+          </FormField>
+          <FormField title="Unit number: enter one per line" width="2/3">
             <textarea className="py-2 px-3 text-xs" value={unitNums} rows={6} type="text" onChange={(e) => setUnitNums(e.target.value)} />
-          </div>
-        </div>
+          </FormField>
+        </FormRow>
 
-        <div className="flex items-baseline justify-between">
-        <div className="flex flex-col w-full pr-3">
-          <span className="text-sm font-semibold py-1">Additional notes</span>
-          <textarea className="px-3 py-2 text-sm" value={notes} rows={2} type="text" onChange={(e) => setNotes(e.target.value)} />
-          </div>
-        </div>
+        <FormRow>
+          <FormField title="Additional notes:" width="full">
+            <textarea className="px-3 py-2 text-sm" value={notes} rows={2} type="text" onChange={(e) => setNotes(e.target.value)} />
+          </FormField>
+        </FormRow>
+
         <div className="flex items-center justify-around">
-
-        {toSubmit.length > 0 && <Button className="w-2/3 mx-4 justify-around my-5 p-4" onClick={() => handleSubmit(toSubmit, session, certNumber)}>Submit {buttonText} address(es)</Button>}
+          {toSubmit.length > 0 && 
+            <Button 
+              className="w-2/3 mx-4 justify-around my-5 p-4"
+              icon={faPlusCircle}
+              onClick={() => handleSubmit(toSubmit, session)}
+            >
+              Submit {buttonText} address(es)
+            </Button>
+          }
         </div>
       </section>
     </>
   )
 }
 
-const NewBuildingAddress = ({ building, setBuilding, street, setStreet, setSelectableLayers, session, certNumber }) => {
+const NewBuildingAddress = ({ building, setBuilding, street, setStreet, parcel, setParcel, setSelectableLayers, session }) => {
 
   let [modelAddress, setModelAddress] = useState(null)
 
@@ -197,7 +199,7 @@ const NewBuildingAddress = ({ building, setBuilding, street, setStreet, setSelec
 
   useEffect(() => {
     if (building != '') {
-      setSelectableLayers([layers.buildings.interaction, layers.streets.interaction])
+      setSelectableLayers([layers.buildings.interaction, layers.streets.interaction, layers.parcels.interaction])
     }
     if (building == '') {
       setSelectableLayers([layers.buildings.interaction])
@@ -216,7 +218,7 @@ const NewBuildingAddress = ({ building, setBuilding, street, setStreet, setSelec
 
           {modelAddress && modelAddress.attributes.parcel_id && <AssignmentParcel parcel={modelAddress.attributes.parcel_id} />}
 
-          {modelAddress && <NewAddressToSubmit {...{ modelAddress, building, street, session, certNumber }} />}
+          {modelAddress && <NewAddressToSubmit {...{ modelAddress, building, street, parcel, session }} />}
         </>
       }
 

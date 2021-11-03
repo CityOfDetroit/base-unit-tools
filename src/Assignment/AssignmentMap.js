@@ -1,9 +1,10 @@
-import mapboxgl from 'mapbox-gl';
+import mapboxgl, { LngLat, NavigationControl } from 'mapbox-gl';
 import { useEffect, useState } from 'react';
 import layers from '../data/layers.js'
+import 'mapbox-gl/dist/mapbox-gl.css';
 import { baseStyle, satelliteStyle, linenStyle } from '../styles/mapstyle'
 
-const AssignmentMap = ({ mode, geocodeResult, setBuilding, setParcel, setStreet, selectableLayers, building, parcel, street, addresses, setCenter, basemap }) => {
+const AssignmentMap = ({ mode, geocodeResult, setBuilding, setParcel, setStreet, lngLat, setLngLat, selectableLayers, building, parcel, street, addresses, setCenter, basemap }) => {
 
   let feature;
   if (geocodeResult) {
@@ -28,16 +29,15 @@ const AssignmentMap = ({ mode, geocodeResult, setBuilding, setParcel, setStreet,
       zoom: 17
     });
 
+    map.addControl(new NavigationControl());
+
     map.on('load', () => {
 
       setTheMap(map)
 
       setCenter(map.getCenter())
 
-      map.addSource("result", {
-        type: "geojson",
-        data: geocodeResult
-      })
+      map.getSource("result").setData(geocodeResult)
 
       map.addLayer({
         id: "result-point",
@@ -45,6 +45,18 @@ const AssignmentMap = ({ mode, geocodeResult, setBuilding, setParcel, setStreet,
         type: "circle",
         paint: {
           "circle-color": "green"
+        }
+      })
+
+      map.addLayer({
+        id: "new-address-point",
+        source: "new-point",
+        type: "circle",
+        paint: {
+          "circle-color": "blue",
+          "circle-radius": 5,
+          "circle-stroke-color": "#ddd",
+          "circle-stroke-width": 2
         }
       })
 
@@ -56,6 +68,8 @@ const AssignmentMap = ({ mode, geocodeResult, setBuilding, setParcel, setStreet,
     })
 
     map.on('click', e => {
+      setLngLat(e.lngLat)
+      console.log(e.lngLat)
       let features = map.queryRenderedFeatures(e.point, {
         layers: [layers.buildings.interaction, layers.streets.interaction, layers.parcels.interaction, layers.addresses.interaction],
       });
@@ -80,6 +94,33 @@ const AssignmentMap = ({ mode, geocodeResult, setBuilding, setParcel, setStreet,
     map.on('moveend', e => {
       setCenter(map.getCenter())
     })
+
+    map.on('styledata', e => {
+      console.log(map.isStyleLoaded())
+      console.log(e)
+      map.setLayoutProperty("address-point", "visibility", "visible")
+      map.setLayoutProperty("address-point-label", "visibility", "visible")
+      map.addLayer({
+        id: "result-point",
+        source: "result",
+        type: "circle",
+        paint: {
+          "circle-color": "green"
+        }
+      })
+
+      map.addLayer({
+        id: "new-address-point",
+        source: "new-point",
+        type: "circle",
+        paint: {
+          "circle-color": "blue",
+          "circle-radius": 5,
+          "circle-stroke-color": "#ddd",
+          "circle-stroke-width": 2
+        }
+      })
+    })
   }, [])
 
   useEffect(() => {
@@ -89,12 +130,26 @@ const AssignmentMap = ({ mode, geocodeResult, setBuilding, setParcel, setStreet,
         center: feature.geometry.coordinates,
         zoom: 17
       })
-
-
       theMap.getSource("result").setData(geocodeResult)
-
     }
   }, [geocodeResult])
+
+  useEffect(() => {
+    if (theMap && mode.name == 'New utility pole' && lngLat !== {}) {
+      theMap.getSource("new-point").setData({
+        type: "FeatureCollection",
+        features: [{
+          type: "Feature",
+          properties: {},
+          geometry: {
+            type: "Point",
+            coordinates: [lngLat.lng, lngLat.lat]
+          }
+        }
+        ]
+      })
+    }
+  }, [lngLat])
 
   useEffect(() => {
     if (theMap) {
@@ -116,7 +171,7 @@ const AssignmentMap = ({ mode, geocodeResult, setBuilding, setParcel, setStreet,
         }
       })
     }
-  }, [building, parcel, street, mode, selectableLayers])
+  }, [building, parcel, street, mode, selectableLayers, basemap ])
 
   useEffect(() => {
     if (theMap) {
