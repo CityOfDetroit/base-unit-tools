@@ -1,4 +1,4 @@
-import { faAddressBook, faAddressCard, faLink, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { faAddressBook, faAddressCard, faCheckSquare, faLink, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from 'react';
 import Button from '../components/Button';
 import layers from '../data/layers';
@@ -18,7 +18,7 @@ import SectionSubhead from '../components/SectionSubhead';
  * @param {object} data 
  * @param {UserSession} session 
  */
-const handleSubmit = (data, session) => {
+const handleSubmit = (data, session, setSubmitted, geometry) => {
   let integromatBody = {
     "addresses": data,
     "list_of_addresses": data.map(ad => ad.full_address).join("\n"),
@@ -38,7 +38,7 @@ const handleSubmit = (data, session) => {
 
   let esriFeatures = data.map(ad => {
     return {
-      geometry: null,
+      geometry: geometry,
       attributes: ad
     }
   })
@@ -47,12 +47,13 @@ const handleSubmit = (data, session) => {
     url: `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/address_assignments/FeatureServer/0`,
     features: esriFeatures,
     authentication: session
-  }).then(r => console.log(r))
+  }).then(r => setSubmitted(r))
 }
 
 const NewAddressToSubmit = ({ modelAddress, building, street, parcel, session }) => {
   let [houseNumber, setHouseNumber] = useState(modelAddress.attributes.street_number)
   let streetFeature = useFeature({ type: 'streets', id: street })
+  let buildingFeature = useFeature({ type: 'buildings', id: building })
   let { street_prefix, street_name, street_type } = streetFeature.attributes
   let fullStreetName = [street_prefix, street_name, street_type].join(" ").trim()
 
@@ -69,6 +70,8 @@ const NewAddressToSubmit = ({ modelAddress, building, street, parcel, session })
   let [addrsToAdd, setAddrsToAdd] = useState([])
   let [notes, setNotes] = useState('')
   let [certNumber, setCertNumber] = useState('')
+
+  let [submitted, setSubmitted] = useState(false)
 
   let toSubmit = []
   let buttonText = null
@@ -176,13 +179,22 @@ const NewAddressToSubmit = ({ modelAddress, building, street, parcel, session })
         </FormRow>
 
         <div className="flex items-center justify-around">
-          {toSubmit.length > 0 && 
+          {toSubmit.length > 0 && !submitted &&
             <Button 
               className="w-2/3 mx-4 justify-around my-5 p-4"
               icon={faPlusCircle}
-              onClick={() => handleSubmit(toSubmit, session)}
+              onClick={() => handleSubmit(toSubmit, session, setSubmitted, buildingFeature.geometry)}
             >
               Submit {buttonText} address(es)
+            </Button>
+          }
+          {
+            submitted &&
+            <Button
+              onClick={() => { setSubmitted(false); setHouseNumber(''); setUnitType(unitTypes[0]); setUnitNums(''); setNotes('')}}
+              icon={faCheckSquare}
+            >
+              Success! Click to reset form.
             </Button>
           }
         </div>
@@ -191,7 +203,7 @@ const NewAddressToSubmit = ({ modelAddress, building, street, parcel, session })
   )
 }
 
-const NewBuildingAddress = ({ building, setBuilding, street, setStreet, parcel, setParcel, setSelectableLayers, session }) => {
+const NewBuildingAddress = ({ building, setBuilding, street, setStreet, parcel, setParcel, setSelectableLayers, session, setSubmitted }) => {
 
   let [modelAddress, setModelAddress] = useState(null)
 

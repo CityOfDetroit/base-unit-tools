@@ -16736,6 +16736,25 @@ export const baseStyle = {
         "paint": {
           "icon-opacity": 0.65
         }
+      },
+      {
+        "id": "new-address-point",
+        "source": "new-point",
+        "type": "circle",
+        "paint": {
+          "circle-color": "rgba(120,0,0,0.5)",
+          "circle-radius": 10,
+          "circle-stroke-color": "#ddd",
+          "circle-stroke-width": 2
+        }
+      },
+      {
+        "id": "result-point",
+        "source": "result",
+        "type": "circle",
+        "paint": {
+          "circle-color": "green"
+        }
       }
     ],
     "metadata": {

@@ -91,7 +91,7 @@ const Assignment = ({ session }) => {
         </AppHeader>
         
         {mode.name === 'New building address' && <NewBuildingAddress {...{ building, street, setStreet, parcel, setParcel, setSelectableLayers, session }} />}
-        {mode.name === 'New utility pole' && <NewUtilityPole {...{ lngLat, street, addresses, setAddresses, setSelectableLayers, session }} />}
+        {mode.name === 'New utility pole' && <NewUtilityPole {...{ lngLat, setLngLat, street, addresses, setAddresses, setSelectableLayers, session }} />}
       </SiteSidebar>
 
       <main>
