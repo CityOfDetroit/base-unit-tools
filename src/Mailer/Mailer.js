@@ -1,6 +1,6 @@
 import { getLayer, queryFeatures } from '@esri/arcgis-rest-feature-layer';
 import { geojsonToArcGIS } from '@esri/arcgis-to-geojson-utils';
-import { faDownload, faDrawPolygon, faSlash, faLock, faMailBulk, faMapMarkerAlt, faMarker, faTrash, faGlobe } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faDrawPolygon, faSlash, faLock, faMailBulk, faMapMarkerAlt, faMarker, faTrash, faGlobe, faLanguage } from '@fortawesome/free-solid-svg-icons';
 import { faLine, faUsps } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
@@ -336,9 +336,15 @@ const Mailer = ({ session }) => {
                   <CSVLink data={formattedData} filename={`mailing_list_${new Date().getTime()}.csv`} className="mr-2">
                     <Button
                       icon={faDownload}
-                      text={`Download .csv`}
+                      text={`Download .csv with ${filtered.length.toLocaleString()} rows`}
                       small />
                   </CSVLink>
+                  <a href="https://detroitmi.maps.arcgis.com/sharing/rest/content/items/da107e7b0d0e48c3b210db20fa3c30e7/data">
+                  <Button
+                      icon={faLanguage}
+                      text={`Output data dictionary`}
+                      small />
+                  </a>
                 </div>
 
 
