@@ -249,19 +249,27 @@ const Mailer = ({ session }) => {
 
 
         <AppHeader app={apps.mailer} introduction={introduction}>
-          <h3 className="mb-2 text-base">Select by address point/underlying parcel</h3>
+          <h3 className="mb-2 text-base">Data selection method</h3>
           <div className="flex items-center">
             <ToggleButton
-              title={`Address point within selection area`}
+              title={`Intersecting address points`}
               active={layer === 'centroid'}
               onClick={() => setLayer('centroid') && setResultIds(null) && setAddresses([]) && setFiltered([])}
             />
             <ToggleButton
-              title={`Address linked parcel within selection area`}
+              title={`Intersecting parcels`}
               active={layer === 'parcel'}
               onClick={() => setLayer('parcel') && setResultIds(null) && setAddresses([]) && setFiltered([])}
             />
           </div>
+          <p className="text-sm leading-5 my-2">
+            The default data selection method for this tool is to pull <b>intersecting address points</b> inside the mailing area.
+            This method is fastest and best to use with mailings to pre-defined areas.
+          </p>
+          <p className="text-sm leading-5 my-2">
+            Alternately, you can choose to pull address points which belong to the <b>intersecting parcels</b> inside the mailing area.
+            Use this if your mailing area is for "parcels within X feet" of some location.
+          </p>
         </AppHeader>
 
         {/* Boundary picker */}
