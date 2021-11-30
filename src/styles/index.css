@@ -7,7 +7,7 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -23,7 +23,6 @@ h1 {
   @apply text-xl;
   font-family  : "Montserrat", sans-serif;
   font-weight  : 900;
-  border-bottom: 5px solid rgb(254, 183, 13);
 }
 
 h2 {
@@ -40,6 +39,7 @@ h4 {
   border-bottom: 5px solid #feb70d;
 }
 
+/* Desktop */
 @media only screen and (min-width: 769px) {
   #root {
     display: grid;
@@ -47,13 +47,14 @@ h4 {
       "h a"
       "s m"
       "f f";
-    grid-template-rows: 3.5rem auto 40px;
+    grid-template-rows: auto auto 40px;
     grid-template-columns: 4fr 6fr;
     height: 100vh;
     grid-gap: 0.75rem;
   }
 }
 
+/* Mobile */
 @media only screen and (max-width: 768px) {
   #root {
     display: grid;
@@ -239,7 +240,7 @@ a {
   @apply font-bold;
   @apply text-lg;
   border-bottom: none;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
 }
