@@ -50,7 +50,7 @@ const handleSubmit = (data, session) => {
   }).then(r => console.log(r))
 }
 
-const NewAddressToSubmit = ({ modelAddress, building, street, parcel, session }) => {
+const NewAddressToSubmit = ({ modelAddress, building, street, parcel, setParcel, session }) => {
   let [houseNumber, setHouseNumber] = useState(modelAddress.attributes.street_number)
   let streetFeature = useFeature({ type: 'streets', id: street })
   let { street_prefix, street_name, street_type } = streetFeature.attributes
@@ -121,6 +121,7 @@ const NewAddressToSubmit = ({ modelAddress, building, street, parcel, session })
 
   useEffect(() => {
     setHouseNumber(modelAddress.attributes.street_number)
+    setParcel(modelAddress.attributes.parcel_id)
     setUnitType('')
     setUnitNums('')
   }, [modelAddress])
@@ -144,7 +145,7 @@ const NewAddressToSubmit = ({ modelAddress, building, street, parcel, session })
         <FormRow>
           <FormInput title="Building ID" value={building} readOnly disabled />
           <FormInput title="Street ID" value={street} readOnly disabled />
-          <FormInput title="Parcel ID" value={parcel} readOnly disabled />
+          <FormInput title="Parcel ID" value={parcel || modelAddress.attributes.parcel_id} readOnly disabled />
         </FormRow>
 
         <SectionSubhead 
@@ -218,7 +219,7 @@ const NewBuildingAddress = ({ building, setBuilding, street, setStreet, parcel, 
 
           {modelAddress && modelAddress.attributes.parcel_id && <AssignmentParcel parcel={modelAddress.attributes.parcel_id} />}
 
-          {modelAddress && <NewAddressToSubmit {...{ modelAddress, building, street, parcel, session }} />}
+          {modelAddress && <NewAddressToSubmit {...{ modelAddress, building, street, parcel, setParcel, session }} />}
         </>
       }
 

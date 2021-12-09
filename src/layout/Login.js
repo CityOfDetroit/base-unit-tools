@@ -31,7 +31,7 @@ export const Login = ({ session, setSession, setLogin }) => {
         <>
           <p className="text-sm py-2">
             Your username will generally end with{" "}
-            <span className="font-bold">_detroitmi</span>.
+            <span className="font-bold">_detroitmi</span>. Your username is case-sensitive.
           </p>
           <p className="py-2">
             <a href="https://detroitmi.maps.arcgis.com/sharing/rest/oauth2/authorize?client_id=arcgisonline&display=default&response_type=token&state=%7B%22portalUrl%22%3A%22https%3A%2F%2Fdetroitmi.maps.arcgis.com%22%2C%22useLandingPage%22%3Atrue%7D&expiration=20160&locale=en-us&redirect_uri=https%3A%2F%2Fdetroitmi.maps.arcgis.com%2Fhome%2Faccountswitcher-callback.html&force_login=true&hideCancel=true&showSignupOption=true&canHandleCrossOrgSignIn=true&signuptype=esri&redirectToUserOrgUrl=true">
