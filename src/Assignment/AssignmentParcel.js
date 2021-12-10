@@ -8,7 +8,7 @@ import layers from '../data/layers';
 
 import { queryFeatures } from '@esri/arcgis-rest-feature-layer'
 
-const AssignmentParcel = ({ parcel, setAddresses, setModelAddress, setStreet }) => {
+const AssignmentParcel = ({ parcel, setAddresses, setModelAddress, setStreet, setBuilding }) => {
 
   let attributes = {}
 
@@ -58,6 +58,12 @@ const AssignmentParcel = ({ parcel, setAddresses, setModelAddress, setStreet }) 
               setAddresses(d.features.map(f => f.attributes))
               setModelAddress(d.features[0])
               setStreet(d.features[0].attributes.street_id)
+              if(setBuilding && d.features[0].attributes.bldg_id === null) {
+                setBuilding('')
+              }
+              else {
+                setBuilding && setBuilding(d.features[0].attributes.bldg_id)
+              }
             }
             else {
               setAddresses([])

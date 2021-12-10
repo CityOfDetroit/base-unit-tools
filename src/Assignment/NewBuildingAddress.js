@@ -159,7 +159,6 @@ const NewAddressToSubmit = ({ modelAddress, building, street, parcel, setParcel,
         </FormRow>
 
         <FormRow>
-
           <FormField title="Unit type" width="1/3">
             <select type="text" className="p-2 text-sm" value={unitType} onChange={(e) => setUnitType(e.target.value)}>
               {unitTypes.map(ut => <option value={ut} key={ut}>{ut}</option>)}

@@ -10,10 +10,12 @@ import AssignmentMapIndices from './AssignmentMapIndices';
 import NewBuildingAddress from './NewBuildingAddress';
 import NewUtilityPole from './NewUtilityPole';
 import AssignmentMapOptions from './AssignmentMapOptions';
-import { faBolt, faCut, faPlusCircle, faWindowClose } from '@fortawesome/free-solid-svg-icons';
+import { faBolt, faCut, faHotel, faPlusCircle, faRandom, faWindowClose } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Button from '../components/Button';
 import NewParcelRevisionAddress from './NewParcelRevisionAddress';
+import NewCondoAddress from './NewCondoAddress';
+import NewStreetExistingAddress from './NewStreetExistingAddress';
 
 const Assignment = ({ session }) => {
 
@@ -56,10 +58,24 @@ const Assignment = ({ session }) => {
       basemap: 'satellite'
     },
     {
+      name: "New condo address",
+      description: "Assign an address for a condominium.",
+      selectableLayers: [layers.parcels.interaction],
+      icon: faHotel,
+      basemap: 'default'
+    },
+    {
       name: "New address for pending parcel revision",
       description: "Assign an address for a new parcel split",
       selectableLayers: [layers.parcels.interaction],
       icon: faCut,
+      basemap: 'default'
+    },
+    {
+      name: "New street for existing address",
+      description: "Change a current address to a new street segment",
+      selectableLayers: [layers.addresses.interaction],
+      icon: faRandom,
       basemap: 'default'
     }
   ]
@@ -93,18 +109,30 @@ const Assignment = ({ session }) => {
   return (
     <>
       <SiteSidebar title="Assignment">
-        {mode && <Button icon={faWindowClose} onClick={() => setMode(null)}>Clear form, and return to scenario selection</Button>}
-
-        {!mode && <AppHeader app={apps['assignment']} introduction={introduction} open />}
+        {mode &&
+          <div className="bg-gray-300 p-2 flex items-center justify-between">
+            <div className="flex">
+              <div className="flex items-center justify-around w-12">
+                <FontAwesomeIcon icon={mode.icon} className="text-2xl mr-2" />
+              </div>
+              <div>
+                <h3>{mode.name}</h3>
+                <p>{mode.description}</p>
+              </div>
+            </div>
+            <Button icon={faWindowClose} onClick={() => setMode(null)}>Back</Button>
+          </div>
+        }
+        {!mode && <AppHeader app={apps['assignment']} introduction={introduction} startsOpen />}
 
         {!mode && modes.map(m => (
-          <div className="bg-gray-300 my-4 p-2 flex items-center" onClick={() => setMode(m)}>
+          <div className="bg-gray-300 my-4 p-2 flex items-center hover:bg-gray-200" onClick={() => setMode(m)}>
             <div className="flex items-center justify-around w-12">
               <FontAwesomeIcon icon={m.icon} className="text-2xl mr-2" />
             </div>
             <div>
-            <h3>{m.name}</h3>
-            <p>{m.description}</p>
+              <h3>{m.name}</h3>
+              <p>{m.description}</p>
             </div>
           </div>
         ))}
@@ -112,6 +140,8 @@ const Assignment = ({ session }) => {
         {mode && mode.name === 'New building address' && <NewBuildingAddress {...{ building, street, setStreet, parcel, setParcel, setSelectableLayers, session }} />}
         {mode && mode.name === 'New utility address' && <NewUtilityPole {...{ lngLat, street, addresses, setAddresses, setSelectableLayers, session }} />}
         {mode && mode.name === 'New address for pending parcel revision' && <NewParcelRevisionAddress {...{ lngLat, street, setStreet, parcel, setParcel, addresses, setAddresses, setSelectableLayers, session }} />}
+        {mode && mode.name === 'New condo address' && <NewCondoAddress {...{ building, setBuilding, lngLat, street, setStreet, parcel, setParcel, addresses, setAddresses, setSelectableLayers, session }} />}
+        {mode && mode.name === 'New street for existing address' && <NewStreetExistingAddress {...{ building, setBuilding, lngLat, street, setStreet, parcel, setParcel, addresses, setAddresses, setSelectableLayers, session }} />}
       </SiteSidebar>
 
       <main>
