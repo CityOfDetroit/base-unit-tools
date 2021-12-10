@@ -150,8 +150,6 @@ const NewCondoAddress = ({ street, setStreet, parcel, building, setBuilding, set
     }
   }, [parcel])
 
-  console.log(parcel)
-  console.log(addresses)
   return (
     <>
       {!parcel && <section className='sidebar-section'>

@@ -49,7 +49,6 @@ const AssignmentParcel = ({ parcel, setAddresses, setModelAddress, setStreet, se
       let queryString = Object.keys(params).map((key) => {
         return encodeURIComponent(key) + '=' + encodeURIComponent(params[key])
       }).join('&');
-      console.log(url + queryString)
       fetch(url + queryString)
         .then(r => r.json())
         .then(d => {

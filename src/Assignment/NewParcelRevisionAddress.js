@@ -129,8 +129,6 @@ const NewParcelRevisionAddress = ({ street, setStreet, parcel, setParcel, sessio
     }
   }, [parcel])
 
-  console.log(parcel)
-  console.log(addresses)
   return (
     <>
       {!parcel && <section className='sidebar-section'>

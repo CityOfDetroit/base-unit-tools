@@ -75,15 +75,12 @@ const NewAddressToSubmit = ({ parcel, modelAddress, setParcel, building, street,
   }]
 
   useEffect(() => {
-    console.log(modelAddress)
-    console.log(street)
     setHouseNumber(modelAddress.attributes.street_number)
     setUnitNum(modelAddress.attributes.unit_number)
     setUnitType(modelAddress.attributes.unit_type)
   }, [modelAddress])
 
   let a = modelAddress.attributes
-  console.log(a)
 
   return (
     <>
