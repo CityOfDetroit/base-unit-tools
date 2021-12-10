@@ -167,8 +167,8 @@ const NewStreetExistingAddress = ({ street, setStreet, parcel, building, setBuil
       {parcel && <AssignmentParcel {...{ parcel, setAddresses, setModelAddress, setStreet, setBuilding }} />}
 
       {addresses.length > 1 && 
-        <section className='sidebar-section'>
-        <h2>More than one address assigned to this parcel, please choose one to reassign:</h2>
+        <section className='mt-2 p-2 bg-yellow-100'>
+        <h2>This parcel has more than one address; please choose one for reassignment:</h2>
         <select className="p-2 m-2" onChange={(e) => setModelAddress({attributes: addresses[e.target.value]})}>
           {addresses.map((a, i) => (
             <option value={i}>{[a.street_number, a.street_prefix, a.street_name, a.street_type, a.unit_type, a.unit_number].join(' ')} [ #{a.addr_id} ]</option>
