@@ -10,9 +10,10 @@ import AssignmentMapIndices from './AssignmentMapIndices';
 import NewBuildingAddress from './NewBuildingAddress';
 import NewUtilityPole from './NewUtilityPole';
 import AssignmentMapOptions from './AssignmentMapOptions';
-import { faBolt, faPlusCircle, faWindowClose } from '@fortawesome/free-solid-svg-icons';
+import { faBolt, faCut, faPlusCircle, faWindowClose } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Button from '../components/Button';
+import NewParcelRevisionAddress from './NewParcelRevisionAddress';
 
 const Assignment = ({ session }) => {
 
@@ -53,6 +54,13 @@ const Assignment = ({ session }) => {
       selectableLayers: [layers.streets.interaction],
       icon: faBolt,
       basemap: 'satellite'
+    },
+    {
+      name: "New address for pending parcel revision",
+      description: "Assign an address for a new parcel split",
+      selectableLayers: [layers.parcels.interaction],
+      icon: faCut,
+      basemap: 'default'
     }
   ]
 
@@ -103,6 +111,7 @@ const Assignment = ({ session }) => {
 
         {mode && mode.name === 'New building address' && <NewBuildingAddress {...{ building, street, setStreet, parcel, setParcel, setSelectableLayers, session }} />}
         {mode && mode.name === 'New utility address' && <NewUtilityPole {...{ lngLat, street, addresses, setAddresses, setSelectableLayers, session }} />}
+        {mode && mode.name === 'New address for pending parcel revision' && <NewParcelRevisionAddress {...{ lngLat, street, setStreet, parcel, setParcel, addresses, setAddresses, setSelectableLayers, session }} />}
       </SiteSidebar>
 
       <main>
