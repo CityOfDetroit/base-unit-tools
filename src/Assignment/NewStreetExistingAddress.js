@@ -82,9 +82,12 @@ const NewAddressToSubmit = ({ parcel, modelAddress, setParcel, building, street,
     setUnitType(modelAddress.attributes.unit_type)
   }, [modelAddress])
 
+  let a = modelAddress.attributes
+  console.log(a)
+
   return (
     <>
-      <h2 className="bg-gray-300 p-2 mt-2 text-base">Creating new condominium address:</h2>
+      <h2 className="bg-gray-300 p-2 mt-2 text-base">Reassigning {[a.street_number, a.street_prefix, a.street_name, a.street_type, a.unit_type, a.unit_number].join(' ')}</h2>
       <section className="sidebar-section border-b-2">
         <FormField title="DPW House Number Certificate" width="3/5">
           <input type='text' className="px-3 py-2" value={certNumber} onChange={(e) => setCertNumber(e.target.value)}></input>
@@ -171,7 +174,7 @@ const NewStreetExistingAddress = ({ street, setStreet, parcel, building, setBuil
         <h2>More than one address assigned to this parcel, please choose one to reassign:</h2>
         <select className="p-2 m-2" onChange={(e) => setModelAddress({attributes: addresses[e.target.value]})}>
           {addresses.map((a, i) => (
-            <option value={i}>{[a.street_number, a.street_prefix, a.street_name, a.street_direction, a.unit_type, a.unit_number].join(' ')} [ #{a.addr_id} ]</option>
+            <option value={i}>{[a.street_number, a.street_prefix, a.street_name, a.street_type, a.unit_type, a.unit_number].join(' ')} [ #{a.addr_id} ]</option>
           ))}
         </select>
         </section>
