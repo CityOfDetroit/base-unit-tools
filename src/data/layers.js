@@ -6,6 +6,7 @@ let HOSTED_ROOT_DEV = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest
 const layers = {
   "addresses": {
     "name": "addresses",
+    "singular": "address",
     "label": "Address Point",
     "endpoint": HOSTED_ROOT_DEV + '4',
     "id_column": "addr_id",
@@ -19,6 +20,7 @@ const layers = {
   },
   "buildings": {
     "name": "buildings",
+    "singular": "building",
     "label": "Building",
     "endpoint": HOSTED_ROOT_DEV + '3',
     "id_column": "bldg_id",
@@ -32,6 +34,7 @@ const layers = {
   },
   "parcels": {
     "name": "parcels",
+    "singular": "parcel",
     "label": "Parcel",
     "endpoint": HOSTED_ROOT_DEV + "1",
     "id_column": "parcel_id",
@@ -45,6 +48,7 @@ const layers = {
   },
   "streets": {
     "name": "streets",
+    "singular": "street",
     "label": "Street",
     "endpoint": HOSTED_ROOT_DEV + "2",
     "id_column": "street_id",
@@ -58,6 +62,7 @@ const layers = {
   },
   "units": {
     "name": "units",
+    "singular": "unit",
     "label": "Unit",
     "endpoint": HOSTED_ROOT_DEV + '0',
     "id_column": "objectid",

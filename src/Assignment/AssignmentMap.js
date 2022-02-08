@@ -34,11 +34,8 @@ const AssignmentMap = ({ mode, geocodeResult, setBuilding, setParcel, setStreet,
     map.on('load', () => {
 
       setTheMap(map)
-
       setCenter(map.getCenter())
-
       map.getSource("result").setData(geocodeResult)
-
       map.setLayoutProperty("address-point", "visibility", "visible")
       map.setLayoutProperty("address-point-label", "visibility", "visible")
 
