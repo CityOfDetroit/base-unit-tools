@@ -29,7 +29,7 @@ const Mailer = ({ session }) => {
       activeText: 'Deliverable addresses only',
       inactiveText: 'All addresses, even undeliverable',
       default: true,
-      filterFunction: (a) => a.attributes.usps_status === 'Deliverable'
+      filterFunction: (a) => a.attributes.usps_status === 'Deliverable' || a.attributes.USPS_Status === 'Deliverable'
     }
   }
 
@@ -44,10 +44,8 @@ const Mailer = ({ session }) => {
   // mode 1 is centroid
   // mode 2 is parcel
   let mailerLayers = [
-    `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/MailerParcels_Test/FeatureServer/0`,
-    `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/MailerPoints_Test/FeatureServer/0`
-    // `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/MailerLayers/FeatureServer/0`, // parcels
-    // `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/MailerLayers/FeatureServer/1` // centroids
+    `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/MailerLayers/FeatureServer/0`, // parcels
+    `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/MailerLayers/FeatureServer/1` // centroids
   ]
   const [layer, setLayer] = useState('centroid')
 
