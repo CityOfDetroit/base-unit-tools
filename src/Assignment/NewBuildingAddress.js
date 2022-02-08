@@ -50,7 +50,7 @@ const handleSubmit = (data, session, setSubmitted, geometry) => {
   }).then(r => setSubmitted(r))
 }
 
-const NewAddressToSubmit = ({ modelAddress, building, street, parcel, session }) => {
+const NewAddressToSubmit = ({ modelAddress, building, street, parcel, setParcel, session }) => {
   let [houseNumber, setHouseNumber] = useState(modelAddress.attributes.street_number)
   let streetFeature = useFeature({ type: 'streets', id: street })
   let buildingFeature = useFeature({ type: 'buildings', id: building })
@@ -124,6 +124,7 @@ const NewAddressToSubmit = ({ modelAddress, building, street, parcel, session })
 
   useEffect(() => {
     setHouseNumber(modelAddress.attributes.street_number)
+    setParcel(modelAddress.attributes.parcel_id)
     setUnitType('')
     setUnitNums('')
   }, [modelAddress])
@@ -147,7 +148,7 @@ const NewAddressToSubmit = ({ modelAddress, building, street, parcel, session })
         <FormRow>
           <FormInput title="Building ID" value={building} readOnly disabled />
           <FormInput title="Street ID" value={street} readOnly disabled />
-          <FormInput title="Parcel ID" value={parcel} readOnly disabled />
+          <FormInput title="Parcel ID" value={parcel || modelAddress.attributes.parcel_id} readOnly disabled />
         </FormRow>
 
         <SectionSubhead 
@@ -161,7 +162,6 @@ const NewAddressToSubmit = ({ modelAddress, building, street, parcel, session })
         </FormRow>
 
         <FormRow>
-
           <FormField title="Unit type" width="1/3">
             <select type="text" className="p-2 text-sm" value={unitType} onChange={(e) => setUnitType(e.target.value)}>
               {unitTypes.map(ut => <option value={ut} key={ut}>{ut}</option>)}
@@ -230,7 +230,7 @@ const NewBuildingAddress = ({ building, setBuilding, street, setStreet, parcel, 
 
           {modelAddress && modelAddress.attributes.parcel_id && <AssignmentParcel parcel={modelAddress.attributes.parcel_id} />}
 
-          {modelAddress && <NewAddressToSubmit {...{ modelAddress, building, street, parcel, session }} />}
+          {modelAddress && <NewAddressToSubmit {...{ modelAddress, building, street, parcel, setParcel, session }} />}
         </>
       }
 

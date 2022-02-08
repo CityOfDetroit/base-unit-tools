@@ -16738,6 +16738,14 @@ export const baseStyle = {
         }
       },
       {
+        "id": "result-point",
+        "source": "result",
+        "type": "circle",
+        "paint": {
+          "circle-color": "green"
+        }
+      },
+      {
         "id": "new-address-point",
         "source": "new-point",
         "type": "circle",
@@ -16746,14 +16754,6 @@ export const baseStyle = {
           "circle-radius": 10,
           "circle-stroke-color": "#ddd",
           "circle-stroke-width": 2
-        }
-      },
-      {
-        "id": "result-point",
-        "source": "result",
-        "type": "circle",
-        "paint": {
-          "circle-color": "green"
         }
       }
     ],
@@ -16783,6 +16783,17 @@ export const satelliteStyle = () => {
     }
     if (l.type === 'line' && l.id.indexOf("Road") === 0) {
       satStyle.layers[i].layout['visibility'] = 'none'
+    }
+  })
+
+  // adjust colors for satellite
+  satStyle.layers.forEach((l, i) => {
+    if (l.id === 'streets-line') {
+      satStyle.layers[i].paint['line-color'] = layers['streets'].color
+      satStyle.layers[i].paint['line-opacity'] = 0.75
+    }
+    if (l.id === 'streets-highlight') {
+      satStyle.layers[i].paint['line-color'] = '#fff'
     }
   })
   

@@ -10,6 +10,12 @@ import AssignmentMapIndices from './AssignmentMapIndices';
 import NewBuildingAddress from './NewBuildingAddress';
 import NewUtilityPole from './NewUtilityPole';
 import AssignmentMapOptions from './AssignmentMapOptions';
+import { faBolt, faCut, faHotel, faPlusCircle, faRandom, faWindowClose } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Button from '../components/Button';
+import NewParcelRevisionAddress from './NewParcelRevisionAddress';
+import NewCondoAddress from './NewCondoAddress';
+import NewStreetExistingAddress from './NewStreetExistingAddress';
 
 const Assignment = ({ session }) => {
 
@@ -39,20 +45,45 @@ const Assignment = ({ session }) => {
   let modes = [
     {
       name: "New building address",
-      description: "Create a new primary address assigned to a building.",
-      selectableLayers: [layers.buildings.interaction]
+      description: "Assign a new primary or unit address to a building.",
+      selectableLayers: [layers.buildings.interaction],
+      icon: faPlusCircle,
+      basemap: 'default'
     },
     {
-      name: "New utility pole",
-      description: "Use this to add a new utility pole address, not linked to any parcel or building.",
-      selectableLayers: [layers.streets.interaction]
+      name: "New utility address",
+      description: "Assign an address for a new utility - not linked to any parcel or building.",
+      selectableLayers: [layers.streets.interaction],
+      icon: faBolt,
+      basemap: 'satellite'
+    },
+    {
+      name: "New condo address",
+      description: "Assign an address for a condominium.",
+      selectableLayers: [layers.parcels.interaction],
+      icon: faHotel,
+      basemap: 'default'
+    },
+    {
+      name: "New address for pending parcel revision",
+      description: "Assign an address for a new parcel split",
+      selectableLayers: [layers.parcels.interaction],
+      icon: faCut,
+      basemap: 'default'
+    },
+    {
+      name: "New street for existing address",
+      description: "Change a current address to a new street segment",
+      selectableLayers: [layers.addresses.interaction],
+      icon: faRandom,
+      basemap: 'default'
     }
   ]
 
-  let [mode, setMode] = useState(modes[0])
+  let [mode, setMode] = useState(null)
 
   // this keeps track of 
-  let [selectableLayers, setSelectableLayers] = useState(modes[0].selectableLayers)
+  let [selectableLayers, setSelectableLayers] = useState(null)
 
   // when the mode changes..
   useEffect(() => {
@@ -63,51 +94,74 @@ const Assignment = ({ session }) => {
     setAddresses([])
     setLngLat(null)
     // set the selectable layers on the map
-    setSelectableLayers(mode.selectableLayers)
+    setSelectableLayers(mode ? mode.selectableLayers : [])
   }, [mode])
 
 
   // quick intro for the Assignment tool
   let introduction = (
     <>
-      <p className="py-2">This tool is for assigning or requesting new addresses.</p>
+      <p>This tool is for assigning or requesting new addresses.</p>
+      <p>Please choose from the following scenarios:</p>
     </>
   )
 
   return (
     <>
       <SiteSidebar title="Assignment">
-
-        <AppHeader app={apps['assignment']} introduction={introduction}>
-          <div className="flex items-center justify-start">
-            <h2 className="text-base w-1/3">Choose a scenario:</h2>
-            <select className="p-2 font-bold w-3/5" onChange={(e) => setMode(modes.filter(m => m.name === e.target.value)[0])}>
-              {modes.map(m => (
-                <option value={m.name} key={m.name}>{m.name}</option>
-              ))}
-            </select>
+        {mode &&
+          <div className="bg-gray-300 p-2 flex items-center justify-between">
+            <div className="flex">
+              <div className="flex items-center justify-around w-12">
+                <FontAwesomeIcon icon={mode.icon} className="text-2xl mr-2" />
+              </div>
+              <div>
+                <h3>{mode.name}</h3>
+                <p>{mode.description}</p>
+              </div>
+            </div>
+            <Button icon={faWindowClose} onClick={() => setMode(null)}>Back</Button>
           </div>
-          <p className="py-2">{mode.description}</p>
-        </AppHeader>
-        
-        {mode.name === 'New building address' && <NewBuildingAddress {...{ building, street, setStreet, parcel, setParcel, setSelectableLayers, session }} />}
-        {mode.name === 'New utility pole' && <NewUtilityPole {...{ lngLat, setLngLat, street, addresses, setAddresses, setSelectableLayers, session }} />}
+        }
+        {!mode && <AppHeader app={apps['assignment']} introduction={introduction} startsOpen />}
+
+        {!mode && modes.map(m => (
+          <div className="bg-gray-300 my-4 p-2 flex items-center hover:bg-gray-200" onClick={() => setMode(m)}>
+            <div className="flex items-center justify-around w-12">
+              <FontAwesomeIcon icon={m.icon} className="text-2xl mr-2" />
+            </div>
+            <div>
+              <h3>{m.name}</h3>
+              <p>{m.description}</p>
+            </div>
+          </div>
+        ))}
+
+        {mode && mode.name === 'New building address' && <NewBuildingAddress {...{ building, street, setStreet, parcel, setParcel, setSelectableLayers, session }} />}
+        {mode && mode.name === 'New utility address' && <NewUtilityPole {...{ lngLat, street, addresses, setAddresses, setSelectableLayers, session }} />}
+        {mode && mode.name === 'New address for pending parcel revision' && <NewParcelRevisionAddress {...{ lngLat, street, setStreet, parcel, setParcel, addresses, setAddresses, setSelectableLayers, session }} />}
+        {mode && mode.name === 'New condo address' && <NewCondoAddress {...{ building, setBuilding, lngLat, street, setStreet, parcel, setParcel, addresses, setAddresses, setSelectableLayers, session }} />}
+        {mode && mode.name === 'New street for existing address' && <NewStreetExistingAddress {...{ building, setBuilding, lngLat, street, setStreet, parcel, setParcel, addresses, setAddresses, setSelectableLayers, session }} />}
       </SiteSidebar>
 
       <main>
-        <section className="bg-gray-100 flex justify-start px-2">
-          <AssignmentMapOptions {...{ options, setOptions, session }} />
-          <AssignmentSearch setSearchValue={setSearchValue} /> 
-
-
-        </section>
-        <section className="bg-gray-100 flex justify-start text-base">
-          {session && <AssignmentMapIndices center={center} session={session} />}
-        </section>
-        <AssignmentMap geocodeResult={data} {...{ mode, building, parcel, street, setBuilding, setParcel, setStreet, selectableLayers, lngLat, setLngLat, addresses, setCenter, basemap: options.basemap }} />
-        <section className="bg-gray-300 py-3 px-3">
-          {!session && <p>Log in for additional address location information.</p>}
-        </section>
+        {mode &&
+          <>
+            <section className="bg-gray-100 flex justify-start px-2">
+              <AssignmentMapOptions {...{ options, setOptions, session }} />
+              <AssignmentSearch setSearchValue={setSearchValue} />
+            </section>
+            <section className="bg-gray-100 flex justify-start text-base">
+              {session && <AssignmentMapIndices center={center} session={session} />}
+            </section>
+          </>
+        }
+        {mode &&
+          <AssignmentMap geocodeResult={data} {...{ mode, building, parcel, street, setBuilding, setParcel, setStreet, selectableLayers, lngLat, setLngLat, addresses, setCenter, basemap: options.basemap }} />
+        }
+        {!session && <section className="bg-gray-300 py-3 px-3">
+          <p>Log in for additional address location information.</p>
+        </section>}
       </main>
     </>
   )

@@ -23,7 +23,7 @@ const AssignmentMap = ({ mode, geocodeResult, setBuilding, setParcel, setStreet,
 
     var map = new mapboxgl.Map({
       container: "map", // container id
-      style: baseStyle, // stylesheet location
+      style: basemap === 'default' ? baseStyle : satelliteStyle(), // stylesheet location
       // bounds: detroitBbox,
       center: [-83.1, 42.35],
       zoom: 17
@@ -43,7 +43,6 @@ const AssignmentMap = ({ mode, geocodeResult, setBuilding, setParcel, setStreet,
 
     map.on('click', e => {
       setLngLat(e.lngLat)
-      console.log(e.lngLat)
       let features = map.queryRenderedFeatures(e.point, {
         layers: [layers.buildings.interaction, layers.streets.interaction, layers.parcels.interaction, layers.addresses.interaction],
       });
@@ -87,7 +86,7 @@ const AssignmentMap = ({ mode, geocodeResult, setBuilding, setParcel, setStreet,
   }, [geocodeResult])
 
   useEffect(() => {
-    if (theMap && mode.name == 'New utility pole' && lngLat !== null) {
+    if (theMap && mode.name == 'New utility address' && lngLat.lng !== null) {
       theMap.getSource("new-point").setData({
         type: "FeatureCollection",
         features: [{

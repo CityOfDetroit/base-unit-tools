@@ -7,32 +7,34 @@ const SiteHeader = ({ session, setSession, login, setLogin }) => {
   if (!login) {
     return (
       <header>
-        <div className="flex items-center justify-between">
-          <img src={logo} className="h-8 mt-2 ml-2 mr-2" alt={"City logo"} />
-          <h1 className="w-full font-black">
+        <div className="flex items-center justify-between" style={{borderBottom: `5px solid rgb(254, 183, 13)`}}>
+          <img src={logo} className="h-8 m-1" alt={"City logo"} />
+          <h1 className="w-full font-black text-xl ml-1 -mb-1">
             Base Unit Tools
           </h1>
         </div>
 
         {session ?
           // If user is logged in, display this div
-          <div className="w-100 flex flex-row-reverse ml-3 items-center mr-1">
-            <span className="leading-none text-base text-gray-500 font-base ml-2" onClick={() => setSession(null)}>
-              <FontAwesomeIcon icon={faSignOutAlt} />
+          <div className="w-100 flex items-center text-base justify-between bg-blue-100 py-2 px-4">
+            <span className="leading-none text-gray-700">
+              You are logged in as: <b>{session.username}</b>
             </span>
-            <span className="leading-none text-xs text-gray-500 font-base">
-              logged in as: <b>{session.username}</b>
+            <span className="leading-none text-gray-500 ml-2 flex items-center font-bold justify-around" onClick={() => setSession(null)}>
+              Log out
+              <FontAwesomeIcon icon={faSignOutAlt} className="text-2xl ml-2" />
             </span>
           </div>
           :
           // Else, this div.
-          <div className="w-100 flex flex-row-reverse ml-3 items-center mr-1" onClick={() => setLogin(true)}>
-            <span className="leading-none text-base text-gray-500 font-base ml-2" >
-              <FontAwesomeIcon icon={faSignInAlt} />
-            </span>
-            <button className="leading-none text-xs text-gray-500 font-base">
-              Log in to ArcGIS Online
+          <div className="w-100 flex items-center text-base justify-between bg-red-100 py-2 px-4" onClick={() => setLogin(true)}>
+            <button className="leading-none text-gray-700">
+              Sign in with your ArcGIS Online account.
             </button>
+            <span className="leading-none text-gray-500 ml-2 flex items-center font-bold justify-around" >
+              Log in
+              <FontAwesomeIcon icon={faSignInAlt} className="text-2xl ml-2" />
+            </span>
           </div>
 
         }
