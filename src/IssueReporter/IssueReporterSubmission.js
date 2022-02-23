@@ -3,6 +3,7 @@ import React, {useState} from 'react';
 import { Link } from "react-router-dom";
 import Button from '../components/Button';
 import {addFeatures} from '@esri/arcgis-rest-feature-layer'
+import layers from '../data/layers'
 
 const addFeature = ({ session, formText, address, x, y, targetType, targetId, setAddResponse }) => {
 
@@ -48,7 +49,7 @@ const IssueReporterSubmission = ({ value, target, session, targetType, featureCe
           address: targetType === 'address' ? value : null,
           x: featureCentroid[1],
           y: featureCentroid[0],
-          targetType: targetType === 'base_unit' ? target.type.replaceAll(/[es]$/g, '') : null,
+          targetType: targetType === 'base_unit' ? layers[target.type].singular : null,
           targetId: targetType === 'base_unit' ? target.id : null,
           setAddResponse: setAddResponse
         });

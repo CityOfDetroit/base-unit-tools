@@ -2,6 +2,10 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import React, { useEffect, useState } from 'react';
 import Button from '../components/Button';
 import {useGeocoder} from '../hooks/useGeocoder';
+import useFeature from '../hooks/useFeature'
+import { queryFeatures } from '@esri/arcgis-rest-feature-layer';
+import layers from '../data/layers';
+import { arcgisToGeoJSON } from '@esri/arcgis-to-geojson-utils';
 
 const MailerAddressSearch = ({ geom, setGeom }) => {
 
@@ -11,7 +15,23 @@ const MailerAddressSearch = ({ geom, setGeom }) => {
   let [location, type] = useGeocoder(searchValue)
   
   useEffect(() => {
-    setGeom(location)
+    if(location) {
+      queryFeatures({
+        "url": layers.parcels.endpoint,
+        "where": `${layers.parcels.id_column} = '${location.features[0].properties.parcel_id}'`,
+        'outFields': '*',
+        'resultRecordCount': 1,
+        'outSR': 4326,
+        'f': 'json'
+      }).then(d => {
+        if(d.features.length > 0) {
+          setGeom(arcgisToGeoJSON(d))
+        }
+        else {
+          setGeom(location)
+        }
+      })
+    }
   }, [location])
 
   return (
