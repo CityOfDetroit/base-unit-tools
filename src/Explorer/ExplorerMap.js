@@ -2,13 +2,15 @@ import mapboxgl from "mapbox-gl";
 import React, { useEffect, useState } from "react";
 import { arcgisToGeoJSON } from '@esri/arcgis-to-geojson-utils';
 import centroid from '@turf/centroid';
+import _ from 'lodash';
 
 import { baseStyle, satelliteStyle, linenStyle } from '../styles/mapstyle'
 import videoIcon from '../images/video.png'
 
 import layers from '../data/layers'
+import { map } from "bluebird";
 
-const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svBearing, basemap, setSvImageKey, svImageKey, setSvKeys }) => {
+const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svBearing, basemap, svImage, setSvImages }) => {
 
   // keep a reference to the map object here
   const [theMap, setTheMap] = useState(null);
@@ -63,26 +65,25 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svBearing, 
       }
     })
 
-    map.on('click', e => {
-
-      const width = 10;
-      const height = 10;
-
-      let features = map.queryRenderedFeatures([
-        [e.point.x - width / 2, e.point.y - height / 2],
-        [e.point.x + width / 2, e.point.y + height / 2]
-      ], {
-        layers: ['mapillary-images'],
-      });
-      if (features.length > 0) {
-        let f = features[0]
-        setSvImageKey({captured_at: f.properties.captured_at, id: f.properties.id})
-        setSvKeys(features.map(f => f.properties))
-      }
-      else {
+    map.on('dragend', e => {
+      if(map.getZoom() > 17.5) {
+        let features = map.queryRenderedFeatures({
+          layers: ['mapillary-images']
+        })
+        let uniqs = _.uniqBy(features, 'properties.id')
+        setSvImages(uniqs)
       }
     })
 
+    map.on('sourcedata', e => {
+      if(e.sourceId === 'mly' && e.isSourceLoaded === true && map.getZoom() > 17.5) {
+        let features = map.queryRenderedFeatures({
+          layers: ['mapillary-images']
+        })
+        setSvImages(_.uniqBy(features, 'properties.id'))
+      }
+    })
+ 
   }, [setClicked]);
 
   // fires when we get a new clicked feature
@@ -122,27 +123,22 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svBearing, 
   }, [theMap, linked, loading, clicked.type])
 
   useEffect(() => {
-    if (theMap && svImageKey) {
-      theMap.setFilter('mapillary-images-highlight', ["==", "id", parseInt(svImageKey.id)])
-      theMap.setFilter('mapillary-location', ["==", "id", parseInt(svImageKey.id)])
+    if (theMap && svImage) {
+      theMap.setFilter('mapillary-location', ["==", "id", parseInt(svImage.properties.id)])
       theMap.setLayoutProperty('mapillary-location', 'icon-rotate', (svBearing - 90))
     }
-  }, [svImageKey, svBearing])
+  }, [svImage, svBearing])
 
   // effect fires when the showSv property changes
   useEffect(() => {
     if (theMap && !loading) {
       if (showSv) {
-        theMap.setLayoutProperty("mapillary-images", "visibility", "visible")
-        theMap.setLayoutProperty("mapillary-images-highlight", "visibility", "visible")
         theMap.setLayoutProperty("mapillary-location", "visibility", "visible")
         theMap.flyTo({
           zoom: 19
         })
       }
       else {
-        theMap.setLayoutProperty("mapillary-images", "visibility", "none")
-        theMap.setLayoutProperty("mapillary-images-highlight", "visibility", "none")
         theMap.setLayoutProperty("mapillary-location", "visibility", "none")
       }
     }
@@ -173,7 +169,7 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svBearing, 
         let coords = centroid(geojsonFeature.geometry).geometry.coordinates
         theMap.easeTo({
           center: coords,
-          zoom: 17
+          zoom: theMap.getZoom() < 17 ? 17: theMap.getZoom()
         })
       }
     }

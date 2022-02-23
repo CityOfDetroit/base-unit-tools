@@ -16686,35 +16686,14 @@ export const baseStyle = {
           ["==", "organization_id", 518073312556755]
         ],
         "layout": {
-          "visibility": "none"
+          "visibility": "visible"
         },
         "paint": {
           "circle-radius": {
             "base": 1,
             "stops": [[13, 0.1], [14, 0.5], [17, 2], [18.5, 4], [19, 7], [19.5, 10]]
           },
-          "circle-color": "rgba(20,20,120,0.3)"
-        }
-      },
-      {
-        'id': 'mapillary-images-highlight',
-        'type': 'circle',
-        'source': 'mly',
-        'source-layer': 'image',
-        "maxzoom": 22,
-        "minzoom": 14,
-        "filter": ["==", "id", true],
-        "layout": {
-          "visibility": "none"
-        },
-        "paint": {
-          "circle-radius": {
-            "base": 1,
-            "stops": [[13, 2], [14, 6.5], [17, 9.5], [19, 16]]
-          },
-          "circle-stroke-color": "black",
-          "circle-stroke-width": 1,
-          "circle-color": "rgba(255,255,0,0.7)"
+          "circle-color": "rgba(20,20,120,0)"
         }
       },
       {

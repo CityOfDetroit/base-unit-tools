@@ -56,8 +56,8 @@ const Explorer = ({ session }) => {
   // streetview-specific information
   // svBearing is the current camera bearing
   const [svBearing, setSvBearing] = useState(null);
-  const [svImageKey, setSvImageKey] = useState(null);
-  const [svKeys, setSvKeys] = useState([]);
+  const [svImage, setSvImage] = useState(null);
+  const [svImages, setSvImages] = useState([]);
 
   // this effect triggers when the user clicks on a new feature in the map
   useEffect(() => {
@@ -89,29 +89,15 @@ const Explorer = ({ session }) => {
         <AppHeader app={apps.explorer} introduction={introduction}>
           <ExplorerSearch {...{ setClicked }} />
           <ExplorerMapOptions {...{options, setOptions, session}} />
-                  {/* Street View if selected and we have a feature */}
-        {/* {options.streetView && feature && <StreetView {...{ feature, setSvBearing }} />} */}
-
         </AppHeader>
-        {options.streetView && svKeys.length > 0 && <MapillarySv {...{svKeys, svImageKey, setSvImageKey, setSvBearing, feature}} />}
-        {options.streetView && svKeys.length === 0 && 
-          <section className="sidebar-section info">
-            <FontAwesomeIcon icon={faStreetView} />
-            <span className="text-semibold text-sm ml-2">
-            Click the blue dots to pull up a street view image.
-            </span>
-          </section>
-        }
 
-
-        {/* Options area */}
+        {options.streetView && svImages.length > 0 && <MapillarySv {...{svImage, svImages, setSvImage, setSvBearing, feature}} />}
 
         {/* based on type, return a specific component. */}
         {clicked.type === 'addresses' && feature && <ExplorerAddress {...{ feature, clicked, setClicked, linked, setLinked }} />}
         {clicked.type === 'buildings' && feature && <ExplorerBuilding {...{ feature, clicked, setClicked, linked, setLinked }} />}
         {clicked.type === 'parcels' && feature && <ExplorerParcel {...{ feature, clicked, setClicked, linked, setLinked }} />}
         {clicked.type === 'streets' && feature && <ExplorerStreet {...{ feature, clicked, setClicked, linked, setLinked }} />}
-
 
         {/* Link to issue reporter */}
         {feature &&
@@ -140,7 +126,7 @@ const Explorer = ({ session }) => {
 
       {/* the main panel contains the map, and we pass it many of our useState variables */}
       <main>
-        <ExplorerMap {...{ clicked, setClicked, linked, feature, history, svImageKey, setSvImageKey, setSvKeys, svBearing, basemap: options.basemap, showSv: options.streetView }} />
+        <ExplorerMap {...{ clicked, setClicked, linked, feature, history, svImage, setSvImages, svBearing, basemap: options.basemap, showSv: options.streetView }} />
       </main>
     </>
   )
