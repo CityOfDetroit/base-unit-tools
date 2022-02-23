@@ -65,7 +65,7 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svBearing, 
       }
     })
 
-    map.on('dragend', e => {
+    map.on('moveend', e => {
       if(map.getZoom() > 17.5) {
         let features = map.queryRenderedFeatures({
           layers: ['mapillary-images']

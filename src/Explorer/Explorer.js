@@ -88,9 +88,10 @@ const Explorer = ({ session }) => {
 
         <AppHeader app={apps.explorer} introduction={introduction}>
           <ExplorerSearch {...{ setClicked }} />
-          <ExplorerMapOptions {...{options, setOptions, session}} />
+          <ExplorerMapOptions {...{options, setOptions, session, clicked}} />
         </AppHeader>
 
+        {options.streetView && svImages.length === 0 && <section className="">Loading street view imagery...</section>}
         {options.streetView && svImages.length > 0 && <MapillarySv {...{svImage, svImages, setSvImage, setSvBearing, feature}} />}
 
         {/* based on type, return a specific component. */}

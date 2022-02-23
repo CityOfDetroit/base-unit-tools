@@ -8,7 +8,7 @@ let basemaps = {
   'satellite': 'Satellite',
 }
 
-const ExplorerMapOptions = ({ options, setOptions, session }) => {
+const ExplorerMapOptions = ({ options, setOptions, session, clicked }) => {
 
   // add to obj on session
   if(session) {
@@ -26,6 +26,7 @@ const ExplorerMapOptions = ({ options, setOptions, session }) => {
           icon={faStreetView}
           text="Street view"
           active={options.streetView}
+          disabled={clicked.id === null}
           className="mr-2"
           small
         />
