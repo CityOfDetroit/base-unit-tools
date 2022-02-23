@@ -1,17 +1,18 @@
 import { Viewer, SimpleMarker } from "mapillary-js";
 import { useEffect, useState } from "react";
 import moment from "moment";
+import distance from "@turf/distance";
 import { arcgisToGeoJSON } from '@esri/arcgis-to-geojson-utils';
 import centroid from '@turf/centroid';
 import bearing from "@turf/bearing";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStreetView } from "@fortawesome/free-solid-svg-icons";
-
+import _ from 'lodash'
 
 /**
  * Wrap a value on the interval [min, max].
  */
- function wrap(value, min, max) {
+function wrap(value, min, max) {
   var interval = max - min;
 
   while (value > max || value < min) {
@@ -49,8 +50,8 @@ function bearingToBasic(desiredBearing, nodeBearing) {
 /**
  * Function to set the mapillary viewer's center by computing bearing
  */
-function setBearing(node, mly, start, end) {
-  var nodeBearing = node.computedCompassAngle; // Computed node compass angle (equivalent
+function computeBearing(node, start, end) {
+  var nodeBearing = node.computedCompassAngle || node.properties.compass_angle; // Computed node compass angle (equivalent
   // to bearing) is used by mjs when placing
   // the node in 3D space.
 
@@ -60,14 +61,13 @@ function setBearing(node, mly, start, end) {
   var basicY = 0.45; // tilt slightly up
 
   var center = [basicX, basicY];
-
-  mly.setCenter(center);
+  return center
 }
 
 const featureToCentroidCoords = (feature) => {
   let geojsonFeature = arcgisToGeoJSON(feature)
   let featureCentroid = centroid(geojsonFeature.geometry).geometry.coordinates
-  let coords = {lng: featureCentroid[0], lat: featureCentroid[1]}
+  let coords = { lng: featureCentroid[0], lat: featureCentroid[1] }
   return coords
 }
 
@@ -81,11 +81,14 @@ let markerStyle = {
 };
 
 
-const MapillarySv = ({ svKeys, svImageKey, setSvImageKey, setSvBearing, feature }) => {
+const MapillarySv = ({ svImage, svImages, setSvImage, setSvBearing, feature }) => {
 
   let [streetview, setStreetview] = useState(null)
 
+  let [sequences, setSequences] = useState(null)
+
   useEffect(() => {
+
     const viewer = new Viewer({
       accessToken: 'MLY|4690399437648324|de87555bb6015affa20c3df794ebab15',
       container: 'mly-viewer',
@@ -98,60 +101,91 @@ const MapillarySv = ({ svKeys, svImageKey, setSvImageKey, setSvBearing, feature 
         cache: true,
         direction: true
       },
-      imageId: svKeys[0].id.toString()
+      imageId: null
     });
 
     viewer.deactivateCover()
 
     setStreetview(viewer)
 
-    if(feature) {
-      let coords = featureToCentroidCoords(feature);
-      let defaultMarker = new SimpleMarker("default-id", { lat: coords.lat, lng: coords.lng }, markerStyle);
-      let markerComponent = viewer.getComponent("marker");
-      markerComponent.add([defaultMarker]);
-    }
+    viewer.on("image", function (e) {
+      e.target.getBearing()
+        .then(d => setSvBearing(d))
+      setSvImage({ properties: {...e.image._core, sequence_id: e.image._spatial.sequence }})
+    });
 
-    viewer.on("image", function(e) { 
-      setSvImageKey({id: e.image.id, captured_at: e.image._spatial.captured_at})
+    viewer.on("pov", function (e) {
       e.target.getBearing()
         .then(d => setSvBearing(d))
     });
 
-    viewer.on("pov", function(e) {  
-      e.target.getBearing()
-        .then(d => setSvBearing(d))
-    });
   }, [])
 
   useEffect(() => {
-    if(streetview && streetview.isNavigable) {
-      streetview.moveTo(svKeys[0].id.toString())
-    }
-  }, [svKeys])
-
-  useEffect(() => {
-    if(streetview) {
-      let coords = featureToCentroidCoords(feature);
-      let defaultMarker = new SimpleMarker("default-id", { lat: coords.lat, lng: coords.lng }, markerStyle);
+    if (streetview) {
+      console.log("New feature")
+      let coords = centroid(arcgisToGeoJSON(feature)).geometry.coordinates
+      let defaultMarker = new SimpleMarker("default-id", { lat: coords[1], lng: coords[0] }, markerStyle);
       let markerComponent = streetview.getComponent("marker");
       markerComponent.add([defaultMarker]);
 
-      streetview.getImage().then(i => {
-        setBearing(i, streetview, [i.originalLngLat.lng, i.originalLngLat.lat], [coords.lng || coords.x, coords.lat || coords.y]);
+      let imagesByDistance = _.sortBy(svImages, i => distance(i.geometry, centroid(arcgisToGeoJSON(feature))))
+      if(svImage) {
+        let filtered = imagesByDistance.filter(i => i.properties.sequence_id === svImage.properties.sequence_id)
+        if (filtered.length > 0) {
+          setSvImage(filtered[0])
+        }
+        else {
+          setSvImage(imagesByDistance[0])
+        }
+      }
+      else {
+        setSvImage(imagesByDistance[0])
+      }
+      streetview.moveTo(imagesByDistance[0].properties.id).then(i => {
+        let imageCoords = i._core.geometry.coordinates ? i._core.geometry.coordinates : [i._core.geometry.lng, i._core.geometry.lat]
+        let featureCentroid = centroid(arcgisToGeoJSON(feature)).geometry.coordinates
+        let center = computeBearing(i, imageCoords, featureCentroid)
+        streetview.setCenter(center)
       })
+
     }
-  }, [feature])
+  }, [feature, streetview])
+
+  useEffect(() => {
+    let imagesByDistance = _.sortBy(svImages, i => distance(i.geometry, centroid(arcgisToGeoJSON(feature))))
+
+    let uniqSeq = _.uniqBy(imagesByDistance, 'properties.sequence_id').map(i => {
+      return {
+        sequence_id: i.properties.sequence_id,
+        image_id: i.properties.id,
+        captured_at: i.properties.captured_at,
+        readable_ts: moment(i.properties.captured_at).format("ll")
+      }
+    })
+    setSequences(_.uniqBy(uniqSeq, 'readable_ts'))
+  }, [svImages])
 
   return (
     <>
-    <h2 className="text-lg bg-gray-200 p-2 flex items-center justify-between">
-      <span><FontAwesomeIcon icon={faStreetView} className="mr-2" />Street view</span>
-      <span className="font-normal">{moment(svImageKey.captured_at).format("ll")}</span>
-    </h2>
-    <section className="sidebar-section street-view">
-    <div id="mly-viewer" style={{height: 300, width: '100%'}}/>
-    </section>
+      <h2 className="text-lg bg-gray-200 p-2 flex items-center justify-between">
+        <span><FontAwesomeIcon icon={faStreetView} className="mr-2" />Street view</span>
+        {
+          sequences && svImage && 
+          <select value={svImage.properties.sequence_id} onChange={(e) => {
+              let imagesInSeq = _.sortBy(svImages, i => distance(i.geometry, centroid(arcgisToGeoJSON(feature)))).filter(i => i.properties.sequence_id == e.target.value)
+              console.log(imagesInSeq)
+              streetview.moveTo(imagesInSeq[0].properties.id)
+            }
+          }>
+          {sequences.map(seq => (
+            <option key={seq.sequence_id} value={seq.sequence_id}>{seq.readable_ts}</option>
+          ))}
+        </select>}
+      </h2>
+      <section className="sidebar-section street-view">
+        <div id="mly-viewer" style={{ height: 300, width: '100%' }} />
+      </section>
     </>
   )
 }
