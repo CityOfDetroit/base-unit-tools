@@ -13,7 +13,7 @@ export const Login = ({ session, setSession, setLogin }) => {
   const [error, setError] = useState(null);
 
   return (
-    <section className="text-sm w-1/2 p-6 bg-gray-100 mt-12 h-96">
+    <section className="text-sm w-full md:w-1/2 p-6 bg-gray-100 mt-0 md:mt-12 md:h-96">
       <h2 className="text-base flex items-center justify-between">
         {session
           ? `Logged in as ${session.username}`
@@ -89,7 +89,7 @@ export const Login = ({ session, setSession, setLogin }) => {
 
       <div className="flex items-center justify-around">
       <Button
-        className="px-8 py-4 mt-4 w-1/2 justify-center"
+        className="px-2 md:px-8 py-1 md:py-4 mt-4 w-1/2 justify-center"
         active={creds.user !== "" && creds.pass !== ""}
         onClick={() => {
           let userSession = new UserSession({

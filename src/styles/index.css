@@ -65,7 +65,7 @@ h4 {
       "s"
       "m"
       "f";
-    grid-template-rows: 70px auto auto 50vh 40px;
+    grid-template-rows: auto auto auto auto 40px;
     grid-gap: 0.25rem;
   }
 
@@ -129,8 +129,9 @@ footer {
 
 /* mobile styling */
 @media only screen and (max-width: 768px) {
+
   .explorer-map {
-    height: calc(50vh - 60px);
+    height: calc(80vh - 60px);
   }
 
   .mailer-map {
@@ -208,6 +209,8 @@ a {
   @apply p-2;
   @apply mb-2;
   @apply bg-gray-100;
+  @apply text-sm;
+  @apply md:text-base;
 }
 
 .sidebar-section p {

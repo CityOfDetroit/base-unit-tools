@@ -34,6 +34,21 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svBearing, 
 
     map.resize();
 
+    map.addControl(
+      new mapboxgl.GeolocateControl({
+        positionOptions: {
+          enableHighAccuracy: true
+        },
+        fitBoundsOptions: {
+          maxZoom: 18.5
+        },
+        // When active the map will receive updates to the device's location as it changes.
+        trackUserLocation: true,
+        // Draw an arrow next to the location dot to indicate which direction the device is heading.
+        showUserHeading: true
+      })
+    );
+
     map.on("load", () => {
       setTheMap(map);
     });
@@ -66,7 +81,7 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svBearing, 
     })
 
     map.on('moveend', e => {
-      if(map.getZoom() > 17.5) {
+      if (map.getZoom() > 17.5) {
         let features = map.queryRenderedFeatures({
           layers: ['mapillary-images']
         })
@@ -76,14 +91,14 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svBearing, 
     })
 
     map.on('sourcedata', e => {
-      if(e.sourceId === 'mly' && e.isSourceLoaded === true && map.getZoom() > 17.5) {
+      if (e.sourceId === 'mly' && e.isSourceLoaded === true && map.getZoom() > 17.5) {
         let features = map.queryRenderedFeatures({
           layers: ['mapillary-images']
         })
         setSvImages(_.uniqBy(features, 'properties.id'))
       }
     })
- 
+
   }, [setClicked]);
 
   // fires when we get a new clicked feature
@@ -169,7 +184,7 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svBearing, 
         let coords = centroid(geojsonFeature.geometry).geometry.coordinates
         theMap.easeTo({
           center: coords,
-          zoom: theMap.getZoom() < 17 ? 17: theMap.getZoom()
+          zoom: theMap.getZoom() < 17 ? 17 : theMap.getZoom()
         })
       }
     }

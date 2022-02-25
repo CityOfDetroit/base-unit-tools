@@ -8,15 +8,15 @@ const SiteHeader = ({ session, setSession, login, setLogin }) => {
     return (
       <header>
         <div className="flex items-center justify-between" style={{borderBottom: `5px solid rgb(254, 183, 13)`}}>
-          <img src={logo} className="h-8 m-1" alt={"City logo"} />
-          <h1 className="w-full font-black text-xl ml-1 -mb-1">
+          <img src={logo} className="h-6 md:h-8 m-1" alt={"City logo"} />
+          <h1 className="w-full font-black text-base md:text-xl ml-1 -mb-1">
             Base Unit Tools
           </h1>
         </div>
 
         {session ?
           // If user is logged in, display this div
-          <div className="w-100 flex items-center text-base justify-between bg-blue-100 py-2 px-4">
+          <div className="w-100 flex items-center justify-between bg-blue-100 py-1 md:py-2 px-2 md:px-4 text-xs md:text-base">
             <span className="leading-none text-gray-700">
               You are logged in as: <b>{session.username}</b>
             </span>
@@ -27,7 +27,7 @@ const SiteHeader = ({ session, setSession, login, setLogin }) => {
           </div>
           :
           // Else, this div.
-          <div className="w-100 flex items-center text-base justify-between bg-red-100 py-2 px-4" onClick={() => setLogin(true)}>
+          <div className="w-100 flex items-center justify-between bg-red-100 py-1 md:py-2 px-2 md:px-4 text-xs md:text-base" onClick={() => setLogin(true)}>
             <button className="leading-none text-gray-700">
               Sign in with your ArcGIS Online account.
             </button>

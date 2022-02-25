@@ -168,7 +168,7 @@ const MapillarySv = ({ svImage, svImages, setSvImage, setSvBearing, feature }) =
 
   return (
     <>
-      <h2 className="text-lg bg-gray-200 p-2 flex items-center justify-between">
+      <h2 className="text-sm md:text-lg bg-gray-200 p-2 flex items-center justify-between">
         <span><FontAwesomeIcon icon={faStreetView} className="mr-2" />Street view</span>
         {
           sequences && svImage && 

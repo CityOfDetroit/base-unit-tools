@@ -17,9 +17,9 @@ const AddressesHere = ({ addresses, setClicked, title=null }) => {
   return (
     <section className='sidebar-section' style={{ maxHeight: '50vh', borderLeft: `4px solid ${layers['addresses'].color}` }}>
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-base">{addresses.length} linked {title} address{addresses.length > 1 ? `es:` : `:`}</h2>
+        <h2 className="text-sm md:text-base">{addresses.length} linked {title} address{addresses.length > 1 ? `es:` : `:`}</h2>
       </div>
-      <div className="overflow-y-auto text-sm pr-3" style={{ maxHeight: '45vh' }}>
+      <div className="overflow-y-auto text-xs md:text-sm" style={{ maxHeight: '45vh' }}>
         {addresses.map((a, i) => (
           <div key={a.addr_id} className={i + 1 < addresses.length ? "py-1 flex items-center justify-between border-b-2" : "py-1 flex items-center justify-between"}>
             <div className="flex items-center">
