@@ -86,7 +86,7 @@ const Explorer = ({ session }) => {
     <>
       <SiteSidebar title="Explorer">
 
-        <AppHeader app={apps.explorer} introduction={introduction}>
+        <AppHeader app={apps.explorer} introduction={introduction} introOpen={false} >
           <ExplorerSearch {...{ setClicked }} />
           <ExplorerMapOptions {...{options, setOptions, session, clicked}} />
         </AppHeader>

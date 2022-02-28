@@ -4,10 +4,10 @@ import { useState } from "react"
 import AnimateHeight from 'react-animate-height'
 
 
-const AppHeader = ({ app, introduction = false, children }) => {
+const AppHeader = ({ app, introduction = false, introOpen=true, children }) => {
 
   let [open, setOpen] = useState(children ? true : false)
-  let [showIntro, setShowIntro] = useState(introduction ? true : false)
+  let [showIntro, setShowIntro] = useState(introduction && introOpen ? true : false)
 
   return (
     <div className="mb-2">

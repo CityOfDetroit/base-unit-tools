@@ -16,8 +16,8 @@ const ExplorerMapOptions = ({ options, setOptions, session, clicked }) => {
   }
 
   return (
-    <>
-      <h2 className="text-sm md:text-base">Map options</h2>
+    <div className="flex flex-col items-start gap-0 md:justify-start">
+      <h2 className="text-sm md:display-none">Map options</h2>
 
       <div className="mt-1 flex flex-col md:flex-row text-sm md:text-base gap-2">
         {/* Street view toggle */}
@@ -47,7 +47,7 @@ const ExplorerMapOptions = ({ options, setOptions, session, clicked }) => {
           </select>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 

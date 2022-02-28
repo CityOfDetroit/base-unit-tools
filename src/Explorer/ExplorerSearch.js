@@ -28,7 +28,7 @@ const ExplorerSearch = ({ setClicked }) => {
           </div>
         }
       </h2>
-      <div className="flex items-center justify-start text-sm md:text-base mt-1 w-4/5">
+      <div className="flex items-center justify-start text-sm md:text-base mt-1 w-full md:w-4/5">
         <input
           className="p-2 w-full bg-"
           type="text"
