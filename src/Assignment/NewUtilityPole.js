@@ -53,7 +53,7 @@ const handleSubmit = (data, lngLat, session, setSubmitted) => {
 const NewAddressToSubmit = ({ street, lngLat, session }) => {
   let [houseNumber, setHouseNumber] = useState('')
   let streetFeature = useFeature({ type: 'streets', id: street })
-  let { street_prefix, street_name, street_type } = streetFeature.attributes
+  let { street_prefix, street_name, street_type } = streetFeature ? streetFeature.attributes : {}
   let fullStreetName = [street_prefix, street_name, street_type].join(" ").trim()
 
   let [notes, setNotes] = useState('')
@@ -128,13 +128,15 @@ const NewAddressToSubmit = ({ street, lngLat, session }) => {
     </>
   )
 }
+
 const NewUtilityPole = ({ street, setStreet, session, addresses, setAddresses, lngLat, setLngLat }) => {
+  console.log(street)
   return (
     <>
       {!street && <section className='sidebar-section'>
         <h2>Click a street segment for the new utility address.</h2>
       </section>}
-      {street && <AssignmentStreet {...{ street, addresses, setAddresses }} />}
+      {street && street !== '' && <AssignmentStreet {...{ street, addresses, setAddresses }} />}
       {street && <section className='sidebar-section'>
         <h2 className="p-1 my-1">Adjust the location <span class="dot" style={{ height: 20, width: 20, border: `2px solid #ddd`, background: `rgba(120,0,0,0.5)`, borderRadius: `50%`, display: `inline-block`, marginBottom: -3, marginLeft: 5, marginRight: 5 }}></span> of the new utility pole address by clicking the map.</h2>
       </section>}

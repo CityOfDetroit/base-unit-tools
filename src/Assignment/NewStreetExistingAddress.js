@@ -52,7 +52,7 @@ const handleSubmit = (data, lngLat, session) => {
 const NewAddressToSubmit = ({ parcel, modelAddress, setParcel, building, street, lngLat, session }) => {
   let [houseNumber, setHouseNumber] = useState('')
   let streetFeature = useFeature({ type: 'streets', id: street })
-  let { street_prefix, street_name, street_type } = streetFeature.attributes
+  let { street_prefix, street_name, street_type } = streetFeature ? streetFeature.attributes : {}
   let fullStreetName = [street_prefix, street_name, street_type].join(" ").trim()
   let [newParcelId, setNewParcelId] = useState('')
 

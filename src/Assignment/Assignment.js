@@ -126,7 +126,7 @@ const Assignment = ({ session }) => {
         {!mode && <AppHeader app={apps['assignment']} introduction={introduction} startsOpen />}
 
         {!mode && modes.map(m => (
-          <div className="bg-gray-300 my-4 p-2 flex items-center hover:bg-gray-200" onClick={() => setMode(m)}>
+          <div key={m.name} className="bg-gray-300 my-4 p-2 flex items-center hover:bg-gray-200" onClick={() => setMode(m)}>
             <div className="flex items-center justify-around w-12">
               <FontAwesomeIcon icon={m.icon} className="text-2xl mr-2" />
             </div>
@@ -138,7 +138,7 @@ const Assignment = ({ session }) => {
         ))}
 
         {mode && mode.name === 'New building address' && <NewBuildingAddress {...{ building, street, setStreet, parcel, setParcel, setSelectableLayers, session }} />}
-        {mode && mode.name === 'New utility address' && <NewUtilityPole {...{ lngLat, street, addresses, setAddresses, setSelectableLayers, session }} />}
+        {mode && mode.name === 'New utility address' && <NewUtilityPole {...{ lngLat, street, setStreet, addresses, setAddresses, setSelectableLayers, session }} />}
         {mode && mode.name === 'New address for pending parcel revision' && <NewParcelRevisionAddress {...{ lngLat, street, setStreet, parcel, setParcel, addresses, setAddresses, setSelectableLayers, session }} />}
         {mode && mode.name === 'New condo address' && <NewCondoAddress {...{ building, setBuilding, lngLat, street, setStreet, parcel, setParcel, addresses, setAddresses, setSelectableLayers, session }} />}
         {mode && mode.name === 'New street for existing address' && <NewStreetExistingAddress {...{ building, setBuilding, lngLat, street, setStreet, parcel, setParcel, addresses, setAddresses, setSelectableLayers, session }} />}
