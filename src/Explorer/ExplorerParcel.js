@@ -38,7 +38,6 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
             .then(e => e.json())
             .then(f => {
               if(d.features.length > 0) {
-                console.log(d, f)
                 let feature = d.features[0]
                 let attribs = feature.attributes
                 attribs.legal_description = f.legaldescription

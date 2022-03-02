@@ -130,7 +130,6 @@ const NewAddressToSubmit = ({ street, lngLat, session }) => {
 }
 
 const NewUtilityPole = ({ street, setStreet, session, addresses, setAddresses, lngLat, setLngLat }) => {
-  console.log(street)
   return (
     <>
       {!street && <section className='sidebar-section'>

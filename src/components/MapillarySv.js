@@ -123,7 +123,6 @@ const MapillarySv = ({ svImage, svImages, setSvImage, setSvBearing, feature }) =
 
   useEffect(() => {
     if (streetview) {
-      console.log("New feature")
       let coords = centroid(arcgisToGeoJSON(feature)).geometry.coordinates
       let defaultMarker = new SimpleMarker("default-id", { lat: coords[1], lng: coords[0] }, markerStyle);
       let markerComponent = streetview.getComponent("marker");
