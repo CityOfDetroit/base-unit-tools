@@ -22,24 +22,25 @@ const handleSubmit = (data, lngLat, session, setSubmitted) => {
     "creator": session.username,
   }
 
-  // fetch(`https://hook.integromat.com/fgu9lrjc6ps43fdk8s7tdat9ylv20uqg`, {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //     'Access-Control-Allow-Origin': '*'
-  //   },
-  //   body: JSON.stringify(integromatBody)
-  // })
-  //   .then(d => console.log(d))
+  fetch(`https://hook.integromat.com/fgu9lrjc6ps43fdk8s7tdat9ylv20uqg`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    },
+    body: JSON.stringify(integromatBody)
+  })
+    .then(d => console.log(d))
 
   let esriFeatures = data.map(ad => {
+    ad['scenario'] = 'NewUtilityPole'
+
     return {
       geometry: { x: lngLat.lng, y: lngLat.lat, spatialReference: { wkid: 4326 } },
       attributes: ad
     }
   })
 
-  console.log(esriFeatures)
   addFeatures({
     url: `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/address_assignments/FeatureServer/0`,
     features: esriFeatures,

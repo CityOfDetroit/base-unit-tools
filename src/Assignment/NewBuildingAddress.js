@@ -37,6 +37,7 @@ const handleSubmit = (data, session, setSubmitted, geometry) => {
     .then(d => console.log(d))
 
   let esriFeatures = data.map(ad => {
+    ad['scenario'] = 'NewBuildingAddress'
     return {
       geometry: geometry,
       attributes: ad

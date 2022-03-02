@@ -35,6 +35,7 @@ const handleSubmit = (data, lngLat, session) => {
     .then(d => console.log(d))
 
   let esriFeatures = data.map(ad => {
+    ad['scenario'] = 'NewStreetExistingAddress'
     return {
       geometry: { x: lngLat.lng, y: lngLat.lat, spatialReference: { wkid: 4326 } },
       attributes: ad
