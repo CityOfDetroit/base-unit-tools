@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import logo from '../images/logo.png';
 import { Login } from './Login';
 
-const SiteHeader = ({ session, setSession, login, setLogin }) => {
+const SiteHeader = ({ session, setSession, login, setLogin, children }) => {
   if (!login) {
     return (
       <header>
@@ -12,6 +12,7 @@ const SiteHeader = ({ session, setSession, login, setLogin }) => {
           <h1 className="w-full font-black text-base md:text-xl ml-1 -mb-1">
             Base Unit Tools
           </h1>
+          {children}
         </div>
 
         {session ?

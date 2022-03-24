@@ -20,12 +20,24 @@ const SiteWrapper = ({ session, setSession, children }) => {
   return (
     <>
       <>
-        <SiteHeader {...{session, setSession, login, setLogin}} />
-        <nav className="">
-          {isDesktop ?
-            // desktop nav
-            <div className="flex items-center justify-start">
-              {Object.keys(apps).map((k, i) => {
+        <SiteHeader {...{ session, setSession, login, setLogin }}>
+          <nav className="">
+            {isDesktop ?
+              // desktop nav
+              <div className="flex items-center justify-start">
+                <select>
+                  {Object.keys(apps).map((k, i) => {
+                    return (
+                      <option value={k}>
+                        <div>
+                          <FontAwesomeIcon icon={apps[k].icon} className="mr-2" />
+                          {apps[k].name}
+                        </div>
+                      </option>
+                    )
+                  })}
+                </select>
+                {/* {Object.keys(apps).map((k, i) => {
                 if ((apps[k].private && session) || !apps[k].private) {
                   return (
                   <Link key={k} to={`.${apps[k].url}`}
@@ -38,12 +50,13 @@ const SiteWrapper = ({ session, setSession, children }) => {
                 )
                 }
                 else {return null;}
-              })}
-            </div>
-            :
-            // hacky mobile navigation
-            <div className="flex items-center justify-around text-xs">
-              {Object.keys(apps).map((k, i) => {
+              })} */}
+              </div>
+              :
+              // hacky mobile navigation
+              <div className="flex items-center justify-around text-xs">
+                mobile nav
+                {/* {Object.keys(apps).map((k, i) => {
                 if ((apps[k].private && session) || (!apps[k].private)) {return (
                   <Link key={k} to={`.${apps[k].url}`}>
                     <div
@@ -55,10 +68,11 @@ const SiteWrapper = ({ session, setSession, children }) => {
                     </div>
                   </Link>
                 )} else { return null; }
-              })}
-            </div>
-          }
-        </nav>
+              })} */}
+              </div>
+            }
+          </nav>
+        </SiteHeader>
       </>
       {children}
       <SiteFooter />

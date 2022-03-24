@@ -44,10 +44,10 @@ h4 {
   #root {
     display: grid;
     grid-template-areas:
-      "h a"
+      "h m"
       "s m"
       "f f";
-    grid-template-rows: 5rem auto 40px;
+    grid-template-rows: 6rem auto 40px;
     grid-template-columns: 4fr 6fr;
     height: 100vh;
     grid-gap: 0.75rem;
@@ -61,7 +61,6 @@ h4 {
     width: 100vw;
     grid-template-areas:
       "h"
-      "a"
       "m"
       "s"
       "f";
@@ -76,10 +75,6 @@ h4 {
 
 header {
   grid-area: h;
-}
-
-nav {
-  grid-area: a;
 }
 
 main {
