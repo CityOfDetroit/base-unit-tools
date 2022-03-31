@@ -41,6 +41,7 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
                 let feature = d.features[0]
                 let attribs = feature.attributes
                 attribs.legal_description = f.legaldescription
+                attribs.zoning = f.zoning
                 setExtendedAttribs(feature.attributes)
               }
             })
@@ -67,6 +68,8 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
       attributes['Total Acreage'] = extendedAttribs.total_acreage
       attributes['Total Square Footage'] = extendedAttribs.total_square_footage
       attributes['Depth x Frontage (ft)'] = `${extendedAttribs.depth} x ${extendedAttribs.frontage}`
+      attributes['Zoning'] = extendedAttribs.zoning
+
 
 
     };
