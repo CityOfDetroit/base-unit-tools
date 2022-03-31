@@ -15,9 +15,11 @@ import ExplorerStreet from './ExplorerStreet';
 import useFeature from '../hooks/useFeature';
 import useQuery from '../hooks/useQuery';
 import MapillarySv from '../components/MapillarySv';
+import SiteHeader from '../layout/SiteHeader';
+import IssueReporter from '../components/IssueReporter';
 
 
-const Explorer = ({ session }) => {
+const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
 
   // query parameters
   let query = useQuery()
@@ -38,6 +40,8 @@ const Explorer = ({ session }) => {
     id: queryId ? queryId : null
   })
   let feature = useFeature(clicked)
+
+  let [geocoded, setGeocoded] = useState(null)
 
   // this stores IDs of linked features, to be highlighted on the map.
   let [linked, setLinked] = useState({
@@ -85,11 +89,9 @@ const Explorer = ({ session }) => {
   return (
     <>
       <SiteSidebar title="Explorer">
+        <SiteHeader {...{ session, setSession, login, setLogin, currentApp: 'explorer' }} />      
 
-        <AppHeader app={apps.explorer} introduction={introduction} introOpen={false} >
-          <ExplorerSearch {...{ setClicked }} />
-          <ExplorerMapOptions {...{options, setOptions, session, clicked}} />
-        </AppHeader>
+        <AppHeader app={apps.explorer} introduction={introduction} introOpen={false} />
 
         {options.streetView && svImages.length === 0 && <section className="">Loading street view imagery...</section>}
         {options.streetView && svImages.length > 0 && <MapillarySv {...{svImage, svImages, setSvImage, setSvBearing, feature}} />}
@@ -100,7 +102,7 @@ const Explorer = ({ session }) => {
         {clicked.type === 'parcels' && feature && <ExplorerParcel {...{ feature, clicked, setClicked, linked, setLinked }} />}
         {clicked.type === 'streets' && feature && <ExplorerStreet {...{ feature, clicked, setClicked, linked, setLinked }} />}
 
-        {/* Link to issue reporter */}
+        {/* Link to issue reporter
         {feature &&
           <section className="sidebar-section warning">
             <Link to={`/issue-reporter?type=${clicked.type}&id=${clicked.id}`}>
@@ -110,7 +112,9 @@ const Explorer = ({ session }) => {
             </span>
             </Link>
           </section>
-        }
+        } */}
+
+        <IssueReporter />
 
         {/* Link to, uh, Linker */}
         {feature && clicked.type === 'addresses' && session &&
@@ -127,7 +131,11 @@ const Explorer = ({ session }) => {
 
       {/* the main panel contains the map, and we pass it many of our useState variables */}
       <main>
-        <ExplorerMap {...{ clicked, setClicked, linked, feature, history, svImage, setSvImages, svBearing, basemap: options.basemap, showSv: options.streetView }} />
+        <section className="bg-gray-200 p-4">
+        <ExplorerSearch {...{ setClicked, setGeocoded }} />
+        <ExplorerMapOptions {...{options, setOptions, session, clicked}} />
+        </section>
+        <ExplorerMap {...{ clicked, setClicked, geocoded, linked, feature, history, svImage, setSvImages, svBearing, basemap: options.basemap, showSv: options.streetView }} />
       </main>
     </>
   )

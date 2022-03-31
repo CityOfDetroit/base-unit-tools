@@ -44,16 +44,12 @@ const ExplorerAddress = ({ feature, clicked, setClicked, linked, setLinked }) =>
           <p className="font-semibold">There is no linked parcel for this address!</p>
         </section>
       }
-      {attr.bldg_id ? <section className='sidebar-section' style={{ borderLeft: `4px solid ${layers['buildings'].color}` }}>
+      {attr.bldg_id && <section className='sidebar-section' style={{ borderLeft: `4px solid ${layers['buildings'].color}` }}>
         <div className="flex items-center justify-between" >
           <h2 className="text-sm md:text-base">linked to building:</h2>
           <IdBadge layer={layers['buildings']} id={attr.bldg_id} setClicked={setClicked} link />
         </div>
-      </section> :
-        <section className='sidebar-section info flex items-center' >
-          <FontAwesomeIcon icon={faExclamationCircle} className="mr-3 text-lg" />
-          <p className="font-semibold py-1">There is no linked building for this address.</p>
-        </section>
+      </section>
       }
 
       {attr.street_id ? <section className='sidebar-section' style={{ borderLeft: `4px solid ${layers['streets'].color}` }}>

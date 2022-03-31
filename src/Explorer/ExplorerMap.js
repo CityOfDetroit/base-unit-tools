@@ -10,7 +10,7 @@ import videoIcon from '../images/video.png'
 import layers from '../data/layers'
 import { map } from "bluebird";
 
-const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svBearing, basemap, svImage, setSvImages }) => {
+const ExplorerMap = ({ clicked, setClicked, geocoded, linked, feature, showSv, svBearing, basemap, svImage, setSvImages }) => {
 
   // keep a reference to the map object here
   const [theMap, setTheMap] = useState(null);
@@ -113,6 +113,17 @@ const ExplorerMap = ({ clicked, setClicked, linked, feature, showSv, svBearing, 
       })
     }
   }, [theMap, clicked, loading])
+
+  // fires when we get a new geocoded feature
+  useEffect(() => {
+    if (theMap && geocoded && !loading) {
+      console.log(geocoded)
+      theMap.easeTo({
+        center: geocoded.features[0].geometry.coordinates,
+        zoom: theMap.getZoom() < 17 ? 17 : theMap.getZoom()
+      })
+    }
+  }, [theMap, geocoded, loading])
 
   // fires when we get linked features
   useEffect(() => {
