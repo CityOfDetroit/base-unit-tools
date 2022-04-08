@@ -1,46 +1,97 @@
-import layers from '../data/layers'
-import IdBadge from './IdBadge'
+import { faChevronCircleDown, faChevronCircleRight, faLink } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import CopyValue from "../components/CopyValue";
+import layers from "../data/layers";
+import IdBadge from "./IdBadge";
+import { useState } from "react";
+import AnimateHeight from "react-animate-height";
 
-const ExplorerFeature = ({ attr, attributes, longAttributes={}, clicked=null }) => {
-
+const ExplorerFeature = ({
+  attr,
+  attributes,
+  longAttributes = {},
+  clicked = null,
+}) => {
   // let hasSource = Object.keys(attr).indexOf('geo_source') > -1
 
-  let layer = layers[clicked.type]
+  let layer = layers[clicked.type];
+
+  let [show, setShow] = useState(true);
 
   return (
     <>
-      <div className="bg-gray-300 p-2 text-xs font-bold flex items-center justify-between" style={{ borderLeft: `8px solid ${layer.color}` }}>
-        <h2>{layer.label}</h2>
+      <div
+        className="bg-gray-300 p-2 text-xs font-bold flex items-center justify-between"
+        style={{ borderLeft: `8px solid ${layer.color}` }}
+      >
         <div className="flex items-center">
-          {/* {hasSource && <span className="font-semibold text-gray-500 bg-gray-300 py-1 px-2 mx-3 text-sm">{attr.geo_source}</span>} */}
+          <h2 className="text-sm md:text-lg mr-3">{layer.label}</h2>
           <IdBadge id={attr[layer.id_column]} layer={layer} link={false} />
-          {/* <pre className="font-bold" style={{background: '#feb70d'}}>{clicked.type === 'parcels' ? null : `#`}{attr[layer.id_column]}</pre> */}
-        </div>      
+          <FontAwesomeIcon
+            icon={faLink}
+            className="ml-2 text-gray-400 hover:text-gray-500"
+          />
+        </div>
+        <div className="flex items-center">
+          <FontAwesomeIcon icon={show ? faChevronCircleDown : faChevronCircleRight} className="mx-2 text-gray-500 text-xl" onClick={() => setShow(!show)} />
+        </div>
       </div>
-      <section className='sidebar-section' style={{ borderLeft: `8px solid ${layer.color}` }}>
+      <AnimateHeight duration={250} height={show ? "auto" : 0}>
+      <section
+        className="sidebar-section"
+        style={{ borderLeft: `8px solid ${layer.color}` }}
+      >
         <table className="w-full">
           <tbody>
             {Object.keys(attributes).map((f, i) => (
-              <tr key={i} className={(i + 1 === Object.keys(attributes).length) ? 'h-10' : 'border-b-2 border-gray-400 h-10'}>
-                <td className="w-2/5 font-bold text-sm">{f}</td>
-                <td className="">{attributes[f]}</td>
+              <tr
+                key={i}
+                className={
+                  i + 1 === Object.keys(attributes).length
+                    ? "flex items-center"
+                    : "border-b-2 border-gray-400 flex items-center"
+                }
+              >
+                <td className="w-1/3 md:w-2/5 my-2 font-bold text-xs md:text-sm ">
+                  {f}
+                </td>
+                <td className="text-xs md:text-sm flex w-2/3 md:w-3/5 my-2 justify-between items-center pr-2">
+                  {attributes[f]}
+                  {attributes[f] && attributes[f] !== '' && <CopyValue
+                    value={attributes[f]}
+                    className="text-gray-300 hover:text-gray-400"
+                  />}
+                </td>
               </tr>
-
             ))}
           </tbody>
         </table>
-        {Object.keys(longAttributes).length > 0 && Object.keys(longAttributes).map((f,i) => (
-          <div key={i} style={{paddingLeft: 2}}>
-          <h3 className={i === 0 ? 'border-t-2 border-gray-400 text-sm py-2' : 'text-sm py-2'}>
-            {f}
-          </h3>
-          <p className="px-2 text-sm leading-tight"> {longAttributes[f]}</p>
-          </div>
+        {Object.keys(longAttributes).length > 0 &&
+          Object.keys(longAttributes).map((f, i) => (
+            <div key={i} style={{ paddingLeft: 2 }}>
+              <div
+                className={
+                  i === 0
+                    ? "border-t-2 border-gray-400 text-xs md:text-sm py-2 pr-2 flex items-center justify-between"
+                    : "text-xs md:text-sm py-2 pr-2 flex items-center justify-between"
+                }
+              >
+                <span className="font-bold">{f}</span>
+                <CopyValue
+                  value={longAttributes[f]}
+                  className="text-gray-300 hover:text-gray-400"
+                />
+              </div>
 
-        ))}
+              <p className="px-1 md:px-2 text-xs md:text-sm leading-4">
+                {longAttributes[f]}
+              </p>
+            </div>
+          ))}
       </section>
+      </AnimateHeight>
     </>
-  )
-}
+  );
+};
 
 export default ExplorerFeature;

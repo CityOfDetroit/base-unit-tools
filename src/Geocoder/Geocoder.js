@@ -9,8 +9,9 @@ import AppHeader from '../components/AppHeader';
 import apps from '../data/apps';
 import { bulkGeocode } from '@esri/arcgis-rest-geocoding';
 import {geocoderUrl} from '../hooks/useGeocoder';
+import SiteHeader from '../layout/SiteHeader';
 
-const Geocoder = () => {
+const Geocoder = ({ session, setSession, login, setLogin }) => {
 
   // we store the user input in value
   let [value, setValue] = useState('')
@@ -70,10 +71,9 @@ const Geocoder = () => {
 
   return (
     <>
+      <SiteHeader {...{ session, setSession, login, setLogin, currentApp: 'geocoder' }} />      
+      <AppHeader app={apps.geocoder} />
       <SiteSidebar title="Geocoder">
-        {/* <p className="opacity-50 text-xs mb-2">currently using: <a href={geocoder.url}><strong>{geocoder.name}</strong></a></p> */}
-
-        <AppHeader app={apps.geocoder} />
         <section className="sidebar-section">
           <h2>1. Enter your list of addresses</h2>
           <p className="text-sm">Please put one address on each line</p>
@@ -135,7 +135,6 @@ const Geocoder = () => {
             <table className="w-full">
               <thead style={{ position: 'sticky' }}>
                 <tr style={{ position: 'sticky' }}>
-                  <th></th>
                   <th>Input</th>
                   {matched && <th>Match</th>}
                   {council && <th>Council Dist.</th>}
@@ -150,7 +149,6 @@ const Geocoder = () => {
               <tbody className="w-full">
                 {results.map((r, i) => (
                   <tr key={`${r.address} - ${i}`} className={i % 2 === 1 ? "text-sm" : "text-sm bg-gray-100"}>
-                    <td><Link to={`/issue-reporter?address=${addresses[i]}`}><FontAwesomeIcon icon={faWrench} /></Link></td>
                     <td>{addresses[i]}</td>
                     {matched && <td>{r.attributes.StAddr}</td>}
                     {council && <td>{r.attributes.council_district}</td>}

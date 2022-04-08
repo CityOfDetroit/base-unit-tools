@@ -1,9 +1,8 @@
 import React from 'react'
 
 export const SiteSidebar = ({ title="My Sidebar", children }) => (
-    <sidebar is="section">
-        {/* <h2 className="text-xl p-2 bg-gray-300 border-none">{title}</h2> */}
-            {children}
+    <sidebar is="section" className="items-start overflow-y-auto pr-2 md:pr-0">
+      {children}
     </sidebar>
 )
 

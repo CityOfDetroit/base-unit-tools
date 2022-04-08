@@ -8,7 +8,7 @@ let basemaps = {
   'satellite': 'Satellite',
 }
 
-const ExplorerMapOptions = ({ options, setOptions, session }) => {
+const ExplorerMapOptions = ({ options, setOptions, session, clicked }) => {
 
   // add to obj on session
   if(session) {
@@ -16,37 +16,36 @@ const ExplorerMapOptions = ({ options, setOptions, session }) => {
   }
 
   return (
-    <>
-      <h2 className="text-base">Map options</h2>
-
-      <div className="mt-1 flex">
+    <section className="flex flex-col items-start">
+      <div className="flex justify-around md:justify-start gap-2 w-full">
         {/* Street view toggle */}
         <Button
           onClick={() => setOptions({ ...options, streetView: !options.streetView })}
           icon={faStreetView}
           text="Street view"
           active={options.streetView}
-          className="mr-2"
+          disabled={clicked.id === null}
+          className="flex-grow-0"
           small
         />
 
         {/* Basemap selector */}
-        <div className="flex items-center my-2">
-          <div className="h-9 px-3 font-semibold text-gray-900 text-sm flex items-center bg-blue-300">
+        <div className="flex h-9">
+          <div className="px-3 font-semibold text-gray-900 flex items-center bg-blue-300 text-sm">
             <FontAwesomeIcon icon={faMapMarked} className="mr-2" />
             <span>Basemap</span>
           </div>
           <select 
-            className="h-9 text-base pl-2 w-32" 
+            className="pl-2 w-24 text-sm" 
             onChange={(e) => setOptions({ ...options, basemap: e.target.value })}
             >
             {Object.keys(basemaps).map((k) => (
-              <option className="text-base" key={k} value={k}>{basemaps[k]}</option>
+              <option key={k} value={k}>{basemaps[k]}</option>
             ))}
           </select>
         </div>
       </div>
-    </>
+    </section>
   )
 }
 

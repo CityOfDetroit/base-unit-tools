@@ -37,6 +37,7 @@ const handleSubmit = (data, session, setSubmitted, geometry) => {
     .then(d => console.log(d))
 
   let esriFeatures = data.map(ad => {
+    ad['scenario'] = 'NewBuildingAddress'
     return {
       geometry: geometry,
       attributes: ad
@@ -54,7 +55,7 @@ const NewAddressToSubmit = ({ modelAddress, building, street, parcel, setParcel,
   let [houseNumber, setHouseNumber] = useState(modelAddress.attributes.street_number)
   let streetFeature = useFeature({ type: 'streets', id: street })
   let buildingFeature = useFeature({ type: 'buildings', id: building })
-  let { street_prefix, street_name, street_type } = streetFeature.attributes
+  let { street_prefix, street_name, street_type } = streetFeature ? streetFeature.attributes : {}
   let fullStreetName = [street_prefix, street_name, street_type].join(" ").trim()
 
   let unitTypes = [

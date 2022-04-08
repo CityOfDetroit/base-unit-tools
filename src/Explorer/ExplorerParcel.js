@@ -34,10 +34,16 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
         outFields: ['*']
       })
         .then(d => {
-          if(d.features.length > 0) {
-            let feature = d.features[0]
-            setExtendedAttribs(feature.attributes)
-          }
+          fetch(`https://apis.detroitmi.gov/assessments/parcel/${attr.parcel_id}/`)
+            .then(e => e.json())
+            .then(f => {
+              if(d.features.length > 0) {
+                let feature = d.features[0]
+                let attribs = feature.attributes
+                attribs.legal_description = f.legaldescription
+                setExtendedAttribs(feature.attributes)
+              }
+            })
         })
     }, [attr.parcel_id])
 

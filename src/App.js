@@ -3,11 +3,11 @@ import {
   BrowserRouter as Router,
   Route, Switch
 } from "react-router-dom";
+
 import Analytics from 'react-router-ga';
 import BaseUnitTools from './BaseUnitTools/BaseUnitTools';
 import Explorer from './Explorer/Explorer';
 import Geocoder from './Geocoder/Geocoder';
-import IssueReporter from './IssueReporter/IssueReporter';
 import SiteWrapper from './layout/SiteWrapper';
 import Validator from './Validator/Validator';
 import Mailer from './Mailer/Mailer';
@@ -21,34 +21,38 @@ function App() {
   // we use this session to track the ArcGIS Online login
   const [session, setSession] = useState(null)
 
+  // get the current browser URL to highlight the correct nav entry
+  // const location = useLocation()
+
+  // let currentApp = Object.keys(apps).find(app => apps[app].url === location.pathname)
+
+  const [login, setLogin] = useState(false)
+
   return (
     <Router basename='/base-unit-tools'>
       <Analytics id={trackingId} debug>
         <SiteWrapper {...{ session, setSession }}>
           <Switch>
             <Route path="/explorer">
-              <Explorer {...{session}} />
-            </Route>
-            <Route path="/issue-reporter">
-              <IssueReporter {...{ session }} />
+              <Explorer {...{session, setSession, login, setLogin }} />
             </Route>
             <Route path="/validator">
-              <Validator />
+              <Validator {...{session, setSession, login, setLogin }} />
             </Route>
             {session && <Route path="/mailer">
-              <Mailer {...{ session }} />
+              <Mailer {...{session, setSession, login, setLogin }} />
             </Route>}
             {session && <Route path="/assignment">
-              <Assignment {...{ session }}/>
+              <Assignment {...{session, setSession, login, setLogin }}/>
             </Route>}
             <Route path="/geocoder">
-              <Geocoder />
+              <Geocoder {...{session, setSession, login, setLogin }} />
             </Route>
             {session && <Route path="/linker">
-              <Linker {...{ session }} />
+              <Linker {...{session, setSession, login, setLogin }} />
             </Route>}
             <Route path="/">
-              <BaseUnitTools {...{ session }} />
+              <BaseUnitTools {...{session, setSession, login, setLogin }} />
             </Route>
           </Switch>
         </SiteWrapper>

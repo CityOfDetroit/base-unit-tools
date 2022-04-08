@@ -20,7 +20,7 @@ export const apps = {
     'geocoder': {
         name: 'Geocoder',
         url: `/geocoder`,
-        description: `Locate and attach information to addresses.`,
+        description: `Locate and attach information to many addresses at once.`,
         questions: [
             `What council district & neighborhood does this address fall in?`,
             `We need geographic coordinates for these addresses.`
@@ -28,19 +28,9 @@ export const apps = {
         icon: faTasks,
         private: false
     },
-    'issue-reporter': {
-        name: 'Issue Reporter',
-        url: `/issue-reporter`,
-        description: `Help us find problems with our address data`,
-        questions: [
-            `I can't get this address to geocode; can we add it to the database?`
-        ],
-        icon: faWrench,
-        private: false
-    },
     'validator': {
         name: 'Validator',
-        description: `A utility to parse, clean up, and validate an individual address`,
+        description: `A utility to validate an individual address`,
         questions: [
             `Is this is a valid address?`
         ],

@@ -22,24 +22,25 @@ const handleSubmit = (data, lngLat, session, setSubmitted) => {
     "creator": session.username,
   }
 
-  // fetch(`https://hook.integromat.com/fgu9lrjc6ps43fdk8s7tdat9ylv20uqg`, {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //     'Access-Control-Allow-Origin': '*'
-  //   },
-  //   body: JSON.stringify(integromatBody)
-  // })
-  //   .then(d => console.log(d))
+  fetch(`https://hook.integromat.com/fgu9lrjc6ps43fdk8s7tdat9ylv20uqg`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    },
+    body: JSON.stringify(integromatBody)
+  })
+    .then(d => console.log(d))
 
   let esriFeatures = data.map(ad => {
+    ad['scenario'] = 'NewUtilityPole'
+
     return {
       geometry: { x: lngLat.lng, y: lngLat.lat, spatialReference: { wkid: 4326 } },
       attributes: ad
     }
   })
 
-  console.log(esriFeatures)
   addFeatures({
     url: `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/address_assignments/FeatureServer/0`,
     features: esriFeatures,
@@ -52,7 +53,7 @@ const handleSubmit = (data, lngLat, session, setSubmitted) => {
 const NewAddressToSubmit = ({ street, lngLat, session }) => {
   let [houseNumber, setHouseNumber] = useState('')
   let streetFeature = useFeature({ type: 'streets', id: street })
-  let { street_prefix, street_name, street_type } = streetFeature.attributes
+  let { street_prefix, street_name, street_type } = streetFeature ? streetFeature.attributes : {}
   let fullStreetName = [street_prefix, street_name, street_type].join(" ").trim()
 
   let [notes, setNotes] = useState('')
@@ -127,13 +128,14 @@ const NewAddressToSubmit = ({ street, lngLat, session }) => {
     </>
   )
 }
+
 const NewUtilityPole = ({ street, setStreet, session, addresses, setAddresses, lngLat, setLngLat }) => {
   return (
     <>
       {!street && <section className='sidebar-section'>
         <h2>Click a street segment for the new utility address.</h2>
       </section>}
-      {street && <AssignmentStreet {...{ street, addresses, setAddresses }} />}
+      {street && street !== '' && <AssignmentStreet {...{ street, addresses, setAddresses }} />}
       {street && <section className='sidebar-section'>
         <h2 className="p-1 my-1">Adjust the location <span class="dot" style={{ height: 20, width: 20, border: `2px solid #ddd`, background: `rgba(120,0,0,0.5)`, borderRadius: `50%`, display: `inline-block`, marginBottom: -3, marginLeft: 5, marginRight: 5 }}></span> of the new utility pole address by clicking the map.</h2>
       </section>}

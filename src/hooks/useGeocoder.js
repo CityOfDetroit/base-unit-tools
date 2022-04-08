@@ -2,12 +2,11 @@ import { useState, useEffect } from 'react'
 import { geocode } from '@esri/arcgis-rest-geocoding';
 
 let geocoders = {
-  prod: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoder/GeocodeServer`,
-  dev: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoder_DEV/GeocodeServer`,
-  dev2: `https://opengis.detroitmi.gov/opengis/rest/services/Geocoders/TestingJoinIDHypothesisBetaCOmposite/GeocodeServer/`
+  composite: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoderCenterline/GeocodeServer`,
+  point: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoder/GeocodeServer`,
 }
 
-export const geocoderUrl = geocoders.prod
+export const geocoderUrl = geocoders.composite
 
 /**
  * useGeocoder custom hook.
@@ -25,7 +24,6 @@ export const useGeocoder = (input) => {
 
   useEffect(() => {
     if (input) {
-
       // first, we try to call the base units geocoder
       geocode({
         endpoint: geocoderUrl,
@@ -37,38 +35,8 @@ export const useGeocoder = (input) => {
           setData(r.geoJson)
           setResultType('point')
         }
-        // we did not get a result: fall back to the street centerline geocoder
         else {
-          let spacesRe = /\s/g
-          // which does not seem to be supported by the Esri library, so we manually fetch using this URL template
-          let url = `https://gis.detroitmi.gov/arcgis/rest/services/DoIT/StreetCenterlineGeocoder/GeocodeServer/findAddressCandidates?Single+Line+Input=${input.replace(spacesRe, '+')}&outFields=*&outSR=4326&f=pjson`
-          fetch(url)
-            .then(s => s.json())
-            .then(d => {
-              if (d.candidates.length > 0) {
-                let add = d.candidates[0]
-                // manually creating a FeatureCollection here
-                setData({
-                  type: 'FeatureCollection',
-                  features: [
-                    {
-                      type: "Feature",
-                      properties: { ...add.attributes },
-                      geometry: {
-                        type: "Point",
-                        coordinates: [add.location.x, add.location.y]
-                      }
-                    }
-                  ]
-                })
-                setResultType('centerline')
-              }
-              // if there was no match on either geocoder, we return [null, 'none']
-              else {
-                setData(null)
-                setResultType('none')
-              }
-            })
+          console.log(r)
         }
       })
     }

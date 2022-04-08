@@ -3,8 +3,9 @@ import AppHeader from '../components/AppHeader';
 import apps from '../data/apps';
 import SiteSidebar from '../layout/SiteSidebar';
 import parse from '../parser.js'
+import SiteHeader from '../layout/SiteHeader';
 
-const Validator = () => {
+const Validator = ({ session, setSession, login, setLogin }) => {
 
   let [value, setValue] = useState('')
 
@@ -31,9 +32,10 @@ const Validator = () => {
   )
   return (
     <>
-      <SiteSidebar title="Validator">
+      <SiteHeader {...{ session, setSession, login, setLogin, currentApp: 'validator' }} />
       <AppHeader app={apps.validator} introduction={introduction}>
       </AppHeader>
+      <SiteSidebar title="Validator">
         <section className="sidebar-section">
           <h2>Address to parse</h2>
           <div className="flex items-center justify-between">

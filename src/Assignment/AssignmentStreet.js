@@ -40,7 +40,7 @@ const AssignmentStreet = ({ street, addresses, setAddresses }) => {
 
   let clicked = { type: 'streets', id: street }
 
-  let { properties: attr } = feature;
+  let { properties: attr } = feature ? feature : {};
 
   // lookup for legalsystem attribute
   let legalSystems = {

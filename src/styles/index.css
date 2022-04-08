@@ -44,13 +44,13 @@ h4 {
   #root {
     display: grid;
     grid-template-areas:
-      "h a"
+      "h m"
+      "ah m"
       "s m"
       "f f";
-    grid-template-rows: 5rem auto 40px;
     grid-template-columns: 4fr 6fr;
+    grid-template-rows: auto auto 1fr auto;
     height: 100vh;
-    grid-gap: 0.75rem;
   }
 }
 
@@ -59,14 +59,14 @@ h4 {
   #root {
     display: grid;
     width: 100vw;
+    min-height: 100vh;
     grid-template-areas:
       "h"
-      "a"
-      "s"
+      "ah"
       "m"
+      "s"
       "f";
-    grid-template-rows: 70px auto auto 50vh 40px;
-    grid-gap: 0.25rem;
+    grid-template-rows: auto auto 1fr auto auto;
   }
 
   nav {
@@ -74,34 +74,25 @@ h4 {
   }
 }
 
-header {
-  grid-area: h;
-}
-
-nav {
-  grid-area: a;
-}
-
 main {
   grid-area: m;
   overflow-y: auto;
+  @apply m-0;
+  @apply md:m-2;
+  @apply pr-2;
+  @apply md:pr-0;
+}
+
+header {
+  grid-area: h;
 }
 
 sidebar {
   grid-area: s;
   overflow-y: auto;
+  @apply pr-2;
+  @apply md:pr-0;
 }
-
-@media only screen and (min-width: 769px) {
-  sidebar {
-    @apply ml-2;
-  }
-
-  main {
-    @apply mr-2;
-  }
-}
-
 
 footer {
   grid-area: f;
@@ -111,11 +102,11 @@ footer {
 /* desktop styling */
 @media only screen and (min-width: 769px) {
   .explorer-map {
-    height: calc(100vh - 60px - 11rem);
+    height: calc(100vh - 64px - 48px - 1rem);
   }
 
   .mailer-map {
-    height: calc(80vh - 100px - 350px);
+    height: calc(50vh);
   }
 
   .assignment-map {
@@ -129,8 +120,9 @@ footer {
 
 /* mobile styling */
 @media only screen and (max-width: 768px) {
+
   .explorer-map {
-    height: calc(50vh - 60px);
+    height: calc(40vh);
   }
 
   .mailer-map {
@@ -206,8 +198,8 @@ a {
 
 .sidebar-section {
   @apply p-2;
-  @apply mb-2;
   @apply bg-gray-100;
+  @apply text-sm;
 }
 
 .sidebar-section p {
