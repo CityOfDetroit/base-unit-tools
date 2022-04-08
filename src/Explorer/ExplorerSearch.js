@@ -19,41 +19,31 @@ const ExplorerSearch = ({ setClicked, setGeocoded }) => {
       })
       setGeocoded(featureCollection)
     }
-    else if (firstResult && firstResult.properties.Addr_type === 'StreetAddress') {
+    else if (firstResult && ['StreetAddress', 'StreetInt'].indexOf(firstResult.properties.Addr_type) > -1) {
+      setClicked({})
       setGeocoded(featureCollection)
     }
   }, [featureCollection, type])
 
   return (
-    <section className="my-1">
-      <h2 className="text-sm md:text-base flex items-center justify-between">
-        Search for an address:
-        {/* what if we couldn't find it? */}
-        {type && type === '' && 
-          <div className="flex items-end justify-start text-xs font-semibold bg-red-400 text-gray-700 px-4 py-1">
-            No results found!
-          </div>
-        }
-      </h2>
-      <div className="flex items-center justify-start text-sm md:text-base mt-1 w-full md:w-4/5">
-        <input
-          className="p-2 w-full bg-"
-          type="text"
-          value={value}
-          onChange={(e) => setValue(e.target.value)} 
-          onKeyPress={(e) => e.code === 'Enter' && setSearchValue(value)}
-          />
-        <Button
-          active={value !== ''}
-          disabled={value === ''}
-          small
-          className="py-2"
-          onClick={() => setSearchValue(value)}
-          text='Search'
-          icon={faSearch} />
-      </div>
-
-    </section>
+    <div className="flex items-center justify-start text-sm md:text-base w-full bg-gray-200 p-2 md:p-3">
+      <input
+        className="p-2 w-full md:w-1/2"
+        type="text"
+        value={value}
+        placeholder={`Search for an address or intersection`}
+        onChange={(e) => setValue(e.target.value)} 
+        onKeyPress={(e) => e.code === 'Enter' && setSearchValue(value)}
+        />
+      <Button
+        active={value !== ''}
+        disabled={value === ''}
+        small
+        className="py-2"
+        onClick={() => setSearchValue(value)}
+        text='Search'
+        icon={faSearch} />
+    </div>
   )
 }
 

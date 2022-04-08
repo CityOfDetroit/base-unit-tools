@@ -14,7 +14,7 @@ export const Login = ({ session, setSession, setLogin }) => {
 
   return (
     <section className="text-sm w-full md:w-1/2 p-6 bg-gray-100 mt-0 md:mt-12 md:h-96">
-      <h2 className="text-base flex items-center justify-between">
+      <h2 className="text-sm flex items-center justify-between">
         {session
           ? `Logged in as ${session.username}`
           : "Log in to ArcGIS Online"}

@@ -16,10 +16,8 @@ const ExplorerMapOptions = ({ options, setOptions, session, clicked }) => {
   }
 
   return (
-    <section className="flex flex-col items-start gap-0 md:justify-start">
-      <h2 className="text-sm md:display-none">Map options</h2>
-
-      <div className="mt-1 flex flex-col md:flex-row text-sm md:text-base gap-2">
+    <section className="flex flex-col items-start">
+      <div className="flex justify-around md:justify-start gap-2 w-full">
         {/* Street view toggle */}
         <Button
           onClick={() => setOptions({ ...options, streetView: !options.streetView })}
@@ -32,17 +30,17 @@ const ExplorerMapOptions = ({ options, setOptions, session, clicked }) => {
         />
 
         {/* Basemap selector */}
-        <div className="flex items-center">
-          <div className="h-9 px-3 font-semibold text-gray-900 flex items-center bg-blue-300">
+        <div className="flex h-9">
+          <div className="px-3 font-semibold text-gray-900 flex items-center bg-blue-300 text-sm">
             <FontAwesomeIcon icon={faMapMarked} className="mr-2" />
             <span>Basemap</span>
           </div>
           <select 
-            className="h-9  pl-2 w-32" 
+            className="pl-2 w-24 text-sm" 
             onChange={(e) => setOptions({ ...options, basemap: e.target.value })}
             >
             {Object.keys(basemaps).map((k) => (
-              <option className="" key={k} value={k}>{basemaps[k]}</option>
+              <option key={k} value={k}>{basemaps[k]}</option>
             ))}
           </select>
         </div>

@@ -33,7 +33,7 @@ const ExplorerFeature = ({
           />
         </div>
         <div className="flex items-center">
-          <FontAwesomeIcon icon={show ? faChevronCircleDown : faChevronCircleRight} className="ml-2 text-xl" onClick={() => setShow(!show)} />
+          <FontAwesomeIcon icon={show ? faChevronCircleDown : faChevronCircleRight} className="mx-2 text-gray-500 text-xl" onClick={() => setShow(!show)} />
         </div>
       </div>
       <AnimateHeight duration={250} height={show ? "auto" : 0}>
@@ -48,14 +48,14 @@ const ExplorerFeature = ({
                 key={i}
                 className={
                   i + 1 === Object.keys(attributes).length
-                    ? "h-10 flex items-center"
-                    : "border-b-2 border-gray-400 h-10 flex items-center"
+                    ? "flex items-center"
+                    : "border-b-2 border-gray-400 flex items-center"
                 }
               >
-                <td className="w-1/3 md:w-2/5 font-bold text-xs md:text-sm">
+                <td className="w-1/3 md:w-2/5 my-2 font-bold text-xs md:text-sm ">
                   {f}
                 </td>
-                <td className="text-xs md:text-sm flex w-2/3 md:w-3/5 justify-between items-center pr-2">
+                <td className="text-xs md:text-sm flex w-2/3 md:w-3/5 my-2 justify-between items-center pr-2">
                   {attributes[f]}
                   {attributes[f] && attributes[f] !== '' && <CopyValue
                     value={attributes[f]}
@@ -83,8 +83,7 @@ const ExplorerFeature = ({
                 />
               </div>
 
-              <p className="px-1 md:px-2 text-xs md:text-sm leading-tight">
-                {" "}
+              <p className="px-1 md:px-2 text-xs md:text-sm leading-4">
                 {longAttributes[f]}
               </p>
             </div>

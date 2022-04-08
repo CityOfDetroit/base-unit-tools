@@ -1,16 +1,13 @@
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import {
   BrowserRouter as Router,
   Route, Switch
 } from "react-router-dom";
-import apps from './data/apps';
-import { Link, useLocation } from 'react-router-dom';
 
 import Analytics from 'react-router-ga';
 import BaseUnitTools from './BaseUnitTools/BaseUnitTools';
 import Explorer from './Explorer/Explorer';
 import Geocoder from './Geocoder/Geocoder';
-import IssueReporter from './IssueReporter/IssueReporter';
 import SiteWrapper from './layout/SiteWrapper';
 import Validator from './Validator/Validator';
 import Mailer from './Mailer/Mailer';
@@ -39,26 +36,23 @@ function App() {
             <Route path="/explorer">
               <Explorer {...{session, setSession, login, setLogin }} />
             </Route>
-            <Route path="/issue-reporter">
-              <IssueReporter {...{ session }} />
-            </Route>
             <Route path="/validator">
-              <Validator />
+              <Validator {...{session, setSession, login, setLogin }} />
             </Route>
             {session && <Route path="/mailer">
-              <Mailer {...{ session }} />
+              <Mailer {...{session, setSession, login, setLogin }} />
             </Route>}
             {session && <Route path="/assignment">
-              <Assignment {...{ session }}/>
+              <Assignment {...{session, setSession, login, setLogin }}/>
             </Route>}
             <Route path="/geocoder">
-              <Geocoder />
+              <Geocoder {...{session, setSession, login, setLogin }} />
             </Route>
             {session && <Route path="/linker">
-              <Linker {...{ session }} />
+              <Linker {...{session, setSession, login, setLogin }} />
             </Route>}
             <Route path="/">
-              <BaseUnitTools {...{ session }} />
+              <BaseUnitTools {...{session, setSession, login, setLogin }} />
             </Route>
           </Switch>
         </SiteWrapper>

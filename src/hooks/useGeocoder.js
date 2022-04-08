@@ -30,7 +30,6 @@ export const useGeocoder = (input) => {
         singleLine: input,
         outFields: '*'
       }).then(r => {
-        console.log(r)
         // if we got a result, return it.
         if (r.candidates.length > 0) {
           setData(r.geoJson)

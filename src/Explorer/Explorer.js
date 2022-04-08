@@ -41,6 +41,7 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
   })
   let feature = useFeature(clicked)
 
+  // this stores the current geocoding result
   let [geocoded, setGeocoded] = useState(null)
 
   // this stores IDs of linked features, to be highlighted on the map.
@@ -88,11 +89,11 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
 
   return (
     <>
+      <SiteHeader {...{ session, setSession, login, setLogin, currentApp: 'explorer' }} />      
+      <AppHeader app={apps.explorer} introduction={introduction} introOpen={false}>
+        <ExplorerMapOptions {...{options, setOptions, session, clicked}} />
+      </AppHeader>
       <SiteSidebar title="Explorer">
-        <SiteHeader {...{ session, setSession, login, setLogin, currentApp: 'explorer' }} />      
-
-        <AppHeader app={apps.explorer} introduction={introduction} introOpen={false} />
-
         {options.streetView && svImages.length === 0 && <section className="">Loading street view imagery...</section>}
         {options.streetView && svImages.length > 0 && <MapillarySv {...{svImage, svImages, setSvImage, setSvBearing, feature}} />}
 
@@ -102,19 +103,7 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
         {clicked.type === 'parcels' && feature && <ExplorerParcel {...{ feature, clicked, setClicked, linked, setLinked }} />}
         {clicked.type === 'streets' && feature && <ExplorerStreet {...{ feature, clicked, setClicked, linked, setLinked }} />}
 
-        {/* Link to issue reporter
-        {feature &&
-          <section className="sidebar-section warning">
-            <Link to={`/issue-reporter?type=${clicked.type}&id=${clicked.id}`}>
-              <FontAwesomeIcon icon={faWrench} />
-              <span className="text-semibold text-sm ml-2">
-                Report an issue here
-            </span>
-            </Link>
-          </section>
-        } */}
-
-        <IssueReporter />
+        {(clicked.type || geocoded) && <IssueReporter {...{session, clicked, geocoded, feature}} />}
 
         {/* Link to, uh, Linker */}
         {feature && clicked.type === 'addresses' && session &&
@@ -131,10 +120,7 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
 
       {/* the main panel contains the map, and we pass it many of our useState variables */}
       <main>
-        <section className="bg-gray-200 p-4">
         <ExplorerSearch {...{ setClicked, setGeocoded }} />
-        <ExplorerMapOptions {...{options, setOptions, session, clicked}} />
-        </section>
         <ExplorerMap {...{ clicked, setClicked, geocoded, linked, feature, history, svImage, setSvImages, svBearing, basemap: options.basemap, showSv: options.streetView }} />
       </main>
     </>

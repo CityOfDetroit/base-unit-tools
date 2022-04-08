@@ -44,13 +44,13 @@ h4 {
   #root {
     display: grid;
     grid-template-areas:
-      "s m"
+      "h m"
+      "ah m"
       "s m"
       "f f";
-    grid-template-rows: auto auto 40px;
     grid-template-columns: 4fr 6fr;
+    grid-template-rows: auto auto 1fr auto;
     height: 100vh;
-    @apply gap-2;
   }
 }
 
@@ -59,12 +59,14 @@ h4 {
   #root {
     display: grid;
     width: 100vw;
+    min-height: 100vh;
     grid-template-areas:
-      "s"
+      "h"
+      "ah"
       "m"
+      "s"
       "f";
-    grid-template-rows: auto auto auto auto auto;
-    @apply gap-1;
+    grid-template-rows: auto auto 1fr auto auto;
   }
 
   nav {
@@ -75,12 +77,21 @@ h4 {
 main {
   grid-area: m;
   overflow-y: auto;
+  @apply m-0;
+  @apply md:m-2;
+  @apply pr-2;
+  @apply md:pr-0;
+}
+
+header {
+  grid-area: h;
 }
 
 sidebar {
   grid-area: s;
   overflow-y: auto;
   @apply pr-2;
+  @apply md:pr-0;
 }
 
 footer {
@@ -91,11 +102,11 @@ footer {
 /* desktop styling */
 @media only screen and (min-width: 769px) {
   .explorer-map {
-    height: calc(100vh - 60px - 11rem);
+    height: calc(100vh - 64px - 48px - 1rem);
   }
 
   .mailer-map {
-    height: calc(80vh - 100px - 350px);
+    height: calc(50vh);
   }
 
   .assignment-map {
@@ -189,7 +200,6 @@ a {
   @apply p-2;
   @apply bg-gray-100;
   @apply text-sm;
-  @apply md:text-base;
 }
 
 .sidebar-section p {

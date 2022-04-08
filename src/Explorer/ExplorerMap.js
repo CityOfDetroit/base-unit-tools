@@ -49,6 +49,8 @@ const ExplorerMap = ({ clicked, setClicked, geocoded, linked, feature, showSv, s
       })
     );
 
+    map.addControl(new mapboxgl.NavigationControl({showCompass: false}), 'top-left');
+
     map.on("load", () => {
       setTheMap(map);
     });
@@ -117,7 +119,6 @@ const ExplorerMap = ({ clicked, setClicked, geocoded, linked, feature, showSv, s
   // fires when we get a new geocoded feature
   useEffect(() => {
     if (theMap && geocoded && !loading) {
-      console.log(geocoded)
       theMap.easeTo({
         center: geocoded.features[0].geometry.coordinates,
         zoom: theMap.getZoom() < 17 ? 17 : theMap.getZoom()
