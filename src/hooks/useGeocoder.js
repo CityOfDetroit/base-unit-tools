@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { geocode } from '@esri/arcgis-rest-geocoding';
 
-let geocoders = {
+export const geocoders = {
   composite: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoderCenterline/GeocodeServer`,
   point: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoder/GeocodeServer`,
 }
@@ -32,6 +32,7 @@ export const useGeocoder = (input) => {
       }).then(r => {
         // if we got a result, return it.
         if (r.candidates.length > 0) {
+          console.log(r)
           setData(r.geoJson)
           setResultType('point')
         }

@@ -17,11 +17,11 @@ const AppHeader = ({ app, introduction = false, introOpen=true, children }) => {
           <h2 className="text-sm md:text-lg ml-2 md:ml-3"><b>{app.name}</b></h2>
         </div>
         <div className="flex items-center gap-4 mr-2">
-          {introduction && <div className="hover:bg-gray-500 hover:bg-opacity-20 rounded" onClick={() => setShowIntro(!showIntro)}>
-            <FontAwesomeIcon icon={faInfoCircle} className={showIntro ? "text-gray-800 text-base md:text-xl" : "text-gray-500 text-base md:text-xl"} />
+          {introduction && <div className="hover:text-gray-500 hover:bg-opacity-20 rounded" onClick={() => setShowIntro(!showIntro)}>
+            <FontAwesomeIcon icon={faInfoCircle} className={showIntro ? "text-gray-800 text-base md:text-xl cursor-pointer" : "text-gray-500 text-base md:text-xl cursor-pointer"} />
           </div>}
-          {children && <div className="hover:bg-gray-500 hover:bg-opacity-20 rounded" onClick={() => setOpen(!open)}>
-            <FontAwesomeIcon icon={faCog} className={open ? "text-gray-800 text-base md:text-xl" : "text-gray-500 text-base md:text-xl"} />
+          {children && <div className="hover:text-gray-500 hover:bg-opacity-20 rounded" onClick={() => setOpen(!open)}>
+            <FontAwesomeIcon icon={faCog} className={open ? "text-gray-800 text-base md:text-xl cursor-pointer" : "text-gray-500 text-base md:text-xl cursor-pointer"} />
           </div>}
         </div>
       </div>

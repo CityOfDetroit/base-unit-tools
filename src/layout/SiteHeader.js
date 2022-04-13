@@ -35,7 +35,8 @@ const SiteHeader = ({
           <div className="flex items-center" onClick={() => setOpen(!open)}>
             <FontAwesomeIcon
               icon={faBars}
-              className="mr-3 text-xl md:text-2xl"
+              className="mr-3 text-xl md:text-2xl hover:text-gray-500"
+              style={{cursor: "pointer"}}
             />
           </div>
         </div>
@@ -64,7 +65,8 @@ const SiteHeader = ({
               {session ? `Log out` : `Log in`}
               <FontAwesomeIcon
                 icon={session ? faSignOutAlt : faSignInAlt}
-                className="text-xl ml-2"
+                className="text-xl md:text-2xl ml-2 hover:text-black"
+                style={{cursor: "pointer"}}
               />
             </span>
           </div>
