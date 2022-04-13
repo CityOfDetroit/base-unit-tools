@@ -8,7 +8,7 @@ import Button from '../components/Button'
 import AppHeader from '../components/AppHeader';
 import apps from '../data/apps';
 import { bulkGeocode } from '@esri/arcgis-rest-geocoding';
-import {geocoderUrl} from '../hooks/useGeocoder';
+import {geocoders} from '../hooks/useGeocoder';
 
 const Geocoder = () => {
 
@@ -21,6 +21,7 @@ const Geocoder = () => {
   let [matched, setMatched] = useState(true)
   let [coords, setCoords] = useState(true)
   let [council, setCouncil] = useState(true)
+  let [qct, setQct] = useState(true)
   let [ids, setIds] = useState(true)
 
   // container for data
@@ -38,7 +39,7 @@ const Geocoder = () => {
 
       bulkGeocode({
         addresses: dataToSend,
-        endpoint: geocoderUrl,
+        endpoint: geocoders.bounds,
         params: {
           'outSR': 4326,
           'outFields': '*',
@@ -64,7 +65,8 @@ const Geocoder = () => {
       street_id: r.attributes.street_id,
       lng: r.attributes.X.toFixed(5),
       lat: r.attributes.Y.toFixed(5),
-      council_district: r.attributes.council_district
+      council_district: r.attributes.council_district,
+      is_qualified_census_tract: r.attributes.is_qualified_census_tract
     }
   })
 
@@ -89,6 +91,10 @@ const Geocoder = () => {
           <div className="checkbox-option">
             <input type="checkbox" id="council" name="council" onChange={() => setCouncil(!council)} checked={council} />
             <label htmlFor="council">Council district</label>
+          </div>
+          <div className="checkbox-option">
+            <input type="checkbox" id="qct" name="qct" onChange={() => setQct(!qct)} checked={qct} />
+            <label htmlFor="qct">Qualified Census Tract</label>
           </div>
           <div className="checkbox-option">
             <input type="checkbox" id="coords" name="coords" onChange={() => setCoords(!coords)} checked={coords} />
@@ -139,6 +145,7 @@ const Geocoder = () => {
                   <th>Input</th>
                   {matched && <th>Match</th>}
                   {council && <th>Council Dist.</th>}
+                  {qct && <th>Qualified Tract</th>}
                   {coords && <th>Longitude</th>}
                   {coords && <th>Latitude</th>}
                   {ids && <th>Address ID</th>}
@@ -154,6 +161,7 @@ const Geocoder = () => {
                     <td>{addresses[i]}</td>
                     {matched && <td>{r.attributes.StAddr}</td>}
                     {council && <td>{r.attributes.council_district}</td>}
+                    {qct && <td>{r.attributes.is_qualified_census_tract}</td>}
                     {coords && <td>{r.attributes.Y.toFixed(5)}</td>}
                     {coords && <td>{r.attributes.X.toFixed(5)}</td>}
                     {ids && <td><Link to={`/explorer?type=addresses&id=${r.attributes.address_id}`}>{r.attributes.address_id}</Link></td>}
