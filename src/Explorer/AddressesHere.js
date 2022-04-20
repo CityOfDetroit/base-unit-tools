@@ -25,7 +25,7 @@ const AddressesHere = ({ addresses, setClicked, title=null }) => {
         <h2 className="text-sm md:text-base">{addresses.length} linked {title} address{addresses.length > 1 ? `es:` : `:`}</h2>
         <FontAwesomeIcon icon={open ? faChevronCircleDown : faChevronCircleRight} className="text-gray-500 text-xl mr-2" onClick={() => setOpen(!open)} />
       </div>
-      <AnimateHeight duration={150} height={open ? "auto" : 0} className="overflow-y-scroll max-h-64">
+      <AnimateHeight duration={150} height={open ? "auto" : 0} className="overflow-y-auto max-h-64">
         {addresses.map((a, i) => (
           <div key={a.addr_id} className={i + 1 < addresses.length ? "py-1 flex items-center justify-between border-b-2" : "py-1 flex items-center justify-between"}>
             <div className="flex items-center">

@@ -32,12 +32,10 @@ export const useGeocoder = (input) => {
       }).then(r => {
         // if we got a result, return it.
         if (r.candidates.length > 0) {
-          console.log(r)
           setData(r.geoJson)
           setResultType('point')
         }
         else {
-          console.log(r)
         }
       })
     }

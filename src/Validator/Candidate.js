@@ -17,9 +17,6 @@ let types = {
 
 const Candidate = ({ candidate }) => {
 
-  console.log(candidate)
-
-
   let [addr, city, zip] = candidate.properties.address?.split(",");
 
   return (

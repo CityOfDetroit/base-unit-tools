@@ -61,9 +61,7 @@ const Validator = ({ session, setSession, login, setLogin }) => {
       <SiteHeader
         {...{ session, setSession, login, setLogin, currentApp: "validator" }}
       />
-      <AppHeader app={apps.validator} introduction={introduction}>
-        <section>you</section>
-      </AppHeader>
+      <AppHeader app={apps.validator} introduction={introduction} />
       <SiteSidebar title="Validator">
         {/* <section className="sidebar-section">
           <h4>Output</h4>

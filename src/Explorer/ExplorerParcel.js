@@ -14,8 +14,7 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
 
     let attributes = {
         "Parcel address": attr.assessor_address,
-        "Assessor's property class": attr.propclassdesc,
-        "Taxable status": attr.taxstatus
+        "Assessor's property class": attr.propclassdesc
     }
 
     let longAttributes = {
@@ -48,6 +47,7 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
     }, [attr.parcel_id])
 
     if(extendedAttribs) {
+      console.log(extendedAttribs)
       longAttributes['Legal description'] = extendedAttribs.legal_description
       attributes['Taxpayer'] = extendedAttribs.taxpayer_1
       extendedAttribs.taxpayer_2 && (attributes['Taxpayer (ext)'] = extendedAttribs.taxpayer_2)
@@ -61,7 +61,7 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
       attributes['Property Use'] = `${extendedAttribs.use_code} - ${extendedAttribs.use_code_desc}`
       extendedAttribs.total_floor_area && (attributes['Total Floor Area'] = `${extendedAttribs.total_floor_area}`)
       extendedAttribs.style && (attributes['Style'] = `${extendedAttribs.style}`)
-      attributes['Tax Status'] = extendedAttribs.tax_status
+      attributes['Taxable Status'] = extendedAttribs.tax_status
       attributes['Assessed Value'] = parseInt(extendedAttribs.assessed_value).toLocaleString()
       attributes['Taxable Value'] = parseInt(extendedAttribs.taxable_value).toLocaleString()
       attributes['Total Acreage'] = extendedAttribs.total_acreage
