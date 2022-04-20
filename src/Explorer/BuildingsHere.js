@@ -6,7 +6,7 @@ const BuildingsHere = ({ buildings, setClicked }) => {
   buildings = buildings.sort((a, b) => b.semcog_build_type - a.semcog_build_type < -1)
 
   return (
-    <section className='sidebar-section' style={{ borderLeft: `4px solid ${layers['buildings'].color}` }} >
+    <section className='sidebar-section' style={{ borderLeft: `8px solid ${layers['buildings'].color}` }} >
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-sm md:text-base">{buildings.length} linked building{buildings.length > 1 ? `s:` : `:`}</h2>
       </div>

@@ -5,6 +5,7 @@ import layers from '../data/layers.js';
 import { useGeocoder } from '../hooks/useGeocoder';
 import SiteSidebar from '../layout/SiteSidebar';
 import AssignmentMap from './AssignmentMap';
+import SiteHeader from '../layout/SiteHeader';
 import AssignmentSearch from './AssignmentSearch';
 import AssignmentMapIndices from './AssignmentMapIndices';
 import NewBuildingAddress from './NewBuildingAddress';
@@ -17,7 +18,7 @@ import NewParcelRevisionAddress from './NewParcelRevisionAddress';
 import NewCondoAddress from './NewCondoAddress';
 import NewStreetExistingAddress from './NewStreetExistingAddress';
 
-const Assignment = ({ session }) => {
+const Assignment = ({ session, setSession, login, setLogin }) => {
 
   // geocoder states
   const [searchValue, setSearchValue] = useState(null)
@@ -108,6 +109,8 @@ const Assignment = ({ session }) => {
 
   return (
     <>
+       <SiteHeader {...{ session, setSession, login, setLogin, currentApp: 'assignment' }} />      
+      {!mode && <AppHeader app={apps['assignment']} introduction={introduction} startsOpen />}
       <SiteSidebar title="Assignment">
         {mode &&
           <div className="bg-gray-300 p-2 flex items-center justify-between">
@@ -123,7 +126,6 @@ const Assignment = ({ session }) => {
             <Button icon={faWindowClose} onClick={() => setMode(null)}>Back</Button>
           </div>
         }
-        {!mode && <AppHeader app={apps['assignment']} introduction={introduction} startsOpen />}
 
         {!mode && modes.map(m => (
           <div key={m.name} className="bg-gray-300 my-4 p-2 flex items-center hover:bg-gray-200" onClick={() => setMode(m)}>

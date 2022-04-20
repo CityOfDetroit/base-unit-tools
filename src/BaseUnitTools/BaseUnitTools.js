@@ -2,13 +2,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { apps } from '../data/apps';
+import SiteHeader from '../layout/SiteHeader';
 import SiteSidebar from '../layout/SiteSidebar';
 
 let toolGridStyle = { display: 'grid', gridTemplateColumns: `repeat(auto-fit, minmax(300px, 1fr))`, gridAutoRows: 150, gridGap: '.75rem' }
 
-const BaseUnitTools = ({ session }) => {
+const BaseUnitTools = ({ session, setSession, login, setLogin }) => {
   return (
     <>
+      <SiteHeader {...{ session, setSession, login, setLogin }} />      
       <SiteSidebar title="Home">
         <section className="sidebar-section">
           <h2 className="mb-2">Welcome to the Base Units Tools site</h2>
@@ -21,6 +23,10 @@ const BaseUnitTools = ({ session }) => {
         </section>
       </SiteSidebar>
       <main>
+        <section className="sidebar-section my-2">
+          <h2>Base unit tools</h2>
+          <p>List of base unit tools</p>
+        </section>
         <div style={toolGridStyle}>
           {Object.values(apps).slice(1).map(a => {
             if (session || !session && !a.private) {

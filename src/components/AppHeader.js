@@ -10,18 +10,18 @@ const AppHeader = ({ app, introduction = false, introOpen=true, children }) => {
   let [showIntro, setShowIntro] = useState(introduction && introOpen ? true : false)
 
   return (
-    <div className="mb-2">
-      <div className="flex items-center bg-gray-300 justify-between p-2">
-        <div className="flex items-center ml-2">
-          <FontAwesomeIcon icon={app.icon} className="text-base md:text-2xl mr-2 mt-1" />
-          <h2 className="text-sm md:text-lg ml-1"><b>{app.name}</b></h2>
+    <div style={{gridArea:"ah"}} className="mb-0 md:mb-2">
+      <div className="flex items-center bg-gray-300 justify-between">
+        <div className="flex items-center px-2 py-2 md:px-3">
+          <FontAwesomeIcon icon={app.icon} className="text-base md:text-2xl" />
+          <h2 className="text-sm md:text-lg ml-2 md:ml-3"><b>{app.name}</b></h2>
         </div>
         <div className="flex items-center gap-4 mr-2">
-          {introduction && <div className="hover:bg-gray-500 hover:bg-opacity-20 rounded" onClick={() => setShowIntro(!showIntro)}>
-            <FontAwesomeIcon icon={faInfoCircle} className={showIntro ? "text-gray-800 text-base md:text-xl" : "text-gray-500 text-base md:text-xl"} />
+          {introduction && <div className="hover:text-gray-500 hover:bg-opacity-20 rounded" onClick={() => setShowIntro(!showIntro)}>
+            <FontAwesomeIcon icon={faInfoCircle} className={showIntro ? "text-gray-800 text-base md:text-xl cursor-pointer" : "text-gray-500 text-base md:text-xl cursor-pointer"} />
           </div>}
-          {children && <div className="hover:bg-gray-500 hover:bg-opacity-20 rounded" onClick={() => setOpen(!open)}>
-            <FontAwesomeIcon icon={faCog} className={open ? "text-gray-800 text-base md:text-xl" : "text-gray-500 text-base md:text-xl"} />
+          {children && <div className="hover:text-gray-500 hover:bg-opacity-20 rounded" onClick={() => setOpen(!open)}>
+            <FontAwesomeIcon icon={faCog} className={open ? "text-gray-800 text-base md:text-xl cursor-pointer" : "text-gray-500 text-base md:text-xl cursor-pointer"} />
           </div>}
         </div>
       </div>
@@ -37,8 +37,7 @@ const AppHeader = ({ app, introduction = false, introOpen=true, children }) => {
         duration={250}
         height={open ? 'auto' : 0}
       >
-        <section className={'px-4 pt-3 pb-4 bg-gray-100'}>
-
+        <section className={'p-2 md:p-3 bg-gray-100'}>
           {children}
         </section>
       </AnimateHeight>
