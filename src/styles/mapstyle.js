@@ -12,7 +12,7 @@ export const baseStyle = {
       },
       "baseunits": {
         "type": "vector",
-        "tiles": ["https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitVectorTiles/VectorTileServer/tile/{z}/{y}/{x}.pbf"]
+        "tiles": ["https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitVectorTilesDev/VectorTileServer/tile/{z}/{y}/{x}.pbf"]
       },
       "satellite": {
         "type": "raster",

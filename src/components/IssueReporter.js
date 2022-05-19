@@ -52,7 +52,7 @@ const lookup = {
   streets: "Street",
 };
 
-const IssueReporter = ({ session, geocoded, clicked, feature }) => {
+const IssueReporter = ({ session, geocoded, clicked, feature, title="Report an issue" }) => {
 
   // whether to show the dropdown
   let [show, setShow] = useState(false);
@@ -77,7 +77,7 @@ const IssueReporter = ({ session, geocoded, clicked, feature }) => {
           }
         >
           <FontAwesomeIcon icon={faExclamationTriangle} className="mr-2" />
-          <h3 className="text-sm md:text-base">{`Report an issue here`}</h3>
+          <h3 className="text-sm md:text-base">{title}</h3>
         </div>
         <FontAwesomeIcon
           icon={show ? faChevronCircleDown : faChevronCircleRight}

@@ -6,8 +6,6 @@ import BuildingsHere from './BuildingsHere';
 import ExplorerFeature from './ExplorerFeature';
 import moment from 'moment'
 
-import { queryFeatures } from '@esri/arcgis-rest-feature-layer'
-
 const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => {
 
     let { attributes: attr } = feature;
@@ -26,52 +24,34 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
 
     useEffect(() => {
 
-      queryFeatures({
-        url: `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Parcels_2021/FeatureServer/0`,
-        where: `parcel_number = '${attr.parcel_id}'`,
-        returnGeometry: false,
-        outFields: ['*']
+      fetch(`https://apis.detroitmi.gov/assessments/parcel/${attr.parcel_id}/`).then(r => r.json()).then(d => {
+        setExtendedAttribs(d)
       })
-        .then(d => {
-          fetch(`https://apis.detroitmi.gov/assessments/parcel/${attr.parcel_id}/`)
-            .then(e => e.json())
-            .then(f => {
-              if(d.features.length > 0) {
-                let feature = d.features[0]
-                let attribs = feature.attributes
-                attribs.legal_description = f.legaldescription
-                attribs.zoning = f.zoning
-                setExtendedAttribs(feature.attributes)
-              }
-            })
-        })
+
     }, [attr.parcel_id])
 
     if(extendedAttribs) {
       console.log(extendedAttribs)
-      longAttributes['Legal description'] = extendedAttribs.legal_description
-      attributes['Taxpayer'] = extendedAttribs.taxpayer_1
-      extendedAttribs.taxpayer_2 && (attributes['Taxpayer (ext)'] = extendedAttribs.taxpayer_2)
-      attributes['Taxpayer Address'] = `${extendedAttribs.taxpayer_street}, ${extendedAttribs.taxpayer_city}, ${extendedAttribs.taxpayer_state}`
-      extendedAttribs.sale_date && (attributes['Sale Date'] = moment(extendedAttribs.sale_date).format("LL"))
-      extendedAttribs.sale_date && (attributes['Sale Price'] = parseInt(extendedAttribs.sale_price).toLocaleString())
-      attributes['PRE %'] = extendedAttribs.homestead_pre
+      longAttributes['Legal description'] = extendedAttribs.legaldescription
+      attributes['Taxpayer'] = extendedAttribs.taxpayer1
+      extendedAttribs.taxpayer2 && (attributes['Taxpayer (ext)'] = extendedAttribs.taxpayer2)
+      attributes['Taxpayer Address'] = `${extendedAttribs.taxpaddr}, ${extendedAttribs.taxpcity}, ${extendedAttribs.taxpstate}`
+      extendedAttribs.saledate && (attributes['Sale Date'] = moment(extendedAttribs.saledate).format("LL"))
+      extendedAttribs.saledate && (attributes['Sale Price'] = parseInt(extendedAttribs.saleprice).toLocaleString())
+      attributes['PRE %'] = extendedAttribs.pre.toLocaleString()
       extendedAttribs.nez && (attributes['NEZ'] = extendedAttribs.nez)
-      attributes['Is Improved?'] = extendedAttribs.is_improved === "1" ? `Yes` : `No`
-      attributes['Property Class'] = `${extendedAttribs.property_class} - ${extendedAttribs.property_class_desc}`
-      attributes['Property Use'] = `${extendedAttribs.use_code} - ${extendedAttribs.use_code_desc}`
+      attributes['Is Improved?'] = extendedAttribs.isimproved === "1" ? `Yes` : `No`
+      attributes['Property Class'] = `${extendedAttribs.propclass} - ${extendedAttribs.propclassdesc}`
+      attributes['Property Use'] = `${extendedAttribs.usecode} - ${extendedAttribs.usecodedesc}`
       extendedAttribs.total_floor_area && (attributes['Total Floor Area'] = `${extendedAttribs.total_floor_area}`)
       extendedAttribs.style && (attributes['Style'] = `${extendedAttribs.style}`)
-      attributes['Taxable Status'] = extendedAttribs.tax_status
-      attributes['Assessed Value'] = parseInt(extendedAttribs.assessed_value).toLocaleString()
-      attributes['Taxable Value'] = parseInt(extendedAttribs.taxable_value).toLocaleString()
-      attributes['Total Acreage'] = extendedAttribs.total_acreage
-      attributes['Total Square Footage'] = extendedAttribs.total_square_footage
+      attributes['Taxable Status'] = extendedAttribs.taxstatus
+      attributes['Assessed Value'] = parseInt(extendedAttribs.assessedvalue).toLocaleString()
+      attributes['Taxable Value'] = parseInt(extendedAttribs.taxablevalue).toLocaleString()
+      attributes['Total Acreage'] = extendedAttribs.totalacreage
+      attributes['Total Square Footage'] = extendedAttribs.totalsqft
       attributes['Depth x Frontage (ft)'] = `${extendedAttribs.depth} x ${extendedAttribs.frontage}`
       attributes['Zoning'] = extendedAttribs.zoning
-
-
-
     };
 
     useEffect(() => {
@@ -140,20 +120,6 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
     return (
         <>
             <ExplorerFeature {...{attr, attributes,longAttributes, clicked}} />
-            {/* <section className='sidebar-section'>
-                <div className="flex items-center justify-between py-2">
-                    <h2 className="text-xl">Linked parcel:</h2>
-                    <p>#{attr.parcel_id}</p>
-                </div>
-                <table className="w-full">
-                    {Object.keys(parcelAttributes).map(f => (
-                        <tr>
-                            <td className="w-1/3 font-bold text-sm">{f}</td>
-                            <td className="">{parcelAttributes[f]}</td>
-                        </tr>
-                    ))}
-                </table>
-            </section> */}
             {buildings.length > 0 && <BuildingsHere {...{buildings, setClicked}} />}
             {addresses.length > 0 && <AddressesHere {...{addresses, setClicked}} />}
         </>

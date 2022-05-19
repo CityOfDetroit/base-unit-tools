@@ -59,7 +59,7 @@ const ExplorerBuilding = ({ feature, clicked, setClicked, linked, setLinked }) =
   return (
     <>
       <ExplorerFeature {...{ attr, attributes, clicked }} />
-      <section className='sidebar-section' style={{ borderLeft: `4px solid ${layers['parcels'].color}` }}>
+      <section className='sidebar-section' style={{ borderLeft: `8px solid ${layers['parcels'].color}` }}>
         <div className="flex items-center justify-between" >
           <h2 className="text-sm md:text-base">linked to parcel:</h2>
           <IdBadge id={attr.parcel_id} layer={layers['parcels']} link setClicked={setClicked} />

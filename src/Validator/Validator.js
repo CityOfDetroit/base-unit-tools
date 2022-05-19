@@ -1,13 +1,13 @@
+import { suggest } from "@esri/arcgis-rest-geocoding";
+import { faCheckSquare } from "@fortawesome/free-solid-svg-icons";
 import React, { useEffect, useState } from "react";
 import AppHeader from "../components/AppHeader";
+import Button from "../components/Button";
 import apps from "../data/apps";
+import { geocoders, useGeocoder } from "../hooks/useGeocoder";
+import SiteHeader from "../layout/SiteHeader";
 import SiteSidebar from "../layout/SiteSidebar";
 import parse from "../parser.js";
-import SiteHeader from "../layout/SiteHeader";
-import { suggest } from "@esri/arcgis-rest-geocoding";
-import { geocoders, useGeocoder } from "../hooks/useGeocoder";
-import Button from "../components/Button";
-import { faCheckSquare } from "@fortawesome/free-solid-svg-icons";
 import Candidate from "./Candidate";
 
 const Validator = ({ session, setSession, login, setLogin }) => {
@@ -36,7 +36,7 @@ const Validator = ({ session, setSession, login, setLogin }) => {
         Use this tool to see how our address parser breaks down a full address
         into its component parts, like street number and street name.
       </p>
-      <p>
+      {/* <p>
         Enter one address in the box below and you'll see the output of the
         parser.
       </p>
@@ -44,7 +44,7 @@ const Validator = ({ session, setSession, login, setLogin }) => {
         The Rules Applied section will show you how the tool is working. For
         example, if you enter <i>123 St Aubin</i> you'll see that the <i>St</i>{" "}
         has been expanded to <i>Saint.</i>
-      </p>
+      </p> */}
     </>
   );
 
@@ -90,29 +90,34 @@ const Validator = ({ session, setSession, login, setLogin }) => {
         <pre className="sidebar-section">
           {JSON.stringify(parse(value).results, null, "\t")}
         </pre> */}
-      </SiteSidebar>
-      <main>
         <section className="sidebar-section mb-2">
           <h2>Address to validate</h2>
-          <div className="flex items-center justify-between">
+          <div className="flex justify-between p-2">
             <input
-              className="p-3 w-full mt-2"
+              className="p-4 w-full text-lg"
               type="text"
               value={value}
               onChange={(e) => {
                 setValue(e.target.value);
-                setGeocodeValue(null)
+                setGeocodeValue(null);
               }}
             />
             <Button
               icon={faCheckSquare}
               onClick={() => setGeocodeValue(value)}
               text="Validate"
-              small
-              className="p-1"
+              className=""
             />
           </div>
         </section>
+        <section className="sidebar-section mt-2">
+          <pre className="font-bold text-lg">Geocoder response</pre>
+          <pre className="p-2 text-xs max-h-96 overflow-scroll ">
+            {JSON.stringify(data, null, "  ")}
+          </pre>
+        </section>
+      </SiteSidebar>
+      <main>
         {suggestions.length > 0 && !geocodeValue && (
           <section className="bg-gray-200 px-2 py-1">
             {suggestions.map((s) => (
@@ -131,12 +136,13 @@ const Validator = ({ session, setSession, login, setLogin }) => {
             ))}
           </section>
         )}
-        {geocodeValue && data && 
+        {geocodeValue && data && (
           <>
-          {/* <pre className="p-2 text-xs max-h-96 overflow-scroll ">{JSON.stringify(data, null, "\t")}</pre> */}
-          {data.features.map(candidate => <Candidate candidate={candidate} />)}
+            {data.features.map((candidate) => (
+              <Candidate candidate={candidate} session={session} />
+            ))}
           </>
-        }
+        )}
       </main>
     </>
   );

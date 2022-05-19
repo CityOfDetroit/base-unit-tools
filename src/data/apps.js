@@ -10,7 +10,7 @@ export const apps = {
     'explorer': {
         name: 'Explorer',
         url: `/explorer`,
-        description: `View a map of the address, building, and parcel data together.`,
+        description: `View a map of the address, building, parcel, and streets data together.`,
         questions: [
             `Which buildings are linked to that street?`
         ],
@@ -30,7 +30,7 @@ export const apps = {
     },
     'validator': {
         name: 'Validator',
-        description: `A utility to validate an individual address`,
+        description: `Look up & validate an individual address`,
         questions: [
             `Is this is a valid address?`
         ],
