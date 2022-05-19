@@ -38,7 +38,7 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
       attributes['Taxpayer Address'] = `${extendedAttribs.taxpaddr}, ${extendedAttribs.taxpcity}, ${extendedAttribs.taxpstate}`
       extendedAttribs.saledate && (attributes['Sale Date'] = moment(extendedAttribs.saledate).format("LL"))
       extendedAttribs.saledate && (attributes['Sale Price'] = parseInt(extendedAttribs.saleprice).toLocaleString())
-      attributes['PRE %'] = extendedAttribs.pre.toLocaleString()
+      extendedAttribs.pre && (attributes['PRE %'] = extendedAttribs.pre.toLocaleString())
       extendedAttribs.nez && (attributes['NEZ'] = extendedAttribs.nez)
       attributes['Is Improved?'] = extendedAttribs.isimproved === "1" ? `Yes` : `No`
       attributes['Property Class'] = `${extendedAttribs.propclass} - ${extendedAttribs.propclassdesc}`
