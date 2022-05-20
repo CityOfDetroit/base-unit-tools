@@ -16,6 +16,8 @@ import { geocoders } from "../hooks/useGeocoder";
 import SiteHeader from "../layout/SiteHeader";
 import CSVReader from "react-csv-reader";
 import { ToggleButton } from "../components/ToggleButton";
+import { Promise } from "bluebird";
+
 
 let customFields = [
   {
@@ -34,9 +36,7 @@ let customFields = [
   },
 ];
 
-const CsvInput = ({ setValue, addresses, setAddresses }) => {
-  // csv upload
-  let [csv, setCsv] = useState(null);
+const CsvInput = ({ csv, setCsv, addresses, setAddresses }) => {
 
   return (
     <>
@@ -53,6 +53,7 @@ const CsvInput = ({ setValue, addresses, setAddresses }) => {
               setAddresses(csv.map((r) => r[e.target.value]));
             }}
           >
+            <option value={`-`}>{`-`}</option>
             {Object.keys(csv[0]).map((d, i) => (
               <option value={d}>{d}</option>
             ))}
@@ -81,6 +82,8 @@ const TextInput = ({ value, setValue }) => {
 const Geocoder = ({ session, setSession, login, setLogin }) => {
   // we store the user input in value
   let [value, setValue] = useState("");
+  // csv upload
+  let [csv, setCsv] = useState(null);
   // and split on a newline to get a list of addresses to geocode
   let [addresses, setAddresses] = useState([]);
 
@@ -90,12 +93,12 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
     matched: true,
     coords: true,
     ids: true,
-  }
+  };
 
   // add the customFields to the options object
-  customFields.forEach(field => {
-    defaultOptions[field.name] = field.default
-  })
+  customFields.forEach((field) => {
+    defaultOptions[field.name] = field.default;
+  });
 
   let [options, setOptions] = useState(defaultOptions);
 
@@ -110,40 +113,64 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
   }, [value]);
 
   useEffect(() => {
-    console.log(addresses)
+    console.log(addresses);
   }, [addresses]);
 
   useEffect(() => {
-    setValue("")
-    setAddresses([])
+    setValue("");
+    setAddresses([]);
+    setCsv(null)
+    setResults([])
+    setPayload([])
   }, [options.mode]);
 
   useEffect(() => {
-    if (payload.length > 0) {
+    const fetchResults = () => {
+      let allResults = [];
+
       let dataToSend = addresses.map((a, i) => {
         return { OBJECTID: i + 1, SingleLine: a };
       });
 
-      bulkGeocode({
-        addresses: dataToSend,
-        endpoint: geocoders.bounds,
-        params: {
-          outSR: 4326,
-          outFields: "*",
-          // 'category': 'Point Address,Subaddress'
+      const chunkSize = 1000;
+
+      let allParams = [];
+
+      for (let i = 0; i < dataToSend.length; i += chunkSize) {
+        const chunk = dataToSend.slice(i, i + chunkSize);
+
+        allParams.push({
+          addresses: chunk,
+          endpoint: geocoders.bounds,
+          params: {
+            outSR: 4326,
+            outFields: "*",
+            // 'category': 'Point Address,Subaddress'
+          },
+        });
+      }
+
+      Promise.map(
+        allParams,
+        (params) => {
+          return bulkGeocode(params);
         },
-      }).then((d) => {
-        setResults(
-          d.locations.sort(
-            (a, b) => a.attributes.ResultID - b.attributes.ResultID
-          )
-        );
-      });
+        { concurrency: 1 }
+      )
+        .each((f) => {
+          allResults = allResults.concat(f.locations);
+        })
+        .then(() => setResults(allResults.sort((a, b) => a.attributes.ResultID - b.attributes.ResultID)));
+    };
+
+    if (payload.length > 0) {
+      fetchResults();
     }
   }, [payload]);
 
   let formattedData = results.map((r, i) => {
-    return {
+
+    let row = {
       input: addresses[i],
       address: r.attributes.StAddr,
       zip_code: r.attributes.Postal,
@@ -157,6 +184,14 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
       council_district: r.attributes.council_district,
       is_qualified_census_tract: r.attributes.is_qualified_census_tract,
     };
+
+    if(csv) {
+      row = {
+        ...csv[i],
+        ...row
+      }
+    }
+    return row
   });
 
   return (
@@ -182,7 +217,7 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
           </div>
           <div className="py-3">
             {options.mode === "upload" && (
-              <CsvInput {...{ setValue, addresses, setAddresses }} />
+              <CsvInput {...{ setCsv, csv, addresses, setAddresses }} />
             )}
             {options.mode === "manual" && (
               <TextInput {...{ value, setValue }} />
@@ -209,7 +244,9 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
               type="checkbox"
               id="council"
               name="council"
-              onChange={() => setOptions({ ...options, council: !options.council })}
+              onChange={() =>
+                setOptions({ ...options, council: !options.council })
+              }
               checked={options.council}
             />
             <label htmlFor="council">Council district</label>
@@ -310,8 +347,12 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
                   >
                     <td>{addresses[i]}</td>
                     {options.matched && <td>{r.attributes.StAddr}</td>}
-                    {options.council && <td>{r.attributes.council_district}</td>}
-                    {options.qct && <td>{r.attributes.is_qualified_census_tract}</td>}
+                    {options.council && (
+                      <td>{r.attributes.council_district}</td>
+                    )}
+                    {options.qct && (
+                      <td>{r.attributes.is_qualified_census_tract}</td>
+                    )}
                     {options.coords && <td>{r.attributes.Y.toFixed(5)}</td>}
                     {options.coords && <td>{r.attributes.X.toFixed(5)}</td>}
                     {options.ids && (
