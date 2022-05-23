@@ -85,6 +85,8 @@ main {
 
 header {
   grid-area: h;
+  @apply mb-0;
+  @apply md:mb-4;
 }
 
 sidebar {

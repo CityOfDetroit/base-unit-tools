@@ -1,23 +1,21 @@
+import { bulkGeocode } from "@esri/arcgis-rest-geocoding";
 import {
   faBan,
   faCheckSquare,
   faDownload,
-  faLeaf,
 } from "@fortawesome/free-solid-svg-icons";
-import React, { useEffect, useState } from "react";
+import { Promise } from "bluebird";
+import React, { useEffect, useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
-import { Link } from "react-router-dom";
-import SiteSidebar from "../layout/SiteSidebar";
-import Button from "../components/Button";
+import CSVReader from "react-csv-reader";
 import AppHeader from "../components/AppHeader";
+import Button from "../components/Button";
+import { ToggleButton } from "../components/ToggleButton";
 import apps from "../data/apps";
-import { bulkGeocode } from "@esri/arcgis-rest-geocoding";
 import { geocoders } from "../hooks/useGeocoder";
 import SiteHeader from "../layout/SiteHeader";
-import CSVReader from "react-csv-reader";
-import { ToggleButton } from "../components/ToggleButton";
-import { Promise } from "bluebird";
-
+import SiteSidebar from "../layout/SiteSidebar";
+import GeocoderResults from "./GeocoderResults";
 
 let customFields = [
   {
@@ -39,16 +37,19 @@ let customFields = [
 const CsvInput = ({ csv, setCsv, addresses, setAddresses }) => {
 
   return (
-    <>
-      <CSVReader
-        parserOptions={{ header: true }}
-        onFileLoaded={(data, fileInfo) => setCsv(data)}
-      />
+    <div className="p-2 bg-gray-300">
+      <div className="p-2 flex items-center justify-between">
+        <span className="font-semibold">Upload file </span>
+        <CSVReader
+          parserOptions={{ header: true }}
+          onFileLoaded={(data, fileInfo) => setCsv(data)}
+        />
+      </div>
       {csv && (
-        <div className="flex items-center justify-between mt-2">
-          <p className="font-bold">Choose the "address" column in your data</p>
+        <div className="flex items-center justify-between p-2">
+          <p className="font-semibold">Choose address column</p>
           <select
-            className="p-2"
+            className="p-1 w-1/2"
             onChange={(e) => {
               setAddresses(csv.map((r) => r[e.target.value]));
             }}
@@ -60,14 +61,29 @@ const CsvInput = ({ csv, setCsv, addresses, setAddresses }) => {
           </select>
         </div>
       )}
-    </>
+      {addresses.length > 0 && (
+        <div className="w-full block flex items-center justify-between p-2">
+          <span className="font-semibold">Example addresses</span>
+          <span>{addresses.slice(0, 3).join("; ")}</span>
+        </div>
+      )}
+    </div>
   );
 };
 
-const TextInput = ({ value, setValue }) => {
+const TextInput = ({ setAddresses }) => {
+  // we store the user input in value
+  let [value, setValue] = useState("");
+
+  const addresses = useMemo(() => value.split("\n").filter((a) => a !== ""));
+
+  useEffect(() => {
+    setAddresses(addresses);
+  }, [value]);
+
   return (
-    <>
-      <p className="text-sm">Please put one address on each line</p>
+    <div className="p-2 bg-gray-300">
+      <p className="font-semibold">Type one address per line</p>
       <textarea
         className="mt-2 border w-full p-2 text-sm"
         value={value}
@@ -75,13 +91,11 @@ const TextInput = ({ value, setValue }) => {
         type="text"
         onChange={(e) => setValue(e.target.value)}
       />
-    </>
+    </div>
   );
 };
 
 const Geocoder = ({ session, setSession, login, setLogin }) => {
-  // we store the user input in value
-  let [value, setValue] = useState("");
   // csv upload
   let [csv, setCsv] = useState(null);
   // and split on a newline to get a list of addresses to geocode
@@ -108,20 +122,13 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
   // container for results
   let [results, setResults] = useState([]);
 
-  useEffect(() => {
-    setAddresses(value.split("\n").filter((a) => a !== ""));
-  }, [value]);
+  let [total, setTotal] = useState(0)
 
   useEffect(() => {
-    console.log(addresses);
-  }, [addresses]);
-
-  useEffect(() => {
-    setValue("");
     setAddresses([]);
-    setCsv(null)
-    setResults([])
-    setPayload([])
+    setCsv(null);
+    setResults([]);
+    setPayload([]);
   }, [options.mode]);
 
   useEffect(() => {
@@ -155,12 +162,18 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
         (params) => {
           return bulkGeocode(params);
         },
-        { concurrency: 1 }
+        { concurrency: 3 }
       )
         .each((f) => {
           allResults = allResults.concat(f.locations);
         })
-        .then(() => setResults(allResults.sort((a, b) => a.attributes.ResultID - b.attributes.ResultID)));
+        .then(() =>
+          setResults(
+            allResults.sort(
+              (a, b) => a.attributes.ResultID - b.attributes.ResultID
+            )
+          )
+        );
     };
 
     if (payload.length > 0) {
@@ -169,7 +182,6 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
   }, [payload]);
 
   let formattedData = results.map((r, i) => {
-
     let row = {
       input: addresses[i],
       address: r.attributes.StAddr,
@@ -185,13 +197,13 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
       is_qualified_census_tract: r.attributes.is_qualified_census_tract,
     };
 
-    if(csv) {
+    if (csv) {
       row = {
         ...csv[i],
-        ...row
-      }
+        ...row,
+      };
     }
-    return row
+    return row;
   });
 
   return (
@@ -202,7 +214,7 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
       <AppHeader app={apps.geocoder} />
       <SiteSidebar title="Geocoder">
         <section className="sidebar-section">
-          <h2>Input your data</h2>
+          <h2>Input your addresses</h2>
           <div className="flex items-center mt-2">
             <ToggleButton
               title={`Upload a .csv`}
@@ -219,26 +231,12 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
             {options.mode === "upload" && (
               <CsvInput {...{ setCsv, csv, addresses, setAddresses }} />
             )}
-            {options.mode === "manual" && (
-              <TextInput {...{ value, setValue }} />
-            )}
+            {options.mode === "manual" && <TextInput {...{ setAddresses }} />}
           </div>
         </section>
 
         <section className="sidebar-section">
-          <h2>2. Choose your fields to output</h2>
-          <div className="checkbox-option">
-            <input
-              type="checkbox"
-              id="matched"
-              name="matched"
-              onChange={() =>
-                setOptions({ ...options, matched: !options.matched })
-              }
-              checked={options.matched}
-            />
-            <label htmlFor="matched">Matched address</label>
-          </div>
+          <h2>Choose data to attach</h2>
           <div className="checkbox-option">
             <input
               type="checkbox"
@@ -321,81 +319,20 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
         )}
       </SiteSidebar>
       <main>
+        {addresses.length > 0 && (
+          <section className="sidebar-section">
+            <h2>Geocoding Results</h2>
+            <p>{addresses.length} addresses</p>
+            <p>{total} total done</p>
+          </section>
+        )}
         {results.length > 0 && (
-          <div className="p-2">
-            <p className="text-xl font-bold pb-3">Your geocoding results</p>
-            <table className="w-full">
-              <thead style={{ position: "sticky" }}>
-                <tr style={{ position: "sticky" }}>
-                  <th>Input</th>
-                  {options.matched && <th>Match</th>}
-                  {options.council && <th>Council Dist.</th>}
-                  {options.qct && <th>Qualified Tract</th>}
-                  {options.coords && <th>Longitude</th>}
-                  {options.coords && <th>Latitude</th>}
-                  {options.ids && <th>Address ID</th>}
-                  {options.ids && <th>Building ID</th>}
-                  {options.ids && <th>Parcel ID</th>}
-                  {options.ids && <th>Street ID</th>}
-                </tr>
-              </thead>
-              <tbody className="w-full">
-                {results.map((r, i) => (
-                  <tr
-                    key={`${r.address} - ${i}`}
-                    className={i % 2 === 1 ? "text-sm" : "text-sm bg-gray-100"}
-                  >
-                    <td>{addresses[i]}</td>
-                    {options.matched && <td>{r.attributes.StAddr}</td>}
-                    {options.council && (
-                      <td>{r.attributes.council_district}</td>
-                    )}
-                    {options.qct && (
-                      <td>{r.attributes.is_qualified_census_tract}</td>
-                    )}
-                    {options.coords && <td>{r.attributes.Y.toFixed(5)}</td>}
-                    {options.coords && <td>{r.attributes.X.toFixed(5)}</td>}
-                    {options.ids && (
-                      <td>
-                        <Link
-                          to={`/explorer?type=addresses&id=${r.attributes.address_id}`}
-                        >
-                          {r.attributes.address_id}
-                        </Link>
-                      </td>
-                    )}
-                    {options.ids && (
-                      <td>
-                        <Link
-                          to={`/explorer?type=buildings&id=${r.attributes.building_id}`}
-                        >
-                          {r.attributes.building_id}
-                        </Link>
-                      </td>
-                    )}
-                    {options.ids && (
-                      <td>
-                        <Link
-                          to={`/explorer?type=parcels&id=${r.attributes.parcel_id}`}
-                        >
-                          {r.attributes.parcel_id}
-                        </Link>
-                      </td>
-                    )}
-                    {options.ids && (
-                      <td>
-                        <Link
-                          to={`/explorer?type=streets&id=${r.attributes.street_id}`}
-                        >
-                          {r.attributes.street_id}
-                        </Link>
-                      </td>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <GeocoderResults
+            results={results}
+            addresses={payload}
+            options={options}
+            customFields={customFields}
+          />
         )}
       </main>
     </>

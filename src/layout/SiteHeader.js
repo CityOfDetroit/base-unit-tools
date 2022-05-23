@@ -26,10 +26,12 @@ const SiteHeader = ({
       <header>
         <div
           className="flex items-center justify-between"
-          style={{ borderBottom: `5px solid rgb(254, 183, 13)` }}
+          style={{ 
+            borderBottom: open ? `8px solid rgba(254, 183, 13, 0.50)` : `8px solid rgb(254, 183, 13)`,
+          }}
         >
           <img src={logo} className="h-6 md:h-8 m-1" alt={"City logo"} />
-          <h1 className="w-full font-black text-base md:text-xl ml-1 -mb-1">
+          <h1 className={open ? "w-full font-black text-base md:text-xl ml-1 -mb-1 opacity-50" : "w-full font-black  text-base md:text-xl ml-1 -mb-1"}>
             Base Unit Tools
           </h1>
           <div className="flex items-center" onClick={() => setOpen(!open)}>

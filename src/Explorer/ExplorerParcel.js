@@ -31,7 +31,6 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
     }, [attr.parcel_id])
 
     if(extendedAttribs) {
-      console.log(extendedAttribs)
       longAttributes['Legal description'] = extendedAttribs.legaldescription
       attributes['Taxpayer'] = extendedAttribs.taxpayer1
       extendedAttribs.taxpayer2 && (attributes['Taxpayer (ext)'] = extendedAttribs.taxpayer2)
