@@ -32,6 +32,41 @@ let customFields = [
     description: "These census tracts are qualified for...",
     default: false,
   },
+  {
+    name: "neighborhood",
+    display: "Neighborhood",
+    geocoderColumn: "neighborhood_name",
+    description: "The neighborhood name this address belongs to.",
+    default: false
+  },
+  {
+    name: "scout_car_area",
+    display: "Scout Car Area",
+    geocoderColumn: "scout_car_area",
+    description: "The scout car area this address belongs to.",
+    default: false
+  },
+  {
+    name: "master_plan_nhood",
+    display: "Master Plan Neighborhood",
+    geocoderColumn: "master_plan_nhood_name",
+    description: "The master plan neighborhood this address belongs to.",
+    default: false
+  },
+  {
+    name: "congressional_district",
+    display: "Congressional District",
+    geocoderColumn: "congressional_district",
+    description: "The congressional district this address belongs to.",
+    default: false
+  },
+  {
+    name: "county_commission_district",
+    display: "County Commission District",
+    geocoderColumn: "county_comission_district",
+    description: "The county commission district this address belongs to.",
+    default: false
+  }
 ];
 
 const CsvInput = ({ csv, setCsv, addresses, setAddresses }) => {
@@ -124,6 +159,8 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
 
   let [total, setTotal] = useState(0)
 
+  let [unmatchedAddr, setUnmatchedAddr] = useState(null);
+
   useEffect(() => {
     setAddresses([]);
     setCsv(null);
@@ -148,7 +185,7 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
 
         allParams.push({
           addresses: chunk,
-          endpoint: geocoders.bounds,
+          endpoint: geocoders.prod,
           params: {
             outSR: 4326,
             outFields: "*",
@@ -237,28 +274,22 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
 
         <section className="sidebar-section">
           <h2>Choose data to attach</h2>
-          <div className="checkbox-option">
-            <input
-              type="checkbox"
-              id="council"
-              name="council"
-              onChange={() =>
-                setOptions({ ...options, council: !options.council })
-              }
-              checked={options.council}
-            />
-            <label htmlFor="council">Council district</label>
-          </div>
-          <div className="checkbox-option">
-            <input
-              type="checkbox"
-              id="qct"
-              name="qct"
-              onChange={() => setOptions({ ...options, qct: !options.qct })}
-              checked={options.qct}
-            />
-            <label htmlFor="qct">Qualified Census Tract</label>
-          </div>
+
+          {customFields.map(field => (
+            <div className="checkbox-option" key={field.name}>
+              <input
+                type="checkbox"
+                id={field.name}
+                name={field.name}
+                onChange={() =>
+                  setOptions({ ...options, [field.name]: !options[field.name] })
+                }
+                checked={options[field.name]}
+              />
+              <label htmlFor={field.name}>{field.display}</label>
+            </div>
+          ))}
+
           <div className="checkbox-option">
             <input
               type="checkbox"
@@ -271,6 +302,7 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
             />
             <label htmlFor="coords">Coordinates</label>
           </div>
+
           <div className="checkbox-option">
             <input
               type="checkbox"
@@ -282,6 +314,7 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
             <label htmlFor="ids">Attach IDs</label>
           </div>
         </section>
+
         <section className="sidebar-section flex justify-between">
           <div>
             <h2>3. Geocode!</h2>
@@ -298,6 +331,7 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
             icon={addresses.length > 0 ? faCheckSquare : faBan}
           />
         </section>
+
         {formattedData.length > 0 && (
           <section className="sidebar-section flex justify-between">
             <div>
@@ -323,7 +357,7 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
           <section className="sidebar-section">
             <h2>Geocoding Results</h2>
             <p>{addresses.length} addresses</p>
-            <p>{total} total done</p>
+            <p>{results.filter(r => r.attributes.StAddr !== '').length} matches</p>
           </section>
         )}
         {results.length > 0 && (
@@ -332,6 +366,7 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
             addresses={payload}
             options={options}
             customFields={customFields}
+            setUnmatchedAddr={setUnmatchedAddr}
           />
         )}
       </main>

@@ -7,7 +7,7 @@ import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { usePagination, useTable } from "react-table";
 
-const GeocoderResults = ({ results, addresses, options, customFields }) => {
+const GeocoderResults = ({ results, addresses, options, customFields, setUnmatchedAddr }) => {
   let cols = [
     {
       accessor: "input",
@@ -26,7 +26,8 @@ const GeocoderResults = ({ results, addresses, options, customFields }) => {
           <div className="w-48">
             <FontAwesomeIcon
               icon={faExclamationTriangle}
-              className="ml-1 text-gray-500"
+              className="ml-1 text-gray-500 hover:text-gray-700"
+              onClick={() => setUnmatchedAddr(row.value)}
             />
             <span className="mx-2 text-gray-500">No match</span>
           </div>
