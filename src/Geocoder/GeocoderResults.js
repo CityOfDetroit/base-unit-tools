@@ -21,7 +21,7 @@ const GeocoderResults = ({
   results,
   addresses,
   options,
-  customFields,
+  geocoderFields,
   setUnmatchedAddr,
   csv,
 }) => {
@@ -128,7 +128,7 @@ const GeocoderResults = ({
     ]);
   }
 
-  customFields.forEach((cf) => {
+  geocoderFields.forEach((cf) => {
     if (options[cf.name]) {
       cols.push({ accessor: cf.geocoderColumn, Header: cf.display });
     }
