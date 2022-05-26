@@ -48,7 +48,7 @@ h4 {
       "ah m"
       "s m"
       "f f";
-    grid-template-columns: 4fr 6fr;
+    grid-template-columns: minmax(450px, 3fr) 7fr;
     grid-template-rows: auto auto 1fr auto;
     height: 100vh;
   }

@@ -75,7 +75,7 @@ const SiteHeader = ({
           {Object.keys(apps).map((app) => {
             if (session || !session && !apps[app].private) {
               return (
-                <div className="flex items-center bg-gray-100 py-1 border-b-2 border-gray-200">
+                <div className="flex items-center bg-gray-100 py-1 border-b-2 border-gray-200" key={apps[app].name}>
                   <div className="w-12 flex items-center justify-around">
                     <FontAwesomeIcon
                       icon={apps[app].icon}
