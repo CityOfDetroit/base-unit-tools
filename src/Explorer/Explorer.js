@@ -17,6 +17,8 @@ import useQuery from '../hooks/useQuery';
 import MapillarySv from '../components/MapillarySv';
 import SiteHeader from '../layout/SiteHeader';
 import IssueReporter from '../components/IssueReporter';
+import IssueReporterAddress from '../components/IssueReporterAddress';
+import { geocode } from '@esri/arcgis-rest-geocoding';
 
 
 const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
@@ -73,6 +75,10 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
     }
   }, [clicked, history, options.streetView])
 
+  useEffect(() => {
+    console.log(geocoded)
+  }, [geocoded])
+
   let introduction = (
     <>
       <p>This tool is for exploring the base units and visualizing the relationships between them.</p>
@@ -103,7 +109,16 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
         {clicked.type === 'parcels' && feature && <ExplorerParcel {...{ feature, clicked, setClicked, linked, setLinked }} />}
         {clicked.type === 'streets' && feature && <ExplorerStreet {...{ feature, clicked, setClicked, linked, setLinked }} />}
 
-        {(clicked.type || geocoded) && <IssueReporter {...{session, clicked, geocoded, feature}} />}
+        {(clicked.type || (geocoded && geocoded.features.length > 0)) && <IssueReporter {...{session, clicked, geocoded, feature}} />}
+
+        {geocoded && geocoded.features.length === 0 && 
+        <section className="sidebar-section">
+          <p>We couldn't find any addresses which matched <strong className="">{geocoded.input}</strong>.</p>
+          <p>If you think this address should exist, please report an issue here:</p>
+          <IssueReporterAddress {...{session, address: geocoded.input, unset: () => setGeocoded(null)}} />
+        </section>
+        }
+
 
         {/* Link to, uh, Linker */}
         {feature && clicked.type === 'addresses' && session &&

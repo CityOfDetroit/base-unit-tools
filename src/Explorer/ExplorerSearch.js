@@ -23,6 +23,10 @@ const ExplorerSearch = ({ setClicked, setGeocoded }) => {
       setClicked({})
       setGeocoded(featureCollection)
     }
+    if(!featureCollection) {
+      setClicked({})
+      setGeocoded({type: "FeatureCollection", features: [], input: searchValue})
+    }
   }, [featureCollection, type])
 
   return (

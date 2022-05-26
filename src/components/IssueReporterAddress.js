@@ -80,14 +80,14 @@ const IssueReporterAddress = ({ session, address='123 Fake St', title="Report an
               value={`No geocoder match`}
               disabled
               type="text"
-              className="p-2 my-1 w-1/3"
+              className="p-2 my-1 w-1/2"
             />
           </div>
           <input
             value={address}
             disabled
             type="text"
-            className="p-2"
+            className="p-2 w-full"
           />
 
 

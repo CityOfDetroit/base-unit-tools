@@ -120,7 +120,7 @@ const ExplorerMap = ({ clicked, setClicked, geocoded, linked, feature, showSv, s
 
   // fires when we get a new geocoded feature
   useEffect(() => {
-    if (theMap && geocoded && !loading) {
+    if (theMap && geocoded && geocoded.features.length > 0 && !loading) {
       theMap.easeTo({
         center: geocoded.features[0].geometry.coordinates,
         zoom: theMap.getZoom() < 17 ? 17 : theMap.getZoom()

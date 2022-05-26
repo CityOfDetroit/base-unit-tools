@@ -40,6 +40,8 @@ export const useGeocoder = (input) => {
           setResultType('point')
         }
         else {
+          setData(null)
+          setResultType('no-match')
         }
       })
     }
