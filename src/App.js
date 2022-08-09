@@ -29,7 +29,7 @@ function App() {
   const [login, setLogin] = useState(false)
 
   return (
-    <Router basename='/base-unit-tools'>
+    <Router>
       <Analytics id={trackingId} debug>
         <SiteWrapper {...{ session, setSession }}>
           <Switch>

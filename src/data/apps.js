@@ -17,6 +17,16 @@ export const apps = {
         icon: faAtlas,
         private: false
     },
+    'validator': {
+        name: 'Validator',
+        description: `Look up & validate an individual address`,
+        questions: [
+            `Is this is a valid address?`
+        ],
+        url: `/validator`,
+        icon: faCheckSquare,
+        private: false
+    },
     'geocoder': {
         name: 'Geocoder',
         url: `/geocoder`,
@@ -26,16 +36,6 @@ export const apps = {
             `We need geographic coordinates for these addresses.`
         ],
         icon: faTasks,
-        private: false
-    },
-    'validator': {
-        name: 'Validator',
-        description: `Look up & validate an individual address`,
-        questions: [
-            `Is this is a valid address?`
-        ],
-        url: `/validator`,
-        icon: faCheckSquare,
         private: false
     },
     'mailer': {

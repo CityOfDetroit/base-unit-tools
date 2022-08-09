@@ -111,12 +111,12 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
 
         {(clicked.type || (geocoded && geocoded.features.length > 0)) && <IssueReporter {...{session, clicked, geocoded, feature}} />}
 
-        {geocoded && geocoded.features.length === 0 && 
-        <section className="sidebar-section">
-          <p>We couldn't find any addresses which matched <strong className="">{geocoded.input}</strong>.</p>
-          <p>If you think this address should exist, please report an issue here:</p>
-          <IssueReporterAddress {...{session, address: geocoded.input, unset: () => setGeocoded(null)}} />
-        </section>
+        {geocoded && geocoded.features.length === 0 && geocoded.input &&
+          <section className="sidebar-section">
+            <p>We couldn't find any addresses which matched <strong className="">{geocoded.input}</strong>.</p>
+            <p>If you think this address should exist, please report an issue here:</p>
+            <IssueReporterAddress {...{session, address: geocoded.input, unset: () => setGeocoded(null)}} />
+          </section>
         }
 
 

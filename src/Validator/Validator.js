@@ -1,5 +1,6 @@
 import { suggest } from "@esri/arcgis-rest-geocoding";
-import { faCheckSquare } from "@fortawesome/free-solid-svg-icons";
+import { faCheckSquare, faChevronRight, faLocationArrow, faMapPin } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import AppHeader from "../components/AppHeader";
 import Button from "../components/Button";
@@ -33,8 +34,7 @@ const Validator = ({ session, setSession, login, setLogin }) => {
   let introduction = (
     <>
       <p>
-        Use this tool to see how our address parser breaks down a full address
-        into its component parts, like street number and street name.
+        Use this tool to validate a single address and see more information about it.
       </p>
       {/* <p>
         Enter one address in the box below and you'll see the output of the
@@ -109,33 +109,33 @@ const Validator = ({ session, setSession, login, setLogin }) => {
               className=""
             />
           </div>
-        </section>
-        <section className="sidebar-section mt-2">
-          <pre className="font-bold text-lg">Geocoder response</pre>
-          <pre className="p-2 text-xs max-h-96 overflow-scroll ">
-            {JSON.stringify(data, null, "  ")}
-          </pre>
-        </section>
-      </SiteSidebar>
-      <main>
-        {suggestions.length > 0 && !geocodeValue && (
-          <section className="bg-gray-200 px-2 py-1">
+          {suggestions.length > 0 && !geocodeValue && (
+          <section className="bg-gray-200 px-2 py-1 mx-2">
             {suggestions.map((s) => (
               <div
                 key={s.text}
-                className="bg-grey-200 flex items-center justify-start my-2 text-sm"
+                className="bg-grey-200 flex items-center justify-start text-sm py-1 hover:text-gray-500 text-gray-700 cursor-pointer"
                 onClick={() => {
                   setValue(s.text.split(",")[0]);
                   setSuggestions([]);
                   setGeocodeValue(s.text.split(",")[0]);
                 }}
               >
-                <span className="w-2/3 text-sm text-gray-700">{s.text}</span>
+                <span className="text-sm "><FontAwesomeIcon icon={faChevronRight} className="mr-2"/> {s.text}</span>
                 <pre>{s.score}</pre>
               </div>
             ))}
           </section>
         )}
+        </section>
+        {/* <section className="sidebar-section mt-2">
+          <pre className="font-bold text-lg">Geocoder response</pre>
+          <pre className="p-2 text-xs max-h-96 overflow-scroll ">
+            {JSON.stringify(data, null, "  ")}
+          </pre>
+        </section> */}
+      </SiteSidebar>
+      <main>
         {geocodeValue && data && (
           <>
             {data.features.map((candidate) => (

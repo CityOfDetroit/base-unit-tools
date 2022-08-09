@@ -100,6 +100,7 @@ const ExplorerMap = ({ clicked, setClicked, geocoded, linked, feature, showSv, s
           layers: ['mapillary-images']
         })
         setSvImages(_.uniqBy(features, 'properties.id'))
+        console.log(features.sort((a, b) => a.properties.captured_at - b.properties.captured_at))
       }
     })
 
