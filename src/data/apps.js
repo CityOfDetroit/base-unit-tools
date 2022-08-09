@@ -10,11 +10,21 @@ export const apps = {
     'explorer': {
         name: 'Explorer',
         url: `/explorer`,
-        description: `View a map of the address, building, and parcel data together.`,
+        description: `View a map of the address, building, parcel, and streets data together.`,
         questions: [
             `Which buildings are linked to that street?`
         ],
         icon: faAtlas,
+        private: false
+    },
+    'validator': {
+        name: 'Validator',
+        description: `Look up & validate an individual address`,
+        questions: [
+            `Is this is a valid address?`
+        ],
+        url: `/validator`,
+        icon: faCheckSquare,
         private: false
     },
     'geocoder': {
@@ -26,16 +36,6 @@ export const apps = {
             `We need geographic coordinates for these addresses.`
         ],
         icon: faTasks,
-        private: false
-    },
-    'validator': {
-        name: 'Validator',
-        description: `A utility to validate an individual address`,
-        questions: [
-            `Is this is a valid address?`
-        ],
-        url: `/validator`,
-        icon: faCheckSquare,
         private: false
     },
     'mailer': {

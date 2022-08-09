@@ -12,7 +12,7 @@ export const baseStyle = {
       },
       "baseunits": {
         "type": "vector",
-        "tiles": ["https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitVectorTiles/VectorTileServer/tile/{z}/{y}/{x}.pbf"]
+        "tiles": ["https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitVectorTilesDev/VectorTileServer/tile/{z}/{y}/{x}.pbf"]
       },
       "satellite": {
         "type": "raster",
@@ -43,6 +43,7 @@ export const baseStyle = {
       "mly": {
         "type": "vector",
         "tiles": ["https://tiles.mapillary.com/maps/vtp/mly1_computed_public/2/{z}/{x}/{y}?access_token=MLY|4690399437648324|de87555bb6015affa20c3df794ebab15"],
+        // "tiles": ["https://tiles.mapillary.com/maps/vtp/mly1/2/{z}/{x}/{y}?access_token=MLY|4690399437648324|de87555bb6015affa20c3df794ebab15"],
         "maxzoom": 14,
         "minzoom": 14
       }

@@ -48,7 +48,7 @@ h4 {
       "ah m"
       "s m"
       "f f";
-    grid-template-columns: 4fr 6fr;
+    grid-template-columns: minmax(450px, 3fr) 7fr;
     grid-template-rows: auto auto 1fr auto;
     height: 100vh;
   }
@@ -85,6 +85,8 @@ main {
 
 header {
   grid-area: h;
+  @apply mb-0;
+  @apply md:mb-4;
 }
 
 sidebar {
@@ -197,7 +199,10 @@ a {
 }
 
 .sidebar-section {
-  @apply p-2;
+  @apply py-2;
+  @apply px-2;
+  @apply md:px-4;
+  @apply md:py-4;
   @apply bg-gray-100;
   @apply text-sm;
 }

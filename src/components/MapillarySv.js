@@ -129,6 +129,7 @@ const MapillarySv = ({ svImage, svImages, setSvImage, setSvBearing, feature }) =
       markerComponent.add([defaultMarker]);
 
       let imagesByDistance = _.sortBy(svImages, i => distance(i.geometry, centroid(arcgisToGeoJSON(feature))))
+      console.log(imagesByDistance)
       if(svImage) {
         let filtered = imagesByDistance.filter(i => i.properties.sequence_id === svImage.properties.sequence_id)
         if (filtered.length > 0) {

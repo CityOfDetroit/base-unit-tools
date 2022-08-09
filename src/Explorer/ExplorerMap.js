@@ -21,6 +21,8 @@ const ExplorerMap = ({ clicked, setClicked, geocoded, linked, feature, showSv, s
   // this effect runs once, when the component loads
   useEffect(() => {
 
+    console.log(feature)
+
     const detroitBbox = [-83.287803, 42.255192, -82.910451, 42.45023];
     var map = new mapboxgl.Map({
       container: "map", // container id
@@ -98,6 +100,7 @@ const ExplorerMap = ({ clicked, setClicked, geocoded, linked, feature, showSv, s
           layers: ['mapillary-images']
         })
         setSvImages(_.uniqBy(features, 'properties.id'))
+        console.log(features.sort((a, b) => a.properties.captured_at - b.properties.captured_at))
       }
     })
 
@@ -118,7 +121,7 @@ const ExplorerMap = ({ clicked, setClicked, geocoded, linked, feature, showSv, s
 
   // fires when we get a new geocoded feature
   useEffect(() => {
-    if (theMap && geocoded && !loading) {
+    if (theMap && geocoded && geocoded.features.length > 0 && !loading) {
       theMap.easeTo({
         center: geocoded.features[0].geometry.coordinates,
         zoom: theMap.getZoom() < 17 ? 17 : theMap.getZoom()

@@ -23,7 +23,7 @@ const AssignmentParcel = ({ parcel, setAddresses, setModelAddress, setStreet, se
 
   useEffect(() => {
     queryFeatures({
-      url: `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Parcels_2021/FeatureServer/0`,
+      url: `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Parcels_Current/FeatureServer/0`,
       where: `parcel_number = '${parcel}'`,
       returnGeometry: false,
       outFields: ['*']
