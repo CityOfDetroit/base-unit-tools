@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { apps } from '../data/apps';
 import SiteHeader from '../layout/SiteHeader';
 import SiteSidebar from '../layout/SiteSidebar';
@@ -35,7 +35,7 @@ const BaseUnitTools = ({ session, setSession, login, setLogin }) => {
                 <div className="bg-gray-200 p-4" key={a.name}>
                   <div className="flex items-center">
                     <FontAwesomeIcon icon={a.icon} size="2x" className="mr-3" />
-                    <Link to={`.${a.url}`}>
+                    <Link href={`.${a.url}`}>
                       <p className="text-xl font-bold">{a.name}</p>
                     </Link>
                   </div>

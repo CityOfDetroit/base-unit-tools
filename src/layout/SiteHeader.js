@@ -9,7 +9,7 @@ import { Login } from "./Login";
 import apps from "../data/apps";
 import { useState } from "react";
 import AnimateHeight from "react-animate-height";
-import { Link } from "react-router-dom";
+import Link from 'next/link';
 
 const SiteHeader = ({
   session,
@@ -82,7 +82,7 @@ const SiteHeader = ({
                       className="mx-3 text-xl h-8"
                     />
                   </div>
-                  <Link to={apps[app].url}>
+                  <Link href={apps[app].url}>
                     <h2 className="text-sm md:text-base">{apps[app].name}</h2>
                   </Link>
                 </div>

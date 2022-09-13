@@ -1,6 +1,6 @@
 import { faWrench } from '@fortawesome/free-solid-svg-icons';
 import React, {useState} from 'react';
-import { Link } from "react-router-dom";
+import Link from 'next/link';
 import Button from '../components/Button';
 import {addFeatures} from '@esri/arcgis-rest-feature-layer'
 
@@ -57,7 +57,7 @@ const LinkerSubmission = ({ session, feature, links }) => {
   {
     addResponse && addResponse.addResults[0].success &&
     <section className="sidebar-section">
-      Thanks for your input! <Link to={`/explorer?type=addresses&id=${feature.properties.addr_id}`}>Jump back to the explorer</Link>
+      Thanks for your input! <Link href={`/explorer?type=addresses&id=${feature.properties.addr_id}`}>Jump back to the explorer</Link>
     </section>
   }
   </section>

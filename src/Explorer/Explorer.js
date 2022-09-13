@@ -1,7 +1,7 @@
 import { faArrowAltCircleRight, faLink, faStreetView, faWrench } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
-import { Link, useHistory } from "react-router-dom";
+import Link from "next/link";
 import AppHeader from '../components/AppHeader';
 import apps from '../data/apps';
 import SiteSidebar from '../layout/SiteSidebar';
@@ -123,7 +123,7 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
         {/* Link to, uh, Linker */}
         {feature && clicked.type === 'addresses' && session &&
           <section className="sidebar-section caution">
-            <Link to={`/linker?type=${clicked.type}&id=${clicked.id}`}>
+            <Link href={`/linker?type=${clicked.type}&id=${clicked.id}`}>
               <FontAwesomeIcon icon={faLink} />
               <span className="text-semibold text-sm ml-2">
                 Edit address links

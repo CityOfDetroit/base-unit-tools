@@ -9,7 +9,7 @@ import {
   faEnvelopeSquare,
   faWindowClose,
 } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import Link from 'next/link';
 import Button from "./Button";
 import { addFeatures } from "@esri/arcgis-rest-feature-layer";
 import layers from "../data/layers";

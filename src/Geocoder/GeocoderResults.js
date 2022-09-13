@@ -12,7 +12,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useMemo } from "react";
-import { Link } from "react-router-dom";
+import Link from 'next/link';
 import { CSVLink } from "react-csv";
 import Button from "../components/Button";
 import { usePagination, useTable } from "react-table";
@@ -65,7 +65,7 @@ const GeocoderResults = ({
         Cell: (row) => (
           <Link
             target={`_blank`}
-            to={`/explorer?type=addresses&id=${row.value}`}
+            href={`/explorer?type=addresses&id=${row.value}`}
           >
             {row.value}
           </Link>
@@ -77,7 +77,7 @@ const GeocoderResults = ({
         Cell: (row) => (
           <Link
             target={`_blank`}
-            to={`/explorer?type=buildings&id=${row.value}`}
+            href={`/explorer?type=buildings&id=${row.value}`}
           >
             {row.value}
           </Link>
@@ -88,7 +88,7 @@ const GeocoderResults = ({
         maxWidth: 15,
         Header: "Parcel ID",
         Cell: (row) => (
-          <Link target={`_blank`} to={`/explorer?type=parcels&id=${row.value}`}>
+          <Link target={`_blank`} href={`/explorer?type=parcels&id=${row.value}`}>
             {row.value}
           </Link>
         ),
@@ -97,7 +97,7 @@ const GeocoderResults = ({
         accessor: "street_id",
         Header: "Street ID",
         Cell: (row) => (
-          <Link target={`_blank`} to={`/explorer?type=streets&id=${row.value}`}>
+          <Link target={`_blank`} href={`/explorer?type=streets&id=${row.value}`}>
             {row.value}
           </Link>
         ),
