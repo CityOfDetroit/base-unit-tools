@@ -5,7 +5,8 @@ export const apps = {
         name: 'Home',
         url: `/`,
         icon: faHome,
-        private: false
+        private: false,
+        show: true
     },
     'search': {
         name: 'Search',
@@ -15,7 +16,8 @@ export const apps = {
         ],
         url: `/search`,
         icon: faSearch,
-        private: false
+        private: false,
+        show: true
     },
     'map': {
         name: 'Map',
@@ -25,7 +27,8 @@ export const apps = {
             `Which buildings are linked to that street?`
         ],
         icon: faAtlas,
-        private: false
+        private: false,
+        show: true
     },
     'geocoder': {
         name: 'Geocoder',
@@ -36,7 +39,8 @@ export const apps = {
             `We need geographic coordinates for these addresses.`
         ],
         icon: faTasks,
-        private: false
+        private: false,
+        show: true
     },
     'mailer': {
         name: 'Mailer',
@@ -46,28 +50,31 @@ export const apps = {
             `I'd like to send a mailing to all owner-occupants in a historic district.`
         ],
         icon: faEnvelope,
-        private: true
+        private: true,
+        show: true
     },
-    // 'linker': {
-    //     name: 'Linker',
-    //     url: `/linker`,
-    //     description: 'Create or edit links for an existing address',
-    //     questions: [
-    //         `All these unlinked addresses are driving me crazy?`
-    //     ],
-    //     icon: faLink,
-    //     private: true
-    // },
-    // 'assignment': {
-    //     name: 'Assignment',
-    //     url: `/assignment`,
-    //     description: 'Assign a new address',
-    //     questions: [
-    //         `I need to assign new addresses for a row of townhouses.`
-    //     ],
-    //     icon: faPlusCircle,
-    //     private: true
-    // }
+    'linker': {
+        name: 'Linker',
+        url: `/linker`,
+        description: 'Create or edit links for an existing address',
+        questions: [
+            `All these unlinked addresses are driving me crazy?`
+        ],
+        icon: faLink,
+        private: true,
+        show: false
+    },
+    'assignment': {
+        name: 'Assignment',
+        url: `/assignment`,
+        description: 'Assign a new address',
+        questions: [
+            `I need to assign new addresses for a row of townhouses.`
+        ],
+        icon: faPlusCircle,
+        private: true,
+        show: false
+    }
 }
 
 export default apps;
