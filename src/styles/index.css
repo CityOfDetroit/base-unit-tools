@@ -250,8 +250,8 @@ a {
   @apply font-semibold;
 }
 
-#mly {
-  height: 30vh;
+#mly-viewer {
+  height: 300px;
 }
 
 .app-intro p {

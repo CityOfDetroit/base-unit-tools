@@ -1,21 +1,13 @@
 import {
-  faExclamationTriangle,
-  faDownload,
-  faForward,
-  faFastForward,
-  faBackward,
-  faStepForward,
-  faAngleRight,
-  faAngleDoubleRight,
-  faAngleLeft,
-  faAngleDoubleLeft,
+  faAngleDoubleLeft, faAngleDoubleRight,
+  faAngleLeft, faAngleRight, faDownload, faExclamationTriangle
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useMemo } from "react";
 import Link from 'next/link';
+import { useMemo } from "react";
 import { CSVLink } from "react-csv";
-import Button from "../components/Button";
 import { usePagination, useTable } from "react-table";
+import Button from "../../src/components/Button";
 
 const GeocoderResults = ({
   results,

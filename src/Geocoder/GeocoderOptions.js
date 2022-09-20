@@ -4,7 +4,7 @@ import { geocoderFields } from "../data/geocoderFields";
 import {
   faInfoCircle,
 } from "@fortawesome/free-solid-svg-icons";
-import { ToggleButton } from "../components/ToggleButton";
+import { ToggleButton } from "../../src/components/ToggleButton";
 
 const GeocoderOptions = ({ options, setOptions }) => {
   return (

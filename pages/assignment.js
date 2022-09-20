@@ -1,22 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import AppHeader from '../components/AppHeader';
-import apps from '../data/apps';
-import layers from '../data/layers.js';
-import { useGeocoder } from '../hooks/useGeocoder';
-import SiteSidebar from '../layout/SiteSidebar';
-import AssignmentMap from './AssignmentMap';
-import SiteHeader from '../layout/SiteHeader';
-import AssignmentSearch from './AssignmentSearch';
-import AssignmentMapIndices from './AssignmentMapIndices';
-import NewBuildingAddress from './NewBuildingAddress';
-import NewUtilityPole from './NewUtilityPole';
-import AssignmentMapOptions from './AssignmentMapOptions';
+import AppHeader from '../src/components/AppHeader';
+import apps from '../src/data/apps';
+import layers from '../src/data/layers.js';
+import { useGeocoder } from '../src/hooks/useGeocoder';
+import SiteSidebar from '../src/layout/SiteSidebar';
+import AssignmentMap from '../src/Assignment/AssignmentMap';
+import AssignmentSearch from '../src/Assignment/AssignmentSearch';
+import AssignmentMapIndices from '../src/Assignment/AssignmentMapIndices';
+import NewBuildingAddress from '../src/Assignment/NewBuildingAddress';
+import NewUtilityPole from '../src/Assignment/NewUtilityPole';
+import AssignmentMapOptions from '../src/Assignment/AssignmentMapOptions';
 import { faBolt, faCut, faHotel, faPlusCircle, faRandom, faWindowClose } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Button from '../components/Button';
-import NewParcelRevisionAddress from './NewParcelRevisionAddress';
-import NewCondoAddress from './NewCondoAddress';
-import NewStreetExistingAddress from './NewStreetExistingAddress';
+import Button from '../src/components/Button';
+import NewParcelRevisionAddress from '../src/Assignment/NewParcelRevisionAddress';
+import NewCondoAddress from '../src/Assignment/NewCondoAddress';
+import NewStreetExistingAddress from '../src/Assignment/NewStreetExistingAddress';
 
 const Assignment = ({ session, setSession, login, setLogin }) => {
 
@@ -109,7 +108,6 @@ const Assignment = ({ session, setSession, login, setLogin }) => {
 
   return (
     <>
-       <SiteHeader {...{ session, setSession, login, setLogin, currentApp: 'assignment' }} />      
       {!mode && <AppHeader app={apps['assignment']} introduction={introduction} startsOpen />}
       <SiteSidebar title="Assignment">
         {mode &&

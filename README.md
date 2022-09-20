@@ -121,7 +121,7 @@ Many tools accept URL parameters - this is handled by the `useQuery` hook provid
 
 ### Layout/display
 
-The main site layout is controlled by `src/layout/SiteWrapper` -- this is rendered in `App.js` and all tools will fit into the `{children}` slot of the `SiteWrapper`, typically with a `<SiteSidebar>` and a `<main>`:
+The main site layout is controlled by `pages/_app.js`.
 
 ```js
 const NewTool = () => {
@@ -138,7 +138,9 @@ const NewTool = () => {
 }
 ```
 
-Logging in is controlled in `src/layout/SiteHeader`, since that is rendered everywhere. That renders a `Login` component which does the work of input and using the esri-arcgis-rest authentication methods.
+Logging in is controlled in `pages/_app.js`, since that is rendered everywhere. 
+
+That renders a `Login` component which does the work of input and using the esri-arcgis-rest authentication methods.
 
 Most components are styled in-line using Tailwind CSS, but there are a fair number of styles in `src/styles/index.css` as well.
 

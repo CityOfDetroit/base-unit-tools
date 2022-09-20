@@ -27,7 +27,7 @@ export const useGeocoder = (input) => {
   let [resultType, setResultType] = useState('')
 
   useEffect(() => {
-    if (input) {
+    if (input && input !== undefined) {
       // first, we try to call the base units geocoder
       geocode({
         endpoint: geocoderUrl,

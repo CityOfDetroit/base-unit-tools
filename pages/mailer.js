@@ -15,18 +15,17 @@ import { Promise } from "bluebird";
 import _ from "lodash";
 import React, { useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
-import AppHeader from "../components/AppHeader";
-import Button from "../components/Button";
-import { ToggleButton } from "../components/ToggleButton";
-import apps from "../data/apps";
-import SiteHeader from "../layout/SiteHeader";
-import SiteSidebar from "../layout/SiteSidebar";
-import MailerAddressSearch from "./MailerAddressSearch";
-import MailerBuffer from "./MailerBuffer";
-import MailerLayerSelector from "./MailerLayerSelector";
-import MailerMap from "./MailerMap";
-import MailerSelection from "./MailerSelection";
-import MailerTable from "./MailerTable";
+import AppHeader from "../src/components/AppHeader";
+import Button from "../src/components/Button";
+import { ToggleButton } from "../src/components/ToggleButton";
+import apps from "../src/data/apps";
+import SiteSidebar from "../src/layout/SiteSidebar";
+import MailerAddressSearch from "../src/Mailer/MailerAddressSearch";
+import MailerBuffer from "../src/Mailer/MailerBuffer";
+import MailerLayerSelector from "../src/Mailer/MailerLayerSelector";
+import MailerMap from "../src/Mailer/MailerMap";
+import MailerSelection from "../src/Mailer/MailerSelection";
+import MailerTable from "../src/Mailer/MailerTable";
 
 const Mailer = ({ session, setSession, login, setLogin }) => {
   // object to track filters
@@ -37,8 +36,7 @@ const Mailer = ({ session, setSession, login, setLogin }) => {
       inactiveText: "All addresses, even undeliverable",
       default: true,
       filterFunction: (a) =>
-        a.attributes.usps_status === "Deliverable" ||
-        a.attributes.USPS_Status === "Deliverable",
+        a.attributes.usps_status === "Deliverable" || a.attributes.USPS_Status === "Deliverable",
     },
   };
 
@@ -133,9 +131,7 @@ const Mailer = ({ session, setSession, login, setLogin }) => {
       const chunkSize = 500;
 
       // get the "breakpoints": basically the first ID value, then every chunkSize'th value afterwards
-      let breakpoints = resultIds.objectIds.filter(
-        (oid, i) => i === 0 || i % chunkSize === 0
-      );
+      let breakpoints = resultIds.objectIds.filter((oid, i) => i === 0 || i % chunkSize === 0);
 
       // push the last ObjectID plus one onto the stack -- we still need to fetch between it
       breakpoints.push(resultIds.objectIds.slice(-1)[0] + 1);
@@ -147,9 +143,7 @@ const Mailer = ({ session, setSession, login, setLogin }) => {
           orderByFields: "objectid",
           // this is confusing, but produces the correct result.
           // it has to be weird because of how BETWEEN seems to work.
-          where: `objectid between ${
-            i === 0 ? breakpoints[0] - 1 : breakpoints[i]
-          } and ${b - 1}`,
+          where: `objectid between ${i === 0 ? breakpoints[0] - 1 : breakpoints[i]} and ${b - 1}`,
           geometry: geojsonToArcGIS(geom)[0].geometry,
           geometryType: "esriGeometryPolygon",
           spatialRel: "esriSpatialRelIntersects",
@@ -199,9 +193,7 @@ const Mailer = ({ session, setSession, login, setLogin }) => {
     let filteredAddresses = addresses;
     Object.keys(filters).forEach((k) => {
       if (filters[k]) {
-        filteredAddresses = filteredAddresses.filter(
-          allFilters[k].filterFunction
-        );
+        filteredAddresses = filteredAddresses.filter(allFilters[k].filterFunction);
       }
     });
     setFiltered(filteredAddresses);
@@ -219,10 +211,7 @@ const Mailer = ({ session, setSession, login, setLogin }) => {
         properties: { ...f.attributes },
         geometry: {
           type: "Point",
-          coordinates: [
-            parseFloat(f[prop].x.toFixed(6)),
-            parseFloat(f[prop].y.toFixed(6)),
-          ],
+          coordinates: [parseFloat(f[prop].x.toFixed(6)), parseFloat(f[prop].y.toFixed(6))],
         },
       };
     });
@@ -237,9 +226,7 @@ const Mailer = ({ session, setSession, login, setLogin }) => {
 
   let introduction = (
     <>
-      <p className="py-2">
-        This tool is for creating a mailing list, based on a selection area.
-      </p>
+      <p className="py-2">This tool is for creating a mailing list, based on a selection area.</p>
       <p className="pt-2">You can start by creating a selection area:</p>
       <ul className="list-disc list-outside ml-4 pb-2">
         <li>Search for an address</li>
@@ -247,23 +234,15 @@ const Mailer = ({ session, setSession, login, setLogin }) => {
         <li>Choose from common city boundaries</li>
       </ul>
       <p className="py-2">
-        Once the selection area is defined, the addresses within will appear on
-        the map.
+        Once the selection area is defined, the addresses within will appear on the map.
       </p>
-      <p className="py-2">
-        Select filters on those addresses, such as deliverability status.
-      </p>
-      <p className="py-2">
-        Finally, you can export those addresses into a .csv file or a GeoJSON.
-      </p>
+      <p className="py-2">Select filters on those addresses, such as deliverability status.</p>
+      <p className="py-2">Finally, you can export those addresses into a .csv file or a GeoJSON.</p>
     </>
   );
 
   return (
     <>
-      <SiteHeader
-        {...{ session, setSession, login, setLogin, currentApp: "mailer" }}
-      />
       <AppHeader app={apps.mailer} introduction={introduction}>
         <h3 className="mb-2 text-base">Data selection method</h3>
         <div className="flex items-center">
@@ -271,32 +250,26 @@ const Mailer = ({ session, setSession, login, setLogin }) => {
             title={`Intersecting address points`}
             active={layer === "centroid"}
             onClick={() =>
-              setLayer("centroid") &&
-              setResultIds(null) &&
-              setAddresses([]) &&
-              setFiltered([])
+              setLayer("centroid") && setResultIds(null) && setAddresses([]) && setFiltered([])
             }
           />
           <ToggleButton
             title={`Intersecting parcels`}
             active={layer === "parcel"}
             onClick={() =>
-              setLayer("parcel") &&
-              setResultIds(null) &&
-              setAddresses([]) &&
-              setFiltered([])
+              setLayer("parcel") && setResultIds(null) && setAddresses([]) && setFiltered([])
             }
           />
         </div>
         <p className="text-sm leading-5 my-2">
           The default data selection method for this tool is to pull{" "}
-          <b>intersecting address points</b> inside the mailing area. This
-          method is fastest and best to use with mailings to pre-defined areas.
+          <b>intersecting address points</b> inside the mailing area. This method is fastest and
+          best to use with mailings to pre-defined areas.
         </p>
         <p className="text-sm leading-5 my-2">
           Alternately, you can choose to pull address points which belong to the{" "}
-          <b>intersecting parcels</b> inside the mailing area. Use this if your
-          mailing area is for "parcels within X feet" of some location.
+          <b>intersecting parcels</b> inside the mailing area. Use this if your mailing area is for
+          "parcels within X feet" of some location.
         </p>
       </AppHeader>
 
@@ -306,10 +279,7 @@ const Mailer = ({ session, setSession, login, setLogin }) => {
           <section className="sidebar-section caution flex items-center">
             <FontAwesomeIcon icon={faLock} className="text-xl ml-2 mr-4" />
             <div>
-              <p>
-                You don't currently have access to this tool, so it may not work
-                correctly.
-              </p>
+              <p>You don't currently have access to this tool, so it may not work correctly.</p>
               <p>
                 Please log in, or if you are logged in,{" "}
                 <a href="https://app.smartsheet.com/b/form/6919c51a844448e2a6811f04a6267292">
@@ -356,28 +326,21 @@ const Mailer = ({ session, setSession, login, setLogin }) => {
 
         {/* If we have a shape, display buffer tool, current selection */}
         {geom && <MailerBuffer {...{ geom, setGeom }} />}
-        {geom && resultIds && (
-          <MailerSelection {...{ geom, setGeom, resultIds }} />
-        )}
+        {geom && resultIds && <MailerSelection {...{ geom, setGeom, resultIds }} />}
 
         {/* If there's a shape and access to the layer */}
         {geom && access && (
           <section className="sidebar-section">
-            {!resultIds &&
-              geom &&
-              geom.features[0].geometry.type === "Polygon" && (
-                <h1>Loading...</h1>
-              )}
+            {!resultIds && geom && geom.features[0].geometry.type === "Polygon" && (
+              <h1>Loading...</h1>
+            )}
 
             {/* If we're waiting on result IDs, show a Loading message */}
             {!resultIds &&
               geom &&
               (geom.features[0].geometry.type === "Point" ||
                 geom.features[0].geometry.type === "LineString") && (
-                <h1>
-                  Apply a buffer to this geometry to generate a mailing list
-                  area.
-                </h1>
+                <h1>Apply a buffer to this geometry to generate a mailing list area.</h1>
               )}
 
             {/* If we have result IDs, show the export portion. */}
@@ -411,9 +374,7 @@ const Mailer = ({ session, setSession, login, setLogin }) => {
                     />
                   </div>
                 ))}
-                <h2>
-                  Downloading {filtered.length.toLocaleString()} addresses
-                </h2>
+                <h2>Downloading {filtered.length.toLocaleString()} addresses</h2>
                 <div className="flex flex-row">
                   <CSVLink
                     data={formattedData}
@@ -427,11 +388,7 @@ const Mailer = ({ session, setSession, login, setLogin }) => {
                     />
                   </CSVLink>
                   <a href="https://detroitmi.maps.arcgis.com/sharing/rest/content/items/da107e7b0d0e48c3b210db20fa3c30e7/data">
-                    <Button
-                      icon={faLanguage}
-                      text={`Output data dictionary`}
-                      small
-                    />
+                    <Button icon={faLanguage} text={`Output data dictionary`} small />
                   </a>
                 </div>
               </>

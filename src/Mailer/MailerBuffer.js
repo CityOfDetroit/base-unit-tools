@@ -1,7 +1,7 @@
 
 import { faExpandArrowsAlt } from '@fortawesome/free-solid-svg-icons'
 import buffer from '@turf/buffer'
-import Button from '../components/Button'
+import Button from '../../src/components/Button'
 import { useState } from 'react';
 
 const MailerBuffer = ({ geom, setGeom }) => {

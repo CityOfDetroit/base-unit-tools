@@ -188,8 +188,8 @@ const MapillarySv = ({ svImage, svImages, setSvImage, setSvBearing, feature }) =
           ))}
         </select>}
       </h2>
-      <section className="sidebar-section street-view">
-        <div id="mly-viewer" style={{ height: 300, width: '100%' }} />
+      <section className="sidebar-section">
+        <div id="mly-viewer"/>
       </section>
     </>
   )

@@ -1,6 +1,6 @@
 import { faArrowAltCircleRight, faCopy } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import CopyValue from "../components/CopyValue";
+import CopyValue from "../../src/components/CopyValue";
 
 const IdBadge = ({ layer, id, link=true, copy=false, setClicked }) => {
 

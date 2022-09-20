@@ -2,19 +2,18 @@ import { bulkGeocode } from "@esri/arcgis-rest-geocoding";
 import { faBan, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import { Promise } from "bluebird";
 import React, { useEffect, useState } from "react";
-import AppHeader from "../components/AppHeader";
-import Button from "../components/Button";
-import IssueReporterAddress from "../components/IssueReporterAddress";
-import apps from "../data/apps";
-import { geocoderFields } from "../data/geocoderFields";
-import { geocoders } from "../hooks/useGeocoder";
-import SiteHeader from "../layout/SiteHeader";
-import SiteSidebar from "../layout/SiteSidebar";
-import { CsvInput } from "./CsvInput";
-import { InputChoice } from "./InputChoice";
-import GeocoderOptions from "./GeocoderOptions";
-import GeocoderResults from "./GeocoderResults";
-import { TextInput } from "./TextInput";
+import AppHeader from "../src/components/AppHeader";
+import Button from "../src/components/Button";
+import IssueReporterAddress from "../src/components/IssueReporterAddress";
+import apps from "../src/data/apps";
+import { geocoderFields } from "../src/data/geocoderFields";
+import { geocoders } from "../src/hooks/useGeocoder";
+import SiteSidebar from "../src/layout/SiteSidebar";
+import { CsvInput } from "../src/Geocoder/CsvInput";
+import { InputChoice } from "../src/Geocoder/InputChoice";
+import GeocoderOptions from "../src/Geocoder/GeocoderOptions";
+import GeocoderResults from "../src/Geocoder/GeocoderResults";
+import { TextInput } from "../src/Geocoder/TextInput";
 
 /**
  * This function chunks addresses in batches of 1000 and geocodes them.
@@ -111,7 +110,6 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
 
   return (
     <>
-      <SiteHeader {...{ session, setSession, login, setLogin, currentApp: "geocoder" }} />
       <AppHeader app={apps.geocoder} />
       <SiteSidebar title="Geocoder">
         <section className="sidebar-section">

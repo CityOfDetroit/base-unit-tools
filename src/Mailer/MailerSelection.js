@@ -1,4 +1,4 @@
-import Button from '../components/Button'
+import Button from '../../src/components/Button'
 import area from '@turf/area';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 

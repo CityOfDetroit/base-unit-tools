@@ -1,4 +1,4 @@
-import { faAtlas, faCheckSquare, faEnvelope, faHome, faLink, faMailBulk, faTasks, faWrench, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { faAtlas, faCheckSquare, faEnvelope, faHome, faLink, faMailBulk, faTasks, faWrench, faPlusCircle, faSearch } from '@fortawesome/free-solid-svg-icons';
 
 export const apps = {
     '/': {
@@ -7,24 +7,24 @@ export const apps = {
         icon: faHome,
         private: false
     },
-    'explorer': {
-        name: 'Explorer',
-        url: `/explorer`,
+    'search': {
+        name: 'Search',
+        description: `Look up & validate an individual address`,
+        questions: [
+            `Is this is a valid address?`
+        ],
+        url: `/search`,
+        icon: faSearch,
+        private: false
+    },
+    'map': {
+        name: 'Map',
+        url: `/map`,
         description: `View a map of the address, building, parcel, and streets data together.`,
         questions: [
             `Which buildings are linked to that street?`
         ],
         icon: faAtlas,
-        private: false
-    },
-    'validator': {
-        name: 'Validator',
-        description: `Look up & validate an individual address`,
-        questions: [
-            `Is this is a valid address?`
-        ],
-        url: `/validator`,
-        icon: faCheckSquare,
         private: false
     },
     'geocoder': {
@@ -48,26 +48,26 @@ export const apps = {
         icon: faEnvelope,
         private: true
     },
-    'linker': {
-        name: 'Linker',
-        url: `/linker`,
-        description: 'Create or edit links for an existing address',
-        questions: [
-            `All these unlinked addresses are driving me crazy?`
-        ],
-        icon: faLink,
-        private: true
-    },
-    'assignment': {
-        name: 'Assignment',
-        url: `/assignment`,
-        description: 'Assign a new address',
-        questions: [
-            `I need to assign new addresses for a row of townhouses.`
-        ],
-        icon: faPlusCircle,
-        private: true
-    }
+    // 'linker': {
+    //     name: 'Linker',
+    //     url: `/linker`,
+    //     description: 'Create or edit links for an existing address',
+    //     questions: [
+    //         `All these unlinked addresses are driving me crazy?`
+    //     ],
+    //     icon: faLink,
+    //     private: true
+    // },
+    // 'assignment': {
+    //     name: 'Assignment',
+    //     url: `/assignment`,
+    //     description: 'Assign a new address',
+    //     questions: [
+    //         `I need to assign new addresses for a row of townhouses.`
+    //     ],
+    //     icon: faPlusCircle,
+    //     private: true
+    // }
 }
 
 export default apps;

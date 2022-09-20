@@ -1,5 +1,5 @@
 import React from "react";
-import { ToggleButton } from "../components/ToggleButton";
+import { ToggleButton } from "../../src/components/ToggleButton";
 export const InputChoice = ({ setOptions, options }) => {
   return (
     <div className="flex items-center justify-center">

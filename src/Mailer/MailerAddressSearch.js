@@ -1,8 +1,8 @@
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import React, { useEffect, useState } from 'react';
-import Button from '../components/Button';
-import {useGeocoder} from '../hooks/useGeocoder';
-import useFeature from '../hooks/useFeature'
+import Button from '../../src/components/Button';
+import {useGeocoder} from '../../src/hooks/useGeocoder';
+import useFeature from '../../src/hooks/useFeature'
 import { queryFeatures } from '@esri/arcgis-rest-feature-layer';
 import layers from '../data/layers';
 import { arcgisToGeoJSON } from '@esri/arcgis-to-geojson-utils';

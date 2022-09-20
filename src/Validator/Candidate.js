@@ -1,7 +1,7 @@
 import { faExternalLinkAlt, faLink } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
-import IssueReporter from "../components/IssueReporter";
+import IssueReporter from "../../src/components/IssueReporter";
 
 let types = {
   PointAddress: {

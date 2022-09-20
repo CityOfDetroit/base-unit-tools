@@ -1,6 +1,6 @@
 import { faMapMarked, faRoad, faStreetView } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Button from '../components/Button';
+import Button from '../../src/components/Button';
 
 // Object with key names and display values
 let basemaps = {

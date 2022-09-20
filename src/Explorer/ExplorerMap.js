@@ -8,7 +8,6 @@ import { baseStyle, satelliteStyle, linenStyle } from '../styles/mapstyle'
 import videoIcon from '../images/video.png'
 
 import layers from '../data/layers'
-import { map } from "bluebird";
 
 const ExplorerMap = ({ clicked, setClicked, geocoded, linked, feature, showSv, svBearing, basemap, svImage, setSvImages }) => {
 
@@ -20,8 +19,6 @@ const ExplorerMap = ({ clicked, setClicked, geocoded, linked, feature, showSv, s
 
   // this effect runs once, when the component loads
   useEffect(() => {
-
-    console.log(feature)
 
     const detroitBbox = [-83.287803, 42.255192, -82.910451, 42.45023];
     var map = new mapboxgl.Map({
@@ -61,11 +58,12 @@ const ExplorerMap = ({ clicked, setClicked, geocoded, linked, feature, showSv, s
     map.on('style.load', () => {
       setLoading(false)
 
+      console.log(videoIcon)
       // load our mapillary video icon in
-      map.loadImage(videoIcon, (error, image) => {
-        if (error) throw error;
-        map.addImage("video", image);
-      });
+      // map.loadImage(videoIcon, (error, image) => {
+      //   if (error) throw error;
+      //   map.addImage("video", image);
+      // });
     })
 
     map.on('click', e => {

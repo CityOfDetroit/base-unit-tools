@@ -4,12 +4,13 @@ import {
   faSignOutAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import logo from "../images/logo.png";
+import logo from "../images/logo_small.png";
 import { Login } from "./Login";
 import apps from "../data/apps";
 import { useState } from "react";
 import AnimateHeight from "react-animate-height";
 import Link from 'next/link';
+import Image from 'next/image'
 
 const SiteHeader = ({
   session,
@@ -25,12 +26,12 @@ const SiteHeader = ({
     return (
       <header>
         <div
-          className="flex items-center justify-between"
+          className="flex items-center justify-between h-14"
           style={{ 
             borderBottom: open ? `8px solid rgba(254, 183, 13, 0.50)` : `8px solid rgb(254, 183, 13)`,
           }}
         >
-          <img src={logo} className="h-6 md:h-8 m-1" alt={"City logo"} />
+          <Image src={logo} alt={"City logo"} height={45} width={40} />
           <h1 className={open ? "w-full font-black text-base md:text-xl ml-1 -mb-1 opacity-50" : "w-full font-black  text-base md:text-xl ml-1 -mb-1"}>
             Base Unit Tools
           </h1>
@@ -75,15 +76,15 @@ const SiteHeader = ({
           {Object.keys(apps).map((app) => {
             if (session || !session && !apps[app].private) {
               return (
-                <div className="flex items-center bg-gray-100 py-1 border-b-2 border-gray-200" key={apps[app].name}>
+                <div className="flex items-center bg-gray-100 py-3 border-b-2 border-gray-200 hover:cursor-pointer hover:bg-gray-200 hover:font-extrabold" key={apps[app].name}>
                   <div className="w-12 flex items-center justify-around">
                     <FontAwesomeIcon
                       icon={apps[app].icon}
-                      className="mx-3 text-xl h-8"
+                      className="mx-3 text-xl h-6"
                     />
                   </div>
                   <Link href={apps[app].url}>
-                    <h2 className="text-sm md:text-base">{apps[app].name}</h2>
+                    <h2 className="text-sm md:text-lg">{apps[app].name}</h2>
                   </Link>
                 </div>
               );

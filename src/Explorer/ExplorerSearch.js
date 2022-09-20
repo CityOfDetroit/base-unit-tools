@@ -1,7 +1,7 @@
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import React, { useEffect, useState } from 'react';
-import Button from '../components/Button';
-import {useGeocoder} from '../hooks/useGeocoder';
+import Button from '../../src/components/Button';
+import {useGeocoder} from '../../src/hooks/useGeocoder';
 
 const ExplorerSearch = ({ setClicked, setGeocoded }) => {
 

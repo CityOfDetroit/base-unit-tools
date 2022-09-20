@@ -1,6 +1,6 @@
 import { faChevronCircleDown, faChevronCircleRight, faLink } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import CopyValue from "../components/CopyValue";
+import CopyValue from "../../src/components/CopyValue";
 import layers from "../data/layers";
 import IdBadge from "./IdBadge";
 import { useState } from "react";

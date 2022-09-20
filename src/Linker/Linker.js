@@ -10,7 +10,6 @@ import apps from "../data/apps";
 import useFeature from "../hooks/useFeature";
 import { useGeocoder } from "../hooks/useGeocoder";
 import useQuery from "../hooks/useQuery";
-import SiteHeader from "../layout/SiteHeader";
 import SiteSidebar from "../layout/SiteSidebar";
 import { Link } from "./Link";
 import LinkerMap from "./LinkerMap";
@@ -105,9 +104,6 @@ const Linker = ({ session, setSession, login, setLogin }) => {
 
   return (
     <>
-      <SiteHeader
-        {...{ session, setSession, login, setLogin, currentApp: "linker" }}
-      />
       <AppHeader app={apps.linker} introduction={linkerIntro}>
         <LinkerSearch {...{ setSearchValue, type }} />
       </AppHeader>
