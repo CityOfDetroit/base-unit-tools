@@ -1,4 +1,5 @@
-# example netlify.toml
 [build]
-  command = "yarn build"
-  publish = "build"
+publish = ".next"
+
+[[plugins]]
+package = "@netlify/plugin-nextjs"
