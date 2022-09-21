@@ -66,7 +66,7 @@ const IssueReporter = ({ session, geocoded, clicked, feature, title="Report an i
   return (
     <section className="bg-gray-300 p-2 md:p-3 mt-2">
       <div
-        className="flex items-center justify-between"
+        className="flex items-center justify-between cursor-pointer"
         onClick={() => setShow(!show)}
       >
         <div

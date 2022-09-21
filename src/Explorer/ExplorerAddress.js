@@ -6,18 +6,23 @@ import layers from '../data/layers';
 import ExplorerFeature from './ExplorerFeature';
 import IdBadge from './IdBadge';
 
+export const addressAttributes = {
+  "Street Number": `street_number`,
+  "Street Prefix": `street_prefix`,
+  "Street Name": `street_name`,
+  "Street Type": `street_type`,
+  "Unit Type": `unit_type`,
+  "Unit Number": `unit_number`
+}
+
 const ExplorerAddress = ({ feature, clicked, setClicked, linked, setLinked }) => {
 
+  let attributes = {}
   let { attributes: attr } = feature;
 
-  let attributes = {
-    "Street Number": attr.street_number,
-    "Street Prefix": attr.street_prefix,
-    "Street Name": attr.street_name,
-    "Street Type": attr.street_type,
-    "Unit Type": attr.unit_type,
-    "Unit Number": attr.unit_number
-  }
+  Object.keys(addressAttributes).forEach(k => {
+    attributes[k] = feature.attributes[addressAttributes[k]]
+  })
 
   useEffect(() => {
     if (feature) {

@@ -130,20 +130,16 @@ const Validator = ({ session, setSession, login, setLogin }) => {
             </section>
           )}
         </section>
-        {/* <section className="sidebar-section mt-2">
+        <section className="sidebar-section mt-2">
           <pre className="font-bold text-lg">Geocoder response</pre>
           <pre className="p-2 text-xs max-h-96 overflow-scroll ">
             {JSON.stringify(data, null, "  ")}
           </pre>
-        </section> */}
+        </section>
       </SiteSidebar>
       <main>
-        {geocodeValue && data && (
-          <>
-            {data.features.map((candidate) => (
-              <Candidate candidate={candidate} session={session} />
-            ))}
-          </>
+        {geocodeValue && data && data.features.length > 0 && (
+          <Candidate candidate={data.features[0]} session={session} />
         )}
       </main>
     </>

@@ -1,12 +1,9 @@
 
 import React, { useEffect, useState } from 'react';
-import AssignmentFeature from './AssignmentFeature';
-import moment from 'moment'
-import AnimateHeight from 'react-animate-height';
-import { faChevronCircleDown, faChevronCircleRight } from '@fortawesome/free-solid-svg-icons';
 import layers from '../data/layers';
+import AssignmentFeature from './AssignmentFeature';
 
-import { queryFeatures } from '@esri/arcgis-rest-feature-layer'
+import { queryFeatures } from '@esri/arcgis-rest-feature-layer';
 
 const AssignmentParcel = ({ parcel, setAddresses, setModelAddress, setStreet, setBuilding }) => {
 

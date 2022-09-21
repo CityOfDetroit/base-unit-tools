@@ -1,29 +1,44 @@
 
 
 import mapboxgl from 'mapbox-gl';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { baseStyle } from '../styles/mapstyle';
 
-const ValidatorMap = () => {
+const AddressMap = ({ center, parcelId, buildingId, streetId }) => {
+
+  let [theMap, setTheMap] = useState(null)
 
   useEffect(() => {
-
-    const detroitBbox = [-83.287803, 42.255192, -82.910451, 42.45023];
 
     var map = new mapboxgl.Map({
       container: "map", // container id
       style: baseStyle, // stylesheet location
-      bounds: detroitBbox,
+      center: center,
+      zoom: 18,
+      interactive: false,
       fitBoundsOptions: {
         padding: 50
       },
     });
 
+    setTheMap(map)
+
+    if(parcelId) {
+      
+    }
+    map.setFilter()
+
   }, [])
 
+  useEffect(() => {
+    if(theMap) {
+      theMap.setCenter(center)
+    }
+  }, [center])
+
   return (
-    <div id="map" className="explorer-map"></div>
+    <div id="map" style={{height: 400, width: 400}}></div>
   )
 }
 
-export default ValidatorMap;
+export default AddressMap;

@@ -38,17 +38,17 @@ function IndexPage(props) {
           {Object.values(apps)
             .slice(1)
             .map((a) => {
-              if (session || (!session && !a.private)) {
+              if ((session || (!session && !a.private)) && a.show) {
                 return (
-                  <div className="bg-gray-200 p-4" key={a.name}>
-                    <div className="flex items-center">
-                      <FontAwesomeIcon icon={a.icon} size="2x" className="mr-3" />
-                      <Link href={`.${a.url}`}>
+                  <Link href={`.${a.url}`}>
+                    <div className="bg-gray-200 p-4 cursor-pointer hover:bg-gray-300" key={a.name}>
+                      <div className="flex items-center">
+                        <FontAwesomeIcon icon={a.icon} size="2x" className="mr-3" />
                         <p className="text-xl font-bold">{a.name}</p>
-                      </Link>
+                      </div>
+                      <p className="my-4">{a.description}</p>
                     </div>
-                    <p className="my-4">{a.description}</p>
-                  </div>
+                  </Link>
                 );
               } else {
                 return;

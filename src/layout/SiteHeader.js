@@ -1,25 +1,14 @@
-import {
-  faBars,
-  faSignInAlt,
-  faSignOutAlt,
-} from "@fortawesome/free-solid-svg-icons";
+import { faBars, faSignInAlt, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import logo from "../images/logo_small.png";
-import { Login } from "./Login";
-import apps from "../data/apps";
+import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import AnimateHeight from "react-animate-height";
-import Link from 'next/link';
-import Image from 'next/image'
+import apps from "../data/apps";
+import logo from "../images/logo_small.png";
+import { Login } from "./Login";
 
-const SiteHeader = ({
-  session,
-  setSession,
-  login,
-  setLogin,
-  currentApp,
-  children,
-}) => {
+const SiteHeader = ({ session, setSession, login, setLogin }) => {
   let [open, setOpen] = useState(false);
 
   if (!login) {
@@ -27,19 +16,27 @@ const SiteHeader = ({
       <header>
         <div
           className="flex items-center justify-between h-14"
-          style={{ 
-            borderBottom: open ? `8px solid rgba(254, 183, 13, 0.50)` : `8px solid rgb(254, 183, 13)`,
+          style={{
+            borderBottom: open
+              ? `8px solid rgba(254, 183, 13, 0.50)`
+              : `8px solid rgb(254, 183, 13)`,
           }}
         >
           <Image src={logo} alt={"City logo"} height={45} width={40} />
-          <h1 className={open ? "w-full font-black text-base md:text-xl ml-1 -mb-1 opacity-50" : "w-full font-black  text-base md:text-xl ml-1 -mb-1"}>
+          <h1
+            className={
+              open
+                ? "w-full font-black text-base md:text-xl ml-1 -mb-1 opacity-50"
+                : "w-full font-black  text-base md:text-xl ml-1 -mb-1"
+            }
+          >
             Base Unit Tools
           </h1>
           <div className="flex items-center" onClick={() => setOpen(!open)}>
             <FontAwesomeIcon
               icon={faBars}
               className="mr-3 text-xl md:text-2xl hover:text-gray-500"
-              style={{cursor: "pointer"}}
+              style={{ cursor: "pointer" }}
             />
           </div>
         </div>
@@ -69,27 +66,27 @@ const SiteHeader = ({
               <FontAwesomeIcon
                 icon={session ? faSignOutAlt : faSignInAlt}
                 className="text-xl md:text-2xl ml-2 hover:text-black"
-                style={{cursor: "pointer"}}
+                style={{ cursor: "pointer" }}
               />
             </span>
           </div>
           {Object.keys(apps).map((app) => {
-            if (session || !session && !apps[app].private && apps[app].show) {
+            if ((session || (!session && !apps[app].private)) && apps[app].show) {
               return (
-                <div className="flex items-center bg-gray-100 py-3 border-b-2 border-gray-200 hover:cursor-pointer hover:bg-gray-200 hover:font-extrabold" key={apps[app].name}>
-                  <div className="w-12 flex items-center justify-around">
-                    <FontAwesomeIcon
-                      icon={apps[app].icon}
-                      className="mx-3 text-xl h-6"
-                    />
-                  </div>
-                  <Link href={apps[app].url}>
+                <Link href={apps[app].url} >
+                  <div
+                    className="flex items-center bg-gray-100 py-3 border-b-2 border-gray-200 hover:cursor-pointer hover:bg-gray-200 hover:font-extrabold"
+                    key={apps[app].name}
+                    onClick={() => setOpen(false)}
+                  >
+                    <div className="w-12 flex items-center justify-around">
+                      <FontAwesomeIcon icon={apps[app].icon} className="mx-3 text-xl h-6" />
+                    </div>
                     <h2 className="text-sm md:text-lg">{apps[app].name}</h2>
-                  </Link>
-                </div>
+                  </div>
+                </Link>
               );
-            }
-            else {
+            } else {
               return;
             }
           })}

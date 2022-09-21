@@ -5,10 +5,10 @@ const Button = ({ text, icon, onClick, disabled=false, active=true, small=false,
     <button 
       className={
         active 
-        ? 'flex items-center px-3 py-2 bg-blue-300 font-bold hover:bg-blue-100 ' + className 
+        ? 'cursor-pointer flex items-center px-3 py-2 bg-blue-300 font-bold hover:bg-blue-100 ' + className 
         : !disabled 
-          ? 'flex items-center px-3 py-2 text-gray-600 font-semibold bg-blue-200 hover:bg-blue-200 ' + className
-          : 'flex items-center px-3 py-2 text-gray-400 bg-blue-200 ' + className} 
+          ? 'cursor-pointer flex items-center px-3 py-2 text-gray-600 font-semibold bg-blue-200 hover:bg-blue-200 ' + className
+          : 'cursor-pointer flex items-center px-3 py-2 text-gray-400 bg-blue-200 ' + className} 
         onClick={onClick} 
         disabled={disabled}
     >

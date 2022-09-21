@@ -27,14 +27,14 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
   let querySv = streetview;
   let querySvImgKey = image;
 
+  let initClicked = {type: queryType, id: queryId}
+  console.log(initClicked)
+
   // this stores the type and id of the currently clicked feature
   // that drives everything, so the value and setter
   // are passed to child components often to consult or use
-  let [clicked, setClicked] = useState({
-    // derive initial values from the URL parameter if we can
-    type: queryType ? queryType : null,
-    id: queryId ? queryId : null,
-  });
+  let [clicked, setClicked] = useState(initClicked);
+
   let feature = useFeature(clicked);
 
   // this stores the current geocoding result
@@ -61,8 +61,8 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
   const [svImages, setSvImages] = useState([]);
 
   useEffect(() => {
-    console.log(geocoded);
-  }, [geocoded]);
+    console.log(clicked, feature);
+  }, [clicked, feature]);
 
   let introduction = (
     <>
