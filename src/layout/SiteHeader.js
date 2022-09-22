@@ -73,10 +73,9 @@ const SiteHeader = ({ session, setSession, login, setLogin }) => {
           {Object.keys(apps).map((app) => {
             if ((session || (!session && !apps[app].private)) && apps[app].show) {
               return (
-                <Link href={apps[app].url} >
+                <Link href={apps[app].url} key={apps[app].name} >
                   <div
                     className="flex items-center bg-gray-100 py-3 border-b-2 border-gray-200 hover:cursor-pointer hover:bg-gray-200 hover:font-extrabold"
-                    key={apps[app].name}
                     onClick={() => setOpen(false)}
                   >
                     <div className="w-12 flex items-center justify-around">

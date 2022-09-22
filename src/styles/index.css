@@ -39,6 +39,10 @@ h4 {
   border-bottom: 5px solid #feb70d;
 }
 
+.city-underline {
+  border-bottom: 3px solid #feb70d;
+}
+
 /* Desktop */
 @media only screen and (min-width: 769px) {
   #root {
@@ -48,7 +52,7 @@ h4 {
       "ah m"
       "s m"
       "f f";
-    grid-template-columns: minmax(450px, 3fr) 7fr;
+    grid-template-columns: minmax(300px, 3fr) 7fr;
     grid-template-rows: auto auto 1fr auto;
     height: 100vh;
   }

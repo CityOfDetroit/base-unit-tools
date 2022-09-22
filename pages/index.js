@@ -40,8 +40,8 @@ function IndexPage(props) {
             .map((a) => {
               if ((session || (!session && !a.private)) && a.show) {
                 return (
-                  <Link href={`.${a.url}`}>
-                    <div className="bg-gray-200 p-4 cursor-pointer hover:bg-gray-300" key={a.name}>
+                  <Link href={`.${a.url}`} key={a.name}>
+                    <div className="bg-gray-200 p-4 cursor-pointer hover:bg-gray-300">
                       <div className="flex items-center">
                         <FontAwesomeIcon icon={a.icon} size="2x" className="mr-3" />
                         <p className="text-xl font-bold">{a.name}</p>
