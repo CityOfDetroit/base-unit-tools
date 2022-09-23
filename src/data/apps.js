@@ -1,4 +1,4 @@
-import { faAtlas, faCheckSquare, faEnvelope, faHome, faLink, faMailBulk, faTasks, faWrench, faPlusCircle, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faAtlas, faCheckSquare, faEnvelope, faHome, faLink, faMailBulk, faTasks, faWrench, faPlusCircle, faSearch, faBusinessTime } from '@fortawesome/free-solid-svg-icons';
 
 export const apps = {
     '/': {
@@ -74,6 +74,14 @@ export const apps = {
         icon: faPlusCircle,
         private: true,
         show: false
+    },
+    'business-truth': {
+      name: "Business Truth",
+      url: `/business-truth`,
+      description: "Show businesses",
+      icon: faBusinessTime,
+      private: false,
+      show: true
     }
 }
 
