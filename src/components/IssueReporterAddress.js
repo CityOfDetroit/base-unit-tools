@@ -46,7 +46,7 @@ const addFeature = ({
   }).then((d) => {setAddResponse(d); unset();});
 };
 
-const IssueReporterAddress = ({ session, address='123 Fake St', title="Report an issue", unset }) => {
+const IssueReporterAddress = ({ session, address='123 Fake St', title="Report a data issue", unset }) => {
 
   // need these for the form
   let [formText, setFormText] = useState("");

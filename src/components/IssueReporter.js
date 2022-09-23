@@ -52,7 +52,7 @@ const lookup = {
   streets: "Street",
 };
 
-const IssueReporter = ({ session, geocoded, clicked, feature, title="Report an issue" }) => {
+const IssueReporter = ({ session, geocoded, clicked, feature, title="Report a data issue" }) => {
 
   // whether to show the dropdown
   let [show, setShow] = useState(false);

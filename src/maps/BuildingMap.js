@@ -1,4 +1,3 @@
-import centroid from "@turf/centroid";
 import mapboxgl from "mapbox-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useEffect, useState } from "react";
@@ -7,13 +6,13 @@ import _ from 'lodash';
 import layers from "../data/layers";
 import AerialControl from "./AerialControl";
 import bbox from "@turf/bbox";
+import centroid from "@turf/centroid";
 
 const BuildingMap = ({ geojson }) => {
 
   let [aerial, setAerial] = useState(false)
   let [loading, setLoading] = useState(true)
   let [theMap, setTheMap] = useState(null);
-  let center = centroid(geojson).geometry.coordinates;
 
   let style = _.cloneDeep(baseStyle)
 
@@ -23,12 +22,16 @@ const BuildingMap = ({ geojson }) => {
     }
   })
 
+
+  let center = centroid(geojson).geometry.coordinates;
+
   useEffect(() => {
 
     var map = new mapboxgl.Map({
       container: "map", // container id
       style: style, // stylesheet location
-      bounds: bbox(geojson),
+      center: center,
+      zoom: 17.5,
       interactive: false,
       fitBoundsOptions: {
         padding: 50,
@@ -48,13 +51,6 @@ const BuildingMap = ({ geojson }) => {
 
 
   }, []);
-
-  useEffect(() => {
-    if (theMap) {
-      theMap.setCenter(center);
-    }
-  }, [center]);
-
 
   // effect fires when we switch the basemap
   useEffect(() => {
