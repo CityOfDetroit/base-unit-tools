@@ -1,9 +1,5 @@
-import { suggest } from "@esri/arcgis-rest-geocoding";
-import {
-  faCheckSquare,
-  faChevronRight,
-  faSearch
-} from "@fortawesome/free-solid-svg-icons";
+import { geocode, suggest } from "@esri/arcgis-rest-geocoding";
+import { faCheckSquare, faChevronRight, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import AppHeader from "../src/components/AppHeader";
@@ -112,6 +108,20 @@ const Validator = ({ session, setSession, login, setLogin }) => {
             address={geocodeValue}
             unset={() => setGeocodeValue(null)}
           />
+        )}
+        {geocodeValue && !data && resultType === "no-match" && (
+          <>
+          <div className="sidebar-section">
+            <h2>We couldn't find the address {geocodeValue}!</h2>
+            <p>If you think this should be a valid City address, please let us know using the form below.
+            </p>
+          </div>
+          <IssueReporterAddress
+            session={session}
+            address={geocodeValue}
+            unset={() => setGeocodeValue(null)}
+            />
+          </>
         )}
       </main>
     </>
