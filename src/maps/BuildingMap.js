@@ -3,31 +3,32 @@ import mapboxgl from "mapbox-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useEffect, useState } from "react";
 import { baseStyle, satelliteStyle } from '../styles/mapstyle';
-
+import _ from 'lodash';
 import layers from "../data/layers";
+import AerialControl from "./AerialControl";
+import bbox from "@turf/bbox";
 
 const BuildingMap = ({ geojson }) => {
 
-  let [satellite, setSatellite] = useState(false)
+  let [aerial, setAerial] = useState(false)
   let [loading, setLoading] = useState(true)
   let [theMap, setTheMap] = useState(null);
   let center = centroid(geojson).geometry.coordinates;
 
-  baseStyle.layers.forEach((l, i) => {
+  let style = _.cloneDeep(baseStyle)
+
+  style.layers.forEach((l, i) => {
     if(l.id === layers.buildings.highlight) {
-      baseStyle.layers[i].filter = ["==", layers.buildings.filter_id, geojson.properties[layers.buildings.id_column]]
+      style.layers[i].filter = ["==", layers.buildings.filter_id, geojson.properties[layers.buildings.id_column]]
     }
   })
-
-  console.log(baseStyle)
 
   useEffect(() => {
 
     var map = new mapboxgl.Map({
       container: "map", // container id
-      style: baseStyle, // stylesheet location
-      center: center,
-      zoom: 17,
+      style: style, // stylesheet location
+      bounds: bbox(geojson),
       interactive: false,
       fitBoundsOptions: {
         padding: 50,
@@ -58,7 +59,7 @@ const BuildingMap = ({ geojson }) => {
   // effect fires when we switch the basemap
   useEffect(() => {
     if (theMap) {
-      if (satellite) {
+      if (aerial) {
         let style = satelliteStyle()
         style.layers.forEach((l, i) => {
           if(l.id === layers.buildings.highlight) {
@@ -69,7 +70,7 @@ const BuildingMap = ({ geojson }) => {
         theMap.setStyle(style)
         setLoading(true)
       }
-      if (!satellite) {
+      if (!aerial) {
         baseStyle.layers.forEach((l, i) => {
           if(l.id === layers.buildings.highlight) {
             baseStyle.layers[i].filter = ["==", layers.buildings.filter_id, geojson.properties[layers.buildings.id_column]]
@@ -79,16 +80,14 @@ const BuildingMap = ({ geojson }) => {
         setLoading(true)
       }
     }
-  }, [satellite])
-
-  useEffect(() => {
-    console.log(satellite)
-  }, [satellite])
+  }, [aerial])
 
   return (
     <div>
-    <span onClick={() => setSatellite(!satellite)}>Click me for satellite</span>
-    <div id="map" style={{ height: 300 }} />
+      <div id="map" style={{ height: 250 }} />
+      <div className="my-1">
+        <AerialControl {...{ aerial, setAerial }} />
+      </div>
     </div>
   );
 };

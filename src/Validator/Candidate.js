@@ -2,9 +2,9 @@ import { faExternalLinkAlt, faLink } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import IssueReporter from "../../src/components/IssueReporter";
-import AddressMap from "./ValidatorMap";
-import ValidatorMap from "./ValidatorMap";
-
+import GeocodeCandidateMap from "../maps/GeocodeCandidateMap";
+import { CategoryItem, UnitCategory } from "../../src/components/UnitCategory";
+import Link from "next/link";
 let types = {
   PointAddress: {
     name: `address point`,
@@ -40,40 +40,71 @@ const Candidate = ({ candidate, session }) => {
 
   let { name, description } = types[candidate.properties.Addr_type];
 
-  let externalLinks = {
-    "Google Maps": `http://www.google.com/maps/place/${lat},${lng}`,
-    "Detroit Street View/Mapillary": `https://www.mapillary.com/app/?lat=${lat}&lng=${lng}&z=19.5&username%5B%5D=codgis`,
+  let { address_id, building_id, parcel_id, street_id } = candidate.properties;
+
+  let candidateData = {
+    "Base unit links": {
+      Address: (
+        <a href={`/address/${address_id}`} target="_blank">
+          {address_id}
+        </a>
+      ),
+      Building: (
+        <a href={`/building/${building_id}`} target="_blank">
+          {building_id}
+        </a>
+      ),
+      Parcel: <a href={`/parcel/${parcel_id}`}>{parcel_id}</a>,
+      Street: <a href={`/street/${street_id}`}>{street_id}</a>,
+    },
+    "External links": {
+      "Google Maps": (
+        <a href={`http://www.google.com/maps/place/${lat},${lng}`} target="_blank">
+          Link
+        </a>
+      ),
+      "Detroit Street View/Mapillary": (
+        <a
+          href={`https://www.mapillary.com/app/?lat=${lat}&lng=${lng}&z=19.5&username%5B%5D=codgis`}
+          target="_blank"
+        >
+          Link
+        </a>
+      ),
+    },
   };
+
+  if (candidate.properties.Addr_type !== "PointAddress") {
+    delete candidateData["Base unit links"];
+  }
 
   return (
     <div>
-      <section className="sidebar-section flex items-center justify-between align-middle">
-        <div>
-          <h2 className="text-lg md:text-xl">{addr}</h2>
-          <h3 className="text-m md:text-lg">{subaddr}</h3>
-        </div>
-        <div className="w-1/2 px-2 text-right text-gray-700">
-          <p className="text-base leading-tight">
-            type: <span className="font-semibold">{name}</span>
-          </p>
-          {/* <p className="leading-tight text-sm">{description}</p> */}
-        </div>
-      </section>
+      <div className="p-2 w-full flex items-center justify-between px-4 bg-gray-300">
+        <h2>
+          {addr} {subaddr}
+        </h2>
+        <h3>{name}</h3>
+      </div>
 
-      <section className="flex items-center gap-4 bg-gray-100 text-sm p-3 bg-gray-200">
-        <ul className="flex items-center flex-row gap-4 font-thin">
-          {Object.keys(externalLinks).map((k) => (
-            <li className="text-gray-600">
-              <a href={externalLinks[k]} target="_blank">
-                {k}
-                <FontAwesomeIcon className="text-gray-400 ml-1 text-xs" icon={faExternalLinkAlt} />
-              </a>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <AddressMap address={candidate} />
+      <div className="sidebar-section grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6">
+        {Object.keys(candidateData).map((category, idx) => {
+          return (
+            <>
+              <UnitCategory key={category} categoryName={category}>
+                {Object.keys(candidateData[category]).map((column, idx) => (
+                  <CategoryItem
+                    column={column}
+                    value={candidateData[category][column]}
+                    borderBottom={Object.keys(candidateData[category]).length - 1 > idx}
+                  />
+                ))}
+              </UnitCategory>
+              {idx === 0 && <GeocodeCandidateMap candidate={candidate} />}
+            </>
+          );
+        })}
+      </div>
 
       <IssueReporter session={session} geocoded={{ features: [candidate] }} clicked={clicked} />
     </div>

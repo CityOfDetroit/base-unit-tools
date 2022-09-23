@@ -5,7 +5,8 @@ import { CategoryItem, UnitCategory } from "../../src/components/UnitCategory";
 import layers from "../../src/data/layers";
 import SiteSidebar from "../../src/layout/SiteSidebar";
 import ParcelMap from "../../src/maps/ParcelMap";
-
+import IssueReporter from "../../src/components/IssueReporter";
+import IdBadge from "../../src/Explorer/IdBadge";
 export async function getServerSideProps(context) {
   const { id } = context.params;
 
@@ -23,17 +24,25 @@ export async function getServerSideProps(context) {
   const assessmentCall = await fetch(`https://apis.detroitmi.gov/assessments/parcel/${id}/`);
   const attributes = await assessmentCall.json();
 
+  const addresses = await queryFeatures({
+    url: layers.addresses.endpoint,
+    where: `parcel_id = '${id}'`,
+    outFields: "*",
+    outSR: 4326,
+    f: "geojson",
+  });
+
   const geojson = features.features[0];
   const assessment = attributes;
 
-  return { props: { geojson, assessment, lyr } };
+  return { props: { geojson, assessment, addresses, lyr } };
 }
 
-const Parcel = ({ geojson, assessment, lyr }) => {
+const Parcel = ({ geojson, assessment, addresses, lyr, session }) => {
   const router = useRouter();
   const { id } = router.query;
 
-  console.log(geojson, assessment);
+  console.log(addresses);
 
   const parcelData = {
     Ownership: {
@@ -67,8 +76,7 @@ const Parcel = ({ geojson, assessment, lyr }) => {
 
   return (
     <>
-      <SiteSidebar>
-      </SiteSidebar>
+      <SiteSidebar></SiteSidebar>
       <main>
         <div
           className="p-2 w-full flex items-center justify-between px-4"
@@ -79,10 +87,10 @@ const Parcel = ({ geojson, assessment, lyr }) => {
 
         <div className="sidebar-section grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6">
           <div className="">
-            <UnitCategory categoryName={`Base information`}>
+            <UnitCategory categoryName={`Parcel information`}>
               <CategoryItem column={`Parcel ID`} value={id} />
               <CategoryItem
-                column={`Property Address`}
+                column={`Parcel Address`}
                 value={geojson.properties.assessor_address}
                 borderBottom={false}
               />
@@ -110,6 +118,12 @@ const Parcel = ({ geojson, assessment, lyr }) => {
             ))}
           </div>
         </div>
+        <IssueReporter
+          geocoded={geojson}
+          feature={geojson}
+          clicked={{ type: lyr.name, id: id }}
+          session={session}
+        />
       </main>
     </>
   );

@@ -2,14 +2,15 @@ import { queryFeatures } from "@esri/arcgis-rest-feature-layer";
 import { useRouter } from "next/router";
 import layers from "../../src/data/layers";
 import SiteSidebar from "../../src/layout/SiteSidebar";
-import StreetMap from "../../src/maps/StreetMap";
-import IssueReporter from "../../src/components/IssueReporter";
+import AddressMap from "../../src/maps/AddressMap";
+import Link from "next/link";
 import { CategoryItem, UnitCategory } from "../../src/components/UnitCategory";
+import IssueReporter from "../../src/components/IssueReporter";
 
 export async function getServerSideProps(context) {
   const { id } = context.params;
 
-  const lyr = layers.streets;
+  const lyr = layers.addresses;
 
   console.log(lyr, id);
   const features = await queryFeatures({
@@ -25,65 +26,74 @@ export async function getServerSideProps(context) {
   return { props: { geojson, lyr } };
 }
 
-const Street = ({ geojson, lyr, session }) => {
-  console.log(geojson);
+const Address = ({ geojson, lyr, session }) => {
   const router = useRouter();
   const { id } = router.query;
 
-  const {
-    street_name,
-    street_prefix,
-    street_type,
-    fraddl,
-    toaddl,
-    fraddr,
-    toaddr,
-    fcc,
-    legalsystem,
-  } = geojson.properties;
+  console.log(geojson.properties)
+  let { bldg_id, parcel_id, street_id, street_number, street_prefix, street_name, street_type, unit_type, unit_number } = geojson.properties;
 
-  const streetData = {
-    "Street information": {
-      "Street ID": id,
-      "Street direction": street_prefix,
-      "Street name": street_name,
-      "Street type": street_type,
+  const addressData = {
+    "Address information": {
+      "Address ID": id,
+      "Street Number": street_number,
+      "Street Prefix": street_prefix,
+      "Street Name": street_name,
+      "Street Type": street_type,
+      "Unit Type": unit_type,
+      "Unit Number": unit_number,
     },
-    "MGF/Address range data": {
-      "Left-hand range": `${fraddl} - ${toaddl}`,
-      "Right-hand range": `${fraddr} - ${toaddr}`,
-    }
+    "Base unit links": {
+      Building: (
+        <Link href={`/building/${bldg_id}`}>
+          <a>{bldg_id}</a>
+        </Link>
+      ),
+      Parcel: (
+        <Link href={`/parcel/${parcel_id}`}>
+          <a>{parcel_id}</a>
+        </Link>
+      ),
+      Street: (
+        <Link href={`/street/${street_id}`}>
+          <a>{street_id}</a>
+        </Link>
+      ),
+    },
+  };
+
+  let clicked = {
+    type: "addresses",
+    id: id,
   };
 
   return (
     <>
       <SiteSidebar>
-
       </SiteSidebar>
       <main>
         <div
           className="p-2 w-full flex items-center justify-between px-4"
           style={{ backgroundColor: `${lyr.color}` }}
         >
-          <h2 className="m-0 font-extrabold" style={{ color: lyr.text_color }}>
-            {lyr.label}: {id}
-          </h2>
+          <h2>{lyr.label}</h2>
         </div>
+
         <div className="sidebar-section grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6">
-          {Object.keys(streetData)
+          {Object.keys(addressData)
             .map((category, idx) => {
               return (
                 <>
                 <UnitCategory key={category} categoryName={category}>
-                  {Object.keys(streetData[category]).map((column, idx) => (
+                  {Object.keys(addressData[category]).map((column, idx) => (
                     <CategoryItem
                     column={column}
-                    value={streetData[category][column]}
-                    borderBottom={Object.keys(streetData[category]).length - 1 > idx}
+                    value={addressData[category][column]}
+                    borderBottom={Object.keys(addressData[category]).length - 1 > idx}
                     />
                     ))}
                 </UnitCategory>
-                {idx === 0 && <StreetMap geojson={geojson} />}
+                {idx === 0 && <AddressMap geojson={geojson} />}
                 </>
               );
             })}
@@ -99,4 +109,4 @@ const Street = ({ geojson, lyr, session }) => {
   );
 };
 
-export default Street;
+export default Address;

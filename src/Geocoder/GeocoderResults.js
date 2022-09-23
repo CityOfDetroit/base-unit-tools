@@ -1,9 +1,13 @@
 import {
-  faAngleDoubleLeft, faAngleDoubleRight,
-  faAngleLeft, faAngleRight, faDownload, faExclamationTriangle
+  faAngleDoubleLeft,
+  faAngleDoubleRight,
+  faAngleLeft,
+  faAngleRight,
+  faDownload,
+  faExclamationTriangle,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Link from 'next/link';
+import Link from "next/link";
 import { useMemo } from "react";
 import { CSVLink } from "react-csv";
 import { usePagination, useTable } from "react-table";
@@ -40,10 +44,15 @@ const GeocoderResults = ({
                 setUnmatchedAddr(row.row.values.input);
               }}
             />
-            <a className="mx-2 text-gray-500"               onClick={() => {
-                console.log(row)
+            <a
+              className="mx-2 text-gray-500"
+              onClick={() => {
+                console.log(row);
                 setUnmatchedAddr(row.row.values.input);
-              }}>No match/Report issue</a>
+              }}
+            >
+              No match/Report issue
+            </a>
           </div>
         ),
     },
@@ -55,24 +64,18 @@ const GeocoderResults = ({
         accessor: "address_id",
         Header: "Address ID",
         Cell: (row) => (
-          <Link
-            target={`_blank`}
-            href={`/explorer?type=addresses&id=${row.value}`}
-          >
+          <a target={`_blank`} href={`/address/${row.value}`}>
             {row.value}
-          </Link>
+          </a>
         ),
       },
       {
         accessor: "building_id",
         Header: "Building ID",
         Cell: (row) => (
-          <Link
-            target={`_blank`}
-            href={`/explorer?type=buildings&id=${row.value}`}
-          >
+          <a target={`_blank`} href={`/building/${row.value}`}>
             {row.value}
-          </Link>
+          </a>
         ),
       },
       {
@@ -80,18 +83,18 @@ const GeocoderResults = ({
         maxWidth: 15,
         Header: "Parcel ID",
         Cell: (row) => (
-          <Link target={`_blank`} href={`/explorer?type=parcels&id=${row.value}`}>
+          <a target={`_blank`} href={`/parcel/${row.value}`}>
             {row.value}
-          </Link>
+          </a>
         ),
       },
       {
         accessor: "street_id",
         Header: "Street ID",
         Cell: (row) => (
-          <Link target={`_blank`} href={`/explorer?type=streets&id=${row.value}`}>
+          <a target={`_blank`} href={`/street/${row.value}`}>
             {row.value}
-          </Link>
+          </a>
         ),
       },
     ]);
@@ -102,20 +105,12 @@ const GeocoderResults = ({
       {
         accessor: (row) => row.Y.toFixed(5),
         Header: "Lat",
-        Cell: (row) => (
-          <span className="tracking-tight">
-            {row.value > 0 ? row.value : null}
-          </span>
-        ),
+        Cell: (row) => <span className="tracking-tight">{row.value > 0 ? row.value : null}</span>,
       },
       {
         accessor: (row) => row.X.toFixed(5),
         Header: "Lon",
-        Cell: (row) => (
-          <span className="tracking-tight">
-            {row.value < 0 ? row.value : null}
-          </span>
-        ),
+        Cell: (row) => <span className="tracking-tight">{row.value < 0 ? row.value : null}</span>,
       },
     ]);
   }
@@ -177,21 +172,24 @@ const GeocoderResults = ({
       <section className="sidebar-section flex items-center gap-12">
         <div className="w-auto pr-4">
           <p>
-            {results.filter((r) => r.attributes.StAddr !== "").length}/
-            {addresses.length} matches
+            {results.filter((r) => r.attributes.StAddr !== "").length}/{addresses.length} matches
           </p>
           <p>
-            <strong>{((results.filter((r) => r.attributes.StAddr !== "").length) * 100 / (addresses.length)).toFixed(1)}%</strong> rate
+            <strong>
+              {(
+                (results.filter((r) => r.attributes.StAddr !== "").length * 100) /
+                addresses.length
+              ).toFixed(1)}
+              %
+            </strong>{" "}
+            rate
           </p>
         </div>
 
         <div>
           {/* <h3>Export data</h3>
           <span>{dataForCsvExport.length} rows in export</span> */}
-          <CSVLink
-            data={dataForCsvExport}
-            filename={`geocode_results_${new Date().getTime()}.csv`}
-          >
+          <CSVLink data={dataForCsvExport} filename={`geocode_results_${new Date().getTime()}.csv`}>
             <Button
               active={results.length > 0}
               disabled={results.length === 0}
@@ -211,10 +209,7 @@ const GeocoderResults = ({
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column) => (
-                  <th
-                    {...column.getHeaderProps()}
-                    className="bg-gray-300 py-2 pl-2 pr-4"
-                  >
+                  <th {...column.getHeaderProps()} className="bg-gray-300 py-2 pl-2 pr-4">
                     {column.render("Header")}
                   </th>
                 ))}
@@ -228,16 +223,11 @@ const GeocoderResults = ({
               return (
                 <tr
                   {...row.getRowProps()}
-                  className={
-                    row.values.StAddr === "" ? "bg-red-50 h-12" : "h-12"
-                  }
+                  className={row.values.StAddr === "" ? "bg-red-50 h-12" : "h-12"}
                 >
                   {row.cells.map((cell) => {
                     return (
-                      <td
-                        {...cell.getCellProps()}
-                        className="pl-2 pr-4 border border-bottom-1"
-                      >
+                      <td {...cell.getCellProps()} className="pl-2 pr-4 border border-bottom-1">
                         {cell.render("Cell")}
                       </td>
                     );
@@ -266,9 +256,9 @@ const GeocoderResults = ({
           </button>
         </div>
         <div>
-            <strong>
-              {pageIndex + 1} of {pageOptions.length}
-            </strong>{" "}
+          <strong>
+            {pageIndex + 1} of {pageOptions.length}
+          </strong>{" "}
           <span>
             | Go to page:
             <input

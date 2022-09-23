@@ -5,24 +5,20 @@ import { useEffect, useState } from "react";
 import { baseStyle, satelliteStyle } from "../styles/mapstyle";
 
 import layers from "../data/layers";
-import bbox from "@turf/bbox";
-import Button from "../components/Button";
-import { faCamera, faSatellite } from "@fortawesome/free-solid-svg-icons";
-import { LazyResult } from "postcss";
 import AerialControl from "./AerialControl";
 
-const StreetMap = ({ geojson }) => {
+const AddressMap = ({ geojson }) => {
   let [aerial, setAerial] = useState(false);
   let [loading, setLoading] = useState(true);
   let [theMap, setTheMap] = useState(null);
   let center = centroid(geojson).geometry.coordinates;
 
   baseStyle.layers.forEach((l, i) => {
-    if (l.id === layers.streets.highlight) {
+    if (l.id === layers.addresses.highlight) {
       baseStyle.layers[i].filter = [
         "==",
-        layers.streets.filter_id,
-        geojson.properties[layers.streets.id_column],
+        layers.addresses.filter_id,
+        geojson.properties[layers.addresses.id_column],
       ];
     }
   });
@@ -33,7 +29,8 @@ const StreetMap = ({ geojson }) => {
     var map = new mapboxgl.Map({
       container: "map", // container id
       style: baseStyle, // stylesheet location
-      bounds: bbox(geojson),
+      center: center,
+      zoom: 17.5,
       interactive: true,
       fitBoundsOptions: {
         padding: 50,
@@ -64,11 +61,11 @@ const StreetMap = ({ geojson }) => {
       if (aerial) {
         let style = satelliteStyle();
         style.layers.forEach((l, i) => {
-          if (l.id === layers.streets.highlight) {
+          if (l.id === layers.addresses.highlight) {
             style.layers[i].filter = [
               "==",
-              layers.streets.filter_id,
-              geojson.properties[layers.streets.id_column],
+              layers.addresses.filter_id,
+              geojson.properties[layers.addresses.id_column],
             ];
           }
         });
@@ -78,11 +75,11 @@ const StreetMap = ({ geojson }) => {
       }
       if (!aerial) {
         baseStyle.layers.forEach((l, i) => {
-          if (l.id === layers.streets.highlight) {
+          if (l.id === layers.addresses.highlight) {
             baseStyle.layers[i].filter = [
               "==",
-              layers.streets.filter_id,
-              geojson.properties[layers.streets.id_column],
+              layers.addresses.filter_id,
+              geojson.properties[layers.addresses.id_column],
             ];
           }
         });
@@ -93,13 +90,16 @@ const StreetMap = ({ geojson }) => {
   }, [aerial]);
 
   return (
-    <div>
-      <div id="map" style={{ height: 250 }} />
-      <div className="my-1">
-        <AerialControl {...{ aerial, setAerial }} />
+    <div className="bg-gray-100">
+      <div className="flex items-center justify-between p-2">
+        <p className="font-semibold">Map</p>
+      </div>
+      <div id="map" style={{ height: 350 }} />
+      <div>
+        <AerialControl {...{aerial, setAerial}} />
       </div>
     </div>
   );
 };
 
-export default StreetMap;
+export default AddressMap;

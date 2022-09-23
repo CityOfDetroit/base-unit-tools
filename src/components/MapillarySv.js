@@ -8,6 +8,8 @@ import bearing from "@turf/bearing";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStreetView } from "@fortawesome/free-solid-svg-icons";
 import _ from 'lodash'
+import "mapillary-js/dist/mapillary.css";
+
 
 /**
  * Wrap a value on the interval [min, max].

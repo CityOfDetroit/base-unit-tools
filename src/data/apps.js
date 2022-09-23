@@ -21,7 +21,7 @@ export const apps = {
     },
     'map': {
         name: 'Map',
-        url: `/explorer`,
+        url: `/map`,
         description: `View a map of the address, building, parcel, and streets data together.`,
         questions: [
             `Which buildings are linked to that street?`

@@ -3,13 +3,14 @@ import { useRouter } from "next/router";
 import layers from "../../src/data/layers";
 import SiteSidebar from "../../src/layout/SiteSidebar";
 import BuildingMap from "../../src/maps/BuildingMap";
-
+import { CategoryItem, UnitCategory } from "../../src/components/UnitCategory";
+import IssueReporter from "../../src/components/IssueReporter";
 export async function getServerSideProps(context) {
   const { id } = context.params;
 
   const lyr = layers.buildings;
 
-  console.log(lyr, id)
+  console.log(lyr, id);
   const features = await queryFeatures({
     url: lyr.endpoint,
     where: `${lyr.id_column} = '${id}'`,
@@ -23,77 +24,64 @@ export async function getServerSideProps(context) {
   return { props: { geojson, lyr } };
 }
 
-const Building = ({ geojson, lyr }) => {
+const Building = ({ geojson, lyr, session }) => {
   const router = useRouter();
   const { id } = router.query;
+  console.log(geojson);
+
+  let { use_category, ted_build_type, bldg_status, parcel_id } = geojson.properties;
 
   const buildingData = {
-    // Ownership: {
-    //   "Taxpayer": assessment.taxpayer1,
-    //   "Taxpayer Address": `${assessment.taxpaddr}, ${assessment.taxpcity}, ${assessment.taxpstate}`,
-    //   "Last Sale Date": assessment.saledate ? dayjs(assessment.saledate).format('MM/DD/YYYY') : `-`,
-    //   "Last Sale Price": parseInt(assessment.saleprice).toLocaleString(),
-    //   "PRE %": assessment.pre,
-    //   "NEZ": assessment.nez,
-    //   // "Related Parcel": (<Link href={`/parcels/${assessment.relatedparcel}`}><span>{assessment.relatedparcel}</span></Link>)
-    // },
-    // "Usage & classification": {
-    //   "Property Class": `${assessment.propclass} - ${assessment.propclassdesc}` ,
-    //   "Property Use": `${assessment.usecode}`,
-    //   "Zoning": assessment.zoning,
-    //   "# of Buildings": assessment.resbldgcount + assessment.cibldgcount,
-    //   "Total Floor Area (sf)": assessment.totalfloor,
-    //   "Style": assessment.style,
-    // },
-    // Taxation: {
-    //   "Tax Status": assessment.taxstatus,
-    //   "Assessed Value": parseInt(assessment.assessedvalue).toLocaleString(),
-    //   "Taxable Value": parseInt(assessment.taxablevalue).toLocaleString(),
-    // },
-    // Dimensions: {
-    //   "Total Acreage": assessment.totalacreage,
-    //   "Total Square Footage": assessment.totalsqft,
-    //   "Depth x Frontage (ft)": `${assessment.depth} x ${assessment.frontage}`,
-    // },
+    "Building information": {
+      "Building ID": id,
+      Status: bldg_status,
+      "Use type": use_category,
+      "Building type": ted_build_type,
+    },
+    "Base unit links": {
+      Parcel: (
+        <a href={`/parcel/${parcel_id}`} target="_blank">
+          {parcel_id}
+        </a>
+      ),
+    },
   };
 
   return (
     <>
-      <SiteSidebar>
-        <div className="sidebar-section">
-          <h2>{lyr.label} lookup</h2>
-        </div>
-      </SiteSidebar>
+      <SiteSidebar></SiteSidebar>
       <main>
         <div
           className="p-2 w-full flex items-center justify-between px-4"
           style={{ backgroundColor: `${lyr.color}` }}
         >
-          <h2 className="m-0 font-extrabold" style={{ color: lyr.text_color }}>
-            {lyr.label}: {id}
-          </h2>
-          <h3 className="m-0 font-extrabold" style={{ color: lyr.text_color }}>
-            {geojson.properties.assessor_address}
-          </h3>
+          <h2>{lyr.label}</h2>
         </div>
+
         <div className="sidebar-section grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6">
-          <BuildingMap geojson={geojson} />
+          {Object.keys(buildingData).map((category, idx) => {
+            return (
+              <>
+                <UnitCategory key={category} categoryName={category}>
+                  {Object.keys(buildingData[category]).map((column, idx) => (
+                    <CategoryItem
+                      column={column}
+                      value={buildingData[category][column]}
+                      borderBottom={Object.keys(buildingData[category]).length - 1 > idx}
+                    />
+                  ))}
+                </UnitCategory>
+                {idx === 0 && <BuildingMap geojson={geojson} />}
+              </>
+            );
+          })}
         </div>
-        <div className="sidebar-section">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-6">
-            {Object.keys(buildingData).map((category) => (
-              <div key={category} className="">
-                <p className="font-bold text-lg text-gray-700 city-underline">{category}</p>
-                {Object.keys(buildingData[category]).map(column => (
-                  <div className="flex items-center justify-between py-1">
-                    <span className="font-semibold text-gray-700">{column}</span>
-                    {buildingData[category][column]}
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
+        <IssueReporter
+          geocoded={geojson}
+          feature={geojson}
+          clicked={{ type: lyr.name, id: id }}
+          session={session}
+        />
       </main>
     </>
   );

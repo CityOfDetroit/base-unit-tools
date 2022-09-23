@@ -13,6 +13,7 @@ import { geocoders, useGeocoder } from "../src/hooks/useGeocoder";
 import SiteSidebar from "../src/layout/SiteSidebar";
 import parse from "../src/parser.js";
 import Candidate from "../src/Validator/Candidate";
+import IssueReporterAddress from "../src/components/IssueReporterAddress";
 
 const Validator = ({ session, setSession, login, setLogin }) => {
   let [value, setValue] = useState("");
@@ -36,16 +37,7 @@ const Validator = ({ session, setSession, login, setLogin }) => {
 
   let introduction = (
     <>
-      <p>Use this tool to validate a single address and see more information about it.</p>
-      {/* <p>
-        Enter one address in the box below and you'll see the output of the
-        parser.
-      </p>
-      <p>
-        The Rules Applied section will show you how the tool is working. For
-        example, if you enter <i>123 St Aubin</i> you'll see that the <i>St</i>{" "}
-        has been expanded to <i>Saint.</i>
-      </p> */}
+      <p>Use this tool to find a single address and see more information about it.</p>
     </>
   );
 
@@ -63,33 +55,6 @@ const Validator = ({ session, setSession, login, setLogin }) => {
     <>
       <AppHeader app={apps.search} introduction={introduction} />
       <SiteSidebar title="Search">
-        {/* <section className="sidebar-section">
-          <h4>Output</h4>
-          {displayFields.map((f) => (
-            <div
-              key={f[1]}
-              className="bg-grey-200 flex items-center justify-start my-2"
-            >
-              <h4 className="w-1/3 text-sm font-normal">{f[1]}</h4>
-              <pre className="text-sm">{results[f[0]]}</pre>
-            </div>
-          ))}
-        </section>
-        <section className="p-2 mb-2 text-sm bg-gray-300">
-          <h4 className="text-sm">Rules applied:</h4>
-          {applied.map((a) => (
-            <div
-              key={a.rule}
-              className="bg-grey-200 flex items-center justify-start my-2 text-sm"
-            >
-              <span className="w-2/3 text-sm text-gray-700">{a.rule}</span>
-              <pre>{a.results[0].trim()}</pre>
-            </div>
-          ))}
-        </section>
-        <pre className="sidebar-section">
-          {JSON.stringify(parse(value).results, null, "\t")}
-        </pre> */}
         <section className="sidebar-section mb-2">
           <h2>Address to search</h2>
           <div className="flex justify-between p-2">
@@ -130,16 +95,23 @@ const Validator = ({ session, setSession, login, setLogin }) => {
             </section>
           )}
         </section>
-        <section className="sidebar-section mt-2">
+        {/* <section className="sidebar-section mt-2">
           <pre className="font-bold text-lg">Geocoder response</pre>
           <pre className="p-2 text-xs max-h-96 overflow-scroll ">
             {JSON.stringify(data, null, "  ")}
           </pre>
-        </section>
+        </section> */}
       </SiteSidebar>
       <main>
         {geocodeValue && data && data.features.length > 0 && (
           <Candidate candidate={data.features[0]} session={session} />
+        )}
+        {geocodeValue && data && data.features.length == 0 && (
+          <IssueReporterAddress
+            session={session}
+            address={geocodeValue}
+            unset={() => setGeocodeValue(null)}
+          />
         )}
       </main>
     </>
