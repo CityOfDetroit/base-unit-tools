@@ -2,7 +2,9 @@ import SiteFooter from "../src/layout/SiteFooter";
 import SiteHeader from "../src/layout/SiteHeader";
 import { useState } from "react";
 import "../src/styles/index.css"
-import '@fortawesome/fontawesome-svg-core/styles.css';
+import { config } from '@fortawesome/fontawesome-svg-core'
+import '@fortawesome/fontawesome-svg-core/styles.css'
+config.autoAddCss = false
 
 // const trackingId = "UA-107915075-11";
 
