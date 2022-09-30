@@ -1,0 +1,262 @@
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import React, { useEffect, useState } from 'react';
+import { queryFeatures } from '@esri/arcgis-rest-feature-layer';
+import Button from '../components/Button';
+import {useGeocoder} from '../hooks/useGeocoder';
+
+// sample response from geocoder
+/*
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -83.0454705,
+                    42.32889900000001
+                ]
+            },
+            "properties": {
+                "address": "1 Woodward Ave, Detroit, 48226",
+                "score": 97.53,
+                "Status": "M",
+                "Score": 97.53,
+                "Match_addr": "1 Woodward Ave, Detroit, 48226",
+                "LongLabel": "1 Woodward Ave, Detroit, 48226",
+                "ShortLabel": "1 Woodward Ave",
+                "Addr_type": "PointAddress",
+                "Type": "",
+                "PlaceName": "",
+                "Place_addr": "1 Woodward Ave, Detroit, 48226",
+                "Phone": "",
+                "URL": "",
+                "Rank": 20,
+                "AddBldg": "",
+                "AddNum": "1",
+                "AddNumFrom": "",
+                "AddNumTo": "",
+                "AddRange": "",
+                "Side": "",
+                "StPreDir": "",
+                "StPreType": "",
+                "StName": "Woodward",
+                "StType": "Ave",
+                "StDir": "",
+                "BldgType": "",
+                "BldgName": "",
+                "LevelType": "",
+                "LevelName": "",
+                "UnitType": "",
+                "UnitName": "",
+                "SubAddr": "",
+                "StAddr": "1 Woodward Ave",
+                "Block": "",
+                "Sector": "",
+                "Nbrhd": "",
+                "District": "",
+                "City": "Detroit",
+                "MetroArea": "",
+                "Subregion": "",
+                "Region": "",
+                "RegionAbbr": "",
+                "Territory": "",
+                "Zone": "",
+                "Postal": "48226",
+                "PostalExt": "3430",
+                "Country": "",
+                "LangCode": "ENG",
+                "Distance": 0,
+                "X": -83.0454705,
+                "Y": 42.32889900000001,
+                "DisplayX": -83.0454705,
+                "DisplayY": 42.32889900000001,
+                "Xmin": -83.0464705,
+                "Xmax": -83.04447049999999,
+                "Ymin": 42.32789900000001,
+                "Ymax": 42.329899000000005,
+                "ExInfo": "",
+                "council_district": "6",
+                "geo_source": "building",
+                "address_id": 290672,
+                "building_id": "624",
+                "parcel_id": "02001910-5",
+                "street_id": "34773"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -83.04453716281343,
+                    42.32846872323672
+                ]
+            },
+            "properties": {
+                "address": "1 Woodward Ave",
+                "score": 97.53,
+                "Status": "M",
+                "Score": 97.53,
+                "Match_addr": "1 Woodward Ave",
+                "LongLabel": "1 Woodward Ave",
+                "ShortLabel": "1 Woodward Ave",
+                "Addr_type": "StreetAddress",
+                "Type": "",
+                "PlaceName": "",
+                "Place_addr": "1 Woodward Ave",
+                "Phone": "",
+                "URL": "",
+                "Rank": 20,
+                "AddBldg": "",
+                "AddNum": "1",
+                "AddNumFrom": "169",
+                "AddNumTo": "1",
+                "AddRange": "1-169",
+                "Side": "R",
+                "StPreDir": "",
+                "StPreType": "",
+                "StName": "Woodward",
+                "StType": "Ave",
+                "StDir": "",
+                "BldgType": "",
+                "BldgName": "",
+                "LevelType": "",
+                "LevelName": "",
+                "UnitType": "",
+                "UnitName": "",
+                "SubAddr": "",
+                "StAddr": "1 Woodward Ave",
+                "Block": "",
+                "Sector": "",
+                "Nbrhd": "",
+                "District": "",
+                "City": "",
+                "MetroArea": "",
+                "Subregion": "",
+                "Region": "",
+                "RegionAbbr": "",
+                "Territory": "",
+                "Zone": "",
+                "Postal": "",
+                "PostalExt": "",
+                "Country": "",
+                "LangCode": "ENG",
+                "Distance": 0,
+                "X": -83.04453716281343,
+                "Y": 42.32846872323672,
+                "DisplayX": -83.04453716281343,
+                "DisplayY": 42.32846872323672,
+                "Xmin": -83.04553716281343,
+                "Xmax": -83.04353716281342,
+                "Ymin": 42.32746872323672,
+                "Ymax": 42.329468723236715,
+                "ExInfo": "",
+                "council_district": "",
+                "geo_source": "",
+                "address_id": 0,
+                "building_id": "",
+                "parcel_id": "",
+                "street_id": ""
+            }
+        }
+    ]
+}
+*/
+
+// TODO: replace setGeocoded w/ SetBusinessData. Have a state-based value called businessData in the main page
+
+// Use this section to send queries to AGO, and call setBusinessData() to ensure the data can be used in the Business Truth page
+
+// may not need to call useGeocoder at all. should be able to get data from the lat/lon columns AGO returns
+
+// maybe the first search target should be Parcels?
+const ExplorerSearch = ({ setClicked, setGeocoded }) => {
+
+  let [value, setValue] = useState("")
+  let [searchValue, setSearchValue] = useState("")
+  let [searchResults, setSearchResults] = useState(null) // null, {}
+  let [address, setAddress] = useState(null)
+  let [featureCollection, type] = useGeocoder(address)
+
+  useEffect(() => {
+    // prevent effect from running on first render
+    if(searchValue != ""){
+      console.log(searchValue)
+
+      queryFeatures({
+        url: `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/BusinessLicenses/FeatureServer/0`,
+        outFields: '*',
+        where: `business_name like '${searchValue}%'`,
+        f: 'json'
+      }).then(r => setSearchResults(r))
+    }
+  }, [searchValue])
+
+  useEffect(() => {
+    if (searchResults != null){
+      console.log("Search Results")
+      console.log(searchResults)
+
+      if(searchResults.features.length > 0){
+        //TODO: Switch to a Levenshtein distance style to select the correct result
+
+        // once the search result is retrieved, bring the user to it
+        let firstResult = searchResults.features[0]
+        console.log(firstResult)
+        let address = [firstResult.street_dir, firstResult.street_name, firstResult.street_num].join(' ')
+        setAddress(address)
+      }
+      else{
+        console.log("No Results")
+      }
+    }
+  }, [searchResults])
+
+  // when we get a new clicked feature or geocoding result, reset.
+  useEffect(() => {
+    let firstResult = featureCollection?.features[0]
+    console.log(featureCollection)
+    console.log("Geocoding result")
+    console.log(firstResult)
+    if (firstResult && firstResult.properties.Addr_type === 'PointAddress') {
+      setClicked({
+        type: 'addresses',
+        id: firstResult.properties.address_id
+      })
+      setGeocoded(featureCollection)
+    }
+    else if (firstResult && ['StreetAddress', 'StreetInt'].indexOf(firstResult.properties.Addr_type) > -1) {
+      setClicked({})
+      setGeocoded(featureCollection)
+    }
+    if(!featureCollection) {
+      setClicked({})
+      setGeocoded({type: "FeatureCollection", features: [], input: searchValue})
+    }
+  }, [featureCollection, type])
+
+  return (
+    <div className="flex items-center justify-start text-sm md:text-base w-full bg-gray-200 p-2 md:p-3">
+      <input
+        className="p-2 w-full md:w-1/2"
+        type="text"
+        value={value}
+        placeholder={`Search for an address or intersection`}
+        onChange={(e) => setValue(e.target.value)} 
+        onKeyPress={(e) => e.code === 'Enter' && setSearchValue(value)}
+        />
+      <Button
+        active={value !== ''}
+        disabled={value === ''}
+        small
+        className="py-2"
+        onClick={() => setSearchValue(value)}
+        text='Search'
+        icon={faSearch} />
+    </div>
+  )
+}
+
+export default ExplorerSearch;
