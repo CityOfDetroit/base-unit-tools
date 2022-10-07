@@ -26,6 +26,14 @@ const ExplorerAddress = ({ feature, clicked, setClicked, linked, setLinked }) =>
 
   useEffect(() => {
     if (feature) {
+      console.log("Attributes")
+      console.log(attributes)
+
+      console.log(attr)
+
+      console.log("clicked")
+      console.log(clicked)
+
       setLinked({
         addresses: [],
         parcels: [feature.attributes.parcel_id],

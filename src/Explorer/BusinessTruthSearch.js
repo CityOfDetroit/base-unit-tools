@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { queryFeatures } from '@esri/arcgis-rest-feature-layer';
 import Button from '../components/Button';
 import {useGeocoder} from '../hooks/useGeocoder';
+import useLayer from '../hooks/useLayer';
 
 // sample response from geocoder
 /*
@@ -172,14 +173,29 @@ import {useGeocoder} from '../hooks/useGeocoder';
 // may not need to call useGeocoder at all. should be able to get data from the lat/lon columns AGO returns
 
 // maybe the first search target should be Parcels?
-const ExplorerSearch = ({ setClicked, setGeocoded }) => {
+
+// TODO: Maybe retrieve all business licenses on page load (or after entering the first letter) and calculate levenshtein distance as you're typing?
+
+const ExplorerSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) => {
 
   let [value, setValue] = useState("")
   let [searchValue, setSearchValue] = useState("")
-  let [searchResults, setSearchResults] = useState(null) // null, {}
+  let [searchResults, setSearchResults] = useState(null) // hold the search results for the first query, e.g. the Business Name query
   let [address, setAddress] = useState(null)
   let [featureCollection, type] = useGeocoder(address)
+  let [addressId, setAddressId] = useState(null)
+  
+  let commercialCocUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/CommercialInspections/FeatureServer/0`
+  let commercialCocData = useLayer(
+    {
+      url: commercialCocUrl,
+      where: `address_id = ${addressId}`
+    }
+  ) 
+  
+  let [businessTruthResults, setBusinessTruthResults] = useState({}) // final full results that will be returned to the main page using setBusinessTruthData
 
+  // conduct the initial search
   useEffect(() => {
     // prevent effect from running on first render
     if(searchValue != ""){
@@ -194,25 +210,59 @@ const ExplorerSearch = ({ setClicked, setGeocoded }) => {
     }
   }, [searchValue])
 
+  // once the initial search's value is obtained, get address id to query for more data
   useEffect(() => {
     if (searchResults != null){
       console.log("Search Results")
       console.log(searchResults)
-
       if(searchResults.features.length > 0){
         //TODO: Switch to a Levenshtein distance style to select the correct result
 
         // once the search result is retrieved, bring the user to it
         let firstResult = searchResults.features[0]
-        console.log(firstResult)
-        let address = [firstResult.street_dir, firstResult.street_name, firstResult.street_num].join(' ')
+        let address = [firstResult.attributes.street_dir, firstResult.attributes.street_name, firstResult.attributes.street_num].join(' ')
+        
+        // set the address variable, adjusting the value fed to the geocoder
         setAddress(address)
+
+        // set the addressId, in order to query for more datasets
+        setAddressId(firstResult.attributes.address_id)
+
+        // send the business truth data back to the main page
+        // TODO: may need to move this after more datasets are joined
+        //setBusinessTruthData(firstResult)
+        let businessLicensesData = {
+          "business_licenses": firstResult
+        }
+        //setBusinessTruthResults(businessLicensesData)
+
+        setBusinessTruthData(businessLicensesData)
       }
       else{
         console.log("No Results")
       }
     }
   }, [searchResults])
+
+  useEffect(() => {
+    if(commercialCocData){
+      console.log("Commercial coc")
+      console.log(commercialCocData)
+
+      if(commercialCocData.features.length > 0){
+        let firstResult = commercialCocData.features[0]
+        setBusinessTruthData(prevState => (
+          {
+            ...prevState,
+            "commercial_coc": firstResult
+          }
+        ))
+      }
+      else{
+        console.log("No Commercial Coc data")
+      }
+    }
+  }, [commercialCocData])
 
   // when we get a new clicked feature or geocoding result, reset.
   useEffect(() => {

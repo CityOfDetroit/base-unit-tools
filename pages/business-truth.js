@@ -12,6 +12,7 @@ import IssueReporterAddress from "../src/components/IssueReporterAddress";
 import MapillarySv from "../src/components/MapillarySv";
 import useFeature from "../src/hooks/useFeature";
 import SiteSidebar from "../src/layout/SiteSidebar";
+import BusinessTruthPanel from "../src/Explorer/BusinessTruthPanel";
 import ExplorerAddress from "../src/Explorer/ExplorerAddress";
 import ExplorerBuilding from "../src/Explorer/ExplorerBuilding";
 import ExplorerMap from "../src/Explorer/ExplorerMap";
@@ -21,29 +22,34 @@ import ExplorerSearch from "../src/Explorer/ExplorerSearch";
 import ExplorerStreet from "../src/Explorer/ExplorerStreet";
 
 const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
-  // business truth search values
-  let [value, setValue] = useState("");
-  let [searchValue, setSearchValue] = useState("")
-  let [searchResults, setSearchResults] = useState([])
-
-  useEffect(() => {
-    // prevent effect from running on first render
-    if(searchValue != ""){
-      console.log(searchValue)
-
-      queryFeatures({
-        url: `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/BusinessLicenses/FeatureServer/0`,
-        outFields: '*',
-        where: `business_name like '${searchValue}%'`,
-        f: 'json'
-      }).then(r => setSearchResults(r))
+  // business truth data
+  let [businessTruthData, setBusinessTruthData] = useState(null);
+  let businessTruthDisplayNames = {
+    "business_licenses": {
+      "Business ID": `business_id`,
+      "Business Name": `business_name`,
+      "Business Type": `business_type`,
+      "Parcel ID": `parcel_id`,
+      "Latitude": `lat`,
+      "Longitude": `lon`,
+      "Address ID": `address_id`,
+      "Street Number": `street_num`,
+      "Street Direction": `street_dir`,
+      "Street Name": `street_name`
+    },
+    "commercial_coc": {
+      "Record ID": `record_id`,
+	    "Record Status": `record_status_date`,
+	    "Parcel ID": `parcel_id`,
+	    "Longitude": `lon`,
+	    "Latitude":	`lat`,
+	    "ObjectId":	`ObjectId`,
+	    "Address ID":	`address_id`,
+	    "Street Number": `street_num`,	
+	    "Street Direction": `street_dir`,	
+	    "Street Name": `street_name`	
     }
-  }, [searchValue])
-
-  useEffect(() => {
-    console.log("Search Results")
-    console.log(searchResults)
-  }, [searchResults])
+  }
 
   // query parameters
   let router = useRouter();
@@ -54,7 +60,7 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
   let querySvImgKey = image;
 
   let initClicked = {type: queryType, id: queryId}
-  console.log(initClicked)
+  //console.log(initClicked)
 
   // this stores the type and id of the currently clicked feature
   // that drives everything, so the value and setter
@@ -87,8 +93,9 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
   const [svImages, setSvImages] = useState([]);
 
   useEffect(() => {
-    console.log(clicked, feature);
-  }, [clicked, feature]);
+    console.log("business truth")
+    console.log(businessTruthData)
+  }, [businessTruthData])
 
   let introduction = (
     <>
@@ -127,8 +134,19 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
         {options.streetView && svImages.length > 0 && (
           <MapillarySv {...{ svImage, svImages, setSvImage, setSvBearing, feature }} />
         )}
-
+        
+        {/* TODO: query for multiple datasets from AGO, and depending on the number, display that many BusinessTruthPanels */}
         {/* based on type, return a specific component. */}
+        {/* <BusinessTruthPanel {...{ businessTruthData } } displayNames={ businessTruthDisplayNames} /> */}
+        {/* businessTruthData.map(dataset => (
+            <BusinessTruthPanel businessTruthData = { dataset } displayNames = { businessTruthDisplayNames } />
+          )) */}
+        {clicked.type === "addresses" && businessTruthData && (
+          Object.keys(businessTruthData).map((datasetName, i) => (
+            <BusinessTruthPanel key = {i} datasetType = {datasetName} businessTruthData = { businessTruthData[datasetName] } displayNames = { businessTruthDisplayNames[datasetName] } />
+          ))
+          
+        )} 
         {clicked.type === "addresses" && feature && (
           <ExplorerAddress {...{ feature, clicked, setClicked, linked, setLinked }} />
         )}
@@ -169,21 +187,14 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
           </section>
         )}
 
-        <BusinessTruthSearch {...{ setClicked, setGeocoded }} />
+        <BusinessTruthSearch {...{ setClicked, setGeocoded, setBusinessTruthData }} />
 
       </SiteSidebar>
 
       {/* the main panel contains the map, and we pass it many of our useState variables */}
       <main>
         This is the business truth page.
-        {searchValue && <p>You searched for {searchValue}!</p>}
-        {searchResults && searchResults.features?.length > 0 && (
-          searchResults.features.map(result => (
-            <div>
-              {result.attributes.business_name}
-            </div>
-          ))
-        )}
+        
         <ExplorerMap
           {...{
             clicked,
@@ -204,3 +215,14 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
 };
 
 export default BusinessPage;
+
+/*
+{searchValue && <p>You searched for {searchValue}!</p>}
+        {searchResults && searchResults.features?.length > 0 && (
+          searchResults.features.map(result => (
+            <div>
+              {result.attributes.business_name}
+            </div>
+          ))
+        )}
+*/
