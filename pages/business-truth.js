@@ -6,13 +6,13 @@ import React, { useEffect, useState } from "react";
 import apps from "../src/data/apps";
 import AppHeader from "../src/components/AppHeader";
 import Button from "../src/components/Button";
-import BusinessTruthSearch from "../src/Explorer/BusinessTruthSearch";
+import BusinessTruthSearch from "../src/BusinessTruth/BusinessTruthSearch";
 import IssueReporter from "../src/components/IssueReporter";
 import IssueReporterAddress from "../src/components/IssueReporterAddress";
 import MapillarySv from "../src/components/MapillarySv";
 import useFeature from "../src/hooks/useFeature";
 import SiteSidebar from "../src/layout/SiteSidebar";
-import BusinessTruthPanel from "../src/Explorer/BusinessTruthPanel";
+import BusinessTruthPanel from "../src/BusinessTruth/BusinessTruthPanel";
 import ExplorerAddress from "../src/Explorer/ExplorerAddress";
 import ExplorerBuilding from "../src/Explorer/ExplorerBuilding";
 import ExplorerMap from "../src/Explorer/ExplorerMap";
@@ -37,10 +37,28 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
       "Street Direction": `street_dir`,
       "Street Name": `street_name`
     },
+    "certificate_of_occupancy": {
+      "Record ID": `record_id`,
+      "Description": `description`,
+	    "Status": `status`,
+      "Date Status": `date_status`
+    },
     "commercial_coc": {
       "Record ID": `record_id`,
-	    "Record Status": `record_status_date`,
-	    "Parcel ID": `parcel_id`,
+	    "Record Status": `record_status_date`
+    }
+  }
+
+  /*
+  "Parcel ID": `parcel_id`,
+	    "Longitude": `lon`,
+	    "Latitude":	`lat`,
+	    "Address ID":	`address_id`,
+	    "Street Number": `street_num`,	
+	    "Street Direction": `street_dir`,	
+	    "Street Name": `street_name`	
+
+  "Parcel ID": `parcel_id`,
 	    "Longitude": `lon`,
 	    "Latitude":	`lat`,
 	    "ObjectId":	`ObjectId`,
@@ -48,8 +66,7 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
 	    "Street Number": `street_num`,	
 	    "Street Direction": `street_dir`,	
 	    "Street Name": `street_name`	
-    }
-  }
+  */
 
   // query parameters
   let router = useRouter();
@@ -193,8 +210,6 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
 
       {/* the main panel contains the map, and we pass it many of our useState variables */}
       <main>
-        This is the business truth page.
-        
         <ExplorerMap
           {...{
             clicked,

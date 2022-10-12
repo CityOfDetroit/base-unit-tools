@@ -3,8 +3,7 @@ import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
 import layers from '../data/layers';
-import ExplorerFeature from './ExplorerFeature';
-import IdBadge from './IdBadge';
+import BusinessTruthFeature from './BusinessTruthFeature';
 
 /*
 attributes example
@@ -58,33 +57,15 @@ export const addressAttributes = {
 const BusinessTruthPanel = ({ datasetType, businessTruthData, displayNames }) => {
   let displayAttributes = {}
   let { attributes: sourceAttributes } = businessTruthData;
-  let [clicked, setClicked] = useState({
-    'id': sourceAttributes.address_id,
-    'type': datasetType
-  })
 
   Object.keys(displayNames).forEach(k => {
     displayAttributes[k] = businessTruthData.attributes[displayNames[k]]
   })
 
-  //TODO: add a use effect to change the tab
-  /*
-  useEffect(() => {
-    if (feature) {
-      setLinked({
-        addresses: [],
-        parcels: [feature.attributes.parcel_id],
-        buildings: [feature.attributes.bldg_id],
-        streets: [feature.attributes.street_id],
-      })
-    }
-  }, [feature, setLinked])
-  */
-
   // is a 'clicked' attribute needed on ExplorerFeature?
   return (
     <>
-      <ExplorerFeature attr={sourceAttributes} attributes={displayAttributes} clicked={clicked} />
+      <BusinessTruthFeature attr={sourceAttributes} attributes={displayAttributes} stylingType={datasetType} />
     </>
   )
 }

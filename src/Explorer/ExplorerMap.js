@@ -112,6 +112,8 @@ const ExplorerMap = ({ clicked, setClicked, geocoded, linked, feature, showSv, s
       let others = Object.keys(layers).filter(l => l !== clicked.type && l !== 'units')
       let filter = ["==", layer.filter_id, clicked.type === 'parcels' ? clicked.id : parseInt(clicked.id)]
       theMap.setFilter(layer.highlight, filter)
+      console.log("Others")
+      console.log(others)
       others.forEach(o => {
         theMap.setFilter(layers[o].highlight, ["==", "$id", ""])
       })

@@ -192,6 +192,14 @@ const ExplorerSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) => {
       where: `address_id = ${addressId}`
     }
   ) 
+
+  let certificateOfOccupancyUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/CertificateOfOccupancy/FeatureServer/0`
+  let certificateOfOccupancyData = useLayer(
+    {
+      url: certificateOfOccupancyUrl,
+      where: `address_id = ${addressId}`
+    }
+  ) 
   
   let [businessTruthResults, setBusinessTruthResults] = useState({}) // final full results that will be returned to the main page using setBusinessTruthData
 
@@ -263,6 +271,24 @@ const ExplorerSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) => {
       }
     }
   }, [commercialCocData])
+
+  useEffect(() => {
+    if(certificateOfOccupancyData){
+
+      if(certificateOfOccupancyData.features.length > 0){
+        let firstResult = certificateOfOccupancyData.features[0]
+        setBusinessTruthData(prevState => (
+          {
+            ...prevState,
+            "certificate_of_occupancy": firstResult
+          }
+        ))
+      }
+      else{
+        console.log("No COO data")
+      }
+    }
+  }, [certificateOfOccupancyData])
 
   // when we get a new clicked feature or geocoding result, reset.
   useEffect(() => {
