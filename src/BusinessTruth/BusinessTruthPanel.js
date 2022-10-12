@@ -62,7 +62,6 @@ const BusinessTruthPanel = ({ datasetType, businessTruthData, displayNames }) =>
     displayAttributes[k] = businessTruthData.attributes[displayNames[k]]
   })
 
-  // is a 'clicked' attribute needed on ExplorerFeature?
   return (
     <>
       <BusinessTruthFeature attr={sourceAttributes} attributes={displayAttributes} stylingType={datasetType} />
@@ -71,17 +70,3 @@ const BusinessTruthPanel = ({ datasetType, businessTruthData, displayNames }) =>
 }
 
 export default BusinessTruthPanel;
-
-/*
-{attr.parcel_id ? <section className='sidebar-section' style={{ borderLeft: `8px solid ${layers['parcels'].color}` }}>
-        <div className="flex items-center justify-between" >
-          <h2 className="text-sm md:text-base">linked to parcel:</h2>
-          <IdBadge layer={layers['parcels']} id={attr.parcel_id} setClicked={setClicked} link />
-        </div>
-      </section> :
-        <section className='sidebar-section warning flex items-center' >
-          <FontAwesomeIcon icon={faExclamationCircle} className="mr-3" />
-          <p className="font-semibold">There is no linked parcel for this address!</p>
-        </section>
-      }
-*/

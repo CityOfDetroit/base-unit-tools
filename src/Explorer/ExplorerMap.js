@@ -141,7 +141,7 @@ const ExplorerMap = ({ clicked, setClicked, geocoded, linked, feature, showSv, s
 
       // loop thru the others and get their linked
       //TODO: adjust this to work for the business truth datasets
-      /*others.forEach(o => {
+      others.forEach(o => {
         let filter;
         if (linked[o].length === 1 && (linked[o][0] === undefined || linked[o][0] === null)) {
           filter = ["==", layers[o].filter_id, ""]
@@ -150,7 +150,7 @@ const ExplorerMap = ({ clicked, setClicked, geocoded, linked, feature, showSv, s
           filter = ["in", layers[o].filter_id].concat(linked[o])
         }
         theMap.setFilter(layers[o].link, filter)
-      })*/
+      })
     }
   }, [theMap, linked, loading, clicked.type])
 

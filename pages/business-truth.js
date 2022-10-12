@@ -24,8 +24,8 @@ import ExplorerStreet from "../src/Explorer/ExplorerStreet";
 const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
   // business truth data
   let [businessTruthData, setBusinessTruthData] = useState(null);
-  let businessTruthDisplayNames = {
-    "business_licenses": {
+  let businessTruthDisplayNames = { // * at end to represent date
+    "business_licenses": { 
       "Business ID": `business_id`,
       "Business Name": `business_name`,
       "Business Type": `business_type`,
@@ -41,11 +41,23 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
       "Record ID": `record_id`,
       "Description": `description`,
 	    "Status": `status`,
-      "Date Status": `date_status`
+      "Date Status*": `date_status`
     },
     "commercial_coc": {
       "Record ID": `record_id`,
-	    "Record Status": `record_status_date`
+	    "Record Status*": `record_status_date`
+    },
+    "restaurant_establishments": {
+      "Establishment ID": `establishment_id`,
+      "Name": `name`,
+      "Owner": `owner`,
+      "License Number": "license_number",
+      "License Type":	"license_type",
+	    "Most Recent License Date*":	"most_recent_license_date",
+	    "Establishment Type": "establishment_type",
+	    "Status":	"status",
+	    "Restaurant Complexity Level": "restaurant_complexity_level",
+	    "Review Frequency in Days":	"review_frequency_in_days"
     }
   }
 
@@ -159,9 +171,11 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
             <BusinessTruthPanel businessTruthData = { dataset } displayNames = { businessTruthDisplayNames } />
           )) */}
         {clicked.type === "addresses" && businessTruthData && (
-          Object.keys(businessTruthData).map((datasetName, i) => (
-            <BusinessTruthPanel key = {i} datasetType = {datasetName} businessTruthData = { businessTruthData[datasetName] } displayNames = { businessTruthDisplayNames[datasetName] } />
-          ))
+          Object.keys(businessTruthData).map((datasetName, i) => {
+
+
+            return <BusinessTruthPanel key = {i} datasetType = {datasetName} businessTruthData = { businessTruthData[datasetName] } displayNames = { businessTruthDisplayNames[datasetName] } />
+          })
           
         )} 
         {clicked.type === "addresses" && feature && (

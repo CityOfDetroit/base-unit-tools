@@ -4,38 +4,12 @@ import {
   faLink,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import AttributeTable from "../components/AttributeTable";
 import CopyValue from "../components/CopyValue";
 import businessTruthTypes from "../data/businessTruthTypes";
 import { useState } from "react";
 import AnimateHeight from "react-animate-height";
 import Link from "next/link";
-
-const AttributeTable = ({ attributes }) => {
-  return (
-    <table className="w-full">
-      <tbody>
-        {Object.keys(attributes).map((f, i) => (
-          <tr
-            key={i}
-            className={
-              i + 1 === Object.keys(attributes).length
-                ? "flex items-center"
-                : "border-b-2 border-gray-400 flex items-center"
-            }
-          >
-            <td className="w-1/3 md:w-2/5 my-2 font-bold text-xs md:text-sm ">{f}</td>
-            <td className="text-xs md:text-sm flex w-2/3 md:w-3/5 my-2 justify-between items-center pr-2">
-              {attributes[f]}
-              {attributes[f] && attributes[f] !== "" && (
-                <CopyValue value={attributes[f]} className="text-gray-300 hover:text-gray-400" />
-              )}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-};
 
 const BusinessTruthFeature = ({ attr, attributes, longAttributes = {}, stylingType = null }) => {
   // let hasSource = Object.keys(attr).indexOf('geo_source') > -1

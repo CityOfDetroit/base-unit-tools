@@ -200,6 +200,14 @@ const ExplorerSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) => {
       where: `address_id = ${addressId}`
     }
   ) 
+
+  let restaurantEstablishmentsUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/Restaurant_Establishments/FeatureServer/0`
+  let restaurantEstablishmentsData = useLayer(
+    {
+      url: restaurantEstablishmentsUrl,
+      where: `address_id = ${addressId}`
+    }
+  ) 
   
   let [businessTruthResults, setBusinessTruthResults] = useState({}) // final full results that will be returned to the main page using setBusinessTruthData
 
@@ -289,6 +297,26 @@ const ExplorerSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) => {
       }
     }
   }, [certificateOfOccupancyData])
+
+  useEffect(() => {
+    if(restaurantEstablishmentsData){
+
+      if(restaurantEstablishmentsData.features.length > 0){
+        console.log("Restaurant Data")
+        console.log(restaurantEstablishmentsData.features)
+        let firstResult = restaurantEstablishmentsData.features[0]
+        setBusinessTruthData(prevState => (
+          {
+            ...prevState,
+            "restaurant_establishments": firstResult
+          }
+        ))
+      }
+      else{
+        console.log("No restaurantEstablishments data")
+      }
+    }
+  }, [restaurantEstablishmentsData])
 
   // when we get a new clicked feature or geocoding result, reset.
   useEffect(() => {
