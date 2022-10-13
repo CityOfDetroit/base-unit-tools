@@ -58,6 +58,34 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
 	    "Status":	"status",
 	    "Restaurant Complexity Level": "restaurant_complexity_level",
 	    "Review Frequency in Days":	"review_frequency_in_days"
+    },
+    "restaurant_inspections": {
+      "Inspection ID": "Inspection_ID",
+      "Establishment ID": `Establishment_ID`,
+      "Name": `Name`,
+      "Inspection Date*": "Inspection_Date",
+      "Inspection Type":	"Inspection_Type",
+	    "Priority Violations":	"Priority_Violations",
+	    "Foundation Violations": "Foundation_Violations",
+	    "Core Violations":	"Core_Violations",
+	    "Total Corrected Priority + Foundation Violations": "Total_Corrected_Priority___Foun",
+	    "In Compliance":	"In_Compliance"
+    },
+    "restaurant_violations": {
+      "Inspection ID": "Inspection_ID",
+      "Establishment ID": `Establishment_ID`,
+      "Inspection Date*": "Inspection_Date",
+	    "Violation Code":	"Violation_Code",
+      "Violation Type": "Violation Type",
+	    "Violation Description": "Violation Description",
+	    "Sub Location":	"Sub_Location",
+	    "Item Description": "Item_Description",
+      "Sub Item":	"Sub_Item",
+      "Problem Description": "Problem_Description",
+	    "Sub Problem":	"Sub_Problem",
+      "Correction Description": "Correction_Description",
+      "Days to Correct":"Days_to_Correct",
+      "Date Corrected*": "Date_Corrected"
     }
   }
 
@@ -244,14 +272,3 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
 };
 
 export default BusinessPage;
-
-/*
-{searchValue && <p>You searched for {searchValue}!</p>}
-        {searchResults && searchResults.features?.length > 0 && (
-          searchResults.features.map(result => (
-            <div>
-              {result.attributes.business_name}
-            </div>
-          ))
-        )}
-*/

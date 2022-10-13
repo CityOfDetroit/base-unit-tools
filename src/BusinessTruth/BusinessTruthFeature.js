@@ -16,7 +16,7 @@ const BusinessTruthFeature = ({ attr, attributes, longAttributes = {}, stylingTy
 
   let style = businessTruthTypes[stylingType];
 
-  let [show, setShow] = useState(true);
+  let [show, setShow] = useState(false);
 
   return (
     <>

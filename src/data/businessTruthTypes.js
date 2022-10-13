@@ -53,7 +53,7 @@ const businessTruthTypes = {
   "fire_inspections": {
     "name": "fire_inspections",
     "singular": "fire_inspections",
-    "label": "Fire Inspections",
+    "label": "Fire Inspection",
     "id_column": "address_id",
     "text_color": "#555",
     "color": "rgb(91, 155, 213)"
@@ -61,7 +61,7 @@ const businessTruthTypes = {
   "restaurant_establishments": {
     "name": "restaurant_establishments",
     "singular": "restaurant_establishments",
-    "label": "Restaurant Establishments",
+    "label": "Restaurant Establishment",
     "id_column": "address_id",
     "text_color": "#555",
     "color": "rgb(191, 144, 0)"
@@ -69,15 +69,15 @@ const businessTruthTypes = {
   "restaurant_inspections": {
     "name": "restaurant_inspections",
     "singular": "restaurant_inspections",
-    "label": "Restaurant Inspections",
+    "label": "Restaurant Inspection",
     "id_column": "address_id",
     "text_color": "#555",
-    "color": "rgb(91, 155, 213)"
+    "color": "rgb(46, 117, 187)"
   },
   "restaurant_violations": {
     "name": "restaurant_violations",
     "singular": "restaurant_violations",
-    "label": "Restaurant Violations",
+    "label": "Restaurant Health Code Violation",
     "id_column": "address_id",
     "text_color": "#555",
     "color": "rgb(91, 155, 213)"
@@ -85,7 +85,7 @@ const businessTruthTypes = {
   "procurement_agreements": {
     "name": "procurement_agreements",
     "singular": "procurement_agreements",
-    "label": "Procurement Agreements",
+    "label": "Procurement Agreement",
     "id_column": "address_id",
     "text_color": "#555",
     "color": "rgb(91, 155, 213)"
@@ -93,7 +93,7 @@ const businessTruthTypes = {
   "child_care_facilities": {
     "name": "child_care_facilities",
     "singular": "child_care_facilities",
-    "label": "child Care Facilities",
+    "label": "child Care Facilitie",
     "id_column": "address_id",
     "text_color": "#555",
     "color": "rgb(91, 155, 213)"

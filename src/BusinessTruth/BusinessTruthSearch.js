@@ -2,6 +2,7 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import React, { useEffect, useState } from 'react';
 import { queryFeatures } from '@esri/arcgis-rest-feature-layer';
 import Button from '../components/Button';
+import BusinessTruthSearchOptions from './BusinessTruthSearchOptions';
 import {useGeocoder} from '../hooks/useGeocoder';
 import useLayer from '../hooks/useLayer';
 
@@ -178,12 +179,20 @@ import useLayer from '../hooks/useLayer';
 
 const ExplorerSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) => {
 
+  // an options object for storing if it's a business name search or address search
+  // searchType options: ['business', 'address']
+  let [options, setOptions] = useState({
+    searchType: 'default'
+  });
+
   let [value, setValue] = useState("")
   let [searchValue, setSearchValue] = useState("")
   let [searchResults, setSearchResults] = useState(null) // hold the search results for the first query, e.g. the Business Name query
   let [address, setAddress] = useState(null)
   let [featureCollection, type] = useGeocoder(address)
   let [addressId, setAddressId] = useState(null)
+
+  let [establishmentId, setEstablishmentId] = useState(null)// used for restaurant data
   
   let commercialCocUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/CommercialInspections/FeatureServer/0`
   let commercialCocData = useLayer(
@@ -206,6 +215,22 @@ const ExplorerSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) => {
     {
       url: restaurantEstablishmentsUrl,
       where: `address_id = ${addressId}`
+    }
+  ) 
+
+  let restaurantInspectionsUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/Restaurant_Inspections/FeatureServer/0`
+  let restaurantInspectionsData = useLayer(
+    {
+      url: restaurantInspectionsUrl,
+      where: `establishment_id = ${establishmentId}`
+    }
+  ) 
+
+  let restaurantViolationsUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/Violations_Cited_per_Restaurant_Inspection/FeatureServer/0`
+  let restaurantViolationsData = useLayer(
+    {
+      url: restaurantViolationsUrl,
+      where: `establishment_id = ${establishmentId}`
     }
   ) 
   
@@ -311,12 +336,50 @@ const ExplorerSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) => {
             "restaurant_establishments": firstResult
           }
         ))
+
+        setEstablishmentId(firstResult.attributes.establishment_id)
       }
       else{
         console.log("No restaurantEstablishments data")
       }
     }
   }, [restaurantEstablishmentsData])
+
+  useEffect(() => {
+    if(restaurantInspectionsData){
+
+      if(restaurantInspectionsData.features.length > 0){
+        let firstResult = restaurantInspectionsData.features[0]
+        setBusinessTruthData(prevState => (
+          {
+            ...prevState,
+            "restaurant_inspections": firstResult
+          }
+        ))
+      }
+      else{
+        console.log("No restaurantInspections data")
+      }
+    }
+  }, [restaurantInspectionsData])
+
+  useEffect(() => {
+    if(restaurantViolationsData){
+
+      if(restaurantViolationsData.features.length > 0){
+        let firstResult = restaurantViolationsData.features[0]
+        setBusinessTruthData(prevState => (
+          {
+            ...prevState,
+            "restaurant_violations": firstResult
+          }
+        ))
+      }
+      else{
+        console.log("No restaurantViolations data")
+      }
+    }
+  }, [restaurantViolationsData])
 
   // when we get a new clicked feature or geocoding result, reset.
   useEffect(() => {
@@ -359,6 +422,7 @@ const ExplorerSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) => {
         onClick={() => setSearchValue(value)}
         text='Search'
         icon={faSearch} />
+      <BusinessTruthSearchOptions options={options} setOptions={setOptions} />
     </div>
   )
 }
