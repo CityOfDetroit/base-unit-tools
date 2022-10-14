@@ -31,7 +31,7 @@ export const geocoderFields = [
   {
     name: "county_commission_district",
     display: "County Commission District",
-    geocoderColumn: "county_comission_district",
+    geocoderColumn: "county_commission_district",
     description: "The county commission district this address belongs to.",
     default: false,
   },
@@ -47,6 +47,13 @@ export const geocoderFields = [
     display: "Police Scout Car Area",
     geocoderColumn: "scout_car_area",
     description: "The scout car area this address belongs to.",
+    default: false,
+  },
+  {
+    name: "related_parcel",
+    display: "Related Parcel",
+    geocoderColumn: "relatedparcel",
+    description: "Any parcels related to this address via NEZ.",
     default: false,
   },
 ];

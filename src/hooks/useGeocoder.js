@@ -4,7 +4,7 @@ import { geocode } from '@esri/arcgis-rest-geocoding';
 export const geocoders = {
   prod: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoder/GeocodeServer`,
   bounds: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoderBoundaries/GeocodeServer`,
-  dev: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoder_DEV/GeocodeServer`,
+  dev: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoderDev/GeocodeServer`,
   dev2: `https://opengis.detroitmi.gov/opengis/rest/services/Geocoders/TestingJoinIDHypothesisBetaCOmposite/GeocodeServer/`,
   composite: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoderCenterline/GeocodeServer`,
   point: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoder/GeocodeServer`,
