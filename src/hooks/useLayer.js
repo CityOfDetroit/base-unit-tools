@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { queryFeatures } from '@esri/arcgis-rest-feature-layer';
 
 /**
@@ -11,6 +11,8 @@ import { queryFeatures } from '@esri/arcgis-rest-feature-layer';
  * @returns json result
  */
 const useLayer = ({ url, where }) => {
+  // check for component mount. Setting initial state to false helps prevent an unnecessary call on initial render
+  const didMountRef = useRef(false);
 
   // we store the returned data here
   let [data, setData] = useState(null)
@@ -20,11 +22,15 @@ const useLayer = ({ url, where }) => {
     console.log("Entered useLayer")
 
     // TODO: initial load will send something like "address_id = null". may need to prevent this
-    if(url && where){
-      console.log("Where: " + where)
-      console.log(where)
-      queryLayer(url, where).catch(console.error);
+    if (didMountRef.current) { 
+      if(url && where){
+        console.log("Where: " + where)
+        console.log(where)
+        queryLayer(url, where).catch(console.error);
+      }
     }
+
+    didMountRef.current = true;
   }, [url, where])
 
   const queryLayer = async (url, where) => {

@@ -177,13 +177,24 @@ import useLayer from '../hooks/useLayer';
 
 // TODO: Maybe retrieve all business licenses on page load (or after entering the first letter) and calculate levenshtein distance as you're typing?
 
-const ExplorerSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) => {
+const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) => {
 
   // an options object for storing if it's a business name search or address search
   // searchType options: ['business', 'address']
   let [options, setOptions] = useState({
     searchType: 'default'
   });
+
+  useEffect(() => {
+    console.log("options")
+    console.log(options)
+  }, [options])
+
+  // TODO: refactor to one object that contains all data
+  let [businessTruthResults
+     , setBusinessTruthResults] = useState({
+    "business_licenses": {}
+  }) // final full results that will be returned to the main page using setBusinessTruthData
 
   let [value, setValue] = useState("")
   let [searchValue, setSearchValue] = useState("")
@@ -234,12 +245,15 @@ const ExplorerSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) => {
     }
   ) 
   
-  let [businessTruthResults, setBusinessTruthResults] = useState({}) // final full results that will be returned to the main page using setBusinessTruthData
+  useEffect(() => {
+    console.log("Current addressId: " + addressId)
+  }, [addressId])
+
 
   // conduct the initial search
   useEffect(() => {
     // prevent effect from running on first render
-    if(searchValue != ""){
+    if(searchValue != "" && options.searchType == 'default'){
       console.log(searchValue)
 
       queryFeatures({
@@ -249,8 +263,15 @@ const ExplorerSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) => {
         f: 'json'
       }).then(r => setSearchResults(r))
     }
+    else if(searchValue != "" && options.searchType == 'address'){
+      console.log(searchValue)
+
+      setAddress(searchValue)
+      // useGeocoder() hook?
+    }
   }, [searchValue])
 
+  //TODO: instead of Search Results, use a businessLicensesData variable?
   // once the initial search's value is obtained, get address id to query for more data
   useEffect(() => {
     if (searchResults != null){
@@ -405,6 +426,7 @@ const ExplorerSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) => {
   }, [featureCollection, type])
 
   return (
+    <div>
     <div className="flex items-center justify-start text-sm md:text-base w-full bg-gray-200 p-2 md:p-3">
       <input
         className="p-2 w-full md:w-1/2"
@@ -422,9 +444,12 @@ const ExplorerSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) => {
         onClick={() => setSearchValue(value)}
         text='Search'
         icon={faSearch} />
+    </div>
+    <div className="flex items-center justify-start text-sm md:text-base w-full bg-gray-200 p-2 md:p-3">
       <BusinessTruthSearchOptions options={options} setOptions={setOptions} />
+    </div>
     </div>
   )
 }
 
-export default ExplorerSearch;
+export default BusinessTruthSearch;
