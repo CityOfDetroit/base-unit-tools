@@ -4,6 +4,8 @@
   "private": true,
   "homepage": "https://base-unit-tools.netlify.app/",
   "dependencies": {
+    "@emotion/react": "^11.10.4",
+    "@emotion/styled": "^11.10.4",
     "@esri/arcgis-rest-auth": "^4.0.2",
     "@esri/arcgis-rest-feature-layer": "^3.0.1",
     "@esri/arcgis-rest-geocoding": "^3.0.5",
@@ -15,6 +17,8 @@
     "@fortawesome/react-fontawesome": "^0.1.13",
     "@mapbox/mapbox-gl-draw": "^1.2.1",
     "@mdx-js/loader": "^2.1.1",
+    "@mui/material": "^5.10.11",
+    "@mui/styled-engine-sc": "^5.10.6",
     "@netlify/plugin-nextjs": "^4.23.1",
     "@radix-ui/react-tooltip": "^0.1.7",
     "@testing-library/jest-dom": "^5.11.4",
@@ -44,6 +48,7 @@
     "react-dom": "^17.0.1",
     "react-select": "^4.3.1",
     "react-table": "^7.7.0",
+    "styled-components": "^5.3.6",
     "tailwindcss": "^3.1.8",
     "web-vitals": "^0.2.4"
   },

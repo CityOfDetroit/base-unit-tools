@@ -1,3 +1,11 @@
+/*
+Flow:
+searchValue -> 
+if businessSearch: address -> geocoder -> addressId -> various dataset queries
+
+if addressSearch
+(if businesslicenses data not set after address id is obtained, query for it)
+*/
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import React, { useEffect, useState } from 'react';
 import { queryFeatures } from '@esri/arcgis-rest-feature-layer';
@@ -284,11 +292,11 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
         let firstResult = searchResults.features[0]
         let address = [firstResult.attributes.street_dir, firstResult.attributes.street_name, firstResult.attributes.street_num].join(' ')
         
-        // set the address variable, adjusting the value fed to the geocoder
+        // set the address variable, adjusting the value fed to the geocoder. This will cause the geocoder to run, which will set the address id and trigger more dataset queries
         setAddress(address)
 
         // set the addressId, in order to query for more datasets
-        setAddressId(firstResult.attributes.address_id)
+        // setAddressId(firstResult.attributes.address_id)
 
         // send the business truth data back to the main page
         // TODO: may need to move this after more datasets are joined
@@ -414,6 +422,10 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
         id: firstResult.properties.address_id
       })
       setGeocoded(featureCollection)
+
+      // set the addressId, in order to query for more datasets
+      setAddressId(firstResult.properties.address_id)
+      
     }
     else if (firstResult && ['StreetAddress', 'StreetInt'].indexOf(firstResult.properties.Addr_type) > -1) {
       setClicked({})

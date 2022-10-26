@@ -9,23 +9,31 @@ import CopyValue from "../components/CopyValue";
 import businessTruthTypes from "../data/businessTruthTypes";
 import { useState } from "react";
 import AnimateHeight from "react-animate-height";
-import Link from "next/link";
+import CustomTooltip from "../components/CustomTooltip";
+import BusinessTruthMetadata from "./BusinessTruthMetadata";
 
-const BusinessTruthFeature = ({ attr, attributes, longAttributes = {}, stylingType = null }) => {
+const BusinessTruthFeature = ({ attr, attributes, longAttributes = {}, datasetType = null, metadata = null, fieldMetadata = null}) => {
   // let hasSource = Object.keys(attr).indexOf('geo_source') > -1
 
-  let style = businessTruthTypes[stylingType];
+  let style = businessTruthTypes[datasetType];
 
   let [show, setShow] = useState(false);
 
   return (
     <>
       <div
+        id="business-truth-feature-header"
         className="bg-gray-300 p-2 text-xs font-bold flex items-center justify-between"
         style={{ borderLeft: `8px solid ${style.color}` }}
       >
         <div className="flex items-center">
-          <h2 className="text-sm md:text-lg mr-3">{style.label}</h2>
+          {/*Display the dataset name*/}
+          {metadata.getDescription(datasetType)
+          ? <CustomTooltip title={metadata.getDescription(datasetType)} placement="top">
+              <h2 id="business-truth-feature-title" className="text-sm md:text-lg mr-3">{style.label}</h2>
+            </CustomTooltip>
+          : <h2 id="business-truth-feature-title" className="text-sm md:text-lg mr-3">{style.label}</h2>
+          }
           <a href={`/${style.singular}/${attr[style.id_column]}`} target="_blank">
               <FontAwesomeIcon icon={faLink} className="ml-2 text-gray-400 hover:text-gray-500" />
           </a>
@@ -38,9 +46,11 @@ const BusinessTruthFeature = ({ attr, attributes, longAttributes = {}, stylingTy
           />
         </div>
       </div>
+      {/*Display the dataset fields*/}
       <AnimateHeight duration={250} height={show ? "auto" : 0}>
         <section className="sidebar-section" style={{ borderLeft: `8px solid ${style.color}` }}>
-          <AttributeTable attributes={attributes} />
+          {/*Stores the fields*/}
+          <AttributeTable attributes={attributes} metadata={fieldMetadata} />
           {Object.keys(longAttributes).length > 0 &&
             Object.keys(longAttributes).map((f, i) => (
               <div key={i} style={{ paddingLeft: 2 }}>

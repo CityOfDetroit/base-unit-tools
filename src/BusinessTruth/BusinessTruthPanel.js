@@ -1,10 +1,3 @@
-
-import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useEffect, useState } from 'react';
-import layers from '../data/layers';
-import BusinessTruthFeature from './BusinessTruthFeature';
-
 /*
 attributes example
 {
@@ -35,12 +28,33 @@ attr example (geocoder/AGO return)
     "geo_source": "building"
 }
 
+displayMetadata example
+{
+    "Business ID": "Unique identifier used to track this business within BSEED's Accela database.",
+    "Business Name": "The name of the business, which could be the Doing Business As (DBA) name, an affiliated Limited Liability Company (LLC) or a personal name.",
+    "Business Type": "The type of the business as defined by Detroit City Code.",
+    "Parcel ID": "Unique number used to track the parcel of land the business is located on. Parcel IDs are assigned by the Office of the Assessor.",
+    "Latitude": "Latitudinal coordinate associated with the business street address",
+    "Longitude": "Longitudinal coordinate associated with the business street address",
+    "Address ID": "Unique address identifier assigned when geocoding the data set with the City of Detroit Base Unit data set.",
+    "Street Number": "Street number of the property address where either the business is located or another location where the business owner conducts business.",
+    "Street Direction": "Street direction of the property address where either the business is located or another location where the business owner conducts business.",
+    "Street Name": "Street name of the property address where either the business is located or another location where the business owner conducts business."
+}
+
 clicked example (stored address_id and type)
 {
     "type": "addresses",
     "id": 183188
 }
 */
+
+import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useEffect, useState } from 'react';
+import layers from '../data/layers';
+import BusinessTruthFeature from './BusinessTruthFeature';
+import BusinessTruthMetadata from "./BusinessTruthMetadata";
 
 // TODO: replace this with passed-in display names 
 // may actually need to declare all column names for all tables here, if we are going to switch tabs
@@ -62,9 +76,13 @@ const BusinessTruthPanel = ({ datasetType, businessTruthData, displayNames }) =>
     displayAttributes[k] = businessTruthData.attributes[displayNames[k]]
   })
 
+  // get the metadata
+  let metadata = new BusinessTruthMetadata();
+  let displayMetadata = metadata.getDisplayMetadata(datasetType, displayNames)
+
   return (
     <>
-      <BusinessTruthFeature attr={sourceAttributes} attributes={displayAttributes} stylingType={datasetType} />
+      <BusinessTruthFeature attr={sourceAttributes} attributes={displayAttributes} datasetType={datasetType} metadata={metadata} fieldMetadata={displayMetadata}/>
     </>
   )
 }

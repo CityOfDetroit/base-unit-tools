@@ -1,0 +1,152 @@
+{
+  "@context": "http://schema.org",
+  "type": "Dataset",
+  "name": "Business Licenses",
+  "creator": [
+    {
+      "type": "Person",
+      "id": null,
+      "email": null,
+      "affiliation": "City of Detroit",
+      "name": "BSEED (Buildings, Safety Engineering, and Environmental Department)"
+    }
+  ],
+  "description": "A Business License is the City’s stamp of approval for a business to operate within the city limits. The business licenses are used for certifying the type of business and that they may operate in the city at that location per the Zoning Ordinance.",
+  "datePublished": "2021-12-01",
+  "keywords": ["licenses", "businesses", "certifications"],
+  "funder": null,
+  "temporalCoverage": "2021-10-25/2022-10-25",
+  "license": "TBD",
+  "spatialCoverage": {
+    "type": "Place",
+    "name": "Detroit, MI",
+    "geo": {
+      "type": "GeoShape",
+      "box": "42.44978 -82.92658 42.27584 -83.28079"
+    }
+  },
+  "variableMeasured": [
+    {
+      "type": "PropertyValue",
+      "unitText": "degrees",
+      "name": "X",
+      "description": "Longitudinal coordinate associated with the business street address"
+    },
+    {
+      "type": "PropertyValue",
+      "unitText": "degrees",
+      "name": "Y",
+      "description": "Latitudinal coordinate associated with the business street address"
+    },
+    {
+      "type": "PropertyValue",
+      "unitText": null,
+      "name": "business_id",
+      "description": "Unique identifier used to track this business within BSEED's Accela database."
+    },
+    {
+      "type": "PropertyValue",
+      "unitText": null,
+      "name": "business_name",
+      "description": "The name of the business, which could be the Doing Business As (DBA) name, an affiliated Limited Liability Company (LLC) or a personal name."
+    },
+    {
+      "type": "PropertyValue",
+      "unitText": null,
+      "name": "business_type",
+      "description": "The type of the business as defined by Detroit City Code."
+    },
+    {
+      "type": "PropertyValue",
+      "unitText": null,
+      "name": "parcel_id",
+      "description": "Unique number used to track the parcel of land the business is located on. Parcel IDs are assigned by the Office of the Assessor."
+    },
+    {
+      "type": "PropertyValue",
+      "unitText": "degrees",
+      "name": "lon",
+      "description": "Longitudinal coordinate associated with the business street address"
+    },
+    {
+      "type": "PropertyValue",
+      "unitText": "degrees",
+      "name": "lat",
+      "description": "Latitudinal coordinate associated with the business street address"
+    },
+    {
+      "type": "PropertyValue",
+      "unitText": null,
+      "name": "ObjectId",
+      "description": "ID assigned to each data set record when uploaded to the ODP softwate service (Esri's ArcGIS Online)"
+    },
+    {
+      "type": "PropertyValue",
+      "unitText": null,
+      "name": "address_id",
+      "description": "Unique address identifier assigned when geocoding the data set with the City of Detroit Base Unit data set."
+    },
+    {
+      "type": "PropertyValue",
+      "unitText": null,
+      "name": "street_num",
+      "description": "Street number of the property address where either the business is located or another location where the business owner conducts business."
+    },
+    {
+      "type": "PropertyValue",
+      "unitText": null,
+      "name": "street_dir",
+      "description": "Street direction of the property address where either the business is located or another location where the business owner conducts business."
+    },
+    {
+      "type": "PropertyValue",
+      "unitText": null,
+      "name": "street_name",
+      "description": "Street name of the property address where either the business is located or another location where the business owner conducts business."
+    },
+    {
+      "type": "PropertyValue",
+      "unitText": null,
+      "name": "street_type",
+      "description": "Street type of the property address where either the business is located or another location where the business owner conducts business."
+    }
+  ],
+  "distribution": [
+    {
+      "type": "DataDownload",
+      "name": "ArcGIS Hub Dataset",
+      "contentUrl": "https://data.detroitmi.gov/maps/detroitmi::businesslicenses",
+      "encodingFormat": "text/html"
+    },
+    {
+      "type": "DataDownload",
+      "name": "ArcGIS GeoService",
+      "contentUrl": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/BusinessLicenses/FeatureServer/0",
+      "encodingFormat": "application/json"
+    },
+    {
+      "type": "DataDownload",
+      "name": "GeoJSON",
+      "contentUrl": "https://data.detroitmi.gov/datasets/detroitmi::businesslicenses.geojson?outSR=%7B%22latestWkid%22%3A3857%2C%22wkid%22%3A102100%7D",
+      "encodingFormat": "application/vnd.geo+json"
+    },
+    {
+      "type": "DataDownload",
+      "name": "CSV",
+      "contentUrl": "https://data.detroitmi.gov/datasets/detroitmi::businesslicenses.csv?outSR=%7B%22latestWkid%22%3A3857%2C%22wkid%22%3A102100%7D",
+      "encodingFormat": "text/csv"
+    },
+    {
+      "type": "DataDownload",
+      "name": "KML",
+      "contentUrl": "https://data.detroitmi.gov/datasets/detroitmi::businesslicenses.kml?outSR=%7B%22latestWkid%22%3A3857%2C%22wkid%22%3A102100%7D",
+      "encodingFormat": "application/vnd.google-earth.kml+xml"
+    },
+    {
+      "type": "DataDownload",
+      "name": "Shapefile",
+      "contentUrl": "https://data.detroitmi.gov/datasets/detroitmi::businesslicenses.zip?outSR=%7B%22latestWkid%22%3A3857%2C%22wkid%22%3A102100%7D",
+      "encodingFormat": "application/zip"
+    }
+  ]
+}

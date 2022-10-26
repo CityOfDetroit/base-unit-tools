@@ -1,0 +1,42 @@
+const businessLicenseMetadata = require('../data/metadata/BSEED_business_licenses_metadata.json');
+
+class BusinessTruthMetadata{
+    constructor(){
+        //same keys as businessTruthTypes.js
+        this.data = {
+            "business_licenses": businessLicenseMetadata
+        }
+    }
+
+    getFields(datasetKey){
+        // return json of column name: description
+        let fieldMap = {};
+        let dataset = this.data[datasetKey];
+        if(dataset){
+            let fields = dataset.variableMeasured; // array of field descriptions
+
+            fields.forEach(item => fieldMap[item.name] = item.description);
+        }
+
+        return fieldMap;
+    }
+
+    getDescription(datasetKey){
+        if(this.data[datasetKey]){
+            return this.data[datasetKey].description;
+        }
+        return null;
+    }
+
+    getDisplayMetadata(datasetKey, displayNames){
+        // metadata w/ keys as displayNames. pass in displayNames as a json
+        let displayMetadata = {};
+        let fieldMap = this.getFields(datasetKey);
+        Object.keys(displayNames).forEach(k => {
+            displayMetadata[k] = fieldMap[displayNames[k]]
+        })
+        return displayMetadata;
+    }
+}
+
+export default BusinessTruthMetadata  
