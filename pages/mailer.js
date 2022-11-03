@@ -169,18 +169,6 @@ const Mailer = ({ session, setSession, login, setLogin }) => {
           allAddresses = allAddresses.concat(f.features);
         })
         .then(() => setAddresses(allAddresses));
-
-      // execute all those Promises
-      // Promise.all(promises)
-      //   .then(resps => {
-      //     // stack up each query response's features into this empty array
-      //     let allAddresses = []
-      //     resps.forEach(r => {
-      //       allAddresses = allAddresses.concat(r.features)
-      //     })
-      //     // store them in state
-      //     setAddresses(allAddresses)
-      //   })
     };
     if (resultIds && resultIds.objectIds.length > 0) {
       fetchAddresses();

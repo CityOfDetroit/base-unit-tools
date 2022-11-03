@@ -1,6 +1,7 @@
 
 import { faExpandArrowsAlt } from '@fortawesome/free-solid-svg-icons'
 import buffer from '@turf/buffer'
+import difference from '@turf/difference'
 import Button from '../../src/components/Button'
 import { useState } from 'react';
 
@@ -46,11 +47,29 @@ const MailerBuffer = ({ geom, setGeom }) => {
 
       </select>
       </div>
+      </div>
+      <div className="p-2 flex gap-2">
+
 
       <Button
         icon={faExpandArrowsAlt}
         onClick={() => setGeom(buffer(geom, distanceInMiles, { units: 'miles' }))}
         text={`${distance} ${unit}`}
+        small
+        />
+      <Button
+        icon={faExpandArrowsAlt}
+        onClick={() => {
+          let originalGeom = geom
+          let buffered = buffer(geom, distanceInMiles, { units: 'miles' })
+          console.log(originalGeom)
+          console.log(buffered)
+          let diff = difference(buffered.features[0], originalGeom.features[0])
+
+          let diffFc = {type: "FeatureCollection", features: [diff]}
+          setGeom(diffFc)
+        }}
+        text={`${distance} ${unit} (buffer only)`}
         small
         />
       </div>
