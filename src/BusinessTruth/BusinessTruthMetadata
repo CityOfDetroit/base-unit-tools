@@ -1,11 +1,31 @@
 const businessLicenseMetadata = require('../data/metadata/BSEED_business_licenses_metadata.json');
 
+let datasets = {
+    "business_licenses": businessLicenseMetadata
+}
+
+//TODO: refactor so datasetKey is passed to constructor
 class BusinessTruthMetadata{
-    constructor(){
+    constructor(name){
         //same keys as businessTruthTypes.js
+        this.name = name
+        this.data = datasets[name]
+        /*
         this.data = {
             "business_licenses": businessLicenseMetadata
         }
+        */
+    }
+
+    get fields(){
+        // return json of column name: description
+        let fieldMap = {};
+        if(this.data){
+            let fields = dataset.variableMeasured; // array of field descriptions
+            fields.forEach(item => fieldMap[item.name] = item.description);
+        }
+
+        return fieldMap;
     }
 
     getFields(datasetKey){
@@ -21,11 +41,29 @@ class BusinessTruthMetadata{
         return fieldMap;
     }
 
+    get description(){
+        if(this.data){
+            return this.data.description;
+        }
+        return null;
+    }
+
     getDescription(datasetKey){
         if(this.data[datasetKey]){
             return this.data[datasetKey].description;
         }
         return null;
+    }
+
+    displayMetadata(displayNames){
+        // metadata w/ keys as displayNames. pass in displayNames as a json
+        let displayMetadata = {};
+        if(this.fields){
+            Object.keys(displayNames).forEach(k => {
+                displayMetadata[k] = this.fields[displayNames[k]]
+            })
+        }
+        return displayMetadata;
     }
 
     getDisplayMetadata(datasetKey, displayNames){

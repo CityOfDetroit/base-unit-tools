@@ -233,7 +233,8 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
   let restaurantEstablishmentsData = useLayer(
     {
       url: restaurantEstablishmentsUrl,
-      where: `address_id = ${addressId}`
+      where: `address_id = ${addressId}`,
+      orderByFields: 'most_recent_license_date desc'
     }
   ) 
 
@@ -241,7 +242,8 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
   let restaurantInspectionsData = useLayer(
     {
       url: restaurantInspectionsUrl,
-      where: `establishment_id = ${establishmentId}`
+      where: `establishment_id = ${establishmentId}`,
+      orderByFields: 'inspection_date desc'
     }
   ) 
 
@@ -249,7 +251,8 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
   let restaurantViolationsData = useLayer(
     {
       url: restaurantViolationsUrl,
-      where: `establishment_id = ${establishmentId}`
+      where: `establishment_id = ${establishmentId}`,
+      orderByFields: 'inspection_date desc'
     }
   ) 
   
@@ -260,25 +263,14 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
 
   // conduct the initial search
   useEffect(() => {
-    // prevent effect from running on first render
-    if(searchValue != "" && options.searchType == 'default'){
-      console.log(searchValue)
+    // clear out previous data
+    setBusinessTruthData({})
+    setAddressId(null)
 
-      queryFeatures({
-        url: `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/BusinessLicenses/FeatureServer/0`,
-        outFields: '*',
-        where: `business_name like '${searchValue}%'`,
-        f: 'json'
-      }).then(r => setSearchResults(r))
-    }
-    else if(searchValue != "" && options.searchType == 'address'){
-      console.log(searchValue)
-
-      setAddress(searchValue)
-      // useGeocoder() hook?
-    }
+    setAddress(searchValue)
   }, [searchValue])
 
+  /*
   //TODO: instead of Search Results, use a businessLicensesData variable?
   // once the initial search's value is obtained, get address id to query for more data
   useEffect(() => {
@@ -313,6 +305,7 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
       }
     }
   }, [searchResults])
+  */
 
   useEffect(() => {
     if(commercialCocData){
@@ -400,7 +393,7 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
         setBusinessTruthData(prevState => (
           {
             ...prevState,
-            "restaurant_violations": firstResult
+            "restaurant_violations": restaurantViolationsData.features //firstResult
           }
         ))
       }
@@ -427,6 +420,7 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
       setAddressId(firstResult.properties.address_id)
       
     }
+    //TODO: add setAddressId here?
     else if (firstResult && ['StreetAddress', 'StreetInt'].indexOf(firstResult.properties.Addr_type) > -1) {
       setClicked({})
       setGeocoded(featureCollection)

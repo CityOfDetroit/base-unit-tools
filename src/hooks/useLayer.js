@@ -10,7 +10,7 @@ import { queryFeatures } from '@esri/arcgis-rest-feature-layer';
  * @param {url: string, where: string}
  * @returns json result
  */
-const useLayer = ({ url, where }) => {
+const useLayer = ({ url, where, orderByFields = '' }) => {
   // check for component mount. Setting initial state to false helps prevent an unnecessary call on initial render
   const didMountRef = useRef(false);
 
@@ -26,19 +26,20 @@ const useLayer = ({ url, where }) => {
       if(url && where){
         console.log("Where: " + where)
         console.log(where)
-        queryLayer(url, where).catch(console.error);
+        queryLayer(url, where, orderByFields).catch(console.error);
       }
     }
 
     didMountRef.current = true;
   }, [url, where])
 
-  const queryLayer = async (url, where) => {
+  const queryLayer = async (url, where, orderByFields) => {
     const data = await queryFeatures({
       url: url,
       outFields: '*',
       where: where,
-      f: 'json'
+      f: 'json',
+      orderByFields: orderByFields
     })
 
     setData(data);

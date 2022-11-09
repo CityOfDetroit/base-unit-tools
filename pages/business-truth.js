@@ -6,13 +6,14 @@ import React, { useEffect, useState } from "react";
 import apps from "../src/data/apps";
 import AppHeader from "../src/components/AppHeader";
 import Button from "../src/components/Button";
+import BusinessTruthDataset from "../src/BusinessTruth/BusinessTruthDataset";
+import BusinessTruthPanel from "../src/BusinessTruth/BusinessTruthPanel";
 import BusinessTruthSearch from "../src/BusinessTruth/BusinessTruthSearch";
 import IssueReporter from "../src/components/IssueReporter";
 import IssueReporterAddress from "../src/components/IssueReporterAddress";
 import MapillarySv from "../src/components/MapillarySv";
 import useFeature from "../src/hooks/useFeature";
 import SiteSidebar from "../src/layout/SiteSidebar";
-import BusinessTruthPanel from "../src/BusinessTruth/BusinessTruthPanel";
 import ExplorerAddress from "../src/Explorer/ExplorerAddress";
 import ExplorerBuilding from "../src/Explorer/ExplorerBuilding";
 import ExplorerMap from "../src/Explorer/ExplorerMap";
@@ -200,9 +201,10 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
           )) */}
         {clicked.type === "addresses" && businessTruthData && (
           Object.keys(businessTruthData).map((datasetName, i) => {
-
-
+            let d = new BusinessTruthDataset(datasetName, businessTruthData[datasetName])
+            console.log(d)
             return <BusinessTruthPanel key = {i} datasetType = {datasetName} businessTruthData = { businessTruthData[datasetName] } displayNames = { businessTruthDisplayNames[datasetName] } />
+            //<BusinessTruthFeature /> = ({ attr, attributes, longAttributes = {}, datasetType = null, metadata = null, fieldMetadata = null})
           })
           
         )} 

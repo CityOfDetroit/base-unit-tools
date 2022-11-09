@@ -55,6 +55,7 @@ import React, { useEffect, useState } from 'react';
 import layers from '../data/layers';
 import BusinessTruthFeature from './BusinessTruthFeature';
 import BusinessTruthMetadata from "./BusinessTruthMetadata";
+import Pagination from '@mui/material/Pagination';
 
 // TODO: replace this with passed-in display names 
 // may actually need to declare all column names for all tables here, if we are going to switch tabs
@@ -66,24 +67,48 @@ export const addressAttributes = {
   "Unit Type": `unit_type`,
   "Unit Number": `unit_number`
 }
-
+//TODO: !!!!! create a new data class to hold businessTruthData, so displayAttributes and sourceAttributes can easily be fetched w/ a function
+// BusinessTruthPanel/BusinessTruthFeature would need to take in one data object
 // TODO: may need a tab/panel parameter
 const BusinessTruthPanel = ({ datasetType, businessTruthData, displayNames }) => {
+  let [page, setPage] = useState(1);
+
+  useEffect(() => {
+    console.log("Page: " + page)
+  }, [page])
+  
   let displayAttributes = {}
-  let { attributes: sourceAttributes } = businessTruthData;
+  let sourceAttributes = null
+  if(businessTruthData.constructor.name == "Array"){
+    sourceAttributes = businessTruthData[0].attributes
+  }
+  else{
+    sourceAttributes = businessTruthData.attributes
+  }
+  //let { attributes: sourceAttributes } = businessTruthData;
 
   Object.keys(displayNames).forEach(k => {
-    displayAttributes[k] = businessTruthData.attributes[displayNames[k]]
+    displayAttributes[k] = sourceAttributes[displayNames[k]] //businessTruthData.attributes[displayNames[k]]
   })
 
   // get the metadata
   let metadata = new BusinessTruthMetadata();
   let displayMetadata = metadata.getDisplayMetadata(datasetType, displayNames)
+  console.log(sourceAttributes)
 
+  const handlePageChange = (e, p) => {
+    setPage(p);
+  };
+
+  //TODO: add component for switching between pages
   return (
-    <>
+    <div>
       <BusinessTruthFeature attr={sourceAttributes} attributes={displayAttributes} datasetType={datasetType} metadata={metadata} fieldMetadata={displayMetadata}/>
-    </>
+      {businessTruthData.constructor.name == "Array"
+      ? <Pagination count={5} page={page} onChange={handlePageChange} showFirstButton showLastButton />
+      : <></>
+      }
+    </div>
   )
 }
 
