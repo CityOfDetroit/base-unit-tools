@@ -21,6 +21,7 @@ import ExplorerMapOptions from "../src/Explorer/ExplorerMapOptions";
 import ExplorerParcel from "../src/Explorer/ExplorerParcel";
 import ExplorerSearch from "../src/Explorer/ExplorerSearch";
 import ExplorerStreet from "../src/Explorer/ExplorerStreet";
+import BusinessTruthFeature from './../src/BusinessTruth/BusinessTruthFeature';
 
 const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
   // business truth data
@@ -203,7 +204,12 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
           Object.keys(businessTruthData).map((datasetName, i) => {
             let d = new BusinessTruthDataset(datasetName, businessTruthData[datasetName])
             console.log(d)
-            return <BusinessTruthPanel key = {i} datasetType = {datasetName} businessTruthData = { businessTruthData[datasetName] } displayNames = { businessTruthDisplayNames[datasetName] } />
+            console.log(d.name)
+            console.log(d.displayNames)
+            console.log(d.displayAttributes)
+            console.log(d.sourceAttributes)
+            return <BusinessTruthFeature key={i} dataset={d} />
+            //return <BusinessTruthPanel key = {i} datasetType = {datasetName} businessTruthData = { businessTruthData[datasetName] } displayNames = { businessTruthDisplayNames[datasetName] } />
             //<BusinessTruthFeature /> = ({ attr, attributes, longAttributes = {}, datasetType = null, metadata = null, fieldMetadata = null})
           })
           

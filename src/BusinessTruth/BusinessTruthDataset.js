@@ -79,6 +79,9 @@ class BusinessTruthDataset {
         this.name = name
         this.data = data
         this.displayNames = businessTruthDisplayNames[name]
+        this.sourceAttributes = this.setSourceAttributes()
+        console.log(this.sourceAttributes)
+        this.displayAttributes = this.setDisplayAttributes()
         this.metadata = new BusinessTruthMetadata(this.name)
         this.displayMetadata = this.metadata.displayMetadata(this.displayNames)
         this.style = businessTruthTypes[name];
@@ -108,6 +111,17 @@ class BusinessTruthDataset {
      *
      * @return {Object} json of field info
      */
+    setSourceAttributes(){
+        let attributes = {}
+        if(this.data.constructor.name == "Array"){
+            attributes = this.data[0].attributes
+        }
+        else{
+            attributes = this.data.attributes
+        }
+        return attributes
+    }
+    /*
     get sourceAttributes(){
         let attributes = {}
         if(this.data.constructor.name == "Array"){
@@ -116,8 +130,9 @@ class BusinessTruthDataset {
         else{
             attributes = this.data.attributes
         }
-        return sourceAttributes
+        return attributes
     }
+    */
 
     /**
      * Holds information shown to user
@@ -134,6 +149,15 @@ class BusinessTruthDataset {
      *
      * @return {Object} json of field info to display
      */
+    setDisplayAttributes(){
+        let attributes = {}
+        let sourceAttributes = this.sourceAttributes
+        Object.keys(this.displayNames).forEach(k => {
+            attributes[k] = sourceAttributes[this.displayNames[k]] //businessTruthData.attributes[displayNames[k]]
+        })
+        return attributes
+    }
+    /*
     get displayAttributes(){
         let attributes = {}
         sourceAttributes = this.sourceAttributes
@@ -142,6 +166,7 @@ class BusinessTruthDataset {
         })
         return attributes
     }
+    */
 
     /*
     // Getter

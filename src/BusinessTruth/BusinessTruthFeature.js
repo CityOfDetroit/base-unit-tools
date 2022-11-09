@@ -12,10 +12,11 @@ import AnimateHeight from "react-animate-height";
 import CustomTooltip from "../components/CustomTooltip";
 import BusinessTruthMetadata from "./BusinessTruthMetadata";
 
-const BusinessTruthFeature = ({ attr, attributes, longAttributes = {}, datasetType = null, metadata = null, fieldMetadata = null}) => {
+//const BusinessTruthFeature = ({ attr, attributes, longAttributes = {}, datasetType = null, metadata = null, fieldMetadata = null}) => {
+const BusinessTruthFeature = ({ dataset }) => {
   // let hasSource = Object.keys(attr).indexOf('geo_source') > -1
 
-  let style = businessTruthTypes[datasetType];
+  let style = dataset.style;
 
   let [show, setShow] = useState(false);
 
@@ -28,13 +29,13 @@ const BusinessTruthFeature = ({ attr, attributes, longAttributes = {}, datasetTy
       >
         <div className="flex items-center">
           {/*Display the dataset name*/}
-          {metadata.getDescription(datasetType)
-          ? <CustomTooltip title={metadata.getDescription(datasetType)} placement="top">
+          {dataset.metadata.description
+          ? <CustomTooltip title={dataset.metadata.description} placement="top">
               <h2 id="business-truth-feature-title" className="text-sm md:text-lg mr-3">{style.label}</h2>
             </CustomTooltip>
           : <h2 id="business-truth-feature-title" className="text-sm md:text-lg mr-3">{style.label}</h2>
           }
-          <a href={`/${style.singular}/${attr[style.id_column]}`} target="_blank">
+          <a href={`/${style.singular}/${dataset.sourceAttributes[style.id_column]}`} target="_blank">
               <FontAwesomeIcon icon={faLink} className="ml-2 text-gray-400 hover:text-gray-500" />
           </a>
         </div>
@@ -50,8 +51,8 @@ const BusinessTruthFeature = ({ attr, attributes, longAttributes = {}, datasetTy
       <AnimateHeight duration={250} height={show ? "auto" : 0}>
         <section className="sidebar-section" style={{ borderLeft: `8px solid ${style.color}` }}>
           {/*Stores the fields*/}
-          <AttributeTable attributes={attributes} metadata={fieldMetadata} />
-          {Object.keys(longAttributes).length > 0 &&
+          <AttributeTable attributes={dataset.displayAttributes} metadata={dataset.displayMetadata} />
+          {/*Object.keys(longAttributes).length > 0 &&
             Object.keys(longAttributes).map((f, i) => (
               <div key={i} style={{ paddingLeft: 2 }}>
                 <div
@@ -70,7 +71,7 @@ const BusinessTruthFeature = ({ attr, attributes, longAttributes = {}, datasetTy
 
                 <p className="px-1 md:px-2 text-xs md:text-sm leading-4">{longAttributes[f]}</p>
               </div>
-            ))}
+                ))*/}
         </section>
       </AnimateHeight>
     </>
