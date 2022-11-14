@@ -386,6 +386,7 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
   }, [restaurantInspectionsData])
 
   useEffect(() => {
+    //restaurant violations returns all violations
     if(restaurantViolationsData){
 
       if(restaurantViolationsData.features.length > 0){

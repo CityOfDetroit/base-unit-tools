@@ -26,89 +26,15 @@ import BusinessTruthFeature from './../src/BusinessTruth/BusinessTruthFeature';
 const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
   // business truth data
   let [businessTruthData, setBusinessTruthData] = useState(null);
-  let businessTruthDisplayNames = { // * at end to represent date
-    "business_licenses": { 
-      "Business ID": `business_id`,
-      "Business Name": `business_name`,
-      "Business Type": `business_type`,
-      "Parcel ID": `parcel_id`,
-      "Latitude": `lat`,
-      "Longitude": `lon`,
-      "Address ID": `address_id`,
-      "Street Number": `street_num`,
-      "Street Direction": `street_dir`,
-      "Street Name": `street_name`
-    },
-    "certificate_of_occupancy": {
-      "Record ID": `record_id`,
-      "Description": `description`,
-	    "Status": `status`,
-      "Date Status*": `date_status`
-    },
-    "commercial_coc": {
-      "Record ID": `record_id`,
-	    "Record Status*": `record_status_date`
-    },
-    "restaurant_establishments": {
-      "Establishment ID": `establishment_id`,
-      "Name": `name`,
-      "Owner": `owner`,
-      "License Number": "license_number",
-      "License Type":	"license_type",
-	    "Most Recent License Date*":	"most_recent_license_date",
-	    "Establishment Type": "establishment_type",
-	    "Status":	"status",
-	    "Restaurant Complexity Level": "restaurant_complexity_level",
-	    "Review Frequency in Days":	"review_frequency_in_days"
-    },
-    "restaurant_inspections": {
-      "Inspection ID": "Inspection_ID",
-      "Establishment ID": `Establishment_ID`,
-      "Name": `Name`,
-      "Inspection Date*": "Inspection_Date",
-      "Inspection Type":	"Inspection_Type",
-	    "Priority Violations":	"Priority_Violations",
-	    "Foundation Violations": "Foundation_Violations",
-	    "Core Violations":	"Core_Violations",
-	    "Total Corrected Priority + Foundation Violations": "Total_Corrected_Priority___Foun",
-	    "In Compliance":	"In_Compliance"
-    },
-    "restaurant_violations": {
-      "Inspection ID": "Inspection_ID",
-      "Establishment ID": `Establishment_ID`,
-      "Inspection Date*": "Inspection_Date",
-	    "Violation Code":	"Violation_Code",
-      "Violation Type": "Violation Type",
-	    "Violation Description": "Violation Description",
-	    "Sub Location":	"Sub_Location",
-	    "Item Description": "Item_Description",
-      "Sub Item":	"Sub_Item",
-      "Problem Description": "Problem_Description",
-	    "Sub Problem":	"Sub_Problem",
-      "Correction Description": "Correction_Description",
-      "Days to Correct":"Days_to_Correct",
-      "Date Corrected*": "Date_Corrected"
-    }
-  }
-
-  /*
-  "Parcel ID": `parcel_id`,
-	    "Longitude": `lon`,
-	    "Latitude":	`lat`,
-	    "Address ID":	`address_id`,
-	    "Street Number": `street_num`,	
-	    "Street Direction": `street_dir`,	
-	    "Street Name": `street_name`	
-
-  "Parcel ID": `parcel_id`,
-	    "Longitude": `lon`,
-	    "Latitude":	`lat`,
-	    "ObjectId":	`ObjectId`,
-	    "Address ID":	`address_id`,
-	    "Street Number": `street_num`,	
-	    "Street Direction": `street_dir`,	
-	    "Street Name": `street_name`	
-  */
+  //TODO: use this to display datasets. Will be important in the future when we want to implement a draggable list
+  let [businessTruthDisplayOrder, setBusinessTruthDisplayOrder] = useState([ 
+    "business_licenses",
+    "certificate_of_occupancy",
+    "commercial_coc",
+    "restaurant_establishments",
+    "restaurant_inspections",
+    "restaurant_violations"
+  ])
 
   // query parameters
   let router = useRouter();
@@ -156,10 +82,11 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
     console.log(businessTruthData)
   }, [businessTruthData])
 
+  //TODO: change the introduction
   let introduction = (
     <>
       <p>
-        This tool is for exploring the base units and visualizing the relationships between them.
+        This tool is for exploring businesses.
       </p>
       <p>You can start by:</p>
       <ul className="list-disc list-outside ml-4 pb-2">
@@ -183,7 +110,7 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
 
   return (
     <>
-      <AppHeader app={apps.map} introduction={introduction} introOpen={false}>
+      <AppHeader app={apps["business-truth"]} introduction={introduction} introOpen={false}>
         <ExplorerMapOptions {...{ options, setOptions, session, clicked }} />
       </AppHeader>
       <SiteSidebar title="Explorer">

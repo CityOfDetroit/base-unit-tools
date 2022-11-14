@@ -46,6 +46,7 @@
     "react-csv": "^2.0.3",
     "react-csv-reader": "^3.5.0",
     "react-dom": "^17.0.1",
+    "react-draggable": "^4.4.5",
     "react-select": "^4.3.1",
     "react-table": "^7.7.0",
     "styled-components": "^5.3.6",
