@@ -10,7 +10,7 @@ import { queryFeatures } from '@esri/arcgis-rest-feature-layer';
  * @param {url: string, where: string}
  * @returns json result
  */
-const useLayer = ({ url, where, orderByFields = '' }) => {
+const useLayer = ({ url, where, orderByFields = '', acceptNull = true }) => {
   // check for component mount. Setting initial state to false helps prevent an unnecessary call on initial render
   const didMountRef = useRef(false);
 
@@ -25,8 +25,14 @@ const useLayer = ({ url, where, orderByFields = '' }) => {
     if (didMountRef.current) { 
       if(url && where){
         console.log("Where: " + where)
-        console.log(where)
-        queryLayer(url, where, orderByFields).catch(console.error);
+        //TODO: may need to change this condition. Is a little hacky, and would prevent something like "Harnull"
+        // if the query does not accept nulls, but there is a null passed in, do not run
+        if (!acceptNull && where.slice(-4).toLowerCase() == 'null'){
+          console.log("Query contains a null")
+        }
+        else{
+          queryLayer(url, where, orderByFields).catch(console.error);
+        }
       }
     }
 

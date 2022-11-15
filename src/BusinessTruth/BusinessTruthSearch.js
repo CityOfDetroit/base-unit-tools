@@ -217,7 +217,8 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
   let commercialCocData = useLayer(
     {
       url: commercialCocUrl,
-      where: `address_id = ${addressId}`
+      where: `address_id = ${addressId}`,
+      acceptNull: false
     }
   ) 
 
@@ -225,7 +226,8 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
   let certificateOfOccupancyData = useLayer(
     {
       url: certificateOfOccupancyUrl,
-      where: `address_id = ${addressId}`
+      where: `address_id = ${addressId}`,
+      acceptNull: false
     }
   ) 
 
@@ -234,7 +236,8 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
     {
       url: restaurantEstablishmentsUrl,
       where: `address_id = ${addressId}`,
-      orderByFields: 'most_recent_license_date desc'
+      orderByFields: 'most_recent_license_date desc',
+      acceptNull: false
     }
   ) 
 
@@ -243,7 +246,8 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
     {
       url: restaurantInspectionsUrl,
       where: `establishment_id = ${establishmentId}`,
-      orderByFields: 'inspection_date desc'
+      orderByFields: 'inspection_date desc',
+      acceptNull: false
     }
   ) 
 
@@ -252,7 +256,8 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
     {
       url: restaurantViolationsUrl,
       where: `establishment_id = ${establishmentId}`,
-      orderByFields: 'inspection_date desc'
+      orderByFields: 'inspection_date desc',
+      acceptNull: false
     }
   ) 
   
@@ -266,6 +271,7 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
     // clear out previous data
     setBusinessTruthData({})
     setAddressId(null)
+    setEstablishmentId(null)
 
     setAddress(searchValue)
   }, [searchValue])

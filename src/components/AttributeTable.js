@@ -10,7 +10,7 @@ const AttributeTable = ({ attributes, metadata = {}}) => {
   //console.log(metadata)
   
   const TableRow = ({label, index}) => {   
-    console.log(metadata?.[label])
+    //console.log(metadata?.[label])
     return (
       <tr
           key={index}
