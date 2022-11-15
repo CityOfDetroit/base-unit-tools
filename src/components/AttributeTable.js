@@ -6,8 +6,8 @@ import CopyValue from "../components/CopyValue";
 import CustomTooltip from "./CustomTooltip";
 
 const AttributeTable = ({ attributes, metadata = {}}) => {
-  console.log(attributes)
-  console.log(metadata)
+  //console.log(attributes)
+  //console.log(metadata)
   
   const TableRow = ({label, index}) => {   
     console.log(metadata?.[label])

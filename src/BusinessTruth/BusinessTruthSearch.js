@@ -326,7 +326,7 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
         setBusinessTruthData(prevState => (
           {
             ...prevState,
-            "commercial_coc": {}
+            "commercial_coc": null
           }
         ))
       }
@@ -350,7 +350,7 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
         setBusinessTruthData(prevState => (
           {
             ...prevState,
-            "certificate_of_occupancy": {}
+            "certificate_of_occupancy": null
           }
         ))
       }
@@ -378,7 +378,7 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
         setBusinessTruthData(prevState => (
           {
             ...prevState,
-            "restaurant_establishments": {}
+            "restaurant_establishments": null
           }
         ))
       }

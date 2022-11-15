@@ -99,17 +99,22 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
   useEffect(() => {
     
     if (didMountRef.current){
-      // need to change if. mainDatasets values should all be in businessTruth data
       let businessTruthDataKeys = Object.keys(businessTruthData)
+      // mainDatasets values should all be in businessTruth data. If they're not, no search has run yet.
       if(mainDatasets.every(val => businessTruthDataKeys.includes(val))){ // Object.keys(businessTruthData).length == mainDatasets.length){
         let noData = true;
         for(let i=0; i<mainDatasets.length; i++){
           let key = mainDatasets[i]
           let data = businessTruthData[key]
           // data exists, so don't show any dialog
+          /*
           if(Object.keys(data).length > 0){
             noData = false
           }
+          */
+          if (data)[
+            noData = false
+          ]
         }
         // if no data, open the dialog
         if(noData){
