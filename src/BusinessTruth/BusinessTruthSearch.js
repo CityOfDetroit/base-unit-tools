@@ -323,6 +323,12 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
       }
       else{
         console.log("No Commercial Coc data")
+        setBusinessTruthData(prevState => (
+          {
+            ...prevState,
+            "commercial_coc": {}
+          }
+        ))
       }
     }
   }, [commercialCocData])
@@ -341,6 +347,12 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
       }
       else{
         console.log("No COO data")
+        setBusinessTruthData(prevState => (
+          {
+            ...prevState,
+            "certificate_of_occupancy": {}
+          }
+        ))
       }
     }
   }, [certificateOfOccupancyData])
@@ -363,6 +375,12 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
       }
       else{
         console.log("No restaurantEstablishments data")
+        setBusinessTruthData(prevState => (
+          {
+            ...prevState,
+            "restaurant_establishments": {}
+          }
+        ))
       }
     }
   }, [restaurantEstablishmentsData])
@@ -425,6 +443,8 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
     else if (firstResult && ['StreetAddress', 'StreetInt'].indexOf(firstResult.properties.Addr_type) > -1) {
       setClicked({})
       setGeocoded(featureCollection)
+
+      setAddressId(firstResult.properties.address_id)
     }
     if(!featureCollection) {
       setClicked({})

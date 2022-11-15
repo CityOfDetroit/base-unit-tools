@@ -30,7 +30,7 @@ const SiteHeader = ({ session, setSession, login, setLogin }) => {
                 : "w-full font-black  text-base md:text-xl ml-1 -mb-1"
             }
           >
-            Base Unit Tools
+            Business Truth Explorer
           </h1>
           <div className="flex items-center" onClick={() => setOpen(!open)}>
             <FontAwesomeIcon

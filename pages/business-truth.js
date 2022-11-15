@@ -2,7 +2,7 @@ import { faArrowAltCircleRight, faLink, faSearch } from "@fortawesome/free-solid
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import apps from "../src/data/apps";
 import AppHeader from "../src/components/AppHeader";
 import Button from "../src/components/Button";
@@ -12,8 +12,9 @@ import BusinessTruthSearch from "../src/BusinessTruth/BusinessTruthSearch";
 import IssueReporter from "../src/components/IssueReporter";
 import IssueReporterAddress from "../src/components/IssueReporterAddress";
 import MapillarySv from "../src/components/MapillarySv";
-import useFeature from "../src/hooks/useFeature";
+import SimpleDialog from "../src/components/SimpleDialog";
 import SiteSidebar from "../src/layout/SiteSidebar";
+import useFeature from "../src/hooks/useFeature";
 import ExplorerAddress from "../src/Explorer/ExplorerAddress";
 import ExplorerBuilding from "../src/Explorer/ExplorerBuilding";
 import ExplorerMap from "../src/Explorer/ExplorerMap";
@@ -22,10 +23,17 @@ import ExplorerParcel from "../src/Explorer/ExplorerParcel";
 import ExplorerSearch from "../src/Explorer/ExplorerSearch";
 import ExplorerStreet from "../src/Explorer/ExplorerStreet";
 import BusinessTruthFeature from './../src/BusinessTruth/BusinessTruthFeature';
+import { render } from "@testing-library/react";
 
 const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
   // business truth data
   let [businessTruthData, setBusinessTruthData] = useState(null);
+  // datasets queried for using address id. Used to check if no data is returned
+  const mainDatasets = [ //"business_licenses",
+    "certificate_of_occupancy",
+    "commercial_coc",
+    "restaurant_establishments"
+  ]
   //TODO: use this to display datasets. Will be important in the future when we want to implement a draggable list
   let [businessTruthDisplayOrder, setBusinessTruthDisplayOrder] = useState([ 
     "business_licenses",
@@ -35,6 +43,9 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
     "restaurant_inspections",
     "restaurant_violations"
   ])
+
+  // check for component mount. Setting initial state to false helps prevent an unnecessary call on initial render
+  const didMountRef = useRef(false);
 
   // query parameters
   let router = useRouter();
@@ -71,6 +82,14 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
     basemap: "default",
   });
 
+  // manages dialog box
+  const [open, setOpen] = useState(false);
+  const handleClose = () => {
+    setOpen(false);
+  }
+  // variabale to check if business truth search is completed. Default is null to represent no search
+  const [searchCompleted, setSearchCompleted] = useState(null);
+
   // streetview-specific information
   // svBearing is the current camera bearing
   const [svBearing, setSvBearing] = useState(null);
@@ -78,8 +97,28 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
   const [svImages, setSvImages] = useState([]);
 
   useEffect(() => {
-    console.log("business truth")
-    console.log(businessTruthData)
+    
+    if (didMountRef.current){
+      // need to change if. mainDatasets values should all be in businessTruth data
+      let businessTruthDataKeys = Object.keys(businessTruthData)
+      if(mainDatasets.every(val => businessTruthDataKeys.includes(val))){ // Object.keys(businessTruthData).length == mainDatasets.length){
+        let noData = true;
+        for(let i=0; i<mainDatasets.length; i++){
+          let key = mainDatasets[i]
+          let data = businessTruthData[key]
+          // data exists, so don't show any dialog
+          if(Object.keys(data).length > 0){
+            noData = false
+          }
+        }
+        // if no data, open the dialog
+        if(noData){
+          setOpen(true)
+        }
+      }
+    }
+
+    didMountRef.current = true;
   }, [businessTruthData])
 
   //TODO: change the introduction
@@ -120,26 +159,22 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
         {options.streetView && svImages.length > 0 && (
           <MapillarySv {...{ svImage, svImages, setSvImage, setSvBearing, feature }} />
         )}
-        
-        {/* TODO: query for multiple datasets from AGO, and depending on the number, display that many BusinessTruthPanels */}
-        {/* based on type, return a specific component. */}
-        {/* <BusinessTruthPanel {...{ businessTruthData } } displayNames={ businessTruthDisplayNames} /> */}
-        {/* businessTruthData.map(dataset => (
-            <BusinessTruthPanel businessTruthData = { dataset } displayNames = { businessTruthDisplayNames } />
-          )) */}
+       
+        {/* Query for multiple datasets from AGO, and depending on the number, display that many BusinessTruthPanels */}
         {clicked.type === "addresses" && businessTruthData && (
+          businessTruthDisplayOrder.map((datasetName, i) => {
+            let currentDataset = businessTruthData[datasetName]
+            if (currentDataset){
+              let d = new BusinessTruthDataset(datasetName, currentDataset)
+              return <BusinessTruthFeature key={i} dataset={d} />
+            }
+          })
+          /*
           Object.keys(businessTruthData).map((datasetName, i) => {
             let d = new BusinessTruthDataset(datasetName, businessTruthData[datasetName])
-            console.log(d)
-            console.log(d.name)
-            console.log(d.displayNames)
-            console.log(d.displayAttributes)
-            console.log(d.sourceAttributes)
             return <BusinessTruthFeature key={i} dataset={d} />
-            //return <BusinessTruthPanel key = {i} datasetType = {datasetName} businessTruthData = { businessTruthData[datasetName] } displayNames = { businessTruthDisplayNames[datasetName] } />
-            //<BusinessTruthFeature /> = ({ attr, attributes, longAttributes = {}, datasetType = null, metadata = null, fieldMetadata = null})
           })
-          
+          */
         )} 
         {clicked.type === "addresses" && feature && (
           <ExplorerAddress {...{ feature, clicked, setClicked, linked, setLinked }} />
@@ -187,6 +222,10 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
 
       {/* the main panel contains the map, and we pass it many of our useState variables */}
       <main>
+        {/*TODO: need some sort of check for if the search if processing. e.g. pass a SetLoading
+        If all businessTruthDisplayOrder keys are present, and the json is all empty, display
+        */}
+        <SimpleDialog title={"No Results"} message={"There was no business data for this address"} open={open} onClose={handleClose}/>
         <ExplorerMap
           {...{
             clicked,
