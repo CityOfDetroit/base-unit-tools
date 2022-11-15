@@ -213,6 +213,15 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
 
   let [establishmentId, setEstablishmentId] = useState(null)// used for restaurant data
   
+  let businessLicensesUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/BusinessLicenses/FeatureServer/0/`
+  let businessLicensesData = useLayer(
+    {
+      url: businessLicensesUrl,
+      where: `address_id = ${addressId}`,
+      acceptNull: false
+    }
+  ) 
+
   let commercialCocUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/CommercialInspections/FeatureServer/0`
   let commercialCocData = useLayer(
     {
@@ -312,6 +321,32 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
     }
   }, [searchResults])
   */
+
+  useEffect(() => {
+    if(businessLicensesData){
+      console.log("businessLicenses")
+      console.log(businessLicensesData)
+
+      if(businessLicensesData.features.length > 0){
+        let firstResult = businessLicensesData.features[0]
+        setBusinessTruthData(prevState => (
+          {
+            ...prevState,
+            "business_licenses": firstResult
+          }
+        ))
+      }
+      else{
+        console.log("No businessLicenses data")
+        setBusinessTruthData(prevState => (
+          {
+            ...prevState,
+            "business_licenses": null
+          }
+        ))
+      }
+    }
+  }, [businessLicensesData])
 
   useEffect(() => {
     if(commercialCocData){

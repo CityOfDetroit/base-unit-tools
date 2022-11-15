@@ -21,7 +21,7 @@ class BusinessTruthMetadata{
         // return json of column name: description
         let fieldMap = {};
         if(this.data){
-            let fields = dataset.variableMeasured; // array of field descriptions
+            let fields = this.data.variableMeasured; // array of field descriptions
             fields.forEach(item => fieldMap[item.name] = item.description);
         }
 
