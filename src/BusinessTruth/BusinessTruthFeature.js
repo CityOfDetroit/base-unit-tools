@@ -20,6 +20,8 @@ const BusinessTruthFeature = ({ dataset }) => {
 
   let style = dataset.style;
 
+  const disabled = dataset.data ? false : true
+
   let [show, setShow] = useState(false);
 
   let [page, setPage] = useState(1);
@@ -58,7 +60,9 @@ const BusinessTruthFeature = ({ dataset }) => {
   }
 
   return (
-      <div>
+      <div style={{
+        opacity: disabled ? 0.5 : 1
+      }}>
         <div
           id="business-truth-feature-header"
           className="bg-gray-300 p-2 text-xs font-bold flex items-center justify-between"

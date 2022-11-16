@@ -8,9 +8,11 @@ const SimpleDialog = ({title, message, onClose, open}) => {
     return (
       <Dialog onClose={onClose} open={open}>
         <DialogTitle>{title}</DialogTitle>
-        <DialogContentText id="alert-dialog-description">
-            {message}
-        </DialogContentText>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+              {message}
+          </DialogContentText>
+        </DialogContent>
       </Dialog>
     );
   }

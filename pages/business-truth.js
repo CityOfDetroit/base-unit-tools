@@ -225,7 +225,7 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
         {/*TODO: need some sort of check for if the search if processing. e.g. pass a SetLoading
         If all businessTruthDisplayOrder keys are present, and the json is all empty, display
         */}
-        <SimpleDialog title={"No Results"} message={"There was no business data for this address"} open={open} onClose={handleClose}/>
+        <SimpleDialog title={"No Results"} message={"There was no business data for this address."} open={open} onClose={handleClose}/>
         <ExplorerMap
           {...{
             clicked,
