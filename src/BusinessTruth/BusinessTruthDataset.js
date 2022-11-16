@@ -78,6 +78,7 @@ class BusinessTruthDataset {
     constructor(name, data) {
         this.name = name
         this.data = data
+        console.log(this.name + ' ' + JSON.stringify(this.data))
         this.displayNames = businessTruthDisplayNames[name]
         this.sourceAttributes = this.setSourceAttributes()
         this.displayAttributes = this.setDisplayAttributes()
@@ -111,19 +112,21 @@ class BusinessTruthDataset {
      * @return {Object} json of field info
      */
     setSourceAttributes(){
-        let attributes = {}
+        let attributes = null
         console.log("Source attributes code")
-        if(Object.keys(this.data).length > 0){
-            if(this.data.constructor.name == "Array"){
-                attributes = this.data[0].attributes
-                //TODO: get an array of all attributes
-                attributes = []
-                this.data.forEach((dataJson, i) =>
-                    attributes.push(dataJson.attributes)
-                )
-            }
-            else{
-                attributes = this.data.attributes
+        if(this.data){
+            if(Object.keys(this.data).length > 0){
+                if(this.data.constructor.name == "Array"){
+                    //attributes = this.data[0].attributes
+                    //TODO: get an array of all attributes
+                    attributes = []
+                    this.data.forEach((dataJson, i) =>
+                        attributes.push(dataJson.attributes)
+                    )
+                }
+                else{
+                    attributes = this.data.attributes
+                }
             }
         }
         return attributes
@@ -157,23 +160,26 @@ class BusinessTruthDataset {
      * @return {Object} json of field info to display
      */
     setDisplayAttributes(){
-        let attributes = {}
+        let attributes = null
         let sourceAttributes = this.sourceAttributes
-        if(Object.keys(this.data).length > 0){
-            if(this.sourceAttributes.constructor.name == "Array"){
-                attributes = []
-                this.sourceAttributes.forEach((attrJson, i) => {
-                    let current_attr = {}
-                    Object.keys(this.displayNames).forEach(k => {
-                        current_attr[k] = attrJson[this.displayNames[k]] //businessTruthData.attributes[displayNames[k]]
+        if(this.data){
+            if(Object.keys(this.data).length > 0){
+                if(this.sourceAttributes.constructor.name == "Array"){
+                    attributes = []
+                    this.sourceAttributes.forEach((attrJson, i) => {
+                        let current_attr = {}
+                        Object.keys(this.displayNames).forEach(k => {
+                            current_attr[k] = attrJson[this.displayNames[k]] //businessTruthData.attributes[displayNames[k]]
+                        })
+                        attributes.push(current_attr)
                     })
-                    attributes.push(current_attr)
-                })
-            }
-            else{
-                Object.keys(this.displayNames).forEach(k => {
-                    attributes[k] = sourceAttributes[this.displayNames[k]] //businessTruthData.attributes[displayNames[k]]
-                })
+                }
+                else{
+                    attributes = {}
+                    Object.keys(this.displayNames).forEach(k => {
+                        attributes[k] = sourceAttributes[this.displayNames[k]] //businessTruthData.attributes[displayNames[k]]
+                    })
+                }
             }
         }
         return attributes

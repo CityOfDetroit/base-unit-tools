@@ -107,11 +107,6 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
           let key = mainDatasets[i]
           let data = businessTruthData[key]
           // data exists, so don't show any dialog
-          /*
-          if(Object.keys(data).length > 0){
-            noData = false
-          }
-          */
           if (data)[
             noData = false
           ]
@@ -169,10 +164,10 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
         {clicked.type === "addresses" && businessTruthData && (
           businessTruthDisplayOrder.map((datasetName, i) => {
             let currentDataset = businessTruthData[datasetName]
-            if (currentDataset){
+            //if (currentDataset){
               let d = new BusinessTruthDataset(datasetName, currentDataset)
               return <BusinessTruthFeature key={i} dataset={d} />
-            }
+            //}
           })
           /*
           Object.keys(businessTruthData).map((datasetName, i) => {

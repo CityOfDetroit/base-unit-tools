@@ -5,7 +5,7 @@ import AnimateHeight from 'react-animate-height'
 import CopyValue from "../components/CopyValue";
 import CustomTooltip from "./CustomTooltip";
 
-const AttributeTable = ({ attributes, metadata = {}}) => {
+const AttributeTable = ({ attributes, metadata = null}) => {
   //console.log(attributes)
   //console.log(metadata)
   
@@ -42,6 +42,22 @@ const AttributeTable = ({ attributes, metadata = {}}) => {
     );
   }
 
+  function renderTableBody(){
+    console.log(attributes)
+    if(attributes){
+      return (
+        Object.keys(attributes).map((f, i) => (
+          metadata?.[f]
+          ? <CustomTooltip key={i} title={metadata[f]}>
+              <TableRow label={f} index={i} />
+            </CustomTooltip>
+          :<TableRow label={f} index={i} />
+        ))
+      )
+    }
+    return <p>No Data</p>
+  }
+
   /*
   metadata
           ? <CustomTooltip title={metadata[f]}>
@@ -52,13 +68,7 @@ const AttributeTable = ({ attributes, metadata = {}}) => {
   return (
     <table className="w-full">
       <tbody>
-        {Object.keys(attributes).map((f, i) => (
-          metadata?.[f]
-          ? <CustomTooltip key={i} title={metadata[f]}>
-              <TableRow label={f} index={i} />
-            </CustomTooltip>
-          :<TableRow label={f} index={i} />
-        ))}
+        {renderTableBody()}
       </tbody>
     </table>
   );

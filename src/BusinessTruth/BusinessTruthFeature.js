@@ -23,11 +23,39 @@ const BusinessTruthFeature = ({ dataset }) => {
   let [show, setShow] = useState(false);
 
   let [page, setPage] = useState(1);
-  let maxPageCount = Math.min(5, dataset.displayAttributes.length) // maximum number of pages to display is 5 or the array length
+  let maxPageCount = 5
+  if(dataset.displayAttributes?.length){
+    maxPageCount = Math.min(maxPageCount, dataset.displayAttributes.length)
+  }
+   // maximum number of pages to display is 5 or the array length
 
   const handlePageChange = (e, p) => {
     setPage(p);
   };
+
+  const renderTable = () => {
+    if(dataset.data){
+      if(dataset.displayAttributes?.constructor?.name == "Array"){
+        return (
+        <div>
+          <Pagination style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }} count={maxPageCount} page={page} onChange={handlePageChange} size="small" />
+          <AttributeTable attributes={dataset.displayAttributes[page-1]} metadata={dataset.displayMetadata} />
+          <Pagination style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }} count={maxPageCount} page={page} onChange={handlePageChange} size="small" />
+        </div>
+        )
+      }
+      return <AttributeTable attributes={dataset.displayAttributes} metadata={dataset.displayMetadata} />
+    }
+    return <p>No Data</p>
+  }
 
   return (
       <div>
@@ -64,14 +92,18 @@ const BusinessTruthFeature = ({ dataset }) => {
             {/*
             Stores the fields
             Need to add something to determine if displayAttributes are arrays
-            */}
-            {dataset.displayAttributes.constructor.name == "Array"
+            
+            dataset.displayAttributes.constructor.name == "Array"
             ? 
             <div>
               <AttributeTable attributes={dataset.displayAttributes[page-1]} metadata={dataset.displayMetadata} />
               <Pagination count={maxPageCount} page={page} onChange={handlePageChange} />
             </div>
             : <AttributeTable attributes={dataset.displayAttributes} metadata={dataset.displayMetadata} />
+            
+            */}
+            {
+              renderTable()
             }
           </section>
         </AnimateHeight>
