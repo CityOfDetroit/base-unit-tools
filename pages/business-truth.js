@@ -39,7 +39,7 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
     "commercial_coc",
     "restaurant_establishments"
   ]
-  //TODO: use this to display datasets. Will be important in the future when we want to implement a draggable list
+  //Use this to display datasets in the siderbar. Important for the draggable list
   let [businessTruthDisplayOrder, setBusinessTruthDisplayOrder] = useState([ 
     "business_licenses",
     "certificate_of_occupancy",
@@ -48,6 +48,8 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
     "restaurant_inspections",
     "restaurant_violations"
   ])
+  //hold the datasets displayed on the map. May need to hold a json that includes position
+  let [businessTruthDisplayMain, setBusinessTruthDisplayMain] = useState([])
 
   // check for component mount. Setting initial state to false helps prevent an unnecessary call on initial render
   const didMountRef = useRef(false);
@@ -66,6 +68,15 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
   // this stores the type and id of the currently clicked feature
   // that drives everything, so the value and setter
   // are passed to child components often to consult or use
+  /**
+   * e.g. 
+   * {
+        "type": "addresses",
+        "id": 545231
+    }
+   */
+
+  //TODO: need to trigger new search and clear businessTruthData when moving to new clicked address
   let [clicked, setClicked] = useState(initClicked);
 
   let feature = useFeature(clicked);
@@ -152,6 +163,7 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
     </>
   );
 
+  // Function to handle dragging onto list or dragging onto map
   const onDragEnd = (result, businessTruthDisplayOrder, setBusinessTruthDisplayOrder) => {
     //TODO: need a way to check if the destination is in the sidebar or map. Maybe need to use the id?
     
@@ -170,6 +182,7 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
     */
 
     // if not dragged to a destination, don't do anything
+     /*
     if(!result.destination){
       return
     }
@@ -177,6 +190,20 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
     console.log("Drag End")
     console.log(result)
 
+    if (source.droppableId != destination.droppableId){
+      let sourceOrder = null
+      if (source.droppableId == "sidebar"){
+        sourceOrder = business
+      }
+    }
+    */
+
+    // if dropping in the map section
+    if(destination.droppableId == "main"){
+
+    }
+
+    // if dropping in the sidebar
     if(destination.droppableId == "sidebar"){
       let newDisplayOrder = businessTruthDisplayOrder;
       //remove from source index
@@ -299,20 +326,33 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
           If all businessTruthDisplayOrder keys are present, and the json is all empty, display
           */}
           <SimpleDialog title={"No Results"} message={"There was no business data for this address."} open={open} onClose={handleClose}/>
-          <ExplorerMap
-            {...{
-              clicked,
-              setClicked,
-              geocoded,
-              linked,
-              feature,
-              svImage,
-              setSvImages,
-              svBearing,
-              basemap: options.basemap,
-              showSv: options.streetView,
-            }}
-          />
+          <Droppable droppableId="main">
+            {
+              (provided, snapshot) => {
+                return (
+                  <div
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                  >
+                    <ExplorerMap
+                      {...{
+                        clicked,
+                        setClicked,          
+                        geocoded,
+                        linked,
+                        feature,
+                        svImage,
+                        setSvImages,
+                        svBearing,
+                        basemap: options.basemap,
+                        showSv: options.streetView,
+                      }}
+                    />
+                  </div>
+                )
+              }
+            }
+          </Droppable>
         </main>
       </DragDropContext>
     </>

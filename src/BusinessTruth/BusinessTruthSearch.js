@@ -185,6 +185,11 @@ import useLayer from '../hooks/useLayer';
 
 // TODO: Maybe retrieve all business licenses on page load (or after entering the first letter) and calculate levenshtein distance as you're typing?
 
+// TODO: refactor into BusinessTruthSearchBar and BusinessTruthSearch
+// Need to be able to access BusinessTruthSearch from business-truth page. We want to trigger an addressId update off of a 'clicked' var change
+// This will allow us to click around the map and trigger data fetch updates
+// May also need to put all businessLicensesData, cocData, etc. vars into json
+
 const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) => {
 
   // an options object for storing if it's a business name search or address search
@@ -513,9 +518,13 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
         text='Search'
         icon={faSearch} />
     </div>
+    {
+    /*
     <div className="flex items-center justify-start text-sm md:text-base w-full bg-gray-200 p-2 md:p-3">
       <BusinessTruthSearchOptions options={options} setOptions={setOptions} />
     </div>
+    */
+    }
     </div>
   )
 }
