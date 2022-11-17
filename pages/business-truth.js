@@ -51,6 +51,26 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
   //hold the datasets displayed on the map. May need to hold a json that includes position
   let [businessTruthDisplayMain, setBusinessTruthDisplayMain] = useState([])
 
+  //
+  let [displayColumns, setDisplayColumns] = useState(
+    {
+      sidebar: {
+        items: [
+          "business_licenses",
+          "certificate_of_occupancy",
+          "commercial_coc",
+          "restaurant_establishments",
+          "restaurant_inspections",
+          "restaurant_violations"
+        ]
+      },
+      main: {
+        items: []
+      }
+    }
+  )
+
+
   // check for component mount. Setting initial state to false helps prevent an unnecessary call on initial render
   const didMountRef = useRef(false);
 
@@ -164,7 +184,7 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
   );
 
   // Function to handle dragging onto list or dragging onto map
-  const onDragEnd = (result, businessTruthDisplayOrder, setBusinessTruthDisplayOrder) => {
+  const onDragEnd = (result, columns, setColumns) => { //businessTruthDisplayOrder, setBusinessTruthDisplayOrder) => {
     //TODO: need a way to check if the destination is in the sidebar or map. Maybe need to use the id?
     
     /*
@@ -197,7 +217,7 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
       }
     }
     */
-
+    /*
     // if dropping in the map section
     if(destination.droppableId == "main"){
 
@@ -214,6 +234,50 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
 
       setBusinessTruthDisplayOrder(newDisplayOrder)
     }
+    */
+    if(!result.destination){
+      return
+    }
+    const {source, destination} = result;
+    console.log("Drag End")
+    console.log(result)
+
+    if (source.droppableId != destination.droppableId){
+      const sourceColumn = columns[source.droppableId];
+      const destColumn = columns[destination.droppableId];
+      const sourceItems = [...sourceColumn.items];
+      const destItems = [...destColumn.items];
+      const [itemToMove] = sourceItems.splice(source.index, 1);
+      destItems.splice(destination.index, 0, itemToMove);
+      setColumns(
+        {
+          ...columns,
+          [source.droppableId]: {
+            ...sourceColumn,
+            items: sourceItems
+          },
+          [destination.droppableId]: {
+            ...destColumn,
+            items: destItems
+          }
+        }
+      );
+    }
+    else{
+      const column = columns[source.droppableId];
+      const copiedItems = [...column.items];
+      const [itemToMove] = copiedItems.splice(source.index, 1);
+      copiedItems.splice(destination.index, 0, itemToMove);
+      setColumns(
+        {
+          ...columns,
+          [source.droppableId]: {
+            ...column,
+            items: copiedItems
+          }
+        }
+      );
+    }
   }
 
   return (
@@ -222,7 +286,10 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
         <ExplorerMapOptions {...{ options, setOptions, session, clicked }} />
       </AppHeader>
 
-      <DragDropContext onDragEnd={result => onDragEnd(result, businessTruthDisplayOrder, setBusinessTruthDisplayOrder)} onDropEnd={result => console.log("DragDrop result: " + result)}>
+      {
+        /** onDragEnd(result, businessTruthDisplayOrder, setBusinessTruthDisplayOrder)} */
+      }
+      <DragDropContext onDragEnd={result => onDragEnd(result, displayColumns, setDisplayColumns)} onDropEnd={result => console.log("DragDrop result: " + result)}>
         <SiteSidebar title="Explorer">
           {options.streetView && svImages.length === 0 && (
             <section className="">Loading street view imagery...</section>
@@ -243,7 +310,8 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
                     ref={provided.innerRef}
                   >
                   {
-                    businessTruthDisplayOrder.map((datasetName, i) => {
+                    //businessTruthDisplayOrder.map((datasetName, i) => {
+                    displayColumns.sidebar.items.map((datasetName, i) => {
                       let currentDataset = businessTruthData[datasetName]
                       //if (currentDataset){
                         let d = new BusinessTruthDataset(datasetName, currentDataset)
@@ -348,6 +416,32 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
                         showSv: options.streetView,
                       }}
                     />
+                    {
+                    //businessTruthDisplayOrder.map((datasetName, i) => {
+                    displayColumns.main.items.map((datasetName, i) => {
+                      let currentDataset = businessTruthData[datasetName]
+                      //if (currentDataset){
+                        let d = new BusinessTruthDataset(datasetName, currentDataset)
+                        return (
+                          <Draggable key={datasetName} draggableId={datasetName} index={i}>
+                            {
+                              (provided, snapshot) => {
+                                return(
+                                  <div
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    ref={provided.innerRef}
+                                  >
+                                    <BusinessTruthFeature key={i} dataset={d} />
+                                  </div>
+                                )
+                              }
+                            }
+                          </Draggable>
+                        )
+                      //}
+                    })
+                  }
                   </div>
                 )
               }
