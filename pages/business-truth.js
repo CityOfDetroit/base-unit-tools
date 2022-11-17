@@ -9,6 +9,7 @@ import Button from "../src/components/Button";
 import BusinessTruthDataset from "../src/BusinessTruth/BusinessTruthDataset";
 import BusinessTruthPanel from "../src/BusinessTruth/BusinessTruthPanel";
 import BusinessTruthSearch from "../src/BusinessTruth/BusinessTruthSearch";
+import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
 import IssueReporter from "../src/components/IssueReporter";
 import IssueReporterAddress from "../src/components/IssueReporterAddress";
 import MapillarySv from "../src/components/MapillarySv";
@@ -147,100 +148,169 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
     </>
   );
 
+  const onDragEnd = (result, businessTruthDisplayOrder, setBusinessTruthDisplayOrder) => {
+    //TODO: need a way to check if the destination is in the sidebar or map. Maybe need to use the id?
+    
+    /*
+    destination ex
+    {
+      "droppableId": "sidebar",
+      "index": 4
+    }
+
+    source ex
+    {
+      "index": 3,
+      "droppableId": "sidebar"
+    }
+    */
+
+    // if not dragged to a destination, don't do anything
+    if(!result.destination){
+      return
+    }
+    const {source, destination} = result;
+    console.log("Drag End")
+    console.log(result)
+
+    if(destination.droppableId == "sidebar"){
+      let newDisplayOrder = businessTruthDisplayOrder;
+      //remove from source index
+      const [itemToMove] = newDisplayOrder.splice(source.index, 1); //remove 1 element at the given index. [] syntax to extract from an array output
+
+      //insert at destination index
+      newDisplayOrder.splice(destination.index, 0, itemToMove)
+
+      setBusinessTruthDisplayOrder(newDisplayOrder)
+    }
+  }
+
   return (
     <>
       <AppHeader app={apps["business-truth"]} introduction={introduction} introOpen={false}>
         <ExplorerMapOptions {...{ options, setOptions, session, clicked }} />
       </AppHeader>
-      <SiteSidebar title="Explorer">
-        {options.streetView && svImages.length === 0 && (
-          <section className="">Loading street view imagery...</section>
-        )}
-        {options.streetView && svImages.length > 0 && (
-          <MapillarySv {...{ svImage, svImages, setSvImage, setSvBearing, feature }} />
-        )}
-       
-        {/* Query for multiple datasets from AGO, and depending on the number, display that many BusinessTruthPanels */}
-        {clicked.type === "addresses" && businessTruthData && (
-          businessTruthDisplayOrder.map((datasetName, i) => {
-            let currentDataset = businessTruthData[datasetName]
-            //if (currentDataset){
-              let d = new BusinessTruthDataset(datasetName, currentDataset)
-              return <BusinessTruthFeature key={i} dataset={d} />
-            //}
-          })
-          /*
-          Object.keys(businessTruthData).map((datasetName, i) => {
-            let d = new BusinessTruthDataset(datasetName, businessTruthData[datasetName])
-            return <BusinessTruthFeature key={i} dataset={d} />
-          })
-          */
-        )} 
-        {clicked.type === "addresses" && feature && (
-          <ExplorerAddress {...{ feature, clicked, setClicked, linked, setLinked }} />
-        )}
-        {clicked.type === "buildings" && feature && (
-          <ExplorerBuilding {...{ feature, clicked, setClicked, linked, setLinked }} />
-        )}
-        {clicked.type === "parcels" && feature && (
-          <ExplorerParcel {...{ feature, clicked, setClicked, linked, setLinked }} />
-        )}
-        {clicked.type === "streets" && feature && (
-          <ExplorerStreet {...{ feature, clicked, setClicked, linked, setLinked }} />
-        )}
 
-        {(clicked.type || (geocoded && geocoded.features.length > 0)) && (
-          <IssueReporter {...{ session, clicked, geocoded, feature }} />
-        )}
+      <DragDropContext onDragEnd={result => onDragEnd(result, businessTruthDisplayOrder, setBusinessTruthDisplayOrder)} onDropEnd={result => console.log("DragDrop result: " + result)}>
+        <SiteSidebar title="Explorer">
+          {options.streetView && svImages.length === 0 && (
+            <section className="">Loading street view imagery...</section>
+          )}
+          {options.streetView && svImages.length > 0 && (
+            <MapillarySv {...{ svImage, svImages, setSvImage, setSvBearing, feature }} />
+          )}
+        
+          {/* Query for multiple datasets from AGO, and depending on the number, display that many BusinessTruthPanels */}
+          {clicked.type === "addresses" && businessTruthData && (
+            <Droppable droppableId="sidebar">
+            {
+              /*TODO: Will I need to add a width and height for this to work?*/
+              (provided, snapshot) => {
+                return (
+                  <div
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                  >
+                  {
+                    businessTruthDisplayOrder.map((datasetName, i) => {
+                      let currentDataset = businessTruthData[datasetName]
+                      //if (currentDataset){
+                        let d = new BusinessTruthDataset(datasetName, currentDataset)
+                        return (
+                          <Draggable key={datasetName} draggableId={datasetName} index={i}>
+                            {
+                              (provided, snapshot) => {
+                                return(
+                                  <div
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    ref={provided.innerRef}
+                                  >
+                                    <BusinessTruthFeature key={i} dataset={d} />
+                                  </div>
+                                )
+                              }
+                            }
+                          </Draggable>
+                        )
+                      //}
+                    })
+                  }
+                  { /*prevent boxes from collapsing together after moving one*/
+                    provided.placeholder
+                  }
+                  </div>
+                )
+              }
+            }
+            </Droppable>
+          )} 
+          {clicked.type === "addresses" && feature && (
+            <ExplorerAddress {...{ feature, clicked, setClicked, linked, setLinked }} />
+          )}
+          {clicked.type === "buildings" && feature && (
+            <ExplorerBuilding {...{ feature, clicked, setClicked, linked, setLinked }} />
+          )}
+          {clicked.type === "parcels" && feature && (
+            <ExplorerParcel {...{ feature, clicked, setClicked, linked, setLinked }} />
+          )}
+          {clicked.type === "streets" && feature && (
+            <ExplorerStreet {...{ feature, clicked, setClicked, linked, setLinked }} />
+          )}
 
-        {geocoded && geocoded.features.length === 0 && geocoded.input && (
-          <section className="sidebar-section">
-            <p>
-              We couldn't find any addresses which matched{" "}
-              <strong className="">{geocoded.input}</strong>.
-            </p>
-            <p>If you think this address should exist, please report an issue here:</p>
-            <IssueReporterAddress
-              {...{ session, address: geocoded.input, unset: () => setGeocoded(null) }}
-            />
-          </section>
-        )}
+          {(clicked.type || (geocoded && geocoded.features.length > 0)) && (
+            <IssueReporter {...{ session, clicked, geocoded, feature }} />
+          )}
 
-        {/* Link to, uh, Linker */}
-        {feature && clicked.type === "addresses" && session && (
-          <section className="sidebar-section caution">
-            <Link href={`/linker?type=${clicked.type}&id=${clicked.id}`}>
-              <FontAwesomeIcon icon={faLink} />
-              <span className="text-semibold text-sm ml-2">Edit address links</span>
-            </Link>
-          </section>
-        )}
+          {geocoded && geocoded.features.length === 0 && geocoded.input && (
+            <section className="sidebar-section">
+              <p>
+                We couldn't find any addresses which matched{" "}
+                <strong className="">{geocoded.input}</strong>.
+              </p>
+              <p>If you think this address should exist, please report an issue here:</p>
+              <IssueReporterAddress
+                {...{ session, address: geocoded.input, unset: () => setGeocoded(null) }}
+              />
+            </section>
+          )}
 
-        <BusinessTruthSearch {...{ setClicked, setGeocoded, setBusinessTruthData }} />
+          {/* Link to, uh, Linker */}
+          {feature && clicked.type === "addresses" && session && (
+            <section className="sidebar-section caution">
+              <Link href={`/linker?type=${clicked.type}&id=${clicked.id}`}>
+                <FontAwesomeIcon icon={faLink} />
+                <span className="text-semibold text-sm ml-2">Edit address links</span>
+              </Link>
+            </section>
+          )}
 
-      </SiteSidebar>
+          <BusinessTruthSearch {...{ setClicked, setGeocoded, setBusinessTruthData }} />
 
-      {/* the main panel contains the map, and we pass it many of our useState variables */}
-      <main>
-        {/*TODO: need some sort of check for if the search if processing. e.g. pass a SetLoading
-        If all businessTruthDisplayOrder keys are present, and the json is all empty, display
-        */}
-        <SimpleDialog title={"No Results"} message={"There was no business data for this address."} open={open} onClose={handleClose}/>
-        <ExplorerMap
-          {...{
-            clicked,
-            setClicked,
-            geocoded,
-            linked,
-            feature,
-            svImage,
-            setSvImages,
-            svBearing,
-            basemap: options.basemap,
-            showSv: options.streetView,
-          }}
-        />
-      </main>
+        </SiteSidebar>
+
+        {/* the main panel contains the map, and we pass it many of our useState variables */}
+        <main>
+          {/*TODO: need some sort of check for if the search if processing. e.g. pass a SetLoading
+          If all businessTruthDisplayOrder keys are present, and the json is all empty, display
+          */}
+          <SimpleDialog title={"No Results"} message={"There was no business data for this address."} open={open} onClose={handleClose}/>
+          <ExplorerMap
+            {...{
+              clicked,
+              setClicked,
+              geocoded,
+              linked,
+              feature,
+              svImage,
+              setSvImages,
+              svBearing,
+              basemap: options.basemap,
+              showSv: options.streetView,
+            }}
+          />
+        </main>
+      </DragDropContext>
     </>
   );
 };
