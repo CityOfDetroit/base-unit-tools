@@ -297,6 +297,8 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
           {options.streetView && svImages.length > 0 && (
             <MapillarySv {...{ svImage, svImages, setSvImage, setSvBearing, feature }} />
           )}
+
+          <BusinessTruthSearch {...{ setClicked, setGeocoded, setBusinessTruthData }} />
         
           {/* Query for multiple datasets from AGO, and depending on the number, display that many BusinessTruthPanels */}
           {clicked.type === "addresses" && businessTruthData && (
@@ -383,8 +385,6 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
               </Link>
             </section>
           )}
-
-          <BusinessTruthSearch {...{ setClicked, setGeocoded, setBusinessTruthData }} />
 
         </SiteSidebar>
 
