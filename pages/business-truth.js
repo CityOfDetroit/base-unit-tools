@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState, useRef } from "react";
+import useLayer from '../src/hooks/useLayer';
 import apps from "../src/data/apps";
 import AppHeader from "../src/components/AppHeader";
 import Button from "../src/components/Button";
@@ -29,29 +30,20 @@ import ExplorerSearch from "../src/Explorer/ExplorerSearch";
 import ExplorerStreet from "../src/Explorer/ExplorerStreet";
 import BusinessTruthFeature from './../src/BusinessTruth/BusinessTruthFeature';
 import { render } from "@testing-library/react";
+import BusinessTruthSearchOptions from './../src/BusinessTruth/BusinessTruthSearchOptions';
 
 const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
   // business truth data
   let [businessTruthData, setBusinessTruthData] = useState(null);
   // datasets queried for using address id. Used to check if no data is returned
-  const mainDatasets = [ //"business_licenses",
+  const mainDatasets = [ 
+    "business_licenses",
     "certificate_of_occupancy",
     "commercial_coc",
     "restaurant_establishments"
   ]
-  //Use this to display datasets in the siderbar. Important for the draggable list
-  let [businessTruthDisplayOrder, setBusinessTruthDisplayOrder] = useState([ 
-    "business_licenses",
-    "certificate_of_occupancy",
-    "commercial_coc",
-    "restaurant_establishments",
-    "restaurant_inspections",
-    "restaurant_violations"
-  ])
-  //hold the datasets displayed on the map. May need to hold a json that includes position
-  let [businessTruthDisplayMain, setBusinessTruthDisplayMain] = useState([])
 
-  //
+  //Use this to display datasets in the sidebar/main page. Important for the draggable list
   let [displayColumns, setDisplayColumns] = useState(
     {
       sidebar: {
@@ -133,7 +125,9 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
   const [svImages, setSvImages] = useState([]);
 
   useEffect(() => {
-    
+    console.log("Business Truth")
+    console.log(businessTruthData)
+
     if (didMountRef.current){
       let businessTruthDataKeys = Object.keys(businessTruthData)
       // mainDatasets values should all be in businessTruth data. If they're not, no search has run yet.
@@ -279,6 +273,98 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
       );
     }
   }
+
+  let businessLicensesUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/BusinessLicenses/FeatureServer/0/`
+  let businessLicensesData = useLayer(
+    {
+      url: businessLicensesUrl,
+      where: `address_id = ${clicked.type=="addresses" ? clicked.id : null}`, //`address_id = ${addressId}`,
+      acceptNull: false
+    }
+  ) 
+
+  let commercialCocUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/CommercialInspections/FeatureServer/0`
+    let commercialCocData = useLayer(
+      {
+        url: commercialCocUrl,
+        where: `address_id = ${clicked.type=="addresses" ? clicked.id : null}`,
+        acceptNull: false
+      }
+    ) 
+  
+    let certificateOfOccupancyUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/CertificateOfOccupancy/FeatureServer/0`
+    let certificateOfOccupancyData = useLayer(
+      {
+        url: certificateOfOccupancyUrl,
+        where: `address_id = ${clicked.type=="addresses" ? clicked.id : null}`,
+        acceptNull: false
+      }
+    ) 
+  
+    let restaurantEstablishmentsUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/Restaurant_Establishments/FeatureServer/0`
+    let restaurantEstablishmentsData = useLayer(
+      {
+        url: restaurantEstablishmentsUrl,
+        where: `address_id = ${clicked.type=="addresses" ? clicked.id : null}`,
+        orderByFields: 'most_recent_license_date desc',
+        acceptNull: false
+      }
+    ) 
+
+  function updateBusinessTruthData(datasetName, data, multiple=false){
+    /**
+     * Used to update the businessTruthData variable
+     *
+     * @param {string}   datasetName          dataset name, e.g. business_licenses
+     * @param {Object or Array of Objects}   data        json of data (field_names: values). Can be an array of multiple json. Returned from AGO
+     * @param {boolean} multiple false: set data using one json. true: set data using an array
+     */
+    if(data){
+      console.log(datasetName)
+      console.log(data)
+
+      if(data.features.length > 0){
+        let dataToSend = null
+        if(multiple){
+          dataToSend = data.features
+        }
+        else{
+          dataToSend = data.features[0]
+        }
+        setBusinessTruthData(prevState => (
+          {
+            ...prevState,
+            [datasetName]: dataToSend // need the [] to represent "computed property name". Otherwise, the key will be "datasetName"
+          }
+        ))
+      }
+      else{
+        console.log(`No ${datasetName} data`)
+        setBusinessTruthData(prevState => (
+          {
+            ...prevState,
+            [datasetName]: null
+          }
+        ))
+      }
+    }
+  }
+
+  useEffect(() => {
+    updateBusinessTruthData("business_licenses", businessLicensesData)
+  }, [businessLicensesData])
+
+  useEffect(() => {
+    updateBusinessTruthData("commercial_coc", commercialCocData)
+  }, [commercialCocData])
+
+  useEffect(() => {
+    updateBusinessTruthData("certificate_of_occupancy", certificateOfOccupancyData)
+  }, [certificateOfOccupancyData])
+
+  useEffect(() => {
+    updateBusinessTruthData("restaurant_establishments", restaurantEstablishmentsData)
+  }, [restaurantEstablishmentsData])
 
   return (
     <>
