@@ -278,7 +278,7 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
   let businessLicensesData = useLayer(
     {
       url: businessLicensesUrl,
-      where: `address_id = ${clicked.type=="addresses" ? clicked.id : null}`, //`address_id = ${addressId}`,
+      where: `address_id = ${clicked.type == "addresses" ? clicked.id : null}`, //`address_id = ${addressId}`,
       acceptNull: false
     }
   ) 
@@ -287,29 +287,49 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
     let commercialCocData = useLayer(
       {
         url: commercialCocUrl,
-        where: `address_id = ${clicked.type=="addresses" ? clicked.id : null}`,
+        where: `address_id = ${clicked.type == "addresses" ? clicked.id : null}`,
         acceptNull: false
       }
     ) 
   
-    let certificateOfOccupancyUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/CertificateOfOccupancy/FeatureServer/0`
-    let certificateOfOccupancyData = useLayer(
-      {
-        url: certificateOfOccupancyUrl,
-        where: `address_id = ${clicked.type=="addresses" ? clicked.id : null}`,
-        acceptNull: false
-      }
-    ) 
-  
-    let restaurantEstablishmentsUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/Restaurant_Establishments/FeatureServer/0`
-    let restaurantEstablishmentsData = useLayer(
-      {
-        url: restaurantEstablishmentsUrl,
-        where: `address_id = ${clicked.type=="addresses" ? clicked.id : null}`,
-        orderByFields: 'most_recent_license_date desc',
-        acceptNull: false
-      }
-    ) 
+  let certificateOfOccupancyUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/CertificateOfOccupancy/FeatureServer/0`
+  let certificateOfOccupancyData = useLayer(
+    {
+      url: certificateOfOccupancyUrl,
+      where: `address_id = ${clicked.type == "addresses" ? clicked.id : null}`,
+      acceptNull: false
+    }
+  ) 
+
+  let restaurantEstablishmentsUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/Restaurant_Establishments/FeatureServer/0`
+  let restaurantEstablishmentsData = useLayer(
+    {
+      url: restaurantEstablishmentsUrl,
+      where: `address_id = ${clicked.type == "addresses" ? clicked.id : null}`,
+      orderByFields: 'most_recent_license_date desc',
+      acceptNull: false
+    }
+  ) 
+
+  let restaurantInspectionsUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/Restaurant_Inspections/FeatureServer/0`
+  let restaurantInspectionsData = useLayer(
+    {
+      url: restaurantInspectionsUrl,
+      where: `establishment_id = ${clicked.establishment_id ? clicked.establishment_id : null}`,
+      orderByFields: 'inspection_date desc',
+      acceptNull: false
+    }
+  ) 
+
+  let restaurantViolationsUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/Violations_Cited_per_Restaurant_Inspection/FeatureServer/0`
+  let restaurantViolationsData = useLayer(
+    {
+      url: restaurantViolationsUrl,
+      where: `establishment_id = ${clicked.establishment_id ? clicked.establishment_id : null}`,
+      orderByFields: 'inspection_date desc',
+      acceptNull: false
+    }
+  ) 
 
   function updateBusinessTruthData(datasetName, data, multiple=false){
     /**
@@ -337,6 +357,16 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
             [datasetName]: dataToSend // need the [] to represent "computed property name". Otherwise, the key will be "datasetName"
           }
         ))
+
+        // if restaurant_establishments, also set the establishment id
+        if(datasetName == "restaurant_establishments"){
+          setClicked(prevState => (
+            {
+              ...prevState,
+              "establishment_id": dataToSend.attributes.establishment_id 
+            }
+          ))
+        }
       }
       else{
         console.log(`No ${datasetName} data`)
@@ -365,6 +395,14 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
   useEffect(() => {
     updateBusinessTruthData("restaurant_establishments", restaurantEstablishmentsData)
   }, [restaurantEstablishmentsData])
+
+  useEffect(() => {
+    updateBusinessTruthData("restaurant_inspections", restaurantInspectionsData)
+  }, [restaurantInspectionsData])
+
+  useEffect(() => {
+    updateBusinessTruthData("restaurant_violations", restaurantViolationsData, true)
+  }, [restaurantViolationsData])
 
   return (
     <>
