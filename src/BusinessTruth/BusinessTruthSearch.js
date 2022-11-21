@@ -239,7 +239,6 @@ const BusinessTruthSearch = ({ setClicked, setGeocoded, setBusinessTruthData }) 
       setAddressId(firstResult.properties.address_id)
       
     }
-    //TODO: add setAddressId here?
     else if (firstResult && ['StreetAddress', 'StreetInt'].indexOf(firstResult.properties.Addr_type) > -1) {
       setClicked({})
       setGeocoded(featureCollection)
