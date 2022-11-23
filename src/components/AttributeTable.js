@@ -6,8 +6,6 @@ import CopyValue from "../components/CopyValue";
 import CustomTooltip from "./CustomTooltip";
 
 const AttributeTable = ({ attributes, metadata = null}) => {
-  //console.log(attributes)
-  //console.log(metadata)
   
   const TableRow = ({label, index}) => {   
     //console.log(metadata?.[label])
@@ -43,7 +41,6 @@ const AttributeTable = ({ attributes, metadata = null}) => {
   }
 
   function renderTableBody(){
-    console.log(attributes)
     if(attributes){
       return (
         Object.keys(attributes).map((f, i) => (
