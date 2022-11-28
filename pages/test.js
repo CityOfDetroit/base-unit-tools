@@ -1,7 +1,3 @@
-/**
- * Business Truth Page
- */
-
 import { faArrowAltCircleRight, faLink, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
@@ -14,7 +10,6 @@ import Button from "../src/components/Button";
 import BusinessTruthDataset from "../src/BusinessTruth/BusinessTruthDataset";
 import BusinessTruthPanel from "../src/BusinessTruth/BusinessTruthPanel";
 import BusinessTruthRestaurant from "../src/BusinessTruth/BusinessTruthRestaurant";
-import BusinessTruthRestaurantInspection from "../src/BusinessTruth/BusinessTruthRestaurantInspection";
 import BusinessTruthSearch from "../src/BusinessTruth/BusinessTruthSearch";
 import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
 import IssueReporter from "../src/components/IssueReporter";
@@ -30,30 +25,16 @@ import ExplorerMapOptions from "../src/Explorer/ExplorerMapOptions";
 import ExplorerParcel from "../src/Explorer/ExplorerParcel";
 import ExplorerSearch from "../src/Explorer/ExplorerSearch";
 import ExplorerStreet from "../src/Explorer/ExplorerStreet";
-import BusinessTruthFeature from './../src/BusinessTruth/BusinessTruthFeature';
+import BusinessTruthFeature from '../src/BusinessTruth/BusinessTruthFeature';
 import { render } from "@testing-library/react";
-import BusinessTruthSearchOptions from './../src/BusinessTruth/BusinessTruthSearchOptions';
+import BusinessTruthSearchOptions from '../src/BusinessTruth/BusinessTruthSearchOptions';
 
-const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
-  // business truth data
-  let [businessTruthData, setBusinessTruthData] = useState(null);
-  // datasets queried for using address id. Used to check if no data is returned
-  const mainDatasets = [ 
-    "business_licenses",
-    "certificate_of_occupancy",
-    "commercial_coc",
-    "restaurant_establishments"
-  ]
-
-  // variable similar to "clicked", which holds the current displayed restaurant data (establishments, inspections, or violations)
-  //TODO: need to reset this on each search
-  let initRestaurant = {type: "restaurant_establishments"}//, id: null}
-  let [activeRestaurantDataset, setActiveRestaurantDataset] = useState(initRestaurant);
+const Test = ({ session, setSession, login, setLogin, currentApp }) => {
 
   //Use this to display datasets in the sidebar/main page. Important for the draggable list
   let [displayColumns, setDisplayColumns] = useState(
     {
-      sidebar: { 
+      sidebar: {
         items: [
           "business_licenses",
           "certificate_of_occupancy",
@@ -129,14 +110,6 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
   const [svBearing, setSvBearing] = useState(null);
   const [svImage, setSvImage] = useState(null);
   const [svImages, setSvImages] = useState([]);
-
-  useEffect(() => {
-    console.log(clicked)
-    
-    // if 'clicked' changes, this means that the current address has changed
-    // thus, we need to clear the activeRestaurantDataset to the default
-    setActiveRestaurantDataset(initRestaurant)
-  }, [clicked])
 
   useEffect(() => {
     console.log("Business Truth")
@@ -288,136 +261,6 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
     }
   }
 
-  let businessLicensesUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/BusinessLicenses/FeatureServer/0/`
-  let businessLicensesData = useLayer(
-    {
-      url: businessLicensesUrl,
-      where: `address_id = ${clicked.type == "addresses" ? clicked.id : null}`, //`address_id = ${addressId}`,
-      acceptNull: false
-    }
-  ) 
-
-  let commercialCocUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/CommercialInspections/FeatureServer/0`
-    let commercialCocData = useLayer(
-      {
-        url: commercialCocUrl,
-        where: `address_id = ${clicked.type == "addresses" ? clicked.id : null}`,
-        acceptNull: false
-      }
-    ) 
-  
-  let certificateOfOccupancyUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/CertificateOfOccupancy/FeatureServer/0`
-  let certificateOfOccupancyData = useLayer(
-    {
-      url: certificateOfOccupancyUrl,
-      where: `address_id = ${clicked.type == "addresses" ? clicked.id : null}`,
-      acceptNull: false
-    }
-  ) 
-
-  let restaurantEstablishmentsUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/Restaurant_Establishments/FeatureServer/0`
-  let restaurantEstablishmentsData = useLayer(
-    {
-      url: restaurantEstablishmentsUrl,
-      where: `address_id = ${clicked.type == "addresses" ? clicked.id : null}`,
-      orderByFields: 'most_recent_license_date desc',
-      acceptNull: false
-    }
-  ) 
-
-  let restaurantInspectionsUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/Restaurant_Inspections/FeatureServer/0`
-  let restaurantInspectionsData = useLayer(
-    {
-      url: restaurantInspectionsUrl,
-      where: `establishment_id = ${clicked.establishment_id ? clicked.establishment_id : null}`,
-      orderByFields: 'inspection_date desc',
-      acceptNull: false
-    }
-  ) 
-
-  let restaurantViolationsUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/Violations_Cited_per_Restaurant_Inspection/FeatureServer/0`
-  let restaurantViolationsData = useLayer(
-    {
-      url: restaurantViolationsUrl,
-      where: `establishment_id = ${clicked.establishment_id ? clicked.establishment_id : null}`,
-      orderByFields: 'inspection_date desc',
-      acceptNull: false
-    }
-  ) 
-
-  function updateBusinessTruthData(datasetName, data, multiple=false){
-    /**
-     * Used to update the businessTruthData variable
-     *
-     * @param {string}   datasetName          dataset name, e.g. business_licenses
-     * @param {Object or Array of Objects}   data        json of data (field_names: values). Can be an array of multiple json. Returned from AGO
-     * @param {boolean} multiple false: set data using one json. true: set data using an array
-     */
-    if(data){
-      console.log(datasetName)
-      console.log(data)
-
-      if(data.features.length > 0){
-        let dataToSend = null
-        if(multiple){
-          dataToSend = data.features
-        }
-        else{
-          dataToSend = data.features[0]
-        }
-        setBusinessTruthData(prevState => (
-          {
-            ...prevState,
-            [datasetName]: dataToSend // need the [] to represent "computed property name". Otherwise, the key will be "datasetName"
-          }
-        ))
-
-        // if restaurant_establishments, also set the establishment id
-        if(datasetName == "restaurant_establishments"){
-          setClicked(prevState => (
-            {
-              ...prevState,
-              "establishment_id": dataToSend.attributes.establishment_id 
-            }
-          ))
-        }
-      }
-      else{
-        console.log(`No ${datasetName} data`)
-        setBusinessTruthData(prevState => (
-          {
-            ...prevState,
-            [datasetName]: null
-          }
-        ))
-      }
-    }
-  }
-
-  useEffect(() => {
-    updateBusinessTruthData("business_licenses", businessLicensesData)
-  }, [businessLicensesData])
-
-  useEffect(() => {
-    updateBusinessTruthData("commercial_coc", commercialCocData)
-  }, [commercialCocData])
-
-  useEffect(() => {
-    updateBusinessTruthData("certificate_of_occupancy", certificateOfOccupancyData)
-  }, [certificateOfOccupancyData])
-
-  useEffect(() => {
-    updateBusinessTruthData("restaurant_establishments", restaurantEstablishmentsData)
-  }, [restaurantEstablishmentsData])
-
-  useEffect(() => {
-    updateBusinessTruthData("restaurant_inspections", restaurantInspectionsData)
-  }, [restaurantInspectionsData])
-
-  useEffect(() => {
-    updateBusinessTruthData("restaurant_violations", restaurantViolationsData, true)
-  }, [restaurantViolationsData])
-
   function renderDroppables(id){
     return (
       <Droppable droppableId={id}>
@@ -476,39 +319,6 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
     )
   }
 
-  function renderBusinessTruthRestaurants(i, dataset){
-    if(activeRestaurantDataset.type == "restaurant_establishments"){
-      let inspectionData = new BusinessTruthDataset("restaurant_inspections", businessTruthData["restaurant_inspections"])
-      let violationData = new BusinessTruthDataset("restaurant_violations", businessTruthData["restaurant_violations"])
-      return <BusinessTruthRestaurant key={i} dataset={dataset} inspectionData={inspectionData} handleInspectionChange={() => setActiveRestaurantDataset({type: "restaurant_inspections"})} />
-    }
-    else{
-      console.log(activeRestaurantDataset.type)
-      return <p>test establishment does not display</p>
-    }
-  }
-
-  function renderBusinessTruthRestaurantInspections(i, dataset){
-    if(activeRestaurantDataset.type == "restaurant_inspections"){
-      let establishmentData = new BusinessTruthDataset("restaurant_establishments", businessTruthData["restaurant_establishments"])
-      return <BusinessTruthRestaurantInspection key={i} dataset={dataset} establishmentData={establishmentData} activeRestaurantDataset={activeRestaurantDataset} setActiveRestaurantDataset={() => setActiveRestaurantDataset({type: "restaurant_establishments"})} />
-    }
-    else{
-      console.log(activeRestaurantDataset.type)
-      return <p>test inspection does not display</p>
-    }
-  }
-
-  function renderBusinessTruthEstablishments(i, dataset){
-    if(activeRestaurantDataset.type == "restaurant_establishments"){
-      let inspectionData = new BusinessTruthDataset("restaurant_inspections", businessTruthData["restaurant_inspections"])
-      return <BusinessTruthRestaurant key={i} dataset={dataset} inspectionData={inspectionData} activeRestaurantDataset={activeRestaurantDataset} setActiveRestaurantDataset={() => setActiveRestaurantDataset({type: "restaurant_inspections"})} />
-    }else{
-      console.log(activeRestaurantDataset.type)
-      return <p>test</p>
-    }
-  }
-
   return (
     <>
       <AppHeader app={apps["business-truth"]} introduction={introduction} introOpen={false}>
@@ -553,23 +363,20 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
                                       ref={provided.innerRef}
                                     >
                                       {
-                                        renderBusinessTruthRestaurants(i, d)
+                                        
                                       }
                                     </div>
                                   ) 
-                                }
-                                else if(datasetName == "restaurant_inspections"){
-                                  return(
-                                    <div
-                                      {...provided.draggableProps}
-                                      {...provided.dragHandleProps}
-                                      ref={provided.innerRef}
-                                    >
-                                      {
-                                        renderBusinessTruthRestaurantInspections(i, d)
-                                      }
-                                    </div>
-                                  ) 
+
+                                  if(activeRestaurantDataset.type == "restaurant_establishments"){
+                                    let inspectionData = new BusinessTruthDataset("restaurant_inspections", businessTruthData["restaurant_inspections"])
+                                    return <BusinessTruthRestaurant key={i} dataset={d} inspectionData={inspectionData} activeRestaurantDataset={activeRestaurantDataset} setActiveRestaurantDataset={setActiveRestaurantDataset} />
+                                    
+                                  
+                                  }else{
+                                    console.log(activeRestaurantDataset.type)
+                                    return <p>test</p>
+                                  }
                                 }
                                 else{
                                   return(
@@ -701,4 +508,4 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
   );
 };
 
-export default BusinessPage;
+export default Test;
