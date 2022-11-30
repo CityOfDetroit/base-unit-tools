@@ -1,7 +1,9 @@
 const businessLicenseMetadata = require('../data/metadata/BSEED_business_licenses_metadata.json');
+const certificateOfOccupancyMetadata = require('../data/metadata/BSEED_certificate_of_occupancy_metadata.json');
 
 let datasets = {
-    "business_licenses": businessLicenseMetadata
+    "business_licenses": businessLicenseMetadata,
+    "certificate_of_occupancy": certificateOfOccupancyMetadata
 }
 
 //TODO: refactor so datasetKey is passed to constructor

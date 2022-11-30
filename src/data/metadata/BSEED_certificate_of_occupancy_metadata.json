@@ -1,0 +1,86 @@
+{
+  "@context": "http://schema.org",
+  "type": "Dataset",
+  "name": "Certificates of Occupancy",
+  "creator": [
+    {
+      "type": "Person",
+      "id": null,
+      "email": null,
+      "affiliation": "City of Detroit",
+      "name": "Buildings, Safety Engineering, and Environmental Department (BSEED)"
+    }
+  ],
+  "description": "A Certificate of Occupancy (C of O) is the permission to occupy a building or space based on approved permits. The application is submitted to BSEED along with all permits associated with the project. The building permit applicant or licensed professional would apply for the C of O, not necessarily the property owner. The purpose of tracking this information is to verify that the completed project has been approved for occupancy.",
+  "datePublished": "2021-11-24",
+  "keywords": ["bseed", "certificate", "occupancy", "property", "permits"],
+  "funder": null,
+  "temporalCoverage": "2019-01-02/NA",
+  "license": null,
+  "spatialCoverage": {
+    "type": "Place",
+    "name": "Detroit, MI",
+    "geo": {
+      "type": "GeoShape",
+      "box": "42.4498 -82.9158 42.2847 -83.2812"
+    }
+  },
+  "variableMeasured": [
+    {
+      "type": "PropertyValue",
+      "unitText": null,
+      "name": "record_id",
+      "description": "BSEED unique identifier"
+    },
+    {
+      "type": "PropertyValue",
+      "unitText": null,
+      "name": "description",
+      "description": "Scope of work detailed on permit."
+    },
+    {
+      "type": "PropertyValue",
+      "unitText": null,
+      "name": "date_status",
+      "description": "Date Certificate of Occupancy issued."
+    },
+    {
+      "type": "PropertyValue",
+      "unitText": null,
+      "name": "parcel_id",
+      "description": "Unique number used to track the parcel of land the business is located on. Parcel IDs are assigned by the Office of the Assessor."
+    },
+    {
+      "type": "PropertyValue",
+      "unitText": null,
+      "name": "address_id",
+      "description": "Unique numeric identifier assigned to the address in City of Detroit Base Units database"
+    },
+    {
+      "type": "PropertyValue",
+      "unitText": null,
+      "name": "street_num",
+      "description": "Street number of the property address where either the business is located or another location where the business owner conducts business."
+    },
+    {
+      "type": "PropertyValue",
+      "unitText": null,
+      "name": "street_dir",
+      "description": "Street direction of the property address where either the business is located or another location where the business owner conducts business."
+    },
+    {
+      "type": "PropertyValue",
+      "unitText": null,
+      "name": "street_name",
+      "description": "Street name of the property address where either the business is located or another location where the business owner conducts business."
+    }
+  ],
+  "distribution": [
+    {
+      "type": "DataDownload",
+      "name": "Certificates of Occupancy",
+      "contentUrl": "https://data.detroitmi.gov/datasets/detroitmi::certificateofoccupancy/",
+      "encodingFormat": null
+    }
+  ]
+}

@@ -72,7 +72,7 @@ const businessTruthTypes = {
     "label": "Restaurant Inspection",
     "id_column": "address_id",
     "text_color": "#555",
-    "color": "rgb(46, 117, 187)"
+    "color": "rgb(191, 144, 0)" //"rgb(46, 117, 187)"
   },
   "restaurant_violations": {
     "name": "restaurant_violations",
@@ -80,7 +80,7 @@ const businessTruthTypes = {
     "label": "Restaurant Health Code Violation",
     "id_column": "address_id",
     "text_color": "#555",
-    "color": "rgb(91, 155, 213)"
+    "color": "rgb(191, 144, 0)" //"rgb(91, 155, 213)"
   },
   "procurement_agreements": {
     "name": "procurement_agreements",

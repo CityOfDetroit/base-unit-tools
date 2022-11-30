@@ -6,7 +6,7 @@ import businessTruthTypes from '../data/businessTruthTypes';
 import BusinessTruthFeature from './BusinessTruthFeature';
 import IdBadge from '../Explorer/IdBadge';
 
-const BusinessTruthRestaurant = ({ dataset, inspectionData, handleInspectionChange, violationData, handleViolationChange}) => {
+const BusinessTruthRestaurantViolation = ({ dataset, establishmentData, handleEstablishmentChange, inspectionData, handleInspectionChange}) => {
 
   useEffect(() => {
     if (dataset) {
@@ -27,7 +27,7 @@ const BusinessTruthRestaurant = ({ dataset, inspectionData, handleInspectionChan
     }
   }, [dataset])
 
-  const renderLinkedDataset = (linkedDataset, idKey, name) => {
+  const renderLinkedDataset = (linkedDataset, idKey, name, onClick) => {
     if(linkedDataset.data){
       // if an array of data was passed in
       if(linkedDataset.displayAttributes?.constructor?.name == "Array"){
@@ -70,7 +70,7 @@ const BusinessTruthRestaurant = ({ dataset, inspectionData, handleInspectionChan
             <section className='sidebar-section' style={{ borderLeft: `8px solid ${dataset.style.color}` }}>
               <div className="flex items-center justify-between" >
                 <h2 className="text-sm md:text-base">linked to {name}:</h2>
-                <IdBadge layer={businessTruthTypes["restaurant_establishments"]} id={linkedDataset.sourceAttributes?.[idKey]} setClicked={handleInspectionChange} link />
+                <IdBadge layer={businessTruthTypes["restaurant_establishments"]} id={linkedDataset.sourceAttributes?.[idKey]} setClicked={onClick} link />
               </div>
             </section> 
           )
@@ -97,16 +97,16 @@ const BusinessTruthRestaurant = ({ dataset, inspectionData, handleInspectionChan
     <>
       <BusinessTruthFeature dataset={dataset} />
       {
+        
+        renderLinkedDataset(establishmentData, "Establishment_ID", "establishment", handleEstablishmentChange)
+        
+      }
+      {
         /**
          * display associated inspections
          * inspectionData.sourceAttributes?.Inspection_ID && ?
          */
-        renderLinkedDataset(inspectionData, "Inspection_ID", "inspection")
-      }
-      {
-        
-        renderLinkedDataset(violationData, "Establishment_ID", "violation")
-        
+        renderLinkedDataset(inspectionData, "Inspection_ID", "inspection", handleInspectionChange)
       }
       {
         /*
@@ -148,4 +148,4 @@ const BusinessTruthRestaurant = ({ dataset, inspectionData, handleInspectionChan
   )
 }
 
-export default BusinessTruthRestaurant;
+export default BusinessTruthRestaurantViolation;

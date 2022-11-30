@@ -15,6 +15,7 @@ import BusinessTruthDataset from "../src/BusinessTruth/BusinessTruthDataset";
 import BusinessTruthPanel from "../src/BusinessTruth/BusinessTruthPanel";
 import BusinessTruthRestaurant from "../src/BusinessTruth/BusinessTruthRestaurant";
 import BusinessTruthRestaurantInspection from "../src/BusinessTruth/BusinessTruthRestaurantInspection";
+import BusinessTruthRestaurantViolation from "../src/BusinessTruth/BusinessTruthRestaurantViolation";
 import BusinessTruthSearch from "../src/BusinessTruth/BusinessTruthSearch";
 import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
 import IssueReporter from "../src/components/IssueReporter";
@@ -480,7 +481,14 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
     if(activeRestaurantDataset.type == "restaurant_establishments"){
       let inspectionData = new BusinessTruthDataset("restaurant_inspections", businessTruthData["restaurant_inspections"])
       let violationData = new BusinessTruthDataset("restaurant_violations", businessTruthData["restaurant_violations"])
-      return <BusinessTruthRestaurant key={i} dataset={dataset} inspectionData={inspectionData} handleInspectionChange={() => setActiveRestaurantDataset({type: "restaurant_inspections"})} />
+      return <BusinessTruthRestaurant 
+        key={i} 
+        dataset={dataset} 
+        inspectionData={inspectionData} 
+        handleInspectionChange={() => setActiveRestaurantDataset({type: "restaurant_inspections"})} 
+        violationData={violationData}
+        handleViolationChange={() => setActiveRestaurantDataset({type: "restaurant_violations"})} 
+        />
     }
     else{
       console.log(activeRestaurantDataset.type)
@@ -499,6 +507,28 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
     }
   }
 
+  function renderBusinessTruthRestaurantViolations(i, dataset){
+    //TODO: if we came here from inspections, filter so only ones w/ correc id appear
+
+    if(activeRestaurantDataset.type == "restaurant_violations"){
+      let establishmentData = new BusinessTruthDataset("restaurant_establishments", businessTruthData["restaurant_establishments"])
+      let inspectionData = new BusinessTruthDataset("restaurant_inspections", businessTruthData["restaurant_inspections"])
+      return <BusinessTruthRestaurantViolation 
+        key={i} 
+        dataset={dataset}
+        establishmentData={establishmentData}
+        handleEstablishmentChange={() => setActiveRestaurantDataset({type: "restaurant_establishments"})}  
+        inspectionData={inspectionData} 
+        handleInspectionChange={() => setActiveRestaurantDataset({type: "restaurant_inspections"})} 
+        />
+    }
+    else{
+      console.log(activeRestaurantDataset.type)
+      return <p>test viol does not display</p>
+    }
+  }
+
+  /*
   function renderBusinessTruthEstablishments(i, dataset){
     if(activeRestaurantDataset.type == "restaurant_establishments"){
       let inspectionData = new BusinessTruthDataset("restaurant_inspections", businessTruthData["restaurant_inspections"])
@@ -508,6 +538,7 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
       return <p>test</p>
     }
   }
+  */
 
   return (
     <>
@@ -567,6 +598,19 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
                                     >
                                       {
                                         renderBusinessTruthRestaurantInspections(i, d)
+                                      }
+                                    </div>
+                                  ) 
+                                }
+                                else if(datasetName == "restaurant_violations"){
+                                  return(
+                                    <div
+                                      {...provided.draggableProps}
+                                      {...provided.dragHandleProps}
+                                      ref={provided.innerRef}
+                                    >
+                                      {
+                                        renderBusinessTruthRestaurantViolations(i, d)
                                       }
                                     </div>
                                   ) 
