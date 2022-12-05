@@ -1,4 +1,3 @@
-
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect } from 'react';
@@ -6,7 +5,128 @@ import businessTruthTypes from '../data/businessTruthTypes';
 import BusinessTruthFeature from './BusinessTruthFeature';
 import IdBadge from '../Explorer/IdBadge';
 
-const BusinessTruthRestaurant = ({ dataset, inspectionData, handleInspectionChange, violationData, handleViolationChange}) => {
+const BusinessTruthRestaurant = ({ establishmentData, inspectionData, violationData, activeRestaurantDataset, setActiveRestaurantDataset }) => {
+
+  const renderLinkedEstablishments = (previous_type) => {
+    if(establishmentData.sourceAttributes?.establishment_id){
+      return (
+        <section className='sidebar-section' style={{ borderLeft: `8px solid ${establishmentData.style.color}` }}>
+          <div className="flex items-center justify-between" >
+            <h2 className="text-sm md:text-base">linked to establishment:</h2>
+              <IdBadge 
+                layer={businessTruthTypes["restaurant_establishments"]} 
+                id={establishmentData.sourceAttributes?.establishment_id} 
+                setClicked={() => {
+                  setActiveRestaurantDataset({
+                    type: 'restaurant_establishments',
+                    filter_id: establishmentData.sourceAttributes?.establishment_id,
+                    previous_type: [previous_type]
+                  })
+                }} 
+                link 
+              />
+            </div>
+        </section> 
+      )
+    }
+    else{
+      return <></>
+    }
+  }
+
+  const renderLinkedInspections = (previous_type) => {
+    if(inspectionData.sourceAttributes?.Inspection_ID){
+      return (
+        <section className='sidebar-section' style={{ borderLeft: `8px solid ${establishmentData.style.color}` }}>
+          <div className="flex items-center justify-between" >
+            <h2 className="text-sm md:text-base">linked to inspection:</h2>
+              <IdBadge 
+                layer={businessTruthTypes["restaurant_establishments"]} 
+                id={inspectionData.sourceAttributes?.Inspection_ID} 
+                setClicked={() => {
+                  setActiveRestaurantDataset({
+                    type: 'restaurant_inspections',
+                    filter_id: inspectionData.sourceAttributes?.Inspection_ID,
+                    previous_type: [previous_type]
+                  })
+                }} 
+                link 
+              />
+            </div>
+        </section> 
+      )
+    }
+    else{
+      return <></>
+    }
+  }
+
+  // need to pass infilter_id to switch between filtering violations by establishments or inspecitons
+  const renderLinkedViolations = (previous_type) => {
+    if(violationData.length > 0){
+      return (
+        <section className='sidebar-section' style={{ borderLeft: `8px solid ${establishmentData.style.color}` }}>
+          <div className="flex items-center justify-between" >
+            <h2 className="text-sm md:text-base">linked to violations:</h2>
+              <IdBadge 
+                layer={businessTruthTypes["restaurant_establishments"]} 
+                id="Violations" 
+                setClicked={() => {
+                  setActiveRestaurantDataset({
+                    type: 'restaurant_violations',
+                    filter_id: establishmentData.sourceAttributes?.Establishment_ID,
+                    previous_type: [previous_type]
+                  })
+                }} 
+                link 
+              />
+            </div>
+        </section> 
+      )
+    }
+    else{
+      return <></>
+    }
+  }
+
+  const render = () => {
+    if(activeRestaurantDataset.type == "restaurant_establishments"){
+      // display linked inspections
+      return(
+        <div>
+          <BusinessTruthFeature dataset={establishmentData}>
+
+          </BusinessTruthFeature>
+          {renderLinkedInspections("restaurant_establishments")}
+          {renderLinkedViolations("restaurant_establishments")}
+        </div>
+      )
+    }
+    else if(activeRestaurantDataset.type == "restaurant_inspections"){
+      return(
+        <div>
+          <BusinessTruthFeature dataset={inspectionData}>
+
+          </BusinessTruthFeature>
+          {renderLinkedEstablishments("restaurant_inspections")}
+          {renderLinkedViolations("restaurant_inspections")}
+        </div>
+      )
+    }
+  }
+
+  return (
+    <div>
+      {
+        render()
+      }
+    </div>
+  )
+}
+
+export default BusinessTruthRestaurant;
+
+const BusinessTruthRestaurantOld = ({ dataset, inspectionData, handleInspectionChange, violationData, handleViolationChange}) => {
 
   useEffect(() => {
     if (dataset) {
@@ -148,4 +268,4 @@ const BusinessTruthRestaurant = ({ dataset, inspectionData, handleInspectionChan
   )
 }
 
-export default BusinessTruthRestaurant;
+//export default BusinessTruthRestaurantOld;

@@ -15,7 +15,7 @@ import BusinessTruthMetadata from "./BusinessTruthMetadata";
 import Pagination from '@mui/material/Pagination';
 
 //const BusinessTruthFeature = ({ attr, attributes, longAttributes = {}, datasetType = null, metadata = null, fieldMetadata = null}) => {
-const BusinessTruthFeature = ({ dataset }) => {
+const BusinessTruthFeature = ({ dataset, maxPageCount = 5 }) => {
   // let hasSource = Object.keys(attr).indexOf('geo_source') > -1
 
   let style = dataset.style;
@@ -25,7 +25,6 @@ const BusinessTruthFeature = ({ dataset }) => {
   let [show, setShow] = useState(false);
 
   let [page, setPage] = useState(1);
-  let maxPageCount = 5
   if(dataset.displayAttributes?.length){
     maxPageCount = Math.min(maxPageCount, dataset.displayAttributes.length)
   }

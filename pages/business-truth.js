@@ -47,8 +47,17 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
   ]
 
   // variable similar to "clicked", which holds the current displayed restaurant data (establishments, inspections, or violations)
+  /**
+   * type: key for restaurant dataset name
+   * id: establishment_id, or inspection_id
+   * previous_type: key for the restaurant dataset name you transitioned from 
+   */
   //TODO: need to reset this on each search
-  let initRestaurant = {type: "restaurant_establishments"}//, id: null}
+  let initRestaurant = {
+    type: "restaurant_establishments",
+    id: null,
+    previous_type: null
+  }
   let [activeRestaurantDataset, setActiveRestaurantDataset] = useState(initRestaurant);
 
   //Use this to display datasets in the sidebar/main page. Important for the draggable list
@@ -60,8 +69,8 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
           "certificate_of_occupancy",
           "commercial_coc",
           "restaurant_establishments",
-          "restaurant_inspections",
-          "restaurant_violations"
+          //"restaurant_inspections",
+          //"restaurant_violations"
         ]
       },
       main: {
@@ -136,7 +145,7 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
     
     // if 'clicked' changes, this means that the current address has changed
     // thus, we need to clear the activeRestaurantDataset to the default
-    setActiveRestaurantDataset(initRestaurant)
+    //setActiveRestaurantDataset(initRestaurant)
   }, [clicked])
 
   useEffect(() => {
@@ -289,6 +298,7 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
     }
   }
 
+  // TODO: change condition to (clicked.type == "address" && clicked.id != null), rather than having "acceptNull" 
   let businessLicensesUrl = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/BusinessLicenses/FeatureServer/0/`
   let businessLicensesData = useLayer(
     {
@@ -478,9 +488,31 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
   }
 
   function renderBusinessTruthRestaurants(i, dataset){
+    let inspectionData = new BusinessTruthDataset("restaurant_inspections", businessTruthData["restaurant_inspections"])
+    let violationData = new BusinessTruthDataset("restaurant_violations", businessTruthData["restaurant_violations"])
+    /*
+    return <BusinessTruthRestaurant 
+      key={i} 
+      dataset={dataset} 
+      inspectionData={inspectionData} 
+      handleInspectionChange={() => setActiveRestaurantDataset({type: "restaurant_inspections"})} 
+      violationData={violationData}
+      handleViolationChange={() => setActiveRestaurantDataset({type: "restaurant_violations"})} 
+      />
+      */
+      return <BusinessTruthRestaurant
+      key={i}
+      establishmentData={dataset}
+      inspectionData={inspectionData} 
+      violationData={violationData} 
+      activeRestaurantDataset={activeRestaurantDataset}
+      setActiveRestaurantDataset={setActiveRestaurantDataset}
+      />
+
     if(activeRestaurantDataset.type == "restaurant_establishments"){
       let inspectionData = new BusinessTruthDataset("restaurant_inspections", businessTruthData["restaurant_inspections"])
       let violationData = new BusinessTruthDataset("restaurant_violations", businessTruthData["restaurant_violations"])
+      /*
       return <BusinessTruthRestaurant 
         key={i} 
         dataset={dataset} 
@@ -489,6 +521,15 @@ const BusinessPage = ({ session, setSession, login, setLogin, currentApp }) => {
         violationData={violationData}
         handleViolationChange={() => setActiveRestaurantDataset({type: "restaurant_violations"})} 
         />
+        */
+       return <BusinessTruthRestaurant
+        key={i}
+        establishmentData={dataset}
+        inspectionData={inspectionData} 
+        violationData={violationData} 
+        activeRestaurantDataset={activeRestaurantDataset}
+        setActiveRestaurantDataset={setActiveRestaurantDataset}
+       />
     }
     else{
       console.log(activeRestaurantDataset.type)
