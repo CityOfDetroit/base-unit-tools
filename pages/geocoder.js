@@ -36,7 +36,7 @@ const fetchResults = (addresses, setResults) => {
 
     allParams.push({
       addresses: chunk,
-      endpoint: geocoders.prod,
+      endpoint: geocoders.dev,
       params: {
         outSR: 4326,
         outFields: "*",
