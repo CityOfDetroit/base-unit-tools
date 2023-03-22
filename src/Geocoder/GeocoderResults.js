@@ -156,10 +156,20 @@ const GeocoderResults = ({
   );
 
   //
-  let dataForCsvExport = rows.map((row, idx) => {
+  let dataForExcelExport = rows.map((row, idx) => {
     let newRow = { ...row.values };
     if (newRow.parcel_id) {
       newRow.parcel_id = `=""${newRow.parcel_id}""`;
+    }
+    if (csv) {
+      newRow = { ...csv[idx], ...newRow };
+    }
+    return newRow;
+  });
+  let dataForCsvExport = rows.map((row, idx) => {
+    let newRow = { ...row.values };
+    if (newRow.parcel_id) {
+      newRow.parcel_id = `${newRow.parcel_id}`;
     }
     if (csv) {
       newRow = { ...csv[idx], ...newRow };
@@ -186,9 +196,16 @@ const GeocoderResults = ({
           </p>
         </div>
 
-        <div>
-          {/* <h3>Export data</h3>
-          <span>{dataForCsvExport.length} rows in export</span> */}
+        <div className="flex gap-2">
+          <CSVLink data={dataForExcelExport} filename={`geocode_results_${new Date().getTime()}.csv`}>
+            <Button
+              active={results.length > 0}
+              disabled={results.length === 0}
+              icon={faDownload}
+              small
+              text={`Download for Excel`}
+            />
+          </CSVLink>
           <CSVLink data={dataForCsvExport} filename={`geocode_results_${new Date().getTime()}.csv`}>
             <Button
               active={results.length > 0}
