@@ -5,14 +5,15 @@ import { featureCollection, combine } from "@turf/turf";
 import React, { useEffect, useState } from "react";
 import { updateFeatures } from "@esri/arcgis-rest-feature-layer";
 
-const CurrentProject = ({ development, setCurrentDevelopment, parcelData, setParcels, updateDevs, setUpdateDevs, session }) => {
+const CurrentProject = ({ development, setCurrentDevelopment, parcelData, setParcelData, setParcels, updateDevs, setUpdateDevs, session }) => {
   useEffect(() => {
     setName(development.properties.name);
     setUniqueId(development.properties.id);
     setHrdId(
       development.properties.hrd_id ? development.properties.hrd_id : ""
     );
-    setParcels([])
+    setParcels([]);
+    setParcelData([]);
   }, [development]);
 
   let [name, setName] = useState(development.properties.name);

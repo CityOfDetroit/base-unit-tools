@@ -46,7 +46,7 @@ const Projects = ({ session, setSession, login, setLogin }) => {
 
   useEffect(() => {
     if (parcels.length === 0) {
-      return;
+      setParcelData([]);
     }
     queryFeatures({
       url: layers.parcels.feature_service,
@@ -104,6 +104,7 @@ const Projects = ({ session, setSession, login, setLogin }) => {
             setCurrentDevelopment={setCurrentDevelopment}
             parcelData={parcelData}
             setParcels={setParcels}
+            setParcelData={setParcelData}
             session={session}
             updateDevs={updateDevs}
             setUpdateDevs={setUpdateDevs}
