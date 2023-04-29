@@ -46,6 +46,20 @@ export const baseStyle = {
         // "tiles": ["https://tiles.mapillary.com/maps/vtp/mly1/2/{z}/{x}/{y}?access_token=MLY|4690399437648324|de87555bb6015affa20c3df794ebab15"],
         "maxzoom": 14,
         "minzoom": 14
+      },
+      "projects": {
+        "type": "geojson",
+        "data": {
+          "type": "FeatureCollection",
+          "features": []
+        }
+      },
+      "current-project": {
+        "type": "geojson",
+        "data": {
+          "type": "FeatureCollection",
+          "features": []
+        }
       }
     },
     "layers": [
@@ -11624,7 +11638,47 @@ export const baseStyle = {
           "circle-stroke-color": "#ddd",
           "circle-stroke-width": 2
         }
-      }
+      },
+      {
+        "id": "all-projects-fill",
+        "type": "fill",
+        "source": "projects",
+        "interactive": true,
+        "minzoom": 12,
+        "layout": {
+          "visibility": "visible"
+        },
+        "paint": {
+          "fill-color": "rgba(120,0,0,0.15)"
+        }
+      },
+      {
+        "id": "current-project-fill",
+        "type": "fill",
+        "source": "current-project",
+        "interactive": true,
+        "minzoom": 12,
+        "layout": {
+          "visibility": "visible"
+        },
+        "paint": {
+          "fill-color": "rgba(0,0,120,0.15)",
+        }
+      },
+      {
+        "id": "current-project-line",
+        "type": "line",
+        "source": "current-project",
+        "interactive": true,
+        "minzoom": 12,
+        "layout": {
+          "visibility": "visible"
+        },
+        "paint": {
+          "line-color": "rgba(0,0,0,0.25)",
+          "line-width": 3
+          }
+      },
     ],
     "metadata": {
       "arcgisStyleUrl": "https://www.arcgis.com/sharing/rest/content/items/273bf8d5c8ac400183fc24e109d20bcf/resources/styles/root.json",

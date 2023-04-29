@@ -37,6 +37,7 @@ const layers = {
     "singular": "parcel",
     "label": "Parcel",
     "endpoint": HOSTED_ROOT_DEV + "1",
+    "feature_service": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Parcels_Current/FeatureServer/0",
     "id_column": "parcel_id",
     "interaction": "parcel-fill",
     "click": "parcel_id",

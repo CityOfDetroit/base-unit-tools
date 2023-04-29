@@ -206,7 +206,8 @@ a {
   @apply py-2;
   @apply px-2;
   @apply md:px-4;
-  @apply md:py-4;
+  @apply md:py-2;
+  @apply md:pb-4;
   @apply bg-gray-100;
   @apply text-sm;
 }
@@ -260,4 +261,15 @@ a {
 
 .app-intro p {
   @apply py-2;
+}
+
+button {
+  @apply py-2;
+  @apply px-4;
+  @apply bg-gray-200;
+  @apply rounded-md;
+  @apply text-sm;
+  @apply font-semibold;
+  @apply hover:bg-gray-300;
+  @apply focus:outline-none;
 }

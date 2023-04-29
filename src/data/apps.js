@@ -1,4 +1,4 @@
-import { faAtlas, faCheckSquare, faEnvelope, faHome, faLink, faMailBulk, faTasks, faWrench, faPlusCircle, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faAtlas, faCheckSquare, faEnvelope, faHome, faLink, faMailBulk, faTasks, faWrench, faPlusCircle, faSearch, faBuilding } from '@fortawesome/free-solid-svg-icons';
 
 export const apps = {
     '/': {
@@ -74,6 +74,17 @@ export const apps = {
         icon: faPlusCircle,
         private: true,
         show: false
+    },
+    'projects': {
+        name: 'Projects',
+        url: `/projects`,
+        description: 'View development projects',
+        questions: [
+            `I need to describe a few different parcels as a Project.`
+        ],
+        icon: faBuilding,
+        private: true,
+        show: true
     }
 }
 
