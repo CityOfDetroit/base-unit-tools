@@ -14,6 +14,8 @@ import { arcgisToGeoJSON } from '@esri/arcgis-to-geojson-utils';
  */
 const useFeature = ({ type, id, f='arcjson' }) => {
 
+  console.log(type, id)
+
   // we store the returned data here
   let [data, setData] = useState(null)
 

@@ -17,25 +17,28 @@ import ExplorerMapOptions from "../src/Explorer/ExplorerMapOptions";
 import ExplorerParcel from "../src/Explorer/ExplorerParcel";
 import ExplorerSearch from "../src/Explorer/ExplorerSearch";
 import ExplorerStreet from "../src/Explorer/ExplorerStreet";
+import MapMain from "../src/Map/MapMain";
+import { arcgisToGeoJSON } from "@esri/arcgis-to-geojson-utils";
 
 const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
   // query parameters
   let router = useRouter();
   const { type, id, streetview, image } = router.query;
-  let queryType = type;
-  let queryId = id;
   let querySv = streetview;
   let querySvImgKey = image;
-
-  let initClicked = {type: queryType, id: queryId}
-  console.log(initClicked)
 
   // this stores the type and id of the currently clicked feature
   // that drives everything, so the value and setter
   // are passed to child components often to consult or use
-  let [clicked, setClicked] = useState(initClicked);
+  let [clicked, setClicked] = useState({
+    type: type,
+    id: id
+  });
 
-  let feature = useFeature(clicked);
+  let feature = useFeature({
+    type: clicked.type ? clicked.type : type,
+    id: clicked.id ? clicked.id : id,
+  });
 
   // this stores the current geocoding result
   let [geocoded, setGeocoded] = useState(null);
@@ -61,8 +64,10 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
   const [svImages, setSvImages] = useState([]);
 
   useEffect(() => {
-    console.log(clicked, feature);
-  }, [clicked, feature]);
+    if(clicked.type) {
+      router.push(`/map?id=${clicked.id}&id=${clicked.type}`, undefined, { shallow: true });
+    }
+  }, [clicked])
 
   let introduction = (
     <>
@@ -147,7 +152,16 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
       {/* the main panel contains the map, and we pass it many of our useState variables */}
       <main>
         <ExplorerSearch {...{ setClicked, setGeocoded }} />
-        <ExplorerMap
+        <MapMain 
+          linked={linked}
+          clicked={{
+            type: clicked.type ? clicked.type : type,
+            id: clicked.id ? clicked.id : id,
+          }}
+          setClicked={setClicked}
+          feature={feature}
+        />
+        {/* <ExplorerMap
           {...{
             clicked,
             setClicked,
@@ -160,7 +174,7 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
             basemap: options.basemap,
             showSv: options.streetView,
           }}
-        />
+        /> */}
       </main>
     </>
   );
