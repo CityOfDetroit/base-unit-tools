@@ -59,7 +59,6 @@ const ExplorerMap = ({ clicked, setClicked, geocoded, linked, feature, showSv, s
     map.on('style.load', () => {
       setLoading(false)
 
-      console.log(videoIcon)
       // load our mapillary video icon in
       // map.loadImage(videoIcon, (error, image) => {
       //   if (error) throw error;
@@ -99,7 +98,6 @@ const ExplorerMap = ({ clicked, setClicked, geocoded, linked, feature, showSv, s
           layers: ['mapillary-images']
         })
         setSvImages(_.uniqBy(features, 'properties.id'))
-        console.log(features.sort((a, b) => a.properties.captured_at - b.properties.captured_at))
       }
     })
 

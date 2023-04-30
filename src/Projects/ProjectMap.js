@@ -6,17 +6,17 @@ import { baseStyle } from "../styles/mapstyle";
 import _ from "lodash";
 
 const ProjectMap = ({
-  developments,
-  currentDevelopment,
-  setCurrentDevelopment,
+  projects,
+  currentProject,
+  setCurrentProject,
   parcels,
   setParcels,
 }) => {
   let style = _.cloneDeep(baseStyle);
 
-  style.sources.projects.data.features = developments;
-  if (currentDevelopment) {
-    style.sources["current-project"].data.features = [currentDevelopment];
+  style.sources.projects.data.features = projects;
+  if (currentProject) {
+    style.sources["current-project"].data.features = [currentProject];
   }
 
   let parcelHighlightLayer = style.layers.findIndex(
@@ -33,8 +33,8 @@ const ProjectMap = ({
     },
   };
 
-  if (currentDevelopment) {
-    map.current.fitBounds(bbox(currentDevelopment), {
+  if (currentProject) {
+    map.current.fitBounds(bbox(currentProject), {
       padding: 50,
       maxZoom: 17,
     });
@@ -47,9 +47,10 @@ const ProjectMap = ({
     if (!project) {
       return;
     }
-    let projectId = project.properties.id;
-    let match = developments.find((d) => d.properties.id === projectId);
-    setCurrentDevelopment(match);
+    
+    
+    let match = projects.find((p) => p.id === project.id);
+    setCurrentProject(match);
   };
 
   const handleDblClick = (e) => {

@@ -23,8 +23,6 @@ const AddressMap = ({ geojson }) => {
     }
   });
 
-  console.log(baseStyle);
-
   useEffect(() => {
     var map = new mapboxgl.Map({
       container: "map", // container id

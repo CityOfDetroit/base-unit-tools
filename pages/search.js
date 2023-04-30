@@ -15,7 +15,6 @@ const Validator = ({ session, setSession, login, setLogin }) => {
   let [value, setValue] = useState("");
 
   let [geocodeValue, setGeocodeValue] = useState(null);
-  console.log(geocodeValue);
   let [data, resultType] = useGeocoder(geocodeValue);
 
   let [suggestions, setSuggestions] = useState([]);

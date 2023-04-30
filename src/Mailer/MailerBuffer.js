@@ -62,8 +62,6 @@ const MailerBuffer = ({ geom, setGeom }) => {
         onClick={() => {
           let originalGeom = geom
           let buffered = buffer(geom, distanceInMiles, { units: 'miles' })
-          console.log(originalGeom)
-          console.log(buffered)
           let diff = difference(buffered.features[0], originalGeom.features[0])
 
           let diffFc = {type: "FeatureCollection", features: [diff]}

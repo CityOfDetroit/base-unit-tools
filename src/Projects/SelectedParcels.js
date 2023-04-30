@@ -15,7 +15,6 @@ const SelectedParcel = ({ parcel, parcelData }) => {
 };
 
 const SelectedParcels = ({ parcels, parcelData, setParcels, setAddNew, addNew, currentDevelopment }) => {
-  console.log(addNew)
   return (
     <div className="mt-4">
       <div className=" text-gray-700 font-bold px-2 py-1 text-sm flex items-center justify-between bg-green-200">

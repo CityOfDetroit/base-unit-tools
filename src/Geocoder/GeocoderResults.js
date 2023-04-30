@@ -47,7 +47,6 @@ const GeocoderResults = ({
             <a
               className="mx-2 text-gray-500"
               onClick={() => {
-                console.log(row);
                 setUnmatchedAddr(row.row.values.input);
               }}
             >

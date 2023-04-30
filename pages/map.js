@@ -28,7 +28,6 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
   let querySvImgKey = image;
 
   let initClicked = {type: queryType, id: queryId}
-  console.log(initClicked)
 
   // this stores the type and id of the currently clicked feature
   // that drives everything, so the value and setter
@@ -61,7 +60,6 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
   const [svImages, setSvImages] = useState([]);
 
   useEffect(() => {
-    console.log(clicked, feature);
   }, [clicked, feature]);
 
   let introduction = (

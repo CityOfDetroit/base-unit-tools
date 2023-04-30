@@ -10,8 +10,6 @@ const GeocodeCandidateMap = ({ candidate }) => {
 
   let [theMap, setTheMap] = useState(null)
 
-  console.log(candidate)
-
   useEffect(() => {
 
     let style = _.cloneDeep(baseStyle)

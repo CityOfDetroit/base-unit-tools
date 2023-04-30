@@ -10,7 +10,6 @@ export async function getServerSideProps(context) {
 
   const lyr = layers.buildings;
 
-  console.log(lyr, id);
   const features = await queryFeatures({
     url: lyr.endpoint,
     where: `${lyr.id_column} = '${id}'`,
@@ -27,7 +26,6 @@ export async function getServerSideProps(context) {
 const Building = ({ geojson, lyr, session }) => {
   const router = useRouter();
   const { id } = router.query;
-  console.log(geojson);
 
   let { use_category, ted_build_type, bldg_status, parcel_id } = geojson.properties;
 

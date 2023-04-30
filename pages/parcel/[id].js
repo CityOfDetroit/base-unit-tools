@@ -12,7 +12,6 @@ export async function getServerSideProps(context) {
 
   const lyr = layers.parcels;
 
-  console.log(lyr, id);
   const features = await queryFeatures({
     url: lyr.endpoint,
     where: `${lyr.id_column} = '${id}'`,
@@ -41,8 +40,6 @@ export async function getServerSideProps(context) {
 const Parcel = ({ geojson, assessment, addresses, lyr, session }) => {
   const router = useRouter();
   const { id } = router.query;
-
-  console.log(addresses);
 
   const parcelData = {
     Ownership: {

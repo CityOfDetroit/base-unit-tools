@@ -26,12 +26,41 @@ const Projects = ({ session }) => {
     </>
   );
 
+  let projectLayers = {
+    development: {
+      layer_name: "Development projects",
+      url: `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/DevLayer_rough_cut/FeatureServer/0`,
+      id: "project_id",
+      name: "name",
+      fields: {
+        name: "Project Name",
+        id: "Unique ID",
+        hrd_id: "HRD ID",
+      },
+    },
+    arpa: {
+      layer_name: "ARPA Projects",
+      url: `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/arpa_project_shapes/FeatureServer/0`,
+      id: "project_id",
+      name: "project_name",
+      fields: {
+        project_name: "Project Name",
+        project_id: "ARPA Project ID",
+        description: "Description",
+      },
+    },
+  };
+
+  // store the currently edited layer here
+  let [currentLayer, setCurrentLayer] = useState(projectLayers.development);
+
   // We'll store the list of currently selected parcels in here.
   let [parcels, setParcels] = useState([]);
   let [parcelData, setParcelData] = useState([]);
 
-  let [developments, setDevelopments] = useState([]);
-  let [currentDevelopment, setCurrentDevelopment] = useState(null);
+  // We'll store the list of currently selected projects in here.
+  let [projects, setProjects] = useState([]);
+  let [currentProject, setCurrentProject] = useState(null);
 
   let [addNew, setAddNew] = useState(false);
 
@@ -55,52 +84,72 @@ const Projects = ({ session }) => {
   useEffect(() => {
     if (session) {
       queryFeatures({
-        url: `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/DevLayer_rough_cut/FeatureServer/0`,
+        url: currentLayer.url,
         where: `1=1`,
         outFields: ["*"],
         f: "geojson",
         authentication: session,
       }).then((response) => {
-        setDevelopments(response.features);
+        setProjects(response.features);
       });
     } else {
       return;
     }
-  }, [session, updateDevs]);
+  }, [session, updateDevs, currentLayer]);
 
   return (
     <>
       <AppHeader app={apps.projects} introduction={introduction}>
-        <p className="text-sm text-gray-500 mb-1">
-          Search for development projects:
+        <p className="text-sm text-gray-500 mb-1">Select a layer to edit:</p>
+        <Select
+          options={Object.keys(projectLayers).map((layer) => {
+            return {
+              value: projectLayers[layer].url,
+              label: projectLayers[layer].layer_name,
+            };
+          })}
+          defaultValue={currentLayer.url}
+          onChange={(e) => {
+            setCurrentLayer(
+              projectLayers[
+                Object.keys(projectLayers).find(
+                  (key) => projectLayers[key].url === e.value
+                )
+              ]
+            );
+          }}
+        />
+        <p className="text-sm text-gray-500 my-1">
+          Search projects:
         </p>
 
         <Select
-          options={developments.map((ft) => {
+          options={projects.map((ft) => {
             return {
-              value: ft.properties.id,
-              label: ft.properties["name"],
+              value: ft.properties.GlobalID,
+              label: ft.properties[currentLayer.name],
             };
           })}
           defaultValue={null}
           onChange={(e) =>
-            setCurrentDevelopment(
-              developments.find((d) => d.properties.id === e.value)
+            setCurrentProject(
+              projects.find((d) => d.properties.GlobalID === e.value)
             )
           }
         />
       </AppHeader>
-      <SiteSidebar title="Development projects" className="gap-2 flex">
-        {currentDevelopment && (
+      <SiteSidebar title="Projects" className="gap-2 flex">
+        {currentProject && (
           <CurrentProject
-            development={currentDevelopment}
-            setCurrentDevelopment={setCurrentDevelopment}
+            project={currentProject}
+            setCurrentProject={setCurrentProject}
             parcelData={parcelData}
             setParcels={setParcels}
             setParcelData={setParcelData}
             session={session}
             updateDevs={updateDevs}
             setUpdateDevs={setUpdateDevs}
+            currentLayer={currentLayer}
           />
         )}
         {parcels.length > 0 && (
@@ -109,10 +158,9 @@ const Projects = ({ session }) => {
             parcelData={parcelData}
             setParcels={setParcels}
             addNew={addNew}
-            
             setAddNew={setAddNew}
-            currentDevelopment={currentDevelopment}
-              />
+            project={currentProject}
+          />
         )}
         {addNew && (
           <NewProject
@@ -123,14 +171,15 @@ const Projects = ({ session }) => {
             updateDevs={updateDevs}
             setUpdateDevs={setUpdateDevs}
             setAddNew={setAddNew}
+            currentLayer={currentLayer}
           />
         )}
       </SiteSidebar>
       <main>
         <ProjectMap
-          developments={developments}
-          currentDevelopment={currentDevelopment}
-          setCurrentDevelopment={setCurrentDevelopment}
+          projects={projects}
+          currentProject={currentProject}
+          setCurrentProject={setCurrentProject}
           parcels={parcels}
           setParcels={setParcels}
         />
