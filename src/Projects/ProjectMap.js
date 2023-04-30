@@ -62,7 +62,7 @@ const ProjectMap = ({
     let parcelId = parcel.properties.parcel_id;
 
     if (parcels.indexOf(parcelId) === -1) {
-      setParcels([...parcels, parcelId]);
+      setParcels([...parcels, parcelId].sort());
     } else {
       setParcels(parcels.filter((p) => p !== parcelId));
     }

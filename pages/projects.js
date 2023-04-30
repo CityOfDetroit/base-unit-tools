@@ -1,37 +1,28 @@
-import React, { useEffect, useRef, useState } from "react";
+import { queryFeatures } from "@esri/arcgis-rest-feature-layer";
+import "mapbox-gl/dist/mapbox-gl.css";
+import React, { useEffect, useState } from "react";
+import Select from "react-select";
+import CurrentProject from "../src/Projects/CurrentProject";
+import ProjectMap from "../src/Projects/ProjectMap";
 import AppHeader from "../src/components/AppHeader";
 import apps from "../src/data/apps";
-import SiteSidebar from "../src/layout/SiteSidebar";
-import MapboxGL from "mapbox-gl/dist/mapbox-gl";
-import Mapbox, { NavigationControl } from "react-map-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
-import { queryFeatures } from "@esri/arcgis-rest-feature-layer";
 import layers from "../src/data/layers";
-import Select from "react-select";
-import ProjectMap from "../src/Projects/ProjectMap";
-import CurrentProject from "../src/Projects/CurrentProject";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faWindowClose } from "@fortawesome/free-solid-svg-icons";
-import SelectedParcel from "../src/Projects/SelectedParcel";
+import SiteSidebar from "../src/layout/SiteSidebar";
+import NewProject from "../src/Projects/NewProject";
+import SelectedParcels from "../src/Projects/SelectedParcels";
 
-const Projects = ({ session, setSession, login, setLogin }) => {
+const Projects = ({ session }) => {
   let introduction = (
     <>
-        Use this tool to edit existing development projects or add a new
-        project.
-
-        <ul className="text-sm list-disc list-inside flex gap-2 flex-col mt-2">
-          <li>
-        <b>Single-click</b> to select a development project. 
-
-          </li>
-          <li>
-        <b>Double-click</b> to select parcels on the map.
-
-          </li>
-        </ul>
-
-        
+      Use this tool to edit existing development projects or add a new project.
+      <ul className="text-sm list-disc list-inside flex gap-2 flex-col mt-2">
+        <li>
+          <b>Single-click</b> to select a development project.
+        </li>
+        <li>
+          <b>Double-click</b> to select parcels on the map.
+        </li>
+      </ul>
     </>
   );
 
@@ -42,11 +33,14 @@ const Projects = ({ session, setSession, login, setLogin }) => {
   let [developments, setDevelopments] = useState([]);
   let [currentDevelopment, setCurrentDevelopment] = useState(null);
 
+  let [addNew, setAddNew] = useState(false);
+
   let [updateDevs, setUpdateDevs] = useState(0);
 
   useEffect(() => {
     if (parcels.length === 0) {
       setParcelData([]);
+      return;
     }
     queryFeatures({
       url: layers.parcels.feature_service,
@@ -59,7 +53,7 @@ const Projects = ({ session, setSession, login, setLogin }) => {
   }, [parcels]);
 
   useEffect(() => {
-    if(session) {
+    if (session) {
       queryFeatures({
         url: `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/DevLayer_rough_cut/FeatureServer/0`,
         where: `1=1`,
@@ -69,8 +63,7 @@ const Projects = ({ session, setSession, login, setLogin }) => {
       }).then((response) => {
         setDevelopments(response.features);
       });
-    }
-    else {
+    } else {
       return;
     }
   }, [session, updateDevs]);
@@ -111,25 +104,26 @@ const Projects = ({ session, setSession, login, setLogin }) => {
           />
         )}
         {parcels.length > 0 && (
-          <div className="mt-4">
-          <div className=" text-gray-700 font-bold px-2 py-1 text-sm flex items-center justify-between bg-green-200">
-            <span>Selected parcels</span>
-            <FontAwesomeIcon icon={faWindowClose} onClick={() => setParcels([])} />
-          </div>
-            <section className="sidebar-section">
-              <h3>{parcels.length} parcels selected</h3>
-              {parcels.map((parcel) => (
-                <SelectedParcel
-                  parcel={parcel}
-                  parcelData={parcelData.find(
-                    (p) => p.properties.parcel_number === parcel
-                  )}
-                  key={parcel}
-                />
-              ))}
-              <button onClick={() => setParcels([])}>Clear</button>
-            </section>
-          </div>
+          <SelectedParcels
+            parcels={parcels}
+            parcelData={parcelData}
+            setParcels={setParcels}
+            addNew={addNew}
+            
+            setAddNew={setAddNew}
+            currentDevelopment={currentDevelopment}
+              />
+        )}
+        {addNew && (
+          <NewProject
+            parcelData={parcelData}
+            setParcels={setParcels}
+            setParcelData={setParcelData}
+            session={session}
+            updateDevs={updateDevs}
+            setUpdateDevs={setUpdateDevs}
+            setAddNew={setAddNew}
+          />
         )}
       </SiteSidebar>
       <main>
