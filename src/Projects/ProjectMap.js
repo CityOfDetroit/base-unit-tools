@@ -1,9 +1,11 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import MapboxGL from "mapbox-gl/dist/mapbox-gl";
 import Mapbox, { NavigationControl } from "react-map-gl";
 import bbox from "@turf/bbox";
 import { baseStyle } from "../styles/mapstyle";
 import _ from "lodash";
+import { geocode } from "@esri/arcgis-rest-geocoding";
+import { geocoders } from "../hooks/useGeocoder";
 
 const ProjectMap = ({
   projects,
@@ -47,8 +49,7 @@ const ProjectMap = ({
     if (!project) {
       return;
     }
-    
-    
+
     let match = projects.find((p) => p.id === project.id);
     setCurrentProject(match);
   };
@@ -69,17 +70,54 @@ const ProjectMap = ({
     }
   };
 
+  const handleGeocode = (address) => {
+    geocode({
+      address: address,
+      outFields: "*",
+      endpoint: geocoders.prod,
+    }).then((response) => {
+      map.current.easeTo({
+        center: [
+          response.candidates[0].location.x,
+          response.candidates[0].location.y,
+        ],
+        zoom: 17,
+      });
+      setParcels([...parcels, response.candidates[0].attributes.parcel_id]);
+      console.log(response);
+    });
+  };
+
+  let [search, setSearch] = useState("");
+
   return (
-    <Mapbox
-      ref={map}
-      mapLib={MapboxGL}
-      mapStyle={style}
-      onDblClick={handleDblClick}
-      onClick={handleClick}
-      doubleClickZoom={false}
-      initialViewState={initialViewState}
-      interactiveLayerIds={["all-projects-fill", "parcel-fill"]}
-    ></Mapbox>
+    <>
+      <div className="flex items-center gap-2">
+        <input
+          className="p-2 text-gray-800 bg-gray-100 my-2 w-1/2"
+          type="text"
+          placeholder="Search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleGeocode(search);
+            }
+          }}
+        />
+        <button onClick={() => handleGeocode(search)}>Search</button>
+      </div>
+      <Mapbox
+        ref={map}
+        mapLib={MapboxGL}
+        mapStyle={style}
+        onDblClick={handleDblClick}
+        onClick={handleClick}
+        doubleClickZoom={false}
+        initialViewState={initialViewState}
+        interactiveLayerIds={["all-projects-fill", "parcel-fill"]}
+      ></Mapbox>
+    </>
   );
 };
 
