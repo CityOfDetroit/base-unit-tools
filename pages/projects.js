@@ -99,7 +99,7 @@ const Projects = ({ session }) => {
 
   return (
     <>
-      <AppHeader app={apps.projects} introduction={introduction}>
+      <AppHeader app={apps.projects} introduction={introduction} introOpen={false}>
         <p className="text-sm text-gray-500 mb-1">Select a layer to edit:</p>
         <Select
           options={Object.keys(projectLayers).map((layer) => {

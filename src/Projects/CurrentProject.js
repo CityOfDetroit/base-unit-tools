@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { featureCollection, combine } from "@turf/turf";
 import React, { useEffect, useState } from "react";
 import { updateFeatures } from "@esri/arcgis-rest-feature-layer";
+import ProjectEvents from "./ProjectEvents";
 
 const CurrentProject = ({
   project,
@@ -113,6 +114,7 @@ const CurrentProject = ({
           </button>
         )}
       </section>
+      <ProjectEvents project={project}/>
     </div>
   );
 };

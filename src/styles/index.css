@@ -206,7 +206,7 @@ a {
   @apply py-2;
   @apply px-2;
   @apply md:px-4;
-  @apply md:py-2;
+  @apply md:py-4;
   @apply md:pb-4;
   @apply bg-gray-100;
   @apply text-sm;
