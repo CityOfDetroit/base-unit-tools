@@ -49,6 +49,17 @@ const Projects = ({ session }) => {
         description: "Description",
       },
     },
+    major_areas : {
+      layer_name: "Major development areas",
+      url: `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/major_development_areas/FeatureServer/0`,
+      id: "project_id",
+      name: "area_name",
+      fields: {
+        area_name: "Area Name",
+        area_type: "Area Type",
+        project_id: "Project ID",
+      }
+    }
   };
 
   // store the currently edited layer here
