@@ -114,7 +114,7 @@ const CurrentProject = ({
           </button>
         )}
       </section>
-      <ProjectEvents project={project}/>
+      <ProjectEvents project={project} session={session}/>
     </div>
   );
 };

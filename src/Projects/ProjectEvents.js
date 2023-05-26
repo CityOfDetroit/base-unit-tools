@@ -2,8 +2,8 @@ import { queryFeatures } from "@esri/arcgis-rest-feature-layer";
 import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 
-const ProjectEvents = ({ project }) => {
-  console.log(project);
+const ProjectEvents = ({ project, session }) => {
+  console.log(project, session);
 
   let [events, setEvents] = useState([]);
 
@@ -13,6 +13,7 @@ const ProjectEvents = ({ project }) => {
       where: `development_id = '${project.properties.id}'`,
       outFields: ["*"],
       orderByFields: ["date DESC"],
+      authentication: session,
       f: "geojson",
     }).then((response) => {
       setEvents(response.features);
