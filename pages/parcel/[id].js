@@ -7,6 +7,7 @@ import SiteSidebar from "../../src/layout/SiteSidebar";
 import ParcelMap from "../../src/maps/ParcelMap";
 import IssueReporter from "../../src/components/IssueReporter";
 import IdBadge from "../../src/Explorer/IdBadge";
+
 export async function getServerSideProps(context) {
   const { id } = context.params;
 

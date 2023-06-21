@@ -26,9 +26,9 @@ const useFeature = ({ type, id, f='arcjson' }) => {
     // if that layer is parcels
     where = type === 'parcels'
       // wrap the id in single-quotes
-      ? `${layer.id_column} = '${id}'`
+      ? `${layer.id_column}='${id}'`
       // if not parcels, no quotes
-      : `${layer.id_column} = ${id}`
+      : `${layer.id_column}=${id}`
   }
 
   // this data fetch will fire any time we change the underlying object
@@ -36,23 +36,24 @@ const useFeature = ({ type, id, f='arcjson' }) => {
     // assuming we have a type & id:
     if (type && id) {
       queryFeatures({
-        url: layer.endpoint,
+        url: type === "parcels" ? layer.feature_service : layer.endpoint,
         'where': where,
         'outFields': '*',
         'resultRecordCount': 1,
-        'outSR': 4326
+        'outSR': 4326,
+        'f': f === 'arcjson' ? 'json' : 'geojson'
       }).then(d => {
-        if(f === 'arcjson') {
-          setData(d.features[0])
-        }
-        else { 
-          setData(arcgisToGeoJSON(d.features[0]))
-        }
+        setData(d.features[0])
       })
     }
   }, [type, id])
 
-  return data
+  if(data) {
+    return data
+  }
+  else {
+    return null;
+  }
 }
 
 export default useFeature;

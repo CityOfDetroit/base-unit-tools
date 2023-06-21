@@ -8,14 +8,14 @@ import { faChevronCircleDown, faChevronCircleRight } from '@fortawesome/free-sol
 
 const AddressesHere = ({ addresses, setClicked, title=null }) => {
 
-  // Create a "collator": https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Collator/compare
+  // Create a "collator": https://developer.mozilla.properties.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Collator/compare
   let collator = new Intl.Collator(undefined, {
     numeric: true,
     sensitivity: "base"
   })
 
   // sort 'em with the collator and then on street number.
-  addresses = addresses.sort((a, b) => collator.compare(b.unit_number, a.unit_number)).sort((a, b) => a.street_number - b.street_number > -1).sort((a, b) => collator.compare(b.street_name, a.street_name))
+  addresses = addresses.sort((a, b) => collator.compare(b.properties.unit_number, a.properties.unit_number)).sort((a, b) => a.properties.street_number - b.properties.street_number > -1).sort((a, b) => collator.compare(b.properties.street_name, a.properties.street_name))
 
   let [open, setOpen] = useState(addresses.length > 2 ? false : true);
 
@@ -27,12 +27,12 @@ const AddressesHere = ({ addresses, setClicked, title=null }) => {
       </div>
       <AnimateHeight duration={150} height={open ? "auto" : 0} className="overflow-y-auto max-h-64">
         {addresses.map((a, i) => (
-          <div key={a.addr_id} className={i + 1 < addresses.length ? "py-1 flex items-center justify-between border-b-2" : "py-1 flex items-center justify-between"}>
+          <div key={a.properties[layers.addresses.id_column]} className={i + 1 < addresses.length ? "py-1 flex items-center justify-between border-b-2" : "py-1 flex items-center justify-between"}>
             <div className="flex items-center">
-              <span className="tabular-nums">{a.street_number} {a.street_prefix} {a.street_name} {a.street_type} {a.unit_type} {a.unit_number}</span>
-              <GeoSourceBadge layer={a.geo_source} />
+              <span className="tabular-nums">{a.properties.street_number} {a.properties.street_prefix} {a.properties.street_name} {a.properties.street_type} {a.properties.unit_type} {a.properties.unit_number}</span>
+              <GeoSourceBadge layer={a.properties.geo_source} />
             </div>
-            <IdBadge id={a.addr_id} layer={layers["addresses"]} setClicked={setClicked} link />
+            <IdBadge id={a.properties[layers.addresses.id_column]} layer={layers["addresses"]} link />
           </div>
         ))}
       </AnimateHeight>

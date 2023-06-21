@@ -1,79 +1,144 @@
 // support two different servers
-let SERVER_ROOT = `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/`
-let HOSTED_ROOT = `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitMetrics/FeatureServer/`
-let HOSTED_ROOT_DEV = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/ExtendedTablesWithIndices/FeatureServer/`
+let SERVER_ROOT = `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/`;
+let HOSTED_ROOT = `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitMetrics/FeatureServer/`;
+let HOSTED_ROOT_DEV = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/BaseUnitFeatures/FeatureServer/`;
+import moment from "moment";
+
 
 const layers = {
-  "addresses": {
-    "name": "addresses",
-    "singular": "address",
-    "label": "Address Point",
-    "endpoint": HOSTED_ROOT_DEV + '4',
-    "id_column": "addr_id",
-    "click": "id",
-    "interaction": "address-point",
-    "highlight": "address-highlight",
-    "link": "address-linked",
-    "filter_id": "addr_id",
-    "text_color": "#555",
-    "color": "rgb(170, 200, 221)"
+  addresses: {
+    name: "addresses",
+    singular: "address",
+    label: "Address Point",
+    endpoint: HOSTED_ROOT_DEV + "0",
+    id_column: "address_id",
+    click: "id",
+    interaction: "address-point",
+    highlight: "address-highlight",
+    link: "address-linked",
+    filter_id: "$id",
+    text_color: "#555",
+    color: "rgb(170, 200, 221)",
+    formatter: (a) => {
+      return {
+        attributes: {
+          "Street Number": a.properties.street_number,
+          "Street Prefix": a.properties.street_prefix,
+          "Street Name": a.properties.street_name,
+          "Street Type": a.properties.street_type,
+          "Unit Type": a.properties.unit_type,
+          "Unit Number": a.properties.unit_number,
+        }
+      }
+    }
   },
-  "buildings": {
-    "name": "buildings",
-    "singular": "building",
-    "label": "Building",
-    "endpoint": HOSTED_ROOT_DEV + '3',
-    "id_column": "bldg_id",
-    "interaction": "building-fill",
-    "click": "bldg_id",
-    "color": "rgb(203, 77, 79)",
-    "text_color": "#eee",
-    "filter_id": "bldg_id",
-    "highlight": "building-highlight",
-    "link": "building-linked"
+  buildings: {
+    name: "buildings",
+    singular: "building",
+    label: "Building",
+    endpoint: HOSTED_ROOT_DEV + "2",
+    id_column: "building_id",
+    interaction: "building-fill",
+    click: "building_id",
+    color: "rgb(203, 77, 79)",
+    text_color: "#eee",
+    filter_id: "$id",
+    highlight: "building-highlight",
+    link: "building-linked",
+    formatter: (b) => {
+      return {
+        attributes: {
+          "Use type": b.properties.use_category,
+        },
+      };
+    },
   },
-  "parcels": {
-    "name": "parcels",
-    "singular": "parcel",
-    "label": "Parcel",
-    "endpoint": HOSTED_ROOT_DEV + "1",
-    "feature_service": "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Parcels_Current/FeatureServer/0",
-    "id_column": "parcel_id",
-    "interaction": "parcel-fill",
-    "click": "parcel_id",
-    "color": "rgb(163, 200, 112)",
-    "text_color": "#555",
-    "filter_id": "parcel_id",
-    "highlight": "parcel-highlight",
-    "link": "parcel-linked"
+  parcels: {
+    name: "parcels",
+    singular: "parcel",
+    label: "Parcel",
+    endpoint: HOSTED_ROOT_DEV + "3",
+    feature_service:
+      "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Parcels_Current/FeatureServer/0/",
+    id_column: "parcel_number",
+    interaction: "parcel-fill",
+    click: "parcel_number",
+    color: "rgb(163, 200, 112)",
+    text_color: "#555",
+    filter_id: "parcel_number",
+    highlight: "parcel-highlight",
+    link: "parcel-linked",
+    formatter: (p) => {
+      return {
+        attributes: {
+          "Parcel address": p.properties.address,
+          "Taxpayer": p.properties.taxpayer_1,
+          "Taxpayer (ext)": p.properties.taxpayer_2,
+          "Taxpayer address": `${p.properties.taxpayer_street}, ${p.properties.taxpayer_city}, ${p.properties.taxpayer_state} ${p.properties.taxpayer_zip}`,
+          "Sale date": p.properties.sale_date ? moment(p.properties.sale_date).format("MM/DD/YYYY") : null,
+          "Sale price": parseInt(p.properties.sale_price).toLocaleString(),
+          "PRE %": p.properties.homestead_pre.toLocaleString(),
+          "NEZ": p.properties.nez,
+          "Is Improved?": p.properties.is_improved === 0 ? "No" : "Yes",
+          "Property Class": `${p.properties.property_class} - ${p.properties.property_class_desc}`,
+          "Property Use": `${p.properties.use_code} - ${p.properties.use_code_desc}`,
+          "Total Floor Area": p.properties.total_floor_area ? parseInt(p.properties.total_floor_area).toLocaleString() : null,
+          "Style": p.properties.style,
+          "Taxable status": p.properties.tax_status,
+          "Assessed value": parseInt(p.properties.assessed_value).toLocaleString(),
+          "Taxable value": parseInt(p.properties.taxable_value).toLocaleString(),
+          "Total Acreage": p.properties.total_acreage,
+          "Total Square Footage": p.properties.total_square_footage,
+          "Depth x Frontage": `${p.properties.depth} x ${p.properties.frontage}`,
+          "Zoning": p.properties.zoning,
+        },
+        longAttributes: {
+          "Legal description": p.properties.legal_description,
+        },
+      };
+    },
   },
-  "streets": {
-    "name": "streets",
-    "singular": "street",
-    "label": "Street",
-    "endpoint": HOSTED_ROOT_DEV + "2",
-    "id_column": "street_id",
-    "interaction": "streets-line",
-    "click": "street_id",
-    "highlight": "streets-highlight",
-    "link": "streets-linked",
-    "filter_id": "street_id",
-    "color": "rgb(148, 70, 109)",
-    "text_color": "#eee"
+  streets: {
+    name: "streets",
+    singular: "street",
+    label: "Street",
+    endpoint: HOSTED_ROOT_DEV + "1",
+    id_column: "street_id",
+    interaction: "streets-line",
+    click: "street_id",
+    highlight: "streets-highlight",
+    link: "streets-linked",
+    filter_id: "$id",
+    color: "rgb(148, 70, 109)",
+    text_color: "#eee",
+    formatter: (s) => {
+      console.log(s)
+      return {
+        attributes: {
+          "Street direction": s.properties.street_direction,
+          "Street name": s.properties.street_name,
+          "Street type": s.properties.street_type,
+          "MGF - Left range": `${s.properties.from_address_left} - ${s.properties.to_address_left}`,
+          "MGF - Right range": `${s.properties.from_address_right} - ${s.properties.to_address_right}`,
+          "Jurisdiction": s.properties.legal_system,
+          "Functional class code": s.properties.functional_class_code,
+        },
+      };
+    }
   },
-  "units": {
-    "name": "units",
-    "singular": "unit",
-    "label": "Unit",
-    "endpoint": HOSTED_ROOT_DEV + '0',
-    "id_column": "objectid",
-    "interaction": "units-point",
-    "click": "unit_id",
-    "highlight": "units-highlight",
-    "link": "units-linked",
-    "color": "rgb(46, 55, 97)",
-    "text_color": "#eee"
-  }
-}
+  // "units": {
+  //   "name": "units",
+  //   "singular": "unit",
+  //   "label": "Unit",
+  //   "endpoint": HOSTED_ROOT_DEV + '0',
+  //   "id_column": "objectid",
+  //   "interaction": "units-point",
+  //   "click": "unit_id",
+  //   "highlight": "units-highlight",
+  //   "link": "units-linked",
+  //   "color": "rgb(46, 55, 97)",
+  //   "text_color": "#eee"
+  // }
+};
 
 export default layers;
