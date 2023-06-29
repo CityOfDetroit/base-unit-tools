@@ -55,6 +55,36 @@ const GeocoderResults = ({
           </div>
         ),
     },
+    {
+      accessor: "AddNum",
+      Header: "Street #",
+      Cell: (row) => <span className="tracking-tight">{row.value}</span>,
+    },
+    {
+      accessor: "StPreDir",
+      Header: "Street Prefix",
+      Cell: (row) => <span className="tracking-tight">{row.value}</span>,
+    },
+    {
+      accessor: "StName",
+      Header: "Street Name",
+      Cell: (row) => <span className="tracking-tight">{row.value}</span>,
+    },
+    {
+      accessor: "StType",
+      Header: "Street Type",
+      Cell: (row) => <span className="tracking-tight">{row.value}</span>,
+    },
+    {
+      accessor: "UnitType",
+      Header: "Unit Type",
+      Cell: (row) => <span className="tracking-tight">{row.value}</span>,
+    },
+    {
+      accessor: "UnitName",
+      Header: "Unit Name",
+      Cell: (row) => <span className="tracking-tight">{row.value}</span>,
+    }
   ];
 
   if (options.ids) {
@@ -157,6 +187,20 @@ const GeocoderResults = ({
   //
   let dataForExcelExport = rows.map((row, idx) => {
     let newRow = { ...row.values };
+
+    newRow["Street Number"] = newRow["AddNum"]
+    delete newRow["AddNum"]
+    newRow["Street Prefix"] = newRow["StPreDir"]
+    delete newRow["StPreDir"]
+    newRow["Street Name"] = newRow["StName"]
+    delete newRow["StName"]
+    newRow["Street Type"] = newRow["StType"]
+    delete newRow["StType"]
+    newRow["Unit Type"] = newRow["UnitType"]
+    delete newRow["UnitType"]
+    newRow["Unit Number"] = newRow["UnitName"]
+    delete newRow["UnitName"]
+
     if (newRow.parcel_id) {
       newRow.parcel_id = `=""${newRow.parcel_id}""`;
     }
@@ -167,6 +211,20 @@ const GeocoderResults = ({
   });
   let dataForCsvExport = rows.map((row, idx) => {
     let newRow = { ...row.values };
+
+    newRow["Street Number"] = newRow["AddNum"]
+    delete newRow["AddNum"]
+    newRow["Street Prefix"] = newRow["StPreDir"]
+    delete newRow["StPreDir"]
+    newRow["Street Name"] = newRow["StName"]
+    delete newRow["StName"]
+    newRow["Street Type"] = newRow["StType"]
+    delete newRow["StType"]
+    newRow["Unit Type"] = newRow["UnitType"]
+    delete newRow["UnitType"]
+    newRow["Unit Number"] = newRow["UnitName"]
+    delete newRow["UnitName"]
+
     if (newRow.parcel_id) {
       newRow.parcel_id = `${newRow.parcel_id}`;
     }
@@ -175,7 +233,7 @@ const GeocoderResults = ({
     }
     return newRow;
   });
-
+  console.log(dataForCsvExport)
   return (
     <>
       <section className="sidebar-section flex items-center gap-12">
