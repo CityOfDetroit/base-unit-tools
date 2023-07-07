@@ -1,22 +1,16 @@
+import { queryFeatures } from "@esri/arcgis-rest-feature-layer";
 import { geocode } from "@esri/arcgis-rest-geocoding";
 import bbox from "@turf/bbox";
 import _ from "lodash";
-import maplibregl from 'maplibre-gl';
+import maplibregl from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
 import React, { useRef, useState } from "react";
 import Mapbox from "react-map-gl";
-import 'maplibre-gl/dist/maplibre-gl.css';
 import layers from "../data/layers";
 import { geocoders } from "../hooks/useGeocoder";
 import { baseStyle } from "../styles/mapstyle";
 
-const BaseUnitsMap = ({
-  feature,
-  selectFeature,
-  setSelectFeature,
-  linked
-}) => {
-
-
+const BaseUnitsMap = ({ feature, selectFeature, setSelectFeature, linked }) => {
   let featureId = selectFeature.id;
   let featureType = selectFeature.type;
 
@@ -31,23 +25,27 @@ const BaseUnitsMap = ({
   }
 
   if (linked) {
-    let layer = layers[featureType]
-    let others = Object.keys(layers).filter(l => l !== featureType && l !== 'units')
+    let layer = layers[featureType];
+    let others = Object.keys(layers).filter(
+      (l) => l !== featureType && l !== "units"
+    );
 
     // set our clickedType link to null
     // theMap.setFilter(layer.link, ["==", "$id", ""])
 
     // loop thru the others and get their linked
-    others.forEach(o => {
+    others.forEach((o) => {
       let filter;
-      if (linked[o].length === 1 && (linked[o][0] === undefined || linked[o][0] === null)) {
-        filter = ["==", layers[o].filter_id, ""]
+      if (
+        linked[o].length === 1 &&
+        (linked[o][0] === undefined || linked[o][0] === null)
+      ) {
+        filter = ["==", layers[o].filter_id, ""];
+      } else {
+        filter = ["in", layers[o].filter_id].concat(linked[o]);
       }
-      else {
-        filter = ["in", layers[o].filter_id].concat(linked[o])
-      }
-      style.layers.find(l => l.id === layers[o].link).filter = filter;
-    })
+      style.layers.find((l) => l.id === layers[o].link).filter = filter;
+    });
   }
 
   const map = useRef();
@@ -59,7 +57,7 @@ const BaseUnitsMap = ({
     },
   };
 
-  if(feature) {
+  if (feature) {
     map.current.fitBounds(bbox(feature), {
       padding: 50,
       maxZoom: 17,
@@ -76,7 +74,7 @@ const BaseUnitsMap = ({
       setSelectFeature({
         id: clicked.properties[layer.filter_id] || clicked.id,
         type: clicked.sourceLayer,
-      }); 
+      });
     }
   };
 
@@ -85,27 +83,64 @@ const BaseUnitsMap = ({
   };
 
   const handleGeocode = (address) => {
-    geocode({
-      address: address,
-      outFields: "*",
-      endpoint: geocoders.prod,
-    }).then((response) => {
-      if (response.candidates.length > 0) {
-        if (response.candidates[0].attributes.address_id !== 0) {
-          setSelectFeature({  
-            id: response.candidates[0].attributes.address_id,
-            type: "addresses",
+
+    // check address to see if it matches Detroit parcel regex
+    let parcelRegex = /^([0,1,2][0-9])([0-9]{6,})([0-9L\.\-]{1,})$/;
+
+    if (parcelRegex.test(address)) {
+      console.log("It's a parcel!");
+
+      queryFeatures({
+        url: layers.parcels.feature_service,
+        where: `parcel_number = '${address}'`,
+        outFields: "*",
+        f: "geojson",
+      }).then((response) => {
+        if (response.features.length > 0) {
+          setSelectFeature({
+            id: response.features[0].properties.parcel_number,
+            type: "parcels",
           });
         }
-      }
-      map.current.easeTo({
-        center: [
-          response.candidates[0].location.x,
-          response.candidates[0].location.y,
-        ],
-        zoom: 17,
+        if (response.features.length === 0) {
+          setSelectFeature({
+            id: null,
+            type: null,
+          });
+        }
+      })
+    }
+
+    // otherwise, geocode the input as an address
+    else {
+      geocode({
+        address: address,
+        outFields: "*",
+        endpoint: geocoders.prod,
+      }).then((response) => {
+        if (response.candidates.length > 0) {
+          if (response.candidates[0].attributes.address_id !== 0) {
+            setSelectFeature({
+              id: response.candidates[0].attributes.address_id,
+              type: "addresses",
+            });
+          }
+          map.current.easeTo({
+            center: [
+              response.candidates[0].location.x,
+              response.candidates[0].location.y,
+            ],
+            zoom: 17,
+          });
+        }
+        if (response.candidates.length === 0) {
+          setSelectFeature({
+            id: null,
+            type: null,
+          });
+        }
       });
-    });
+    }
   };
 
   let [search, setSearch] = useState("");
