@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 
 const ProjectEvents = ({ project, session }) => {
-  console.log(project, session);
 
   let [events, setEvents] = useState([]);
 

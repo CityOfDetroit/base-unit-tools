@@ -84,7 +84,6 @@ const ProjectMap = ({
         zoom: 17,
       });
       setParcels([...parcels, response.candidates[0].attributes.parcel_id]);
-      console.log(response);
     });
   };
 

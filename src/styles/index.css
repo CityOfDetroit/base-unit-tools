@@ -263,7 +263,7 @@ a {
   @apply py-2;
 }
 
-button {
+.button {
   @apply py-2;
   @apply px-4;
   @apply bg-gray-200;
@@ -272,4 +272,21 @@ button {
   @apply font-semibold;
   @apply hover:bg-gray-300;
   @apply focus:outline-none;
+}
+
+.toggle-group-item {
+  @apply py-1;
+  @apply px-3;
+}
+
+*[data-state='on'] {
+  @apply bg-gray-500;
+  @apply text-white;
+  @apply font-bold;
+}
+
+*[data-state='off'] {
+  @apply bg-gray-200;
+  @apply text-gray-500;
+  @apply font-medium
 }

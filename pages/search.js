@@ -39,7 +39,7 @@ const Validator = ({ session, setSession, login, setLogin }) => {
   useEffect(() => {
     if (value) {
       suggest(value, {
-        endpoint: geocoders.point,
+        endpoint: geocoders.prod,
       }).then((r) => {
         setSuggestions(r.suggestions);
       });

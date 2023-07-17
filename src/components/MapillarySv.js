@@ -125,12 +125,12 @@ const MapillarySv = ({ svImage, svImages, setSvImage, setSvBearing, feature }) =
 
   useEffect(() => {
     if (streetview) {
-      let coords = centroid(arcgisToGeoJSON(feature)).geometry.coordinates
+      let coords = centroid(feature).geometry.coordinates
       let defaultMarker = new SimpleMarker("default-id", { lat: coords[1], lng: coords[0] }, markerStyle);
       let markerComponent = streetview.getComponent("marker");
       markerComponent.add([defaultMarker]);
 
-      let imagesByDistance = _.sortBy(svImages, i => distance(i.geometry, centroid(arcgisToGeoJSON(feature))))
+      let imagesByDistance = _.sortBy(svImages, i => distance(i.geometry, centroid(feature)))
       if(svImage) {
         let filtered = imagesByDistance.filter(i => i.properties.sequence_id === svImage.properties.sequence_id)
         if (filtered.length > 0) {
@@ -145,7 +145,7 @@ const MapillarySv = ({ svImage, svImages, setSvImage, setSvBearing, feature }) =
       }
       streetview.moveTo(imagesByDistance.slice(0, 20).sort((a, b) => a.properties.captured_at < b.properties.captured_at)[0].properties.id).then(i => {
         let imageCoords = i._core.geometry.coordinates ? i._core.geometry.coordinates : [i._core.geometry.lng, i._core.geometry.lat]
-        let featureCentroid = centroid(arcgisToGeoJSON(feature)).geometry.coordinates
+        let featureCentroid = centroid(feature).geometry.coordinates
         let center = computeBearing(i, imageCoords, featureCentroid)
         streetview.setCenter(center)
       })
@@ -154,7 +154,7 @@ const MapillarySv = ({ svImage, svImages, setSvImage, setSvBearing, feature }) =
   }, [feature, streetview])
 
   useEffect(() => {
-    let imagesByDistance = _.sortBy(svImages, i => distance(i.geometry, centroid(arcgisToGeoJSON(feature)))).slice(0, 20)
+    let imagesByDistance = _.sortBy(svImages, i => distance(i.geometry, centroid(feature))).slice(0, 20)
 
     let uniqSeq = _.uniqBy(imagesByDistance, 'properties.sequence_id').map(i => {
       return {
@@ -174,11 +174,11 @@ const MapillarySv = ({ svImage, svImages, setSvImage, setSvBearing, feature }) =
         {
           sequences && svImage && 
           <select value={svImage.properties.sequence_id} onChange={(e) => {
-              let imagesInSeq = _.sortBy(svImages, i => distance(i.geometry, centroid(arcgisToGeoJSON(feature))))
+              let imagesInSeq = _.sortBy(svImages, i => distance(i.geometry, centroid(feature)))
                 .filter(i => i.properties.sequence_id == e.target.value)
               streetview.moveTo(imagesInSeq[0].properties.id).then(i => {
                 let imageCoords = i._core.geometry.coordinates ? i._core.geometry.coordinates : [i._core.geometry.lng, i._core.geometry.lat]
-                let featureCentroid = centroid(arcgisToGeoJSON(feature)).geometry.coordinates
+                let featureCentroid = centroid(feature).geometry.coordinates
                 let center = computeBearing(i, imageCoords, featureCentroid)
                 streetview.setCenter(center)
               })

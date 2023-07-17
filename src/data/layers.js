@@ -21,13 +21,26 @@ const layers = {
     color: "rgb(170, 200, 221)",
     formatter: (a) => {
       return {
+        title: [a.properties.street_number, a.properties.street_prefix, a.properties.street_name, a.properties.street_type, a.properties.unit_type, a.properties.unit_number].join(" "),
         attributes: {
-          "Street Number": a.properties.street_number,
-          "Street Prefix": a.properties.street_prefix,
-          "Street Name": a.properties.street_name,
-          "Street Type": a.properties.street_type,
-          "Unit Type": a.properties.unit_type,
-          "Unit Number": a.properties.unit_number,
+          "Street number": a.properties.street_number,
+          "Street prefix": a.properties.street_prefix,
+          "Street name": a.properties.street_name,
+          "Street type": a.properties.street_type,
+          "Unit type": a.properties.unit_type,
+          "Unit number": a.properties.unit_number,
+        },
+        groups: {
+          "Primary address": [
+            "Street number",
+            "Street prefix",
+            "Street name",
+            "Street type",
+          ],
+          "Subaddress": [
+            "Unit type",
+            "Unit number"
+          ]
         }
       }
     }
@@ -47,9 +60,15 @@ const layers = {
     link: "building-linked",
     formatter: (b) => {
       return {
+        title: b.properties.also_known_as,
         attributes: {
-          "Use type": b.properties.use_category,
+          "Status": b.properties.status,
         },
+        groups: {
+          "Building": [
+            "Status",
+          ] 
+        }
       };
     },
   },
@@ -70,13 +89,14 @@ const layers = {
     link: "parcel-linked",
     formatter: (p) => {
       return {
+        title: p.properties.address,
         attributes: {
           "Parcel address": p.properties.address,
           "Taxpayer": p.properties.taxpayer_1,
           "Taxpayer (ext)": p.properties.taxpayer_2,
           "Taxpayer address": `${p.properties.taxpayer_street}, ${p.properties.taxpayer_city}, ${p.properties.taxpayer_state} ${p.properties.taxpayer_zip}`,
-          "Sale date": p.properties.sale_date ? moment(p.properties.sale_date).format("MM/DD/YYYY") : null,
-          "Sale price": parseInt(p.properties.sale_price).toLocaleString(),
+          "Sale date": p.properties.sale_date ? moment(p.properties.sale_date).format("LL") : null,
+          "Sale price": `$${parseInt(p.properties.sale_price).toLocaleString()}`,
           "PRE %": p.properties.homestead_pre.toLocaleString(),
           "NEZ": p.properties.nez,
           "Is Improved?": p.properties.is_improved === 0 ? "No" : "Yes",
@@ -91,6 +111,33 @@ const layers = {
           "Total Square Footage": p.properties.total_square_footage,
           "Depth x Frontage": `${p.properties.depth} x ${p.properties.frontage}`,
           "Zoning": p.properties.zoning,
+        },
+        groups: {
+          "Ownership": [
+            "Taxpayer",
+            "Taxpayer (ext)",
+            "Taxpayer address",
+            "PRE %",
+            "NEZ",
+            "Sale date",
+            "Sale price"
+          ],
+          "Usage & classification": [
+            "Property Class",
+            "Property Use",
+            "Zoning",
+            "Style",
+          ],
+          "Taxation": [
+            "Taxable status",
+            "Assessed value",
+            "Taxable value",
+          ],
+          "Dimensions": [
+            "Total Acreage",
+            "Total Square Footage",
+            "Depth x Frontage",
+          ]
         },
         longAttributes: {
           "Legal description": p.properties.legal_description,
@@ -112,8 +159,8 @@ const layers = {
     color: "rgb(148, 70, 109)",
     text_color: "#eee",
     formatter: (s) => {
-      console.log(s)
       return {
+        title: [s.properties.street_direction, s.properties.street_name, s.properties.street_type].join(" "),
         attributes: {
           "Street direction": s.properties.street_direction,
           "Street name": s.properties.street_name,
@@ -123,6 +170,21 @@ const layers = {
           "Jurisdiction": s.properties.legal_system,
           "Functional class code": s.properties.functional_class_code,
         },
+        groups: {
+          "Name": [
+            "Street direction",
+            "Street name",
+            "Street type",
+          ],
+          "Address ranges": [
+            "MGF - Left range",
+            "MGF - Right range",
+          ],
+          "Classification": [
+            "Jurisdiction",
+            "Functional class code",
+          ]
+        }
       };
     }
   },

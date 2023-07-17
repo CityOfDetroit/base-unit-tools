@@ -45,17 +45,17 @@ const Candidate = ({ candidate, session }) => {
   let candidateData = {
     "Base unit links": {
       Address: (
-        <a href={`/address/${address_id}`} target="_blank">
+        <a href={`/map?id=${address_id}&type=addresses`} target="_blank">
           {address_id}
         </a>
       ),
       Building: (
-        <a href={`/building/${building_id}`} target="_blank">
+        <a href={`/map?id=${building_id}&type=buildings`} target="_blank">
           {building_id}
         </a>
       ),
-      Parcel: <a href={`/parcel/${parcel_id}`}>{parcel_id}</a>,
-      Street: <a href={`/street/${street_id}`}>{street_id}</a>,
+      Parcel: <a href={`/map?id=${parcel_id}&type=parcels`}>{parcel_id}</a>,
+      Street: <a href={`/map?id=${street_id}&type=streets`}>{street_id}</a>,
     },
     "External links": {
       "Google Maps": (

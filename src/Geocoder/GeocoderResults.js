@@ -93,7 +93,7 @@ const GeocoderResults = ({
         accessor: "address_id",
         Header: "Address ID",
         Cell: (row) => (
-          <a target={`_blank`} href={`/address/${row.value}`}>
+          <a target={`_blank`} href={`/map?id=${row.value}&type=addresses`}>
             {row.value}
           </a>
         ),
@@ -102,7 +102,7 @@ const GeocoderResults = ({
         accessor: "building_id",
         Header: "Building ID",
         Cell: (row) => (
-          <a target={`_blank`} href={`/building/${row.value}`}>
+          <a target={`_blank`} href={`/map?id=${row.value}&type=buildings`}>
             {row.value}
           </a>
         ),
@@ -112,7 +112,7 @@ const GeocoderResults = ({
         maxWidth: 15,
         Header: "Parcel ID",
         Cell: (row) => (
-          <a target={`_blank`} href={`/parcel/${row.value}`}>
+          <a target={`_blank`} href={`/map?id=${row.value}&type=parcels`}>
             {row.value}
           </a>
         ),
@@ -121,7 +121,7 @@ const GeocoderResults = ({
         accessor: "street_id",
         Header: "Street ID",
         Cell: (row) => (
-          <a target={`_blank`} href={`/street/${row.value}`}>
+          <a target={`_blank`} href={`/map?id=${row.value}&type=streets`}>
             {row.value}
           </a>
         ),

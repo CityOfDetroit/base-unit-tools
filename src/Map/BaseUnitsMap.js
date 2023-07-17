@@ -4,17 +4,38 @@ import bbox from "@turf/bbox";
 import _ from "lodash";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Mapbox from "react-map-gl";
 import layers from "../data/layers";
 import { geocoders } from "../hooks/useGeocoder";
-import { baseStyle } from "../styles/mapstyle";
+import { baseStyle, satelliteStyle, linenStyle } from "../styles/mapstyle";
+import videoIcon from "../images/video.png";
 
-const BaseUnitsMap = ({ feature, selectFeature, setSelectFeature, linked }) => {
+const BaseUnitsMap = ({
+  feature,
+  selectFeature,
+  setSelectFeature,
+  linked,
+  visible,
+  basemap,
+  setSvImages,
+  svImage,
+  svBearing,
+  streetView,
+}) => {
   let featureId = selectFeature.id;
   let featureType = selectFeature.type;
 
-  let style = _.cloneDeep(baseStyle);
+  console.log(visible)
+
+  // set the style based on the basemap
+  let styles = {
+    streets: baseStyle,
+    satellite: satelliteStyle(),
+    linen: linenStyle(),
+  };
+
+  let style = _.cloneDeep(styles[basemap]);
 
   // highlight the selected feature
   if (featureId && featureType) {
@@ -31,8 +52,6 @@ const BaseUnitsMap = ({ feature, selectFeature, setSelectFeature, linked }) => {
     );
 
     // set our clickedType link to null
-    // theMap.setFilter(layer.link, ["==", "$id", ""])
-
     // loop thru the others and get their linked
     others.forEach((o) => {
       let filter;
@@ -48,6 +67,27 @@ const BaseUnitsMap = ({ feature, selectFeature, setSelectFeature, linked }) => {
     });
   }
 
+
+  if (Object.values(visible).every((v) => v === false) === false) {
+    // set the visibility of the layers
+    Object.keys(visible).forEach((key) => {
+      style.layers.forEach((l) => {
+        if (l["source-layer"] === key) {
+          l.layout.visibility = visible[key] ? "visible" : "none";
+        }
+      });
+    });
+  }
+
+  // set svBearing
+  if (svImage) {
+    let layer = style.layers.find((l) => l.id === "mapillary-location");
+    layer.layout.visibility = streetView ? "visible" : "none";
+    layer.layout['icon-rotate'] = svBearing - 90;
+    layer.filter = ["==", "id", parseInt(svImage.properties.id)];
+    console.log(style.layers.find((l) => l.id === "mapillary-location"));
+  }
+
   const map = useRef();
   const initialViewState = {
     bounds: [-83.287803, 42.255192, -82.910451, 42.45023],
@@ -57,12 +97,23 @@ const BaseUnitsMap = ({ feature, selectFeature, setSelectFeature, linked }) => {
     },
   };
 
-  if (feature) {
-    map.current.fitBounds(bbox(feature), {
-      padding: 50,
-      maxZoom: 17,
-    });
-  }
+  // useEffect(() => {
+  //   if (map.current) {
+  //     map.current.loadImage(videoIcon, (error, image) => {
+  //       if (error) throw error;
+  //       map.current.addImage("video", image);
+  //     });
+  //   }
+  // }, [map.current]);
+
+  useEffect(() => {
+    if (feature && map.current) {
+      map.current.fitBounds(bbox(feature), {
+        padding: 50,
+        maxZoom: 17.51,
+      });
+    }
+  }, [feature]);
 
   const handleClick = (e) => {
     let clicked = map.current.queryRenderedFeatures(e.point, {
@@ -83,13 +134,10 @@ const BaseUnitsMap = ({ feature, selectFeature, setSelectFeature, linked }) => {
   };
 
   const handleGeocode = (address) => {
-
     // check address to see if it matches Detroit parcel regex
     let parcelRegex = /^([0,1,2][0-9])([0-9]{6,})([0-9L\.\-]{1,})$/;
 
     if (parcelRegex.test(address)) {
-      console.log("It's a parcel!");
-
       queryFeatures({
         url: layers.parcels.feature_service,
         where: `parcel_number = '${address}'`,
@@ -108,7 +156,7 @@ const BaseUnitsMap = ({ feature, selectFeature, setSelectFeature, linked }) => {
             type: null,
           });
         }
-      })
+      });
     }
 
     // otherwise, geocode the input as an address
@@ -120,10 +168,25 @@ const BaseUnitsMap = ({ feature, selectFeature, setSelectFeature, linked }) => {
       }).then((response) => {
         if (response.candidates.length > 0) {
           if (response.candidates[0].attributes.address_id !== 0) {
-            setSelectFeature({
-              id: response.candidates[0].attributes.address_id,
-              type: "addresses",
-            });
+            // if there's just one key true in "visible", put that in a variable
+            let visibleLayers = Object.keys(visible).filter(
+              (key) => visible[key] === true
+            );
+            if (visibleLayers.length === 1) {
+              let layer = layers[visibleLayers[0]];
+              console.log(response.candidates[0].attributes);
+              setSelectFeature({
+                id: response.candidates[0].attributes[
+                  visibleLayers[0] === "parcels" ? "parcel_id" : layer.id_column
+                ],
+                type: visibleLayers[0],
+              });
+            } else {
+              setSelectFeature({
+                id: response.candidates[0].attributes.address_id,
+                type: "addresses",
+              });
+            }
           }
           map.current.easeTo({
             center: [
@@ -140,6 +203,16 @@ const BaseUnitsMap = ({ feature, selectFeature, setSelectFeature, linked }) => {
           });
         }
       });
+    }
+  };
+
+  const handleMoveEnd = (e) => {
+    if (map.current.getZoom() > 17.5) {
+      let features = map.current.queryRenderedFeatures({
+        layers: ["mapillary-images"],
+      });
+      let uniqs = _.uniqBy(features, "properties.id");
+      setSvImages(uniqs);
     }
   };
 
@@ -160,7 +233,8 @@ const BaseUnitsMap = ({ feature, selectFeature, setSelectFeature, linked }) => {
             }
           }}
         />
-        <button onClick={() => handleGeocode(search)}>Search</button>
+        <button onClick={() => handleGeocode(search)}
+        className="button">Search</button>
       </div>
       <Mapbox
         ref={map}
@@ -168,6 +242,7 @@ const BaseUnitsMap = ({ feature, selectFeature, setSelectFeature, linked }) => {
         mapStyle={style}
         onDblClick={handleDblClick}
         onClick={handleClick}
+        onMoveEnd={handleMoveEnd}
         doubleClickZoom={false}
         initialViewState={initialViewState}
         interactiveLayerIds={Object.keys(layers).map(
