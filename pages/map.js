@@ -11,6 +11,25 @@ import ExplorerFeature from "../src/Explorer/ExplorerFeature";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import MapillarySv from "../src/components/MapillarySv";
 
+const constructParams = (selectFeature, visible, basemap) => {
+  let params = [];
+
+  if(selectFeature && selectFeature.id !== undefined && selectFeature.type !== undefined) {
+    params.push(`id=${selectFeature.id}`);
+    params.push(`type=${selectFeature.type}`);
+  }
+
+  if(visible && visible !== undefined) {
+    params.push(`layers=${Object.keys(visible).filter(key => visible[key]).join(",")}`);
+  }
+
+  if(basemap && basemap !== undefined) {
+    params.push(`basemap=${basemap}`);
+  }
+
+  return params.join("&");
+}
+
 const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
   let introduction = (
     <>
@@ -68,51 +87,90 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
   let [svBearing, setSvBearing] = useState(0);
   let [streetView, setStreetView] = useState(false);
 
-  // when the query params change, update the selectFeature state
   useEffect(() => {
-    setSelectFeature({
-      id: router.query.id,
-      type: router.query.type,
-    });
-  }, [router.query.id, router.query.type]);
-
-  useEffect(() => {
-    if (router.query.layer) {
+    console.log('Router layers:', router.query.layers)
+    if(!router) return;
+    if(router && !router.isReady) return;
+    if(router && router.query.layers !== undefined && router.isReady) {
       setVisible({
-        addresses: router.query.layer === "addresses" ? false : false,
-        parcels: router.query.layer === "parcels" ? true : false,
-        buildings: router.query.layer === "buildings" ? true : false,
-        streets: router.query.layer === "streets" ? true : false,
+        parcels: router.query.layers.includes("parcels") ? true : false,
+        buildings: router.query.layers.includes("buildings") ? true : false,
+        streets: router.query.layers.includes("streets") ? true : false,
       });
     }
-  }, [router.query.layer]);
-
-  // when the selectFeature state changes, update the query params
-  useEffect(() => {
-    if (selectFeature.id && selectFeature.type) {
-      router.replace(
-        `/map?id=${selectFeature.id}&type=${selectFeature.type}`,
-        undefined,
-        { shallow: true }
-      );
+    if (router && router.isReady && router.query.layers === undefined) {
+      setVisible({
+        parcels: true,
+        buildings: true,
+        streets: true
+      });
     }
-  }, [feature]);
+  }, [router.query.layers]);
 
   useEffect(() => {
-    // console.log(svImages);
-  }, [svImages]);
+    if(router.query.basemap !== undefined) {
+      setBasemap(router.query.basemap);
+    }
+  }, [router.query.basemap]);
+
+  useEffect(() => {
+    if(router.query.streetView !== undefined) {
+      setStreetView(router.query.streetView === "true" ? true : false);
+    }
+  }, [router.query.streetView]);
+
+  useEffect(() => {
+    if (router.query.id && router.query.type) {
+      setSelectFeature({
+        id: router.query.id,
+        type: router.query.type,
+      });
+    }
+  }, [router.query.id, router.query.type]);
 
   // this stores which layers are visible on the map
   let [visible, setVisible] = useState({
-    addresses:
-      (router.query.layer === "addresses" || !router.query.layer) ? false : false,
-    parcels:
-      (router.query.layer === "parcels" || !router.query.layer) ? true : false,
-    buildings:
-      (router.query.layer === "buildings" || !router.query.layer) ? true : false,
-    streets:
-      (router.query.layer === "streets" || !router.query.layer) ? true : false,
+    parcels: true,
+    buildings: true,
+    streets: true
   });
+
+  // if any one of these changes, update the URL using constructParams
+  useEffect(() => {
+    if(feature && router.isReady) {
+      let params = constructParams(selectFeature, visible, basemap);
+      console.log("Feature", params)
+      router.replace(
+        `/map?${params}`,
+        undefined,
+        { shallow: true }
+        );
+    }
+  }, [feature])
+
+  useEffect(() => {
+    if(visible && router.isReady) {
+      let params = constructParams(selectFeature, visible, basemap);
+      console.log("Visible", params)
+      router.replace(
+        `/map?${params}`,
+        undefined,
+        { shallow: true }
+        );
+    }
+  }, [visible])
+
+  useEffect(() => {
+    if(basemap && router.isReady) {
+      let params = constructParams(selectFeature, visible, basemap);
+      console.log("Basemap", params)
+      router.replace(
+        `/map?${params}`,
+        undefined,
+        { shallow: true }
+        );
+    }
+  }, [basemap])
 
   return (
     <>
@@ -137,7 +195,7 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
                   }
                 }}
               >
-                {["streets", "satellite", "linen"].map((key) => (
+                {(session ? ["streets", "satellite", "linen"] : ['streets', 'satellite']).map((key) => (
                   <ToggleGroup.Item
                     key={key}
                     value={key}
@@ -156,27 +214,19 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
               Visible layers
             </p>
             {/* ToggleGroup for setVisible */}
-            {router && (
+            {visible && router.isReady && (
               <ToggleGroup.Root
                 type="multiple"
                 className="grid grid-cols-2 gap-1"
-                defaultValue={
-                  router.query.layer
-                    ? [router.query.layer]
-                    : ["parcels", "buildings", "streets"]
-                }
+                defaultValue={Object.keys(visible).filter(key => visible[key])}
                 onValueChange={(value) => {
-                  console.log(value);
-                  let newVisible = {
-                    addresses: false,
-                    parcels: false,
-                    buildings: false,
-                    streets: false,
-                  };
-                  value.forEach((v) => {
-                    newVisible[v] = true;
-                  });
-                  setVisible(newVisible);
+                  if(router.isReady) {
+                    setVisible({
+                      parcels: value.includes("parcels") ? true : false,
+                      buildings: value.includes("buildings") ? true : false,
+                      streets: value.includes("streets") ? true : false,
+                    });
+                  }
                 }}
               >
                 {Object.keys(visible).map((key) => (
@@ -226,20 +276,21 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
 
       {/* the main panel contains the map, and we pass it many of our useState variables */}
       <main>
-        <BaseUnitsMap
+        {visible && <BaseUnitsMap
           {...{
             feature,
             selectFeature,
             setSelectFeature,
             linked,
             visible,
+            setVisible,
             basemap,
             setSvImages,
             svImage,
             svBearing,
             streetView
           }}
-        />
+        />}
       </main>
     </>
   );

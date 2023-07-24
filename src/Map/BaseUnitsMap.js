@@ -17,6 +17,7 @@ const BaseUnitsMap = ({
   setSelectFeature,
   linked,
   visible,
+  setVisible,
   basemap,
   setSvImages,
   svImage,
@@ -138,6 +139,12 @@ const BaseUnitsMap = ({
     let parcelRegex = /^([0,1,2][0-9])([0-9]{6,})([0-9L\.\-]{1,})$/;
 
     if (parcelRegex.test(address)) {
+
+      setVisible({
+        ...visible,
+        parcels: true
+      })
+
       queryFeatures({
         url: layers.parcels.feature_service,
         where: `parcel_number = '${address}'`,
@@ -157,6 +164,7 @@ const BaseUnitsMap = ({
           });
         }
       });
+
     }
 
     // otherwise, geocode the input as an address
