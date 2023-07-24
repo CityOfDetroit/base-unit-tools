@@ -253,7 +253,7 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
               className="inline-flex rounded"
               defaultValue={streetView ? "streetView" : "streetView"}
               onValueChange={(value) => {
-                setStreetView(value === "streetView" ? true : false);
+                setStreetView(!streetView);
               }}
             >
               <ToggleGroup.Item
