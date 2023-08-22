@@ -40,7 +40,6 @@ const ExplorerParcel = ({ feature, clicked, setClicked, linked, setLinked }) => 
                 let feature = d.features[0]
                 let attribs = feature.attributes
                 attribs.legal_description = f.legaldescription
-                attribs.zoning = f.zoning
                 setExtendedAttribs(feature.attributes)
               }
             })
