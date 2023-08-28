@@ -232,7 +232,7 @@ const BaseUnitsMap = ({
         <input
           className="p-2 text-gray-800 bg-gray-100 my-2 w-1/2"
           type="text"
-          placeholder="Search"
+          placeholder="Search by address (2 Woodward) / parcel ID (02002661.)"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => {
