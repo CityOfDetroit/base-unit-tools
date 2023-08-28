@@ -105,7 +105,7 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
         streets: true
       });
     }
-  }, [router.query.layers]);
+  }, []);
 
   useEffect(() => {
     if(router.query.basemap !== undefined) {
