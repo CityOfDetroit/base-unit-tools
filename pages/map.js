@@ -218,7 +218,7 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
               <ToggleGroup.Root
                 type="multiple"
                 className="grid grid-cols-2 gap-1"
-                defaultValue={Object.keys(visible).filter(key => visible[key])}
+                // defaultValue={Object.keys(visible).filter(key => visible[key])}
                 onValueChange={(value) => {
                   if(router.isReady) {
                     setVisible({
