@@ -8,17 +8,6 @@ export const apps = {
         private: false,
         show: true
     },
-    'search': {
-        name: 'Search',
-        description: `Look up & validate an individual address`,
-        questions: [
-            `Is this is a valid address?`
-        ],
-        url: `/search`,
-        icon: faSearch,
-        private: false,
-        show: true
-    },
     'map': {
         name: 'Map',
         url: `/map`,
@@ -27,6 +16,17 @@ export const apps = {
             `Which buildings are linked to that street?`
         ],
         icon: faAtlas,
+        private: false,
+        show: true
+    },
+    'search': {
+        name: 'Search',
+        description: `Look up & validate an individual address`,
+        questions: [
+            `Is this is a valid address?`
+        ],
+        url: `/search`,
+        icon: faSearch,
         private: false,
         show: true
     },
