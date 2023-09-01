@@ -84,6 +84,11 @@ const GeocoderResults = ({
       accessor: "UnitName",
       Header: "Unit Name",
       Cell: (row) => <span className="tracking-tight">{row.value}</span>,
+    },
+    {
+      accessor: "Postal",
+      Header: "Zip Code",
+      Cell: (row) => <span className="tracking-tight">{row.value}</span>,
     }
   ];
 
@@ -187,7 +192,9 @@ const GeocoderResults = ({
   //
   let dataForExcelExport = rows.map((row, idx) => {
     let newRow = { ...row.values };
-
+    
+    newRow["Address"] = newRow["StAddr"]
+    delete newRow["StAddr"]
     newRow["Street Number"] = newRow["AddNum"]
     delete newRow["AddNum"]
     newRow["Street Prefix"] = newRow["StPreDir"]
@@ -200,6 +207,8 @@ const GeocoderResults = ({
     delete newRow["UnitType"]
     newRow["Unit Number"] = newRow["UnitName"]
     delete newRow["UnitName"]
+    newRow["Zip Code"] = newRow["Postal"]
+    delete newRow["Postal"]
 
     if (newRow.parcel_id) {
       newRow.parcel_id = `=""${newRow.parcel_id}""`;
@@ -209,9 +218,12 @@ const GeocoderResults = ({
     }
     return newRow;
   });
+
   let dataForCsvExport = rows.map((row, idx) => {
     let newRow = { ...row.values };
 
+    newRow["Address"] = newRow["StAddr"]
+    delete newRow["StAddr"]
     newRow["Street Number"] = newRow["AddNum"]
     delete newRow["AddNum"]
     newRow["Street Prefix"] = newRow["StPreDir"]
@@ -224,6 +236,8 @@ const GeocoderResults = ({
     delete newRow["UnitType"]
     newRow["Unit Number"] = newRow["UnitName"]
     delete newRow["UnitName"]
+    newRow["Zip Code"] = newRow["Postal"]
+    delete newRow["Postal"]
 
     if (newRow.parcel_id) {
       newRow.parcel_id = `${newRow.parcel_id}`;
