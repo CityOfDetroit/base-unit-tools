@@ -1,7 +1,7 @@
 const SiteFooter = () => (
     <footer className="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-2 py-4 justify-between px-3 text-xs">
         <p>
-          City of Detroit, 2021. 
+          City of Detroit, {new Date().getFullYear()}. 
         </p>
         <p>
           Feedback?{" "}
