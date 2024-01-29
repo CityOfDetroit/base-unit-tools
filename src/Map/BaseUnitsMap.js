@@ -191,8 +191,8 @@ const BaseUnitsMap = ({
               });
             } else {
               setSelectFeature({
-                id: response.candidates[0].attributes.address_id,
-                type: "addresses",
+                id: response.candidates[0].attributes.parcel_id,
+                type: "parcels",
               });
             }
           }
