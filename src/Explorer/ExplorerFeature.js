@@ -69,7 +69,7 @@ const AttributeTable = ({ attributes, groups, title }) => {
                           {attributes[groups[g][f]] &&
                             attributes[groups[g][f]] !== "" && (
                               <CopyValue
-                                value={groups[g][f]}
+                                value={attributes[groups[g][f]]}
                                 className="text-gray-300 hover:text-gray-400 mr-4"
                               />
                             )}
