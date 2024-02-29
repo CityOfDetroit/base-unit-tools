@@ -88,6 +88,7 @@ const layers = {
     highlight: "parcel-highlight",
     link: "parcel-linked",
     formatter: (p) => {
+      console.log(p)
       return {
         title: p.properties.address,
         attributes: {
@@ -111,6 +112,7 @@ const layers = {
           "Total Square Footage": p.properties.total_square_footage,
           "Depth x Frontage": `${p.properties.depth} x ${p.properties.frontage}`,
           "Zoning": p.properties.zoning,
+          "Historic Designation": p.properties.historic_designation
         },
         groups: {
           "Ownership": [
@@ -127,6 +129,7 @@ const layers = {
             "Property Use",
             "Zoning",
             "Style",
+            "Historic Designation"
           ],
           "Taxation": [
             "Taxable status",
