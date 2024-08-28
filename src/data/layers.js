@@ -78,7 +78,7 @@ const layers = {
     label: "Parcel",
     endpoint: HOSTED_ROOT_DEV + "3",
     feature_service:
-      "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Parcels_Current/FeatureServer/0/",
+      "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Parcel_File_2023/FeatureServer/1/",
     id_column: "parcel_number",
     interaction: "parcel-fill",
     click: "parcel_number",
