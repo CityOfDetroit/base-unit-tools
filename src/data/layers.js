@@ -88,7 +88,6 @@ const layers = {
     highlight: "parcel-highlight",
     link: "parcel-linked",
     formatter: (p) => {
-      console.log(p)
       return {
         title: p.properties.address,
         attributes: {

@@ -88,7 +88,6 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
   let [streetView, setStreetView] = useState(false);
 
   useEffect(() => {
-    console.log('Router layers:', router.query.layers)
     if(!router) return;
     if(router && !router.isReady) return;
     if(router && router.query.layers !== undefined && router.isReady) {
@@ -139,7 +138,6 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
   useEffect(() => {
     if(feature && router.isReady) {
       let params = constructParams(selectFeature, visible, basemap);
-      console.log("Feature", params)
       router.replace(
         `/map?${params}`,
         undefined,
@@ -151,7 +149,6 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
   useEffect(() => {
     if(visible && router.isReady) {
       let params = constructParams(selectFeature, visible, basemap);
-      console.log("Visible", params)
       router.replace(
         `/map?${params}`,
         undefined,
@@ -163,7 +160,6 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
   useEffect(() => {
     if(basemap && router.isReady) {
       let params = constructParams(selectFeature, visible, basemap);
-      console.log("Basemap", params)
       router.replace(
         `/map?${params}`,
         undefined,

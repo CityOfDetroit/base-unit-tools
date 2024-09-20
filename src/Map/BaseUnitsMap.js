@@ -27,8 +27,6 @@ const BaseUnitsMap = ({
   let featureId = selectFeature.id;
   let featureType = selectFeature.type;
 
-  console.log(visible)
-
   // set the style based on the basemap
   let styles = {
     streets: baseStyle,
@@ -86,7 +84,6 @@ const BaseUnitsMap = ({
     layer.layout.visibility = streetView ? "visible" : "none";
     layer.layout['icon-rotate'] = svBearing - 90;
     layer.filter = ["==", "id", parseInt(svImage.properties.id)];
-    console.log(style.layers.find((l) => l.id === "mapillary-location"));
   }
 
   const map = useRef();
@@ -182,7 +179,6 @@ const BaseUnitsMap = ({
             );
             if (visibleLayers.length === 1) {
               let layer = layers[visibleLayers[0]];
-              console.log(response.candidates[0].attributes);
               setSelectFeature({
                 id: response.candidates[0].attributes[
                   visibleLayers[0] === "parcels" ? "parcel_id" : layer.id_column
