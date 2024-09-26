@@ -220,7 +220,7 @@ const MapillarySv = ({ svImage, svImages, setSvImage, setSvBearing, feature }) =
             })
           }
           }>
-            {sequences.map(seq => (
+            {sequences.sort((a, b) => b.captured_at > a.captured_at).map(seq => (
               <option key={seq.sequence_id} value={seq.sequence_id}>{seq.readable_ts}</option>
             ))}
           </select>}
