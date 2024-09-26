@@ -138,9 +138,7 @@ const MapillarySv = ({ svImage, svImages, setSvImage, setSvBearing, feature }) =
         markerComponent.add([defaultMarker]);
   
         let imagesByDistance = _.sortBy(svImages, i => distance(i.geometry, centroid(feature)))
-  
-        console.log(imagesByDistance.map(i => moment(i.properties.captured_at).format("ll")))
-  
+    
         let sequences = []
   
         imagesByDistance.forEach(img => {
@@ -163,8 +161,6 @@ const MapillarySv = ({ svImage, svImages, setSvImage, setSvBearing, feature }) =
   
         let sortedSequences = sequences.sort((a, b) => b[2] - a[2])
   
-        console.log(sortedSequences)
-
         if(sortedSequences === undefined || sortedSequences.length === 0) {
           return;
         }
@@ -201,17 +197,11 @@ const MapillarySv = ({ svImage, svImages, setSvImage, setSvBearing, feature }) =
         readable_ts: moment(i.properties.captured_at).format("ll")
       }
     }).sort((a, b) => b.captured_at > a.captured_at)
-    setSequences(_.uniqBy(uniqSeq, 'readable_ts'))
+
+    let sequences = _.uniqBy(uniqSeq, 'readable_ts')
+    console.log(sequences)
+    setSequences(sequences)
   }, [svImages])
-
-  console.log(svImage)
-
-  const [isFullScreen, setIsFullScreen] = useState(false)
-
-  const toggleFs = () => {
-    setIsFullScreen(!isFullScreen)
-    streetview.resize()
-  }
 
   return (
     <>
