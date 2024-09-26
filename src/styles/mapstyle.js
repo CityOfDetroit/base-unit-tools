@@ -60,7 +60,6 @@ export const baseStyle = {
       tiles: [
         "https://tiles.mapillary.com/maps/vtp/mly1_computed_public/2/{z}/{x}/{y}?access_token=MLY|4690399437648324|de87555bb6015affa20c3df794ebab15",
       ],
-      // "tiles": ["https://tiles.mapillary.com/maps/vtp/mly1/2/{z}/{x}/{y}?access_token=MLY|4690399437648324|de87555bb6015affa20c3df794ebab15"],
       maxzoom: 14,
       minzoom: 14,
     },
@@ -4916,7 +4915,6 @@ export const baseStyle = {
       filter: [
         "all",
         ["==", "is_pano", true],
-        ["==", "organization_id", 518073312556755],
       ],
       layout: {
         visibility: "visible",

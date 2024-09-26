@@ -108,7 +108,8 @@ footer {
 /* desktop styling */
 @media only screen and (min-width: 769px) {
   .explorer-map {
-    height: calc(100vh - 64px - 48px - 1rem);
+    height: calc(50vh - 64px - 48px - 1rem);
+    /* height: auto; */
   }
 
   .mailer-map {
@@ -256,7 +257,7 @@ a {
 }
 
 #mly-viewer {
-  height: 300px;
+  height: 40vh;
 }
 
 .app-intro p {

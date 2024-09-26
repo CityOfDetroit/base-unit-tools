@@ -113,7 +113,7 @@ const MapillarySv = ({ svImage, svImages, setSvImage, setSvBearing, feature }) =
     viewer.on("image", function (e) {
       e.target.getBearing()
         .then(d => setSvBearing(d))
-      setSvImage({ properties: {...e.image._core, sequence_id: e.image._spatial.sequence }})
+      setSvImage({ properties: { ...e.image._core, sequence_id: e.image._spatial.sequence } })
     });
 
     viewer.on("pov", function (e) {
@@ -125,36 +125,73 @@ const MapillarySv = ({ svImage, svImages, setSvImage, setSvBearing, feature }) =
 
   useEffect(() => {
     if (streetview) {
-      let coords = centroid(feature).geometry.coordinates
-      let defaultMarker = new SimpleMarker("default-id", { lat: coords[1], lng: coords[0] }, markerStyle);
-      let markerComponent = streetview.getComponent("marker");
-      markerComponent.add([defaultMarker]);
 
-      let imagesByDistance = _.sortBy(svImages, i => distance(i.geometry, centroid(feature)))
       if(svImage) {
-        let filtered = imagesByDistance.filter(i => i.properties.sequence_id === svImage.properties.sequence_id)
-        if (filtered.length > 0) {
-          setSvImage(filtered[0])
-        }
-        else {
-          setSvImage(imagesByDistance.slice(0, 20).sort((a, b) => a.properties.captured_at < b.properties.captured_at)[0])
-        }
+        streetview.deactivateCover()
       }
-      else {
-        setSvImage(imagesByDistance.slice(0, 20).sort((a, b) => a.properties.captured_at < b.properties.captured_at)[0])
-      }
-      streetview.moveTo(imagesByDistance.slice(0, 20).sort((a, b) => a.properties.captured_at < b.properties.captured_at)[0].properties.id).then(i => {
-        let imageCoords = i._core.geometry.coordinates ? i._core.geometry.coordinates : [i._core.geometry.lng, i._core.geometry.lat]
-        let featureCentroid = centroid(feature).geometry.coordinates
-        let center = computeBearing(i, imageCoords, featureCentroid)
-        streetview.setCenter(center)
-      })
 
+      if(svImages) {
+
+        let coords = centroid(feature).geometry.coordinates
+        let defaultMarker = new SimpleMarker("default-id", { lat: coords[1], lng: coords[0] }, markerStyle);
+        let markerComponent = streetview.getComponent("marker");
+        markerComponent.add([defaultMarker]);
+  
+        let imagesByDistance = _.sortBy(svImages, i => distance(i.geometry, centroid(feature)))
+  
+        console.log(imagesByDistance.map(i => moment(i.properties.captured_at).format("ll")))
+  
+        let sequences = []
+  
+        imagesByDistance.forEach(img => {
+          if (sequences.map(s => s[0]).indexOf(img.properties.sequence_id) > -1) {
+            return;
+          }
+          if (distance(img.geometry, centroid(feature)) > 0.04) {
+            return;
+          }
+          else {
+            sequences.push([
+              img.properties.sequence_id,
+              img.properties.id,
+              img.properties.captured_at,
+              moment(img.properties.captured_at).format("ll"),
+              distance(img.geometry, centroid(feature))
+            ])
+          }
+        })
+  
+        let sortedSequences = sequences.sort((a, b) => b[2] - a[2])
+  
+        console.log(sortedSequences)
+
+        if(sortedSequences === undefined || sortedSequences.length === 0) {
+          return;
+        }
+  
+        let initialImage = imagesByDistance.find(img => img.properties.id == sortedSequences[0][1])
+  
+        setSvImage(initialImage)
+  
+        streetview.moveTo(initialImage.properties.id).then(i => {
+          let imageCoords = i._core.geometry.coordinates ? i._core.geometry.coordinates : [i._core.geometry.lng, i._core.geometry.lat]
+          let featureCentroid = centroid(feature).geometry.coordinates
+          let center = computeBearing(i, imageCoords, featureCentroid)
+          streetview.setCenter(center)
+        })
+      }
     }
   }, [feature, streetview])
 
   useEffect(() => {
-    let imagesByDistance = _.sortBy(svImages, i => distance(i.geometry, centroid(feature))).slice(0, 20)
+    let imagesByDistance = _.sortBy(svImages, i => distance(i.geometry, centroid(feature))).filter(img => {
+      if (distance(img.geometry, centroid(feature)) > 0.04) {
+        return false;
+      }
+      else {
+        return true;
+      }
+    })
 
     let uniqSeq = _.uniqBy(imagesByDistance, 'properties.sequence_id').map(i => {
       return {
@@ -167,27 +204,36 @@ const MapillarySv = ({ svImage, svImages, setSvImage, setSvBearing, feature }) =
     setSequences(_.uniqBy(uniqSeq, 'readable_ts'))
   }, [svImages])
 
+  console.log(svImage)
+
+  const [isFullScreen, setIsFullScreen] = useState(false)
+
+  const toggleFs = () => {
+    setIsFullScreen(!isFullScreen)
+    streetview.resize()
+  }
+
   return (
     <>
       <h2 className="text-sm md:text-lg bg-gray-200 p-2 flex items-center justify-between">
         <span><FontAwesomeIcon icon={faStreetView} className="mr-2" />Street view</span>
         {
-          sequences && svImage && 
+          sequences && svImage &&
           <select value={svImage.properties.sequence_id} onChange={(e) => {
-              let imagesInSeq = _.sortBy(svImages, i => distance(i.geometry, centroid(feature)))
-                .filter(i => i.properties.sequence_id == e.target.value)
-              streetview.moveTo(imagesInSeq[0].properties.id).then(i => {
-                let imageCoords = i._core.geometry.coordinates ? i._core.geometry.coordinates : [i._core.geometry.lng, i._core.geometry.lat]
-                let featureCentroid = centroid(feature).geometry.coordinates
-                let center = computeBearing(i, imageCoords, featureCentroid)
-                streetview.setCenter(center)
-              })
-            }
+            let imagesInSeq = _.sortBy(svImages, i => distance(i.geometry, centroid(feature)))
+              .filter(i => i.properties.sequence_id == e.target.value)
+            streetview.moveTo(imagesInSeq[0].properties.id).then(i => {
+              let imageCoords = i._core.geometry.coordinates ? i._core.geometry.coordinates : [i._core.geometry.lng, i._core.geometry.lat]
+              let featureCentroid = centroid(feature).geometry.coordinates
+              let center = computeBearing(i, imageCoords, featureCentroid)
+              streetview.setCenter(center)
+            })
+          }
           }>
-          {sequences.map(seq => (
-            <option key={seq.sequence_id} value={seq.sequence_id}>{seq.readable_ts}</option>
-          ))}
-        </select>}
+            {sequences.map(seq => (
+              <option key={seq.sequence_id} value={seq.sequence_id}>{seq.readable_ts}</option>
+            ))}
+          </select>}
       </h2>
       <section className="sidebar-section">
         <div id="mly-viewer"/>

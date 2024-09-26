@@ -23,6 +23,7 @@ const BaseUnitsMap = ({
   svImage,
   svBearing,
   streetView,
+  children
 }) => {
   let featureId = selectFeature.id;
   let featureType = selectFeature.type;
@@ -144,13 +145,13 @@ const BaseUnitsMap = ({
 
       queryFeatures({
         url: layers.parcels.feature_service,
-        where: `parcel_number = '${address}'`,
+        where: `parcel_id = '${address}'`,
         outFields: "*",
         f: "geojson",
       }).then((response) => {
         if (response.features.length > 0) {
           setSelectFeature({
-            id: response.features[0].properties.parcel_number,
+            id: response.features[0].properties.parcel_id,
             type: "parcels",
           });
         }
@@ -215,8 +216,8 @@ const BaseUnitsMap = ({
       let features = map.current.queryRenderedFeatures({
         layers: ["mapillary-images"],
       });
-      let uniqs = _.uniqBy(features, "properties.id");
-      setSvImages(uniqs);
+      // let uniqs = _.uniqBy(features, "properties.id");
+      setSvImages(features);
     }
   };
 
@@ -240,6 +241,9 @@ const BaseUnitsMap = ({
         <button onClick={() => handleGeocode(search)}
         className="button">Search</button>
       </div>
+      <div>
+        {children}
+      </div>
       <Mapbox
         ref={map}
         mapLib={maplibregl}
@@ -252,6 +256,7 @@ const BaseUnitsMap = ({
         interactiveLayerIds={Object.keys(layers).map(
           (l) => layers[l].interaction
         )}
+        style={{height: streetView ? `44.5vh`: `90vh`}}
       ></Mapbox>
     </>
   );

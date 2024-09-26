@@ -264,7 +264,6 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
         </div>
       </AppHeader>
       <SiteSidebar title="Explorer">
-        {svImages.length > 0 && streetView && <MapillarySv {...{svImage, svImages, setSvImage, setSvBearing, feature}} />}
         {feature && (
           <ExplorerFeature {...{ feature, selectFeature, setLinked }} />
         )}
@@ -285,8 +284,9 @@ const Explorer = ({ session, setSession, login, setLogin, currentApp }) => {
             svImage,
             svBearing,
             streetView
-          }}
-        />}
+          }}>
+            {svImages.length > 0 && streetView && <MapillarySv {...{svImage, svImages, setSvImage, setSvBearing, feature}} />}
+          </BaseUnitsMap>}
       </main>
     </>
   );
