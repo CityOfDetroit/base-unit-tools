@@ -25,19 +25,25 @@ const SiteFooter = () => {
         >
           <Flex direction={"column"} gap={"2"} minWidth={`200px`}>
             {/* <h3>Tools</h3> */}
-            <Flex direction={"column"} gap={"1"}>
+            <Flex direction={"column"} gap={"2"}>
               {filteredApps.map((key) => {
                 return (
                   <Link to={apps[key].url}>
-                    <Text size={"4"}>{apps[key].name}</Text>
+                    <Text size={"4"} weight="medium">{apps[key].name}</Text>
                   </Link>
                 );
               })}
             </Flex>
           </Flex>
 
-          <Flex direction={"column"} gap={"2"}>
+          <Flex direction={"column"} gap={"1"}>
             <h3>Resources</h3>
+            <Link to="https://base-units-detroitmi.hub.arcgis.com/">
+              <Text size={"2"}>Base Units Hub</Text>
+            </Link>
+            <Link to="https://data.detroitmi.gov/">
+              <Text  size={"2"}>Open Data Portal</Text>
+            </Link>
           </Flex>
         </Grid>
         <Separator size="4" className="my-4 w-svw" />

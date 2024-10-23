@@ -10,7 +10,7 @@ const Homepage = () => {
   return (
     <div className="bg-gray-200 dark:bg-gray-800">
       <Container size={"2"} className="min-h-96">
-        <Box pb={"4"}>
+        <Box py={"5"}>
           <h2 className="cod-style py-2">
             Welcome to the Base Units Tools site
           </h2>
@@ -18,11 +18,9 @@ const Homepage = () => {
             Base Units are the fundamental units of measurement we use to
             describe our city.
           </p>
-          <a href="https://www.baseunits.com" target="_blank" rel="noreferrer">
-            Learn more about them at our Hub Site.
-          </a>
         </Box>
-        <Grid columns={"2"} gap={"4"}>
+        <h3>Tools available on this site</h3>
+        <Grid columns={"2"} gap={"4"} p={"3"}>
           {Object.keys(apps)
             .slice(1)
             .map((app) => {
