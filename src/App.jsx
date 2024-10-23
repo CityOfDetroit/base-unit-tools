@@ -13,6 +13,7 @@ import {
 import { useAuth, AuthProvider } from "./contexts/AuthContext";
 import Login from "./Login";
 import BaseUnitsMap from "./Map/BaseUnitsMap";
+import Geocoder from "./Geocoder/Geocoder";
 
 // Protected route component
 const ProtectedRoute = ({ children }) => {
@@ -31,6 +32,7 @@ function App() {
               <Route path="/" element={<Homepage />} />
               <Route path="/login" element={<Login />} />
               <Route path="/map" element={<BaseUnitsMap />} />
+              <Route path="/geocoder" element={<Geocoder />} />
             </Routes>
           </Layout>
         </Router>

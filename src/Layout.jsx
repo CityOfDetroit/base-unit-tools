@@ -1,10 +1,7 @@
 // src/Layout.js
-import React, { useState, useEffect } from "react";
-import { useAuth } from "./contexts/AuthContext";
-import { useTheme } from "./contexts/ThemeContext";
-import { Container } from "@radix-ui/themes";
-import SiteHeader from "./SiteHeader";
+import React from "react";
 import SiteFooter from "./SiteFooter";
+import SiteHeader from "./SiteHeader";
 
 const Layout = ({ children }) => {
   return (
