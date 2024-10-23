@@ -20,7 +20,6 @@
     "@turf/bearing": "^7.1.0",
     "@turf/centroid": "^7.1.0",
     "@turf/distance": "^7.1.0",
-    "geojson-to-svg": "^1.1.4",
     "mapillary-js": "^4.1.2",
     "maplibre-gl": "^4.7.1",
     "moment": "^2.30.1",
