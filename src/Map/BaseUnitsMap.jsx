@@ -17,6 +17,7 @@ import MapComponent from "./Map";
 import MapGeocoder from "./MapGeocoder";
 import Mapillary from "./Mapillary";
 import MapillarySwitch from "./MapillarySwitch";
+import BuildingLinks from "./BuildingLinks";
 
 const BaseUnitsMap = () => {
 
@@ -162,6 +163,18 @@ const BaseUnitsMap = () => {
               feature,
               layer,
               refetch,
+            }}
+          />
+        )}
+        {feature && layer === "building" && (
+          <BuildingLinks
+            {...{
+              layer,
+              feature,
+              loading,
+              refetch,
+              linkedAddresses,
+              setLinkedAddresses,
             }}
           />
         )}

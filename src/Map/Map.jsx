@@ -50,7 +50,7 @@ const MapComponent = ({
         container: mapRef.current,
         style: baseStyle,
         center: [-83.07715, 42.37927],
-        zoom: 12.5,
+        zoom: 10.75,
       });
 
       map.on("load", () => {
