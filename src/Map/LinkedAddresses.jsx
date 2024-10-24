@@ -68,22 +68,22 @@ const LinkedAddresses = ({
           );
 
         setLinkedAddresses(sortedAddresses);
-        setLoading(false)
+        setLoading(false);
       });
     }
   }, [feature]);
 
   useEffect(() => {
-    if(layer === 'address') {
-      setLinkedAddresses([feature])
-      setLoading(false)
+    if (layer === "address") {
+      setLinkedAddresses([feature]);
+      setLoading(false);
     }
   }, [layer]);
 
   if (layer === "address") {
     return;
   }
-  
+
   return (
     <Collapsible.Root open={open} onOpenChange={setOpen}>
       <Box>
@@ -91,14 +91,17 @@ const LinkedAddresses = ({
           <Flex align={"center"} gap={"2"} className="dark:text-slate-700">
             <SewingPinFilledIcon />
             <Text size="2" weight={"medium"}>
-              {!loading ? 
-                `${linkedAddresses.length === 0 ? 'No' : linkedAddresses.length} addresses linked to this ${layer}`
-                : "loading ..."
-                }
+              {!loading
+                ? `${
+                    linkedAddresses.length === 0 ? "No" : linkedAddresses.length
+                  } addresses linked to this ${layer}`
+                : "loading ..."}
             </Text>
-            {linkedAddresses.length > 0 && <Collapsible.Trigger as={Button} className="ml-auto">
-              {open ? <CaretDownIcon /> : <CaretRightIcon />}
-            </Collapsible.Trigger>}
+            {linkedAddresses.length > 0 && (
+              <Collapsible.Trigger as={Button} className="ml-auto">
+                {open ? <CaretDownIcon /> : <CaretRightIcon />}
+              </Collapsible.Trigger>
+            )}
           </Flex>
         </Card>
 
@@ -106,7 +109,6 @@ const LinkedAddresses = ({
           <Collapsible.Content>
             <Flex
               direction={"column"}
-              gap={"1"}
               p={"2"}
               className="max-h-48 lg:max-h-96 overflow-auto"
             >
@@ -128,22 +130,31 @@ const LinkedAddresses = ({
                       </Text>
                       <Link to={`/map?id=${address.id}&layer=address`}>
                         <Box
-                          className="rounded-full"
+                          className="rounded-full px-1"
                           style={{
                             backgroundColor: layers.address.bg_color,
                             opacity: 0.5,
                           }}
                         >
-                          <ArrowRightIcon
-                            height="22"
-                            width="22"
-                            className="text-black p-1"
-                          />
+                          <Flex>
+                            <Text
+                              size="1"
+                              weight={"bold"}
+                              className="text-black p-1 font-mono"
+                            >
+                              #{props.address_id}
+                            </Text>
+                            <ArrowRightIcon
+                              height="22"
+                              width="22"
+                              className="text-black p-1"
+                            />
+                          </Flex>
                         </Box>
                       </Link>
                     </Flex>
                     {idx + 1 < linkedAddresses.length && (
-                      <Separator size={"4"} p={"2"} />
+                      <Separator size={"4"} my={"1"} />
                     )}
                   </div>
                 );

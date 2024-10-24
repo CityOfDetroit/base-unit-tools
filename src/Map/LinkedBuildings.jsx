@@ -76,7 +76,6 @@ const LinkedBuildings = ({
           <Collapsible.Content>
             <Flex
               direction={"column"}
-              gap={"1"}
               p={"2"}
               className="max-h-48 lg:max-h-96 overflow-auto"
             >
@@ -95,23 +94,32 @@ const LinkedBuildings = ({
                         {props.building_id}
                       </Text>
                       <Link to={`/map?id=${building.id}&layer=building`}>
-                        <Box
-                          className="rounded-full"
+                      <Box
+                          className="rounded-full px-1"
                           style={{
                             backgroundColor: layers.building.bg_color,
                             opacity: 0.5,
                           }}
                         >
-                          <ArrowRightIcon
-                            height="22"
-                            width="22"
-                            className="text-black p-1"
-                          />
+                          <Flex>
+                            <Text
+                              size="1"
+                              weight={"bold"}
+                              className="text-black p-1 font-mono"
+                            >
+                              #{props.building_id}
+                            </Text>
+                            <ArrowRightIcon
+                              height="22"
+                              width="22"
+                              className="text-black p-1"
+                            />
+                          </Flex>
                         </Box>
                       </Link>
                     </Flex>
                     {idx + 1 < linkedBuildings.length && (
-                      <Separator size={"4"} p={"2"} />
+                      <Separator size={"4"} my="1" />
                     )}
                   </div>
                 );
