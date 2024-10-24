@@ -54,7 +54,8 @@ const GeocoderOptions = ({ options, setOptions }) => {
                   geocoderFields.forEach((field) => {
                     newOpts[field.name] = b;
                   });
-                  setOptions({ ...options, ...newOpts });
+                  let setOpts = {...options, ...newOpts}
+                  (setOpts);
                 }}
               >
                 <Text>{b ? "All" : "None"}</Text>
@@ -80,6 +81,7 @@ const GeocoderOptions = ({ options, setOptions }) => {
               className="checkbox-option flex items-center gap-1"
               key={field.name}
               value={field.name}
+              checked={options[field.name]}
             >
               {field.display}
             </CheckboxGroup.Item>
