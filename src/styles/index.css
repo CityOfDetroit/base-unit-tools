@@ -1,254 +1,50 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Roboto+Condensed:wght@300;400;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700;900&display=swap");
 
-/* ./src/index.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family: "Inter", sans-serif;
+  @apply min-h-screen;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+h1,h2,h3,h4,h5,h6 {
+  @apply font-semibold;
 }
 
-h1 {
-  @apply text-xl;
-  font-family  : "Montserrat", sans-serif;
-  font-weight  : 900;
+.cod-style {
+  font-family: "Montserrat", sans-serif;
 }
 
-h2 {
-  font-family  : "Montserrat", sans-serif;
-  font-weight  : 800;
-  border-bottom: 5px solid #feb70d;
-  /* font-size : 12px; */
+h1.cod-style {
+  @apply text-2xl font-extrabold;
 }
 
-h3,
-h4 {
-  font-family  : "Montserrat", sans-serif;
-  font-weight  : 700;
-  border-bottom: 5px solid #feb70d;
-}
-
-/* Desktop */
-@media only screen and (min-width: 769px) {
-  #root {
-    display: grid;
-    grid-template-areas:
-      "h m"
-      "ah m"
-      "s m"
-      "f f";
-    grid-template-columns: 4fr 6fr;
-    grid-template-rows: auto auto 1fr auto;
-    height: 100vh;
-  }
-}
-
-/* Mobile */
-@media only screen and (max-width: 768px) {
-  #root {
-    display: grid;
-    width: 100vw;
-    min-height: 100vh;
-    grid-template-areas:
-      "h"
-      "ah"
-      "m"
-      "s"
-      "f";
-    grid-template-rows: auto auto 1fr auto auto;
-  }
-
-  nav {
-    @apply text-sm;
-  }
+h2.cod-style {
+  @apply text-xl font-bold;
 }
 
 main {
-  grid-area: m;
-  overflow-y: auto;
-  @apply m-0;
-  @apply md:m-2;
-  @apply pr-2;
-  @apply md:pr-0;
+  @apply flex flex-col h-auto pb-12;
 }
 
-header {
-  grid-area: h;
+/* put footer at bottom */
+footer, header {
+  @apply bg-gray-200 dark:bg-slate-900;
 }
 
-sidebar {
-  grid-area: s;
-  overflow-y: auto;
-  @apply pr-2;
-  @apply md:pr-0;
+main {
+  @apply bg-gray-100 dark:bg-slate-800;
 }
 
-footer {
-  grid-area: f;
-  background: #ddd;
+header, footer {
+  @apply p-2;
 }
 
-/* desktop styling */
-@media only screen and (min-width: 769px) {
-  .explorer-map {
-    height: calc(100vh - 64px - 48px - 1rem);
-  }
-
-  .mailer-map {
-    height: calc(50vh);
-  }
-
-  .assignment-map {
-    height: calc(100vh - 250px);
-  }
-
-  .issue-reporter-map, .linker-map {
-    height: calc(100vh - 100px - 1.5rem);
-  }
-}
-
-/* mobile styling */
-@media only screen and (max-width: 768px) {
-
-  .explorer-map {
-    height: calc(40vh);
-  }
-
-  .mailer-map {
-    height: calc(80vh - 100px - 350px);
-  }
-
-  .assignment-map {
-    height: calc(50vh - 250px);
-  }
-
-  .issue-reporter-map, .linker-map {
-    height: calc(50vh - 100px);
-  }
-}
-
-input[type="radio"] + label span {
-  transition: background .2s,
-    transform .2s;
-}
-
-input[type="radio"] + label span:hover,
-input[type="radio"] + label:hover span{
-transform: scale(1.2);
-} 
-
-input[type="radio"]:checked + label span {
-background-color: #044455;
-box-shadow: 0px 0px 0px 2px white inset;
-}
-
-input[type="radio"]:checked + label{
- color: #044455;
-}
-
-.checkbox-option {
-  display: flex;
-  align-items: center;
-}
-
-.checkbox-option input[type="checkbox"] {
-  transform: scale(1.25);
-}
-
-.checkbox-option label {
-  @apply m-1;
-  @apply pl-2;
-}
-
-table{
-  position: relative;
-  border-collapse: collapse;
-}
-
-th {
-  text-align: left;
-  @apply text-sm;
-  @apply pb-2;
-  position: sticky;
-  top:0;
-  background: rgba(255,255,255,0.95);
-  
-}
-
-a:hover {
-  color:#555;
-  text-decoration: underline dotted 0.01em;
+.rt-Card {
 }
 
 a {
-  @apply font-semibold;
-  text-decoration: underline 0.01em;
-}
-
-.sidebar-section {
-  @apply p-2;
-  @apply bg-gray-100;
-  @apply text-sm;
-}
-
-.sidebar-section p {
-  @apply my-1;
-}
-
-.feature {
-  @apply bg-gray-200;
-}
-
-.warning {
-  @apply bg-red-200;
-  @apply px-3;
-}
-
-.caution {
-  @apply bg-yellow-200;
-}
-
-.info {
-  @apply bg-blue-100;
-  @apply px-3;
-}
-
-.focus {
-  @apply bg-green-100;
-}
-
-.sidebar-section h1, h2, h3, h4 {
-  @apply font-bold;
-  @apply text-lg;
-  border-bottom: none;
-  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-}
-
-.btn-disabled {
-  @apply opacity-50;
-}
-
-.btn-enabled {
-  @apply font-semibold;
-}
-
-#mly {
-  height: 30vh;
-}
-
-.app-intro p {
-  @apply py-2;
+  @apply hover:underline hover:underline-offset-2;
 }

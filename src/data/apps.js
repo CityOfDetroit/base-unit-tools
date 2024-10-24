@@ -1,21 +1,25 @@
-import { faAtlas, faCheckSquare, faEnvelope, faHome, faLink, faMailBulk, faTasks, faWrench, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { Crosshair2Icon, EnvelopeOpenIcon, GlobeIcon, HomeIcon } from "@radix-ui/react-icons";
 
 export const apps = {
     '/': {
         name: 'Home',
         url: `/`,
-        icon: faHome,
-        private: false
+        // icon: faHome,
+        icon: "HomeIcon",
+        private: false,
+        show: true
     },
-    'explorer': {
-        name: 'Explorer',
-        url: `/explorer`,
-        description: `View a map of the address, building, and parcel data together.`,
+    'map': {
+        name: 'Map',
+        url: `/map`,
+        description: `View a map of the address, building, parcel, and streets data together.`,
         questions: [
             `Which buildings are linked to that street?`
         ],
-        icon: faAtlas,
-        private: false
+        // icon: faAtlas,
+        icon: "GlobeIcon",
+        private: false,
+        show: true
     },
     'geocoder': {
         name: 'Geocoder',
@@ -25,18 +29,9 @@ export const apps = {
             `What council district & neighborhood does this address fall in?`,
             `We need geographic coordinates for these addresses.`
         ],
-        icon: faTasks,
-        private: false
-    },
-    'validator': {
-        name: 'Validator',
-        description: `A utility to validate an individual address`,
-        questions: [
-            `Is this is a valid address?`
-        ],
-        url: `/validator`,
-        icon: faCheckSquare,
-        private: false
+        icon: "Crosshair2Icon",
+        private: false,
+        show: true
     },
     'mailer': {
         name: 'Mailer',
@@ -45,28 +40,9 @@ export const apps = {
         questions: [
             `I'd like to send a mailing to all owner-occupants in a historic district.`
         ],
-        icon: faEnvelope,
-        private: true
-    },
-    'linker': {
-        name: 'Linker',
-        url: `/linker`,
-        description: 'Create or edit links for an existing address',
-        questions: [
-            `All these unlinked addresses are driving me crazy?`
-        ],
-        icon: faLink,
-        private: true
-    },
-    'assignment': {
-        name: 'Assignment',
-        url: `/assignment`,
-        description: 'Assign a new address',
-        questions: [
-            `I need to assign new addresses for a row of townhouses.`
-        ],
-        icon: faPlusCircle,
-        private: true
+        icon: "EnvelopeOpenIcon",
+        private: true,
+        show: true
     }
 }
 

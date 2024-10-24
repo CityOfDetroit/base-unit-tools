@@ -1,159 +1,63 @@
-# Base Unit Tools
+# Getting Started with Vite
 
-A collection of public-facing apps to enable upkeep and use of the city of Detroit's base units:
+This project uses [Vite](https://vitejs.dev/) for fast and optimized development.
 
-- Addresses
-- Parcels
-- Buildings
-- Streets
-- and more features to come.
+## Available Scripts
 
-## About this site
+In the project directory, you can run:
 
-This site is built primarily using React, with the following libraries:
+### `npm start`
 
-- [create-react-app](https://create-react-app.dev/)
-- [react-router-dom](https://reactrouter.com/web/guides/quick-start)
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-for styling/icons:
-- [tailwindcss](https://tailwindcss.com/)
-- [Font Awesome free icon set](https://fontawesome.com/icons?d=gallery&p=2&m=free)
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
-for mapping/spatial:
-- [mapbox-gl-js](https://docs.mapbox.com/mapbox-gl-js/api/) (soon: maplibre.js) 
-- [mapillary-js](https://mapillary.github.io/mapillary-js/)
-- [esri-arcgis-rest](https://esri.github.io/arcgis-rest-js/)
-- [turf.js](https://turfjs.org/)
+### `npm test`
 
-## Tools
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### Explorer
+### `npm run build`
 
-This is a tool for **exploring the base unit relationships**.
+Builds the app for production to the `dist` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-We can also display more detailed information about a particular base unit.
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-This tool should also serve as a jumping off point for other tools, such as the Issue Reporter.
+### `npm run serve`
 
-This tool can also be easily linked to from other tools, such as the Geocoder.
+Serves the production build from the `dist` folder.\
+Useful for previewing the production build locally.
 
-This tool accepts URL parameters:
+## Learn More
 
-- `type`: one of `addresses`, `buildings`, `parcels`, `streets`
-- `id`: the ID of the feature
-- `streetview`: should be `true` if you want Mapillary to automatically display.
+You can learn more in the [Vite documentation](https://vitejs.dev/guide/).
 
-Example URL: http://localhost:3000/base-unit-tools/explorer?type=buildings&id=653&streetview=true will link directly to CAYMC, with the `StreetView` component activated.
+To learn React, check out the [React documentation](https://reactjs.org/).
 
-### Issue Reporter
+### Code Splitting
 
-This is a tool for **reporting issues** with an address or base unit.
+Vite automatically handles code splitting for you.
 
-Once you enter an address, or select a base unit and enter an ID, hit the Search button.
+### Analyzing the Bundle Size
 
-You should then be able to enter the issue in a text box and submit.
+You can use tools like [source-map-explorer](https://www.npmjs.com/package/source-map-explorer) to analyze the bundle size.
 
-If you're a city employee, please **log in** so that your account can be attached to your submission.
+### Making a Progressive Web App
 
-This tool accepts one of two sets of URL parameters, either:
-- `address`: representing an address string, which will be geocoded by the tools
+Vite does not include built-in support for making a Progressive Web App, but you can follow the [Vite PWA Plugin](https://vite-plugin-pwa.netlify.app/) guide to add this feature.
 
-or, passed together:
-- `type`: one of `addresses`, `buildings`, `parcels`, `streets`
-- `id`: the ID of the feature
+### Advanced Configuration
 
-which will be used to look up an existing base unit.
+See the [Vite configuration guide](https://vitejs.dev/config/) for more advanced configuration options.
 
-For best use, the issue reporter should be linked from other tools using the `type` and `id` parameters.
+### Deployment
 
-### Geocoder
+You can deploy the production build from the `dist` folder to any static hosting service.
 
-This is a tool for **geocoding & adding information to a list of addresses**. By locating each address (a process known as geocoding), we can tell you more information about each address, like what neighborhood or council district it's in.
+### `npm run build` fails to minify
 
-- Enter your list of addresses into the text box
-- Choose fields to include with output
-- Geocode
-- Export results to CSV
-
-### Validator
-
-This is a tool for **parsing and validating** a particular address.
-
-At the moment, it only parses an address into its constituent parts.
-
-Eventually, it should validate an address by:
-
-- Verifying that the street name exists
-- Matching it to a potential street segment
-- ...
-
-### Mailer
-
-This is a tool for **generating a mailing list** based on a particular selection area.
-
-You can select an area from some predetermined boundaries, draw your own shape, or input an address to start your mailing list.
-
-You can also apply a buffer to any shape to comply with distance-based mailing requirements.
-
-After filtering addresses based on their attributes, you can export a .csv of addresses for use in a mail merge.
-
-### Linker
-
-This is a tool for **editing address links.**
-
-## Installation
-
-1. Clone the repository
-2. Run `yarn` / `npm install` to install dependencies
-3. Run `yarn start` to develop at localhost:3000
-
-## Site structure
-
-### Routing
-
-App/URL routing is primarily controlled in `src/App.js`, with `react-router-dom`.
-
-There is a route for each tool which renders that tool. 
-
-The top-level tool components may receive the `session` as a prop if they need to know whether the user is logged in or not.
-
-Many tools accept URL parameters - this is handled by the `useQuery` hook provided by `react-router-dom`.
-
-### Layout/display
-
-The main site layout is controlled by `src/layout/SiteWrapper` -- this is rendered in `App.js` and all tools will fit into the `{children}` slot of the `SiteWrapper`, typically with a `<SiteSidebar>` and a `<main>`:
-
-```js
-const NewTool = () => {
-  return (
-    <>
-      <SiteSidebar>
-        {...sidebar things}
-      </SiteSidebar>
-      <main>
-        {...main component, maybe a map}
-      </main>
-    </>
-  )
-}
-```
-
-Logging in is controlled in `src/layout/SiteHeader`, since that is rendered everywhere. That renders a `Login` component which does the work of input and using the esri-arcgis-rest authentication methods.
-
-Most components are styled in-line using Tailwind CSS, but there are a fair number of styles in `src/styles/index.css` as well.
-
-### Sitewide config files
-
-We use a few different files to drive consistent behavior across the site. These files are stored in `src/data`.
-
-- `apps.js` controls the listing of tools.
-- `geocoders.js` lists the different geocoders available.
-- `layers.js` is a common data structure for the base units.
-
-The basemaps/mapstyles are stored in `src/styles/mapstyle.js`. This file starts with a `baseStyle` and then exports several other functional styles which are derived from the `baseStyle` such as the `satelliteStyle`.
-
-### Sitewide UI components
-
-These are stored in `src/components`.
-
-- `Button` takes a few props such an `icon` and `text`.
+If `npm run build` fails to minify, see the [Vite troubleshooting guide](https://vitejs.dev/guide/troubleshooting.html).
