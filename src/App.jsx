@@ -15,7 +15,7 @@ import { useAuth, AuthProvider } from "./contexts/AuthContext";
 import Login from "./Login";
 import BaseUnitsMap from "./Map/BaseUnitsMap";
 import Geocoder from "./Geocoder/Geocoder";
-import Mailer from "./Mailer/mailer";
+import Mailer from "./Mailer/Mailer";
 
 // Protected route component
 const ProtectedRoute = ({ children }) => {
