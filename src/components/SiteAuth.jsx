@@ -1,10 +1,18 @@
 import { EnterIcon, ExitIcon, PersonIcon } from "@radix-ui/react-icons";
 import { Button, Flex, Text } from "@radix-ui/themes";
-import React from "react";
+import React, { useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 
 const SiteAuth = () => {
   const { isAuthenticated, username, handleSignIn, handleSignOut } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log("User is authenticated");
+    } else {
+      console.log("User is not authenticated");
+    }
+  }, [isAuthenticated]);
 
   return (
     <Flex
@@ -15,7 +23,6 @@ const SiteAuth = () => {
       justify={{ initial: "start", sm: "end" }}
     >
       {isAuthenticated && (
-        <>
           <Flex direction={"row"} gap={"2"} align={"center"}>
             <PersonIcon />
             <Text size={"1"} weight={"medium"} color="gray">
@@ -32,7 +39,6 @@ const SiteAuth = () => {
               <ExitIcon />
             </Button>
           </Flex>
-        </>
       )}
       {!isAuthenticated && (
         <Flex

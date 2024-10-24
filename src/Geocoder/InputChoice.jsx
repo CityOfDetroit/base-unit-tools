@@ -11,7 +11,7 @@ export const InputChoice = ({ setOptions, options }) => {
       size={"1"}
     >
       <RadioCards.Item value="manual">manual</RadioCards.Item>
-      <RadioCards.Item value="upload">upload file</RadioCards.Item>
+      <RadioCards.Item value="upload">upload .csv</RadioCards.Item>
     </RadioCards.Root>
   );
 };

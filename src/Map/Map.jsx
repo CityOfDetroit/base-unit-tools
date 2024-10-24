@@ -58,17 +58,18 @@ const MapComponent = ({
       map.on("load", () => {
         setMapLoaded(true);
 
-        map.on("click", (e) => {
-          const features = map.queryRenderedFeatures(e.point, {
-            layers: Object.keys(layers).map((lyr) => layers[lyr].interaction),
-          });
-
-          setClickedFeatures(features);
+      });
+ 
+      map.on("click", (e) => {
+        const features = map.queryRenderedFeatures(e.point, {
+          layers: Object.keys(layers).map((lyr) => layers[lyr].interaction),
         });
 
-        map.on("dblclick", (e) => {
-          setClickedIdx(clickedIdx + 1);
-        });
+        setClickedFeatures(features);
+      });
+
+      map.on("dblclick", (e) => {
+        setClickedIdx(clickedIdx + 1);
       });
 
       map.on("moveend", () => {

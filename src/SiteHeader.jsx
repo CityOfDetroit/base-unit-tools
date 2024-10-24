@@ -1,5 +1,5 @@
 import { Container } from "@radix-ui/themes";
-import React from "react";
+import React, { useEffect } from "react";
 import SiteAuth from "./components/SiteAuth";
 import { useAuth } from "./contexts/AuthContext";
 import { Link } from "react-router-dom";

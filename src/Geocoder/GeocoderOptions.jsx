@@ -48,6 +48,7 @@ const GeocoderOptions = ({ options, setOptions }) => {
             {[true, false].map((b) => (
               <Button
                 size={"1"}
+                key={b}
                 onClick={() => {
                   let newOpts = {};
                   geocoderFields.forEach((field) => {

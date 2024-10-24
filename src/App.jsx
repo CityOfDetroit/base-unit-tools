@@ -9,11 +9,13 @@ import {
   Routes,
   Route,
   Navigate,
+  Outlet
 } from "react-router-dom";
 import { useAuth, AuthProvider } from "./contexts/AuthContext";
 import Login from "./Login";
 import BaseUnitsMap from "./Map/BaseUnitsMap";
 import Geocoder from "./Geocoder/Geocoder";
+import Mailer from "./Mailer/mailer";
 
 // Protected route component
 const ProtectedRoute = ({ children }) => {
@@ -33,6 +35,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/map" element={<BaseUnitsMap />} />
               <Route path="/geocoder" element={<Geocoder />} />
+              <Route path="/mailer" element={<ProtectedRoute path="/mailer"><Mailer /></ProtectedRoute>} />
             </Routes>
           </Layout>
         </Router>

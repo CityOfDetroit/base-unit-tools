@@ -28,7 +28,7 @@ const SiteFooter = () => {
             <Flex direction={"column"} gap={"2"}>
               {filteredApps.map((key) => {
                 return (
-                  <Link to={apps[key].url}>
+                  <Link to={apps[key].url} key={key}>
                     <Text size={"4"} weight="medium">{apps[key].name}</Text>
                   </Link>
                 );

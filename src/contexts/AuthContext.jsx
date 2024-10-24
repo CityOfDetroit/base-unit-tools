@@ -8,6 +8,8 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState("");
+  const [token, setToken] = useState(null);
+
   const portalUrl = "https://detroitmi.maps.arcgis.com";
 
   useEffect(() => {
@@ -35,6 +37,7 @@ export const AuthProvider = ({ children }) => {
       .getCredential(portalUrl + "/sharing")
       .then((credentials) => {
         setUsername(credentials.userId);
+        setToken(credentials.token);
       })
       .catch((error) => {
         console.error(error);
@@ -47,6 +50,10 @@ export const AuthProvider = ({ children }) => {
       .then(() => {
         setIsAuthenticated(true);
         getCurrentUser();
+        // navigate to home page
+
+        navigat
+
       })
       .catch((error) => {
         console.error(error);
@@ -57,11 +64,12 @@ export const AuthProvider = ({ children }) => {
     esriId.destroyCredentials();
     setIsAuthenticated(false);
     setUsername("");
+    setToken(null);
   };
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, username, handleSignIn, handleSignOut }}
+      value={{ isAuthenticated, token, username, handleSignIn, handleSignOut }}
     >
       {children}
     </AuthContext.Provider>

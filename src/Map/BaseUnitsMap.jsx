@@ -87,23 +87,9 @@ const BaseUnitsMap = () => {
     }
   }, [feature]);
 
-  // reset the selected feature when the layer changes
+  // reset linked addresses when the layer changes
   useEffect(() => {
-    setLinkedAddresses([]);
-
-    // // switching layer, but the existing feature references an id of the new layer
-    // // move to the ID the user is probably looking for
-    // if (feature) {
-    //   let newLayer = layers[layer];
-    //   if (feature.properties[newLayer.id_column]) {
-    //     setParams({
-    //       id: feature.properties[newLayer.id_column],
-    //       layer: layer,
-    //     });
-    //   }
-    // }
-    // nullify();
-    
+    setLinkedAddresses([]);    
   }, [layer]);
 
   return (
@@ -142,6 +128,7 @@ const BaseUnitsMap = () => {
           <MapillarySwitch {...{ streetview, setStreetview }} />
         </Card>
       </Flex>
+      
       {/* feature information */}
       <Flex
         gap={"2"}
