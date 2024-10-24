@@ -196,7 +196,10 @@ const MapComponent = ({
       let zoom = mapInstance.current.getZoom();
       if (streetview && zoom < 17.5) {
         zoom = 17.51;
-      }
+      };
+      if (!streetview && zoom < 17.5) {
+        zoom = 16.5;
+      };
       mapInstance.current.easeTo({
         center,
         essential: true,

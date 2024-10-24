@@ -25,7 +25,7 @@ const BaseUnitsMap = () => {
 
   // main pieces of state
   // the currently selected layer
-  const [layer, setLayer] = useState(params?.get("layer") || "parcel");
+  const [layer, setLayer] = useState(params?.get("layer") || params?.get("type") || "parcel");
 
   // streetview state
   let [streetview, setStreetview] = useState(false);
@@ -40,7 +40,7 @@ const BaseUnitsMap = () => {
     error,
     refetch,
     nullify,
-  } = useBaseFeature(params?.get("id"), params?.get("layer"));
+  } = useBaseFeature(params?.get("id"), layer);
 
   const {
     feature: geocodedFeature,
