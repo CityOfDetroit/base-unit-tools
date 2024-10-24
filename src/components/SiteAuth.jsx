@@ -6,14 +6,6 @@ import { useAuth } from "../contexts/AuthContext";
 const SiteAuth = () => {
   const { isAuthenticated, username, handleSignIn, handleSignOut } = useAuth();
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      console.log("User is authenticated");
-    } else {
-      console.log("User is not authenticated");
-    }
-  }, [isAuthenticated]);
-
   return (
     <Flex
       direction={"column"}

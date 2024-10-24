@@ -1,11 +1,10 @@
 import { Box } from "@radix-ui/themes";
+import { centroid } from "@turf/centroid";
 import maplibregl from "maplibre-gl";
 import React, { useEffect, useRef, useState } from "react";
 import { useTheme } from "../contexts/ThemeContext";
-import { centroid } from "@turf/centroid";
 import layers from "../data/layers";
 import { baseStyle, darkStyle } from "../styles/mapstyle";
-import { random } from "underscore";
 
 const MapComponent = ({
   layer,
@@ -14,7 +13,6 @@ const MapComponent = ({
   linkedAddresses,
   refetch,
   streetview,
-  setStreetview,
   viewerImage,
   viewerBearing,
   setSvImages,
@@ -52,7 +50,7 @@ const MapComponent = ({
         container: mapRef.current,
         style: baseStyle,
         center: [-83.07715, 42.37927],
-        zoom: 16.5,
+        zoom: 12.5,
       });
 
       map.on("load", () => {

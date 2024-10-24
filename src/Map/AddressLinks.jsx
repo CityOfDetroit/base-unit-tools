@@ -8,7 +8,6 @@ import { Link } from "react-router-dom";
 import { icons } from "./FeatureTable";
 
 const AddressLinks = ({ layer, feature }) => {
-  console.log(feature);
 
   let [open, setOpen] = useState(false);
 

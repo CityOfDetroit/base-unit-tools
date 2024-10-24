@@ -146,7 +146,6 @@ const MailerMap = ({ geom, setGeom, mode, setMode, features, filtered }) => {
 
   useEffect(() => {
     if (theMap && theDraw && geom) {
-      console.log(geom)
       if (geom.features[0].geometry.type !== 'Point') {
         theMap.fitBounds(bbox(geom), { padding: 40, maxZoom: 17 });
       }

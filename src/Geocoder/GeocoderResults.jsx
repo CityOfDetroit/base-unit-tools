@@ -245,7 +245,7 @@ const GeocoderResults = ({
     }
     return newRow;
   });
-  console.log(dataForCsvExport);
+
   return (
     <Flex direction="column" p={"2"} gap="2">
       <Text size={"4"}>Results</Text>

@@ -203,7 +203,6 @@ const BaseUnitsMap = () => {
             linkedAddresses,
             refetch,
             streetview,
-            setStreetview,
             svImages,
             setSvImages,
             viewerImage,

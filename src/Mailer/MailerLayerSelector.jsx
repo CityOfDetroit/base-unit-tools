@@ -87,7 +87,6 @@ const MailerLayerSelector = ({ geom, setGeom }) => {
         return ft.id === parseInt(currentFeature);
       });
 
-      console.log(matching[0]);
       let simplified = simplify(matching[0], { tolerance: 0.0001 });
       setGeom({ type: "FeatureCollection", features: [simplified] });
     }

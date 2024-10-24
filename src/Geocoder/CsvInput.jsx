@@ -20,7 +20,6 @@ export const CsvInput = ({ csv, setCsv, addresses, setAddresses }) => {
           <Text weight="medium">.csv address column:</Text>
           <Select.Root
             onValueChange={(e) => {
-              // console.log(e)
               setAddresses(csv.map((r) => r[e]));
             }}
           >

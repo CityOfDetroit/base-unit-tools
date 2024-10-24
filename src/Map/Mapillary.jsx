@@ -102,7 +102,6 @@ const Mapillary = ({ svImages, feature, viewerImage, setViewerImage, setViewerBe
         selectedImage.geometry.coordinates
       );
       viewer.setCenter(center);
-      console.log("nodechanged", node);
     });
 
     viewer.on("image", (image) => {
@@ -113,7 +112,6 @@ const Mapillary = ({ svImages, feature, viewerImage, setViewerImage, setViewerBe
 
     viewer.on("imageclick", (image) => {
       setSelectedImage(image);
-      console.log("imageclick", node);
     });
 
     viewer.on("dblclick", (image) => {
