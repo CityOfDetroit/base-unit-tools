@@ -6,7 +6,7 @@ export const geocoders = {
   dev: `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoderDev/GeocodeServer`,
 }
 
-export const geocoderUrl = geocoders.dev
+export const geocoderUrl = geocoders.prod
 
 const useGeocoder = (initialAddress = '') => {
   const [address, setAddress] = useState(initialAddress);
