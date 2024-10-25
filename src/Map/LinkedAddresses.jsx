@@ -5,6 +5,7 @@ import {
   ArrowRightIcon,
   CaretDownIcon,
   CaretRightIcon,
+  DownloadIcon,
   EnterIcon,
   PinRightIcon,
   SewingPinFilledIcon,
@@ -12,6 +13,7 @@ import {
 import { Link } from "react-router-dom";
 import { Box, Button, Flex, Text, Card, Separator } from "@radix-ui/themes";
 import * as Collapsible from "@radix-ui/react-collapsible";
+import { CSVLink } from "react-csv";
 
 const LinkedAddresses = ({
   layer,
@@ -83,6 +85,24 @@ const LinkedAddresses = ({
   if (layer === "address") {
     return;
   }
+
+  const formattedData = linkedAddresses.map((address) => {
+    let { properties: props, geometry } = address;
+    return {
+      address_id: props.address_id,
+      street_number: props.street_number,
+      street_direction: props.street_direction,
+      street_name: props.street_name,
+      street_type: props.street_type,
+      unit_type: props.unit_type,
+      unit_number: props.unit_number,
+      city: props.city,
+      state: props.state,
+      zip: props.zip,
+      lng: geometry.coordinates[0].toFixed(6),
+      lat: geometry.coordinates[1].toFixed(6)
+    };
+  })
 
   return (
     <Collapsible.Root open={open} onOpenChange={setOpen}>
@@ -160,6 +180,22 @@ const LinkedAddresses = ({
                 );
               })}
             </Flex>
+            <div>
+              <Separator size={"4"} />
+              {/* add ability to Export as csv */}
+              <Flex align={"end"} justify={"end"} className="w-full" mt={"2"}>
+                <CSVLink
+                  data={formattedData}
+                  filename={`linked_addresses_${new Date().getTime()}.csv`}
+                  className="mr-2"
+                >
+                  <Button size={"1"}>
+                    <DownloadIcon />
+                    Export .csv
+                  </Button>
+                </CSVLink>
+              </Flex>
+            </div>
           </Collapsible.Content>
         )}
       </Box>
