@@ -1,8 +1,4 @@
-import {
-  Card,
-  Flex,
-  Grid
-} from "@radix-ui/themes";
+import { Card, Flex, Grid, Select, Text } from "@radix-ui/themes";
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import layers from "../data/layers";
@@ -20,18 +16,24 @@ import MapillarySwitch from "./MapillarySwitch";
 import BuildingLinks from "./BuildingLinks";
 
 const BaseUnitsMap = () => {
-
   const [params, setParams] = useSearchParams();
 
   // main pieces of state
   // the currently selected layer
-  const [layer, setLayer] = useState(params?.get("layer") || params?.get("type") || "parcel");
+  const [layer, setLayer] = useState(
+    params?.get("layer") || params?.get("type") || "parcel"
+  );
 
   // streetview state
   let [streetview, setStreetview] = useState(false);
   let [svImages, setSvImages] = useState([]);
   let [viewerImage, setViewerImage] = useState(null);
   let [viewerBearing, setViewerBearing] = useState(0);
+
+  let allStyles = ["streets", "satellite", "linen"];
+
+  // map state
+  let [style, setStyle] = useState("streets");
 
   // the primary hook for fetching the current feature
   const {
@@ -90,7 +92,7 @@ const BaseUnitsMap = () => {
 
   // reset linked addresses when the layer changes
   useEffect(() => {
-    setLinkedAddresses([]);    
+    setLinkedAddresses([]);
   }, [layer]);
 
   return (
@@ -105,7 +107,28 @@ const BaseUnitsMap = () => {
       p={{ initial: "0", sm: "2", lg: "4" }}
     >
       {/* app control panel */}
-      {/* <LayerSwitcher {...{ layer, setLayer }} /> */}
+      <Flex gap={"2"} gridArea="controls" align={"center"} p="2">
+        {/* <LayerSwitcher {...{ layer, setLayer }} /> */}
+        <Card>
+          <Flex direction="column" gap={"2"} className="w-36">
+            <Text size={"2"}>Select basemap</Text>
+            <Select.Root
+              value={style}
+              onValueChange={(value) => setStyle(value)}
+              size={"1"}
+            >
+              <Select.Trigger />
+              <Select.Content>
+                {allStyles.map((s) => (
+                  <Select.Item key={s} value={s}>
+                    {s}
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Root>
+          </Flex>
+        </Card>
+      </Flex>
 
       {/* geocoding panel */}
       <Flex
@@ -129,7 +152,7 @@ const BaseUnitsMap = () => {
           <MapillarySwitch {...{ streetview, setStreetview }} />
         </Card>
       </Flex>
-      
+
       {/* feature information */}
       <Flex
         gap={"2"}
@@ -212,6 +235,7 @@ const BaseUnitsMap = () => {
           {...{
             layer,
             setLayer,
+            style,
             feature,
             linkedAddresses,
             refetch,

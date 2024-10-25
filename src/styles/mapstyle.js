@@ -79,34 +79,34 @@ export const baseStyle = {
     },
   },
   layers: [
-    // {
-    //   id: "satellite",
-    //   type: "raster",
-    //   source: "satellite",
-    //   minzoom: 0,
-    //   maxzoom: 22,
-    //   paint: {
-    //     "raster-opacity": 1,
-    //     "raster-saturation": -0.75,
-    //   },
-    //   layout: {
-    //     visibility: "none",
-    //   },
-    // },
-    // {
-    //   id: "linen-map",
-    //   type: "raster",
-    //   source: "linen-map",
-    //   minzoom: 0,
-    //   maxzoom: 22,
-    //   paint: {
-    //     "raster-opacity": 1,
-    //     "raster-saturation": -0.75,
-    //   },
-    //   layout: {
-    //     visibility: "none",
-    //   },
-    // },
+    {
+      id: "satellite",
+      type: "raster",
+      source: "satellite",
+      minzoom: 0,
+      maxzoom: 22,
+      paint: {
+        "raster-opacity": 1,
+        "raster-saturation": -0.75,
+      },
+      layout: {
+        visibility: "none",
+      },
+    },
+    {
+      id: "linen-map",
+      type: "raster",
+      source: "linen-map",
+      minzoom: 0,
+      maxzoom: 22,
+      paint: {
+        "raster-opacity": 1,
+        "raster-saturation": -0.75,
+      },
+      layout: {
+        visibility: "none",
+      },
+    },
     {
       id: "Land/Not ice",
       type: "fill",

@@ -4,7 +4,6 @@ import layers from "../data/layers";
 
 const LayerSwitcher = ({ layer, setLayer }) => {
   return (
-    <Flex gap={"2"} gridArea="controls" align={"center"} p="2">
     <RadioCards.Root
       defaultValue="parcel"
       value={layer}
@@ -30,7 +29,6 @@ const LayerSwitcher = ({ layer, setLayer }) => {
         );
       })}
     </RadioCards.Root>
-  </Flex>
   );
 }
 

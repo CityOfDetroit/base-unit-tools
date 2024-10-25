@@ -4,11 +4,12 @@ import maplibregl from "maplibre-gl";
 import React, { useEffect, useRef, useState } from "react";
 import { useTheme } from "../contexts/ThemeContext";
 import layers from "../data/layers";
-import { baseStyle, darkStyle } from "../styles/mapstyle";
+import { baseStyle, darkStyle, linenStyle, satelliteStyle } from "../styles/mapstyle";
 
 const MapComponent = ({
   layer,
   setLayer,
+  style,
   feature,
   linkedAddresses,
   refetch,
@@ -23,6 +24,12 @@ const MapComponent = ({
   const [mapLoaded, setMapLoaded] = useState(false);
   const [clickedFeatures, setClickedFeatures] = useState([]);
   const [clickedIdx, setClickedIdx] = useState(0);
+
+  let mapStyles = {
+    streets: baseStyle,
+    satellite: satelliteStyle(),
+    linen: linenStyle()
+  }
 
   useEffect(() => {
     if (!mapLoaded) {
@@ -48,7 +55,7 @@ const MapComponent = ({
     if (mapRef.current && !mapInstance.current) {
       const map = new maplibregl.Map({
         container: mapRef.current,
-        style: baseStyle,
+        style: style ? mapStyles[style] : baseStyle,
         center: [-83.07715, 42.37927],
         zoom: 10.75,
       });
@@ -102,6 +109,12 @@ const MapComponent = ({
       setSvImages([]);
     }
   }, [streetview]);
+
+  useEffect(() => {
+    if (mapInstance.current && style && mapLoaded) {
+      mapInstance.current.setStyle(mapStyles[style]);
+    }
+  }, [style]);
 
   /**
    * Effect for when the user clicks on the map
