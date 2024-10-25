@@ -1,8 +1,9 @@
 import React from "react";
 import apps from "./data/apps";
-import { Box, Card, Container, Grid, IconButton } from "@radix-ui/themes";
+import { Box, Card, Container, Grid, Flex, Text } from "@radix-ui/themes";
 import { Link } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
+import Icon from "./components/Icon";
 
 const Homepage = () => {
   const { isAuthenticated } = useAuth();
@@ -28,8 +29,11 @@ const Homepage = () => {
               return (
                 <Link to={apps[app].url}>
                   <Card size="1" className="text-sm" key={app}>
-                    <h4>{apps[app].name}</h4>
-                    <p>{apps[app].description}</p>
+                    <Flex direction="row" align="center" gap="2" pb={"2"}>
+                      <Icon name={apps[app].icon} />
+                      <Text size={"3"} weight="medium">{apps[app].name}</Text>
+                    </Flex>
+                    <Text>{apps[app].description}</Text>
                   </Card>
                 </Link>
               );

@@ -1,9 +1,10 @@
-import { Card, Container, Flex, Grid, Separator, Text } from "@radix-ui/themes";
+import { Container, Flex, Grid, Separator, Text } from "@radix-ui/themes";
 import React from "react";
 import { Link } from "react-router-dom";
-import apps from "./data/apps";
-import SiteAuth from "./components/SiteAuth";
 import { useAuth } from "./contexts/AuthContext";
+import apps from "./data/apps";
+import Icon from "./components/Icon";
+import { GitHubLogoIcon } from "@radix-ui/react-icons";
 
 const SiteFooter = () => {
   // const { isDarkMode, toggleDarkMode } = useTheme();
@@ -23,13 +24,17 @@ const SiteFooter = () => {
           rows={{ initial: "auto", sm: "1" }}
           gap={"4"}
         >
-          <Flex direction={"column"} gap={"2"} minWidth={`200px`}>
-            {/* <h3>Tools</h3> */}
+          <Flex direction={"column"} gap={"2"}>
             <Flex direction={"column"} gap={"2"}>
               {filteredApps.map((key) => {
                 return (
                   <Link to={apps[key].url} key={key}>
-                    <Text size={"4"} weight="medium">{apps[key].name}</Text>
+                    <Flex align="center" gap="2">
+                      <Icon name={apps[key].icon} />
+                      <Text size={"2"} weight="medium">
+                        {apps[key].name}
+                      </Text>
+                    </Flex>
                   </Link>
                 );
               })}
@@ -37,12 +42,32 @@ const SiteFooter = () => {
           </Flex>
 
           <Flex direction={"column"} gap={"1"}>
-            <h3>Resources</h3>
+            <Text size="2" weight={"bold"}>
+              Resources
+            </Text>
             <Link to="https://base-units-detroitmi.hub.arcgis.com/">
               <Text size={"2"}>Base Units Hub</Text>
             </Link>
             <Link to="https://data.detroitmi.gov/">
-              <Text  size={"2"}>Open Data Portal</Text>
+              <Text size={"2"}>Open Data Portal</Text>
+            </Link>
+          </Flex>
+          <div>
+          </div>
+          <Flex direction="column" gap="2">
+            <Text size="2" weight={"bold"}>
+              About this site
+            </Text>
+            <Link to="https://github.com/CityOfDetroit/base-unit-tools">
+              <Flex direction="row" align="center" gap={"1"}>
+                <Text size={"2"}>View on GitHub</Text>
+                <GitHubLogoIcon />
+              </Flex>
+            </Link>
+            <Link to="https://app.smartsheet.com/b/form/6919c51a844448e2a6811f04a6267292">
+              <Flex direction="row" align="center" gap={"1"}>
+                <Text size={"2"}>Contact/feedback form</Text>
+              </Flex>
             </Link>
           </Flex>
         </Grid>
