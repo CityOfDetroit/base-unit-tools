@@ -84,7 +84,11 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
   // container for results
   let [results, setResults] = useState([]);
 
+  // container for unmatched addresses
   let [unmatchedAddr, setUnmatchedAddr] = useState(null);
+
+  // state to display "geocode addresses" button
+  let [geocoded, setGeocoded] = useState(false);
 
   useEffect(() => {
     setCsv(null);
@@ -103,8 +107,13 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
   useEffect(() => {
     if (payload.length > 0) {
       fetchResults(addresses, setResults);
+      setGeocoded(true);
     }
-  }, [payload, addresses]);
+  }, [payload]);
+
+  useEffect(() => {
+    setGeocoded(false);
+  }, [addresses])
 
   return (
     <>
@@ -128,7 +137,7 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
           </Card>
 
           <GeocoderOptions {...{ options, setOptions }} />
-          {addresses.length > 0 && results.length === 0 && (
+          {addresses.length > 0 && !geocoded && (
             <Button
               size={"1"}
               active={addresses.length > 0}
