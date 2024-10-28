@@ -6,13 +6,28 @@ import { geocoderUrl } from "../hooks/useGeocoder";
 
 const MapGeocoder = ({
   geocodeRefetch,
-  geocodeError
+  geocodeError,
+  refetch
 }) => {
   const [geocodeValue, setGeocodeValue] = useState("");
 
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
-      geocodeRefetch(geocodeValue);
+
+      let parcelRegex = /^([0,1,2][0-9])([0-9]{6,})([0-9L\.\-]{1,})$/;
+
+      if (parcelRegex.test(geocodeValue)) {
+        refetch(
+          geocodeValue,
+          "parcel",
+        )
+      }
+
+      else {
+        geocodeRefetch(geocodeValue);
+      }
+
+
     }
   };
 

@@ -140,7 +140,7 @@ const BaseUnitsMap = () => {
         overflowX={"auto"}
       >
         <Card size={"1"} className="">
-          <MapGeocoder {...{ geocodeRefetch, geocodeError }} />
+          <MapGeocoder {...{ geocodeRefetch, geocodeError, refetch }} />
         </Card>
         <FeatureTable
           {...{
