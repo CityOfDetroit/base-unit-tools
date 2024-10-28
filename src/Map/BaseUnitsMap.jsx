@@ -14,6 +14,7 @@ import MapGeocoder from "./MapGeocoder";
 import Mapillary from "./Mapillary";
 import MapillarySwitch from "./MapillarySwitch";
 import BuildingLinks from "./BuildingLinks";
+import BasemapSelector from "./BasemapSelector";
 
 const BaseUnitsMap = () => {
   const [params, setParams] = useSearchParams();
@@ -29,8 +30,6 @@ const BaseUnitsMap = () => {
   let [svImages, setSvImages] = useState([]);
   let [viewerImage, setViewerImage] = useState(null);
   let [viewerBearing, setViewerBearing] = useState(0);
-
-  let allStyles = ["streets", "satellite", "linen"];
 
   // map state
   let [style, setStyle] = useState("streets");
@@ -98,37 +97,14 @@ const BaseUnitsMap = () => {
   return (
     <Grid
       areas={{
-        initial: "'streetview' 'geocoder' 'map' 'info' 'controls'",
-        sm: "'info streetview' 'info geocoder' 'info map' 'info controls'",
+        initial: "'streetview' 'geocoder' 'map' 'info'",
+        sm: "'info geocoder' 'info streetview' 'info map' 'info map'",
       }}
       columns={{ initial: "1fr", sm: "1fr 1fr", md: "2fr 3fr" }}
-      rows={{ initial: "auto auto auto auto auto", sm: "auto auto auto" }}
-      gap={{ initial: "0", sm: "2" }}
+      rows={{ initial: "auto auto auto auto", sm: "min-content 0fr 1fr 1fr" }}
+      gap={{ initial: "0", sm: "0" }}
       p={{ initial: "0", sm: "2", lg: "4" }}
     >
-      {/* app control panel */}
-      <Flex gap={"2"} gridArea="controls" align={"center"} p="2">
-        {/* <LayerSwitcher {...{ layer, setLayer }} /> */}
-        <Card>
-          <Flex direction="column" gap={"2"} className="w-36">
-            <Text size={"2"}>Select basemap</Text>
-            <Select.Root
-              value={style}
-              onValueChange={(value) => setStyle(value)}
-              size={"1"}
-            >
-              <Select.Trigger />
-              <Select.Content>
-                {allStyles.map((s) => (
-                  <Select.Item key={s} value={s}>
-                    {s}
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Root>
-          </Flex>
-        </Card>
-      </Flex>
 
       {/* geocoding panel */}
       <Flex
@@ -136,20 +112,20 @@ const BaseUnitsMap = () => {
         gridArea={"geocoder"}
         justify={"start"}
         align={"center"}
-        pt={{ initial: "2", sm: "0" }}
+        pt={{ initial: "2", sm: "2" }}
+        pb={{ initial: "2", sm: "2" }}
         p={"2"}
         direction={{
           initial: "column",
           sm: "row",
         }}
       >
-        <Card size={"1"} className="w-full sm:w-2/3">
-          <MapGeocoder {...{ geocodeRefetch, geocodeError }} />
-        </Card>
-
-        <Card size={"1"} className="w-full sm:w-1/3">
+        <Card size={"1"} className="">
           {/* mapillary bit */}
           <MapillarySwitch {...{ streetview, setStreetview }} />
+        </Card>
+        <Card>
+          <BasemapSelector {...{ style, setStyle }} />
         </Card>
       </Flex>
 
@@ -163,6 +139,9 @@ const BaseUnitsMap = () => {
         className=""
         overflowX={"auto"}
       >
+        <Card size={"1"} className="">
+          <MapGeocoder {...{ geocodeRefetch, geocodeError }} />
+        </Card>
         <FeatureTable
           {...{
             feature,
@@ -226,7 +205,7 @@ const BaseUnitsMap = () => {
           }}
         />
       ) : (
-        <div style={{ gridArea: "streetview", height: 0 }}></div>
+        <div style={{ gridArea: "streetview", height: "0 auto" }}></div>
       )}
 
       {/* map component */}

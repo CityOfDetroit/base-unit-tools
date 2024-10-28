@@ -9,7 +9,7 @@ const Homepage = () => {
   const { isAuthenticated } = useAuth();
 
   return (
-    <div className="bg-gray-200 dark:bg-gray-800">
+    <div className="bg-gray-100 dark:bg-gray-800">
       <Container size={"2"} className="min-h-96">
         <Box py={"5"}>
           <h2 className="cod-style py-2">

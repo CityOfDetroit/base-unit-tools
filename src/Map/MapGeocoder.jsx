@@ -17,18 +17,18 @@ const MapGeocoder = ({
   };
 
   return (
-    <Flex direction="column" gap={"2"} className="sm:min-w-64">
+    <Flex direction="column" gap={"2"}>
       <Flex align={"center"} gap={"2"}>
         <MagnifyingGlassIcon height="30" width="30" color="gray" />
         <TextField.Root
           placeholder="Search for an address or parcel ID"
           onChange={(e) => setGeocodeValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="flex items-center w-full w-lg"
+          className="flex items-center w-full w-lg pb-2 text-xs"
         ></TextField.Root>
       </Flex>
       <Inset>
-        <Flex align={"end"} justify={"between"} p={"1"}>
+        <Flex align={"end"} justify={"between"} p={"1"} pt="2">
           {geocodeError ? (
             <Text className="text-red-800" size={"1"} weight={"bold"}>
               {geocodeError}

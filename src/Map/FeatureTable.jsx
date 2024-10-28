@@ -25,6 +25,10 @@ export const icons = {
 const FeatureTable = ({ layer, loading, feature, refetch }) => {
   let lyr = layers[layer];
 
+  if (!lyr) {
+    return;
+  }
+
   let dataSourceUrl =
     (lyr?.feature_service || lyr?.endpoint) +
     `/query?where=${lyr.id_column}='${
