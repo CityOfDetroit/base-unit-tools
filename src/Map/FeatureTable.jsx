@@ -30,10 +30,14 @@ const FeatureTable = ({ layer, loading, feature, refetch }) => {
   }
 
   let dataSourceUrl =
-    (lyr?.feature_service || lyr?.endpoint) +
+    (lyr?.endpoint) +
     `/query?where=${lyr.id_column}='${
       feature?.properties[lyr.id_column]
     }'&outFields=*&f=html`;
+
+  console.log(feature);
+
+  let featureId = `${lyr.name === 'parcels' ? `` : `#`}${feature?.properties[lyr.id_column]}`;
 
   return (
     <Flex direction={"column"}>
@@ -46,13 +50,24 @@ const FeatureTable = ({ layer, loading, feature, refetch }) => {
             {icons[layer]}
           </Box>
           {feature && (
-            <Flex className="text-sm" direction={"column"} align={"start"}>
-              <Text size={"1"} weight={"bold"}>
-                {lyr.label}
-              </Text>
-              <Text size={"3"} className="font-mono">
-                {loading ? `loading ...` : feature.properties[lyr.id_column]}
-              </Text>
+            <Flex className="text-sm w-full" direction={"column"} align={"start"} >
+              <Flex align="center" justify={"between"} className="w-full">
+                <Text size={"2"} weight={"bold"}>
+                  {lyr.label}
+                </Text>
+                <Box className="rounded-full py-1 px-2" style={{backgroundColor: lyr.bg_color}}>
+                <Text size={"2"} className="font-mono" weight={"bold"}>
+                  {loading
+                    ? `loading ...`
+                    : featureId}
+                </Text>
+                    </Box>
+              </Flex>
+              {!loading && lyr.label_column && (
+                <Text size={"3"} weight="medium">
+                  {feature.properties[lyr.label_column]}
+                </Text>
+              )}
             </Flex>
           )}
           {!feature && (
@@ -64,7 +79,7 @@ const FeatureTable = ({ layer, loading, feature, refetch }) => {
           )}
         </Flex>
         <Inset>
-          <Flex justify={"end"} gap={"4"} p={"1"}>
+          <Flex justify={"end"} gap={"4"} p={"1"} mt="3">
             {feature && (
               <FeatureLink
                 url={`/map?id=${

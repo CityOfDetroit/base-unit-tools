@@ -14,7 +14,7 @@ const MailerAddressSearch = ({ geom, setGeom }) => {
   useEffect(() => {
     if(feature && !loading) {
       queryFeatures({
-        "url": layers.parcel.feature_service,
+        "url": layers.parcel.endpoint,
         "where": `${layers.parcel.id_column} = '${feature.attributes.parcel_id}'`,
         'outFields': '*',
         'resultRecordCount': 1,

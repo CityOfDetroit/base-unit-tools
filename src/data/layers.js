@@ -18,32 +18,7 @@ const layers = {
     link: "address-linked",
     filter_id: "$id",
     color: "rgb(170, 200, 221)",
-    bg_color: "rgba(170, 200, 221, 1)",
-    formatter: (a) => {
-      return {
-        title: [a.properties.street_number, a.properties.street_prefix, a.properties.street_name, a.properties.street_type, a.properties.unit_type, a.properties.unit_number].join(" "),
-        attributes: {
-          "Street number": a.properties.street_number,
-          "Street prefix": a.properties.street_prefix,
-          "Street name": a.properties.street_name,
-          "Street type": a.properties.street_type,
-          "Unit type": a.properties.unit_type,
-          "Unit number": a.properties.unit_number,
-        },
-        groups: {
-          "Primary address": [
-            "Street number",
-            "Street prefix",
-            "Street name",
-            "Street type",
-          ],
-          "Subaddress": [
-            "Unit type",
-            "Unit number"
-          ]
-        }
-      }
-    }
+    bg_color: "rgba(170, 200, 221, 1)"
   },
   building: {
     name: "buildings",
@@ -64,8 +39,9 @@ const layers = {
     singular: "parcel",
     label: "Parcel",
     layer_id: "Parcels (Current)",
+    label_column: "address",
     icon: GroupIcon,
-    feature_service:
+    endpoint:
       "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/parcel_file_current/FeatureServer/0/",
     id_column: "parcel_id",
     interaction: "parcel-fill",
