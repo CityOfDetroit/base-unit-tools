@@ -74,7 +74,7 @@ const getLayerUrl = (layer) => {
     case 'building':
       return layers.building.endpoint;
     case 'parcel':
-      return layers.parcel.feature_service;
+      return layers.parcel.endpoint;
     case 'address':
       return layers.address.endpoint;
     case 'street':

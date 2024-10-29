@@ -23,7 +23,6 @@ const MapComponent = ({
   const { isDarkMode } = useTheme();
   const [mapLoaded, setMapLoaded] = useState(false);
   const [clickedFeatures, setClickedFeatures] = useState([]);
-  const [clickedIdx, setClickedIdx] = useState(0);
 
   let mapStyles = {
     streets: baseStyle,
@@ -71,10 +70,6 @@ const MapComponent = ({
         });
 
         setClickedFeatures(features);
-      });
-
-      map.on("dblclick", (e) => {
-        setClickedIdx(clickedIdx + 1);
       });
 
       map.on("moveend", () => {
@@ -132,35 +127,27 @@ const MapComponent = ({
 
       // check for clicked features
       if (clickedFeatures.length > 0) {
-        let newFeature = clickedFeatures[clickedIdx];
+
+        let newFeature = clickedFeatures[0];
 
         const lyr = Object.keys(layers).find(
-          (l) => layers[l].interaction === newFeature.layer.id
+          (l) => layers[l].interaction === newFeature?.layer?.id
         );
 
         refetch(
-          lyr === "parcel" ? newFeature.properties.parcel_id : newFeature.id,
+          lyr === "parcel" ? newFeature?.properties.parcel_id : newFeature?.id,
           lyr
         );
         setLayer(lyr);
 
         // get the layer that was clicked
-        let filter = ["==", "$id", newFeature.id];
-        mapInstance.current.setFilter(layers[lyr].highlight, filter);
-
-        // // set that as the clickedFeature
-        // if (feature) {
-        //   let filter = ["==", "$id", feature.id];
-        //   mapInstance.current.setFilter(currentLyr.highlight, filter);
-
-        //   refetch(
-        //     layer === "parcel" ? feature.properties.parcel_id : feature.id,
-        //     layer
-        //   );
-        // }
+        let filter = ["==", "$id", newFeature?.id];
+        if (lyr) {
+          mapInstance.current.setFilter(layers[lyr]?.highlight, filter);
+        }
       }
     }
-  }, [clickedFeatures, clickedIdx]);
+  }, [clickedFeatures]);
 
   // useEffect(() => {
   //   if (mapInstance.current && layer && mapLoaded) {
@@ -222,11 +209,14 @@ const MapComponent = ({
   }, [feature]);
 
   useEffect(() => {
-    if (mapInstance.current && linkedAddresses.length > 0 && mapLoaded) {
+    if (mapInstance.current && linkedAddresses.length > 0 && mapLoaded && layers[layer]) {
       // get the layers that aren't the current one
       const otherLayers = Object.keys(layers).filter((l) => l !== layer);
 
-      mapInstance.current.setFilter(layers[layer].linked, ["==", "$id", ""]);
+      if (layers[layer].linked) {
+        mapInstance.current.setFilter(layers[layer]?.linked, ["==", "$id", ""]);
+      }
+
 
       otherLayers.forEach((l) => {
         let lyr = layers[l];
@@ -318,7 +308,7 @@ const MapComponent = ({
 
     
   return (
-    <Box p={"2"}>
+    <Box p="2">
       <Box
         ref={mapRef}
         height={

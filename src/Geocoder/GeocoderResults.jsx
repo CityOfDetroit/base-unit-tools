@@ -247,7 +247,7 @@ const GeocoderResults = ({
   });
 
   return (
-    <Flex direction="column" p={"2"} gap="2">
+    <Flex direction="column" p={"2"} gap="2" className="overflow-auto">
       <Text size={"4"}>Results</Text>
       <Flex direction={{initial: "column", sm:"row"}} gap={"3"} align={{initial: "start", sm: "center"}} justify={"start"}>
         <Text size={"1"} weight="bold">
@@ -289,8 +289,8 @@ const GeocoderResults = ({
           </Button>
         </CSVLink>
       </Flex>
-      <div className="overflow-auto max-w-[70vw] w-full">
-        <table {...getTableProps()} className="text-xs">
+      <div className="overflow-auto">
+        <table {...getTableProps()} className="text-xs overflow-auto">
           <thead>
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>

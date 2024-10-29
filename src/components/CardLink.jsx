@@ -19,7 +19,6 @@ const CardLink = ({ text, url, icon }) => {
       >
         <Link to={url}>
         <Flex align={"center"} gap={"1"}>
-
           {icon}
           {text}
         </Flex>
