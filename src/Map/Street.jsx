@@ -12,10 +12,12 @@ const Street = ({ street }) => {
 
   let { properties: props } = street;
 
+  console.log(props)
+
   return (
     <>
       <Category label="Name">
-        <Attribute label="Street direction" value={props?.street_direction} />
+        <Attribute label="Street prefix" value={props?.street_prefix} />
         <Attribute label="Street name" value={props?.street_name} />
         <Attribute label="Street type" value={props?.street_type} />
       </Category>

@@ -91,7 +91,7 @@ const LinkedAddresses = ({
     return {
       address_id: props.address_id,
       street_number: props.street_number,
-      street_direction: props.street_direction,
+      street_prefix: props.street_prefix,
       street_name: props.street_name,
       street_type: props.street_type,
       unit_type: props.unit_type,
@@ -144,7 +144,7 @@ const LinkedAddresses = ({
                       gap="4"
                     >
                       <Text size="2" weight={"bold"} className="w-full">
-                        {props.street_number} {props.street_direction}{" "}
+                        {props.street_number} {props.street_prefix}{" "}
                         {props.street_name} {props.street_type}{" "}
                         {props.unit_type} {props.unit_number}
                       </Text>
