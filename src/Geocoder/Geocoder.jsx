@@ -81,8 +81,7 @@ const failedAddressUpload = (unmatched) => {
   let url = "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/unmatched_geocode_addresses/FeatureServer/0";
   addFeatures({
     url: url,
-    features: unmatched,
-    authentication: "3NKHt6i2urmWtqOuugvr9Q7kB3HVnixx-jF8RBdU6zyYHVVhc6h7lwrcCAbiBJ5UNeD6zKw8IeWrwfXmJmkRpBbtcSF4pvUj-Cymv9UGAlbfnE0_NieLfawKltqikEpY"
+    features: unmatched
   });
 
 };
@@ -145,7 +144,7 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
   useEffect(() => {
     if(geocoded && unmatchedAddr.length > 0) {
       console.log(unmatchedAddr);
-      failedAddressUpload(unmatchedAddr);
+      // failedAddressUpload(unmatchedAddr);
       setUnmatchedAddr([]);
     };
   },[unmatchedAddr]);
