@@ -70,7 +70,6 @@ const fetchResults = (addresses, setResults, setUnmatchedAddr) => {
       )
     )
     .then(() => setUnmatchedAddr(failResults))
-    //.then(() => failedAddressUpload(failResults))
 };
 
 /**
