@@ -10,13 +10,15 @@ import GeocoderOptions from "./GeocoderOptions";
 import GeocoderResults from "./GeocoderResults";
 import { TextInput } from "./TextInput";
 import { CheckCircledIcon, LinkNone1Icon } from "@radix-ui/react-icons";
+import { addFeatures } from "@esri/arcgis-rest-feature-service";
 
 /**
  * This function chunks addresses in batches of 1000 and geocodes them.
  * @param {} addresses
  * @param {} setResults
+ * @param {} setUnmatchedAddr
  */
-const fetchResults = (addresses, setResults) => {
+const fetchResults = (addresses, setResults, setUnmatchedAddr) => {
   let allResults = [];
   let failResults = [];
   let dataToSend = addresses.map((a, i) => {
@@ -53,21 +55,39 @@ const fetchResults = (addresses, setResults) => {
       // extract locations where geocode fails (score=0)
       for (let res in allResults) {
         if (allResults[res].score == 0){
-          let input = addresses[res]; // index input address
+          let resID = allResults[res].attributes.ResultID - 1
+          let input = addresses[resID]; // index input address
           // build object
-          const inputAttributes = {attributes:{failed_address: input}};   
+          let inputAttributes = {attributes:{failed_address: input}};   
           // concat to array       
           failResults = failResults.concat(inputAttributes);
         };
-      console.log(failResults);
       }
     })
     .then(() =>
       setResults(
         allResults.sort((a, b) => a.attributes.ResultID - b.attributes.ResultID)
       )
-    );
+    )
+    .then(() => setUnmatchedAddr(failResults))
+    //.then(() => failedAddressUpload(failResults))
 };
+
+/**
+ * 
+ * @param {} unmatched 
+ */
+const failedAddressUpload = (unmatched) => {
+
+  let url = "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/unmatched_geocode_addresses/FeatureServer/0";
+  addFeatures({
+    url: url,
+    features: unmatched,
+    authentication: "3NKHt6i2urmWtqOuugvr9Q7kB3HVnixx-jF8RBdU6zyYHVVhc6h7lwrcCAbiBJ5UNeD6zKw8IeWrwfXmJmkRpBbtcSF4pvUj-Cymv9UGAlbfnE0_NieLfawKltqikEpY"
+  });
+
+};
+
 
 const Geocoder = ({ session, setSession, login, setLogin }) => {
   // csv upload
@@ -97,7 +117,7 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
   let [results, setResults] = useState([]);
 
   // container for unmatched addresses
-  let [unmatchedAddr, setUnmatchedAddr] = useState(null);
+  let [unmatchedAddr, setUnmatchedAddr] = useState([]);
 
   // state to display "geocode addresses" button
   let [geocoded, setGeocoded] = useState(false);
@@ -107,25 +127,33 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
     setAddresses([]);
     setPayload([]);
     setResults([]);
-    setUnmatchedAddr(null);
+    setUnmatchedAddr([]);
   }, [options.mode]);
 
   useEffect(() => {
     setResults([]);
     setPayload([]);
-    setUnmatchedAddr(null);
+    setUnmatchedAddr([]);
   }, [csv]);
 
   useEffect(() => {
     if (payload.length > 0) {
-      fetchResults(addresses, setResults);
+      fetchResults(addresses, setResults, setUnmatchedAddr);
       setGeocoded(true);
     }
   }, [payload]);
 
   useEffect(() => {
+    if(geocoded && unmatchedAddr.length > 0) {
+      console.log(unmatchedAddr);
+      failedAddressUpload(unmatchedAddr);
+      setUnmatchedAddr([]);
+    };
+  },[unmatchedAddr]);
+
+  useEffect(() => {
     setGeocoded(false);
-  }, [addresses])
+  }, [addresses]);
 
   return (
     <>
