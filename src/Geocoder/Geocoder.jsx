@@ -18,7 +18,7 @@ import { CheckCircledIcon, LinkNone1Icon } from "@radix-ui/react-icons";
  */
 const fetchResults = (addresses, setResults) => {
   let allResults = [];
-
+  let failResults = [];
   let dataToSend = addresses.map((a, i) => {
     return { OBJECTID: i + 1, SingleLine: a };
   });
@@ -49,6 +49,18 @@ const fetchResults = (addresses, setResults) => {
   )
     .each((f) => {
       allResults = allResults.concat(f.locations);
+
+      // extract locations where geocode fails (score=0)
+      for (let res in allResults) {
+        if (allResults[res].score == 0){
+          let input = addresses[res]; // index input address
+          // build object
+          const inputAttributes = {attributes:{failed_address: input}};   
+          // concat to array       
+          failResults = failResults.concat(inputAttributes);
+        };
+      console.log(failResults);
+      }
     })
     .then(() =>
       setResults(
@@ -132,7 +144,7 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
             <Button
               size={"1"}
               active={addresses.length > 0}
-              disabled={addresses.length === 0}
+              //disabled={addresses.length === 0}
               onClick={() => {
                 addresses.length > 0 && setPayload(addresses);
               }}
