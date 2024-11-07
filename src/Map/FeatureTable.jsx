@@ -35,8 +35,6 @@ const FeatureTable = ({ layer, loading, feature, refetch }) => {
       feature?.properties[lyr.id_column]
     }'&outFields=*&f=html`;
 
-  console.log(feature);
-
   let featureId = `${lyr.name === 'parcels' ? `` : `#`}${feature?.properties[lyr.id_column]}`;
 
   return (

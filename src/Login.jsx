@@ -1,25 +1,26 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
+import { useSearchParams } from "react-router-dom";
 
-const Login = () => {
+const Login = ({ sendTo }) => {
   const { isAuthenticated, username, handleSignIn, handleSignOut } = useAuth();
+
+  const [params, setParams] = useSearchParams();
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(`/${params.get("app")}`);
+    }
+  }, [isAuthenticated]);
 
   return (
     <div>
       {/* ... (authentication buttons) */}
       {isAuthenticated ? (
-        <div className="text-xs flex gap-1 text-gray-600 items-center">
-          <span className="flex flex-col">
-            <b>{username}</b>
-          </span>
-          <button
-            className="text-xs font-semibold opacity-70 hover:opacity-100 hover:bg-red-300 w-20"
-            onClick={handleSignOut}
-          >
-            Sign Out
-          </button>
-        </div>
+        <p>Hey</p>
       ) : (
         <button
           className="text-xs font-semibold opacity-70 hover:opacity-100 hover:bg-blue-300 w-20"

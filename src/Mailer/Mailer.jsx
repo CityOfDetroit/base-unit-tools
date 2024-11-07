@@ -11,7 +11,7 @@ import MailerLayerSelector from "./MailerLayerSelector";
 import MailerMap from "./MailerMap";
 import MailerSelection from "./MailerSelection";
 import MailerTable from "./MailerTable";
-import { Button, Card, Grid, Text, Flex, Switch } from "@radix-ui/themes";
+import { Button, Card, Grid, Text, Flex, Switch, RadioCards } from "@radix-ui/themes";
 import { useAuth } from "../contexts/AuthContext";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { Link } from "react-router-dom";
@@ -95,7 +95,7 @@ const Mailer = () => {
         // the key bit
         returnIdsOnly: true,
         orderByFields: "objectid",
-        // intersects-with-selectino parameters
+        // intersects-with-selection parameters
         geometry: geojsonToArcGIS(geom)[0].geometry,
         geometryType: "esriGeometryPolygon",
         spatialRel: "esriSpatialRelIntersects",
@@ -236,29 +236,13 @@ const Mailer = () => {
 
   return (
     <Grid
-      columns={{ initial: "1fr", sm: "1fr 3fr" }}
-      rows={{ initial: "auto", sm: "50vh auto" }}
+      columns={{ initial: "1fr", sm: "2fr 3fr" }}
+      rows={{ initial: "auto", sm: "auto auto" }}
       gap={{ initial: "0", sm: "4" }}
       p={{ initial: "0", sm: "2", lg: "4" }}
     >
       {/* <AppHeader app={apps.mailer} introduction={introduction}>
         <h3 className="mb-2 text-base">Data selection method</h3>
-        <div className="flex items-center">
-          <ToggleButton
-            title={`Intersecting address points`}
-            active={layer === "centroid"}
-            onClick={() =>
-              setLayer("centroid") && setResultIds(null) && setAddresses([]) && setFiltered([])
-            }
-          />
-          <ToggleButton
-            title={`Intersecting parcels`}
-            active={layer === "parcel"}
-            onClick={() =>
-              setLayer("parcel") && setResultIds(null) && setAddresses([]) && setFiltered([])
-            }
-          />
-        </div>
         <p className="text-sm leading-5 my-2">
           The default data selection method for this tool is to pull{" "}
           <b>intersecting address points</b> inside the mailing area. This method is fastest and
@@ -315,7 +299,16 @@ const Mailer = () => {
       )}
 
       {geom && (
-        <Flex direction="column" gap="2">
+        <Flex direction="column" gap="2" >
+          <Text size="2" weight={"medium"}>Selection mode</Text>
+          <RadioCards.Root value={layer} defaultValue="parcel" onValueChange={(value) => setLayer(value)} gap={"2"}>
+            <RadioCards.Item value="centroid">
+              <Text size="1">Address points within buffer</Text>
+            </RadioCards.Item>
+            <RadioCards.Item value="parcel">
+              <Text size="1">Addresses on parcels within buffer</Text>
+            </RadioCards.Item>
+          </RadioCards.Root>
           {/* If we have a shape, display buffer tool, current selection */}
           <MailerBuffer {...{ geom, setGeom }} />
           {/* If there's a shape and access to the layer */}
@@ -342,7 +335,7 @@ const Mailer = () => {
               {resultIds && (
                 <Card>
                   <Flex direction={"column"} gap={"2"}>
-                    <Text weight="medium">Address filtering options</Text>
+                    <Text weight="medium">Options</Text>
                     {Object.keys(filters).map((f) => (
                       <Flex gap="2">
                         <Switch

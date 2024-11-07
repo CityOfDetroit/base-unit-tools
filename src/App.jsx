@@ -18,13 +18,14 @@ import Geocoder from "./Geocoder/Geocoder";
 import Mailer from "./Mailer/Mailer";
 
 // Protected route component
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ path, children }) => {
   const { isAuthenticated } = useAuth();
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
+  return isAuthenticated ? children : <Navigate to={`/login?app=${path.replace("/", "")}`} />;
 };
 
 
 function App() {
+
   return (
     <ThemeProvider>
       <AuthProvider>

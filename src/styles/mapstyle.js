@@ -93,7 +93,7 @@ export const baseStyle = {
       maxzoom: 22,
       paint: {
         "raster-opacity": 1,
-        "raster-saturation": -0.25,
+        "raster-saturation": -0.75,
       },
       layout: {
         visibility: "none",
@@ -1044,8 +1044,8 @@ export const baseStyle = {
       paint: {
         "fill-color": {
           stops: [
-            [14, "#aaa"],
-            [19, "#bbb"],
+            [14, "#000"],
+            [19, "#fff"],
           ],
         },
         "fill-opacity": {
