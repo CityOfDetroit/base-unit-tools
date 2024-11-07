@@ -12,8 +12,6 @@ const Street = ({ street }) => {
 
   let { properties: props } = street;
 
-  console.log(props)
-
   return (
     <>
       <Category label="Name">

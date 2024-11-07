@@ -1,6 +1,4 @@
 // support two different servers
-let SERVER_ROOT = `https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/`;
-let HOSTED_ROOT = `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitMetrics/FeatureServer/`;
 let HOSTED_ROOT_DEV = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/BaseUnitFeatures/FeatureServer/`;
 import { GroupIcon } from "@radix-ui/react-icons";
 import moment from "moment";
