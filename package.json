@@ -1,6 +1,6 @@
 {
   "name": "base-unit-tools-two",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@arcgis/core": "^4.30.9",
