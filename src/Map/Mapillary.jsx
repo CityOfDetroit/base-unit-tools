@@ -1,9 +1,4 @@
-import {
-  Card,
-  Flex,
-  RadioGroup,
-  Text
-} from "@radix-ui/themes";
+import { Card, Flex, RadioGroup, Text } from "@radix-ui/themes";
 import bearing from "@turf/bearing";
 import centroid from "@turf/centroid";
 import distance from "@turf/distance";
@@ -12,6 +7,7 @@ import "mapillary-js/dist/mapillary.css";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import _ from "underscore";
+import { DataSource } from "../components/CardLink";
 
 /**
  * Wrap a value on the interval [min, max].
@@ -68,7 +64,13 @@ function computeBearing(node, start, end) {
   return center;
 }
 
-const Mapillary = ({ svImages, feature, viewerImage, setViewerImage, setViewerBearing }) => {
+const Mapillary = ({
+  svImages,
+  feature,
+  viewerImage,
+  setViewerImage,
+  setViewerBearing,
+}) => {
   let [sequenceImages, setSequenceImages] = useState([]);
 
   let [selectedImage, setSelectedImage] = useState(null);
@@ -76,6 +78,8 @@ const Mapillary = ({ svImages, feature, viewerImage, setViewerImage, setViewerBe
   let [viewer, setViewer] = useState(null);
 
   let [loading, setLoading] = useState(false);
+
+  let [center, setCenter] = useState(null);
 
   useEffect(() => {
     const viewer = new Viewer({
@@ -106,8 +110,7 @@ const Mapillary = ({ svImages, feature, viewerImage, setViewerImage, setViewerBe
 
     viewer.on("image", (image) => {
       setViewerImage(image);
-      image.target.getBearing()
-        .then(d => setViewerBearing(d))
+      image.target.getBearing().then((d) => setViewerBearing(d));
     });
 
     viewer.on("imageclick", (image) => {
@@ -119,8 +122,7 @@ const Mapillary = ({ svImages, feature, viewerImage, setViewerImage, setViewerBe
     });
 
     viewer.on("pov", function (e) {
-      e.target.getBearing()
-        .then(d => setViewerBearing(d))
+      e.target.getBearing().then((d) => setViewerBearing(d));
     });
 
     setViewer(viewer);
@@ -152,6 +154,7 @@ const Mapillary = ({ svImages, feature, viewerImage, setViewerImage, setViewerBe
             : [i._core.geometry.lng, i._core.geometry.lat];
           let featureCentroid = centroid(feature).geometry.coordinates;
           let center = computeBearing(i, imageCoords, featureCentroid);
+          setCenter(center);
           viewer.setCenter(center);
         });
     }
@@ -201,6 +204,15 @@ const Mapillary = ({ svImages, feature, viewerImage, setViewerImage, setViewerBe
     }
   }, [svImages, feature]);
 
+  console.log(selectedImage);
+  console.log(viewer);
+
+  let url;
+
+  if (selectedImage && center) {
+    url = `https://www.mapillary.com/app/?lat=${selectedImage._geometry.coordinates[1]}&lng=${selectedImage._geometry.coordinates[0]}&z=18&pKey=${selectedImage.properties.id}&focus=photo&x=${center[0]}&y=${center[1]}`;
+  }
+
   return (
     <Flex
       className="h-auto sm:h-96"
@@ -224,7 +236,9 @@ const Mapillary = ({ svImages, feature, viewerImage, setViewerImage, setViewerBe
             <Flex direction="column">
               <Text size={"1"}>Image taken on:</Text>
               <Text size={"3"} weight="bold">
-                {moment(viewerImage.image._spatial.captured_at).format("MMM DD, YYYY")}
+                {moment(viewerImage.image._spatial.captured_at).format(
+                  "MMM DD, YYYY"
+                )}
               </Text>
             </Flex>
           )}
@@ -246,7 +260,13 @@ const Mapillary = ({ svImages, feature, viewerImage, setViewerImage, setViewerBe
             )}
             {sequenceImages?.length > 0 && !loading && viewerImage && (
               <RadioGroup.Root
-                onValueChange={(value) => setSelectedImage(sequenceImages.find((image) => image.properties.sequence_id === value))}
+                onValueChange={(value) =>
+                  setSelectedImage(
+                    sequenceImages.find(
+                      (image) => image.properties.sequence_id === value
+                    )
+                  )
+                }
                 value={viewerImage?.image._core?.sequence?.id}
                 className="max-h-72 overflow-y-auto w-full"
               >
@@ -270,6 +290,9 @@ const Mapillary = ({ svImages, feature, viewerImage, setViewerImage, setViewerBe
             )}
           </Flex>
         </Flex>
+        {url && (
+          <DataSource url={url} />
+        )}
       </Card>
     </Flex>
   );
