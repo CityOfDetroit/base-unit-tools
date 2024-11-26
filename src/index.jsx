@@ -9,12 +9,8 @@ import { Theme } from "@radix-ui/themes";
 const root = createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <html>
-      <body>
-        <Theme accentColor="green" grayColor="sand" radius="small" scaling="100%">
-          <App />
-        </Theme>
-      </body>
-    </html>
+    <Theme accentColor="green" grayColor="sand" radius="small" scaling="100%">
+      <App />
+    </Theme>
   </React.StrictMode>
 );
