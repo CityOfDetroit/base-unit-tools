@@ -14,7 +14,7 @@ const MapGeocoder = ({
   const handleKeyDown = (event) => {
     if (event.key === "Enter") {
 
-      let parcelRegex = /^([0,1,2][0-9])([0-9]{6,})([0-9L\.\-]{1,})$/;
+      let parcelRegex = /^([0,1,2][0-9])([0-9]{6,})([0-9A-Z\.\-]{1,})$/;
 
       if (parcelRegex.test(geocodeValue)) {
         refetch(
