@@ -40,7 +40,9 @@
   },
   "scripts": {
     "start": "vite",
-    "build": "vite build",
+    "build:standalone": "vite build",
+    "build:embedded": "BUILD_TARGET=embedded vite build",
+    "build:all": "npm run build:standalone && npm run build:embedded",
     "serve": "vite preview"
   },
   "eslintConfig": {
