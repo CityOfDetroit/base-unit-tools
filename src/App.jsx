@@ -5,7 +5,8 @@ import MapComponent from "./Map/Map";
 import Homepage from "./Homepage";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import {
-  BrowserRouter as Router,
+  BrowserRouter,
+  MemoryRouter,
   Routes,
   Route,
   Navigate,
@@ -24,7 +25,9 @@ const ProtectedRoute = ({ path, children }) => {
 };
 
 
-function App() {
+const App = ({ mode = 'standalone', basePath = '' }) => {
+  // Choose router based on mode
+  const Router = mode === 'standalone' ? BrowserRouter : MemoryRouter;
 
   return (
     <ThemeProvider>
