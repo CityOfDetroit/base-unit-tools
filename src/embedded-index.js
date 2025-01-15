@@ -1,5 +1,5 @@
-import { initBaseUnitTools } from './index.jsx';
+import { initEmbeddedBaseUnitTools } from './ShadowDOMWrapper';
 
-initBaseUnitTools('root', { 
-  mode: 'embedded',
-});
+if (document.getElementById('root')) {
+  initEmbeddedBaseUnitTools('root');
+}

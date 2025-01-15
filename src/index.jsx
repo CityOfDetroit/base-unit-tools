@@ -7,14 +7,14 @@ import "@radix-ui/themes/styles.css";
 import { Theme } from "@radix-ui/themes";
 
 // Function to initialize the app
-export function initBaseUnitTools(elementId, options = {}) {
+function initStandaloneBaseUnitTools(elementId) {
   const root = createRoot(document.getElementById(elementId));
   root.render(
     <React.StrictMode>
       <Theme accentColor="green" grayColor="sand" radius="small" scaling="100%">
         <App
-          mode={options.mode || 'embedded'}
-          basePath={options.basePath || ''}
+          mode={'standalone'}
+          basePath={''}
         />
       </Theme>
     </React.StrictMode>
@@ -23,5 +23,5 @@ export function initBaseUnitTools(elementId, options = {}) {
 
 // If running standalone
 if (document.getElementById('root')) {
-  initBaseUnitTools('root', { mode: 'standalone' });
+  initStandaloneBaseUnitTools('root');
 }
