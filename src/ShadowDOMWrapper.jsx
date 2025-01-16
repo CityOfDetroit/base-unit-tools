@@ -2,7 +2,15 @@ import React, { useEffect, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { Theme } from "@radix-ui/themes";
+import 'maplibre-gl/dist/maplibre-gl.css';
 import './styles/index.css';  // Import app styles (including Tailwind)
+import "@radix-ui/themes/styles.css";
+import "@radix-ui/colors/blue-alpha.css";
+import "@radix-ui/colors/blue.css";
+import "@radix-ui/colors/green-alpha.css";
+import "@radix-ui/colors/green.css";
+import "@radix-ui/colors/gray-alpha.css";
+import "@radix-ui/colors/gray.css";
 
 const ShadowDOMWrapper = () => {
   const hostRef = useRef(null);
@@ -19,20 +27,60 @@ const ShadowDOMWrapper = () => {
       container.id = 'shadow-root';
       shadowRootRef.current.appendChild(container);
 
-      // Add required stylesheets
-      const stylesheets = [
-        { href: '/base-unit-tools.css', id: 'bundled-styles' }, // Bundled styles
-        { href: 'https://unpkg.com/@radix-ui/themes@3.1.4/styles.css', id: 'radix-styles' },
-        { href: 'https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css', id: 'maplibre-styles' }
-      ];
+      const copyRootVariables = () => {
+        const link = shadowRootRef.current.querySelector('#bundled-styles');
 
-      stylesheets.forEach(({ href, id }) => {
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = href;
-        link.id = id;
-        shadowRootRef.current.appendChild(link);
-      });
+        if (link) {
+          const waitForSheet = new Promise((resolve) => {
+            if (link.sheet) {
+              resolve(link.sheet);
+              return;
+            }
+            link.onload = () => resolve(link.sheet);
+          });
+
+          waitForSheet.then(sheet => {
+            let hostStyles = '';
+
+            Array.from(sheet.cssRules).forEach(rule => {
+              // Handle regular style rules
+              if (rule.type === CSSRule.STYLE_RULE && rule.selectorText.includes(':root')) {
+                const newSelector = rule.selectorText.replace(/:root/g, ':host');
+                hostStyles += `${newSelector} { ${rule.style.cssText} }\n`;
+              }
+              // Handle media queries and supports rules
+              else if (rule.type === CSSRule.MEDIA_RULE || rule.type === CSSRule.SUPPORTS_RULE) {
+                let mediaRules = '';
+                Array.from(rule.cssRules).forEach(nestedRule => {
+                  if (nestedRule.selectorText && nestedRule.selectorText.includes(':root')) {
+                    const newSelector = nestedRule.selectorText.replace(/:root/g, ':host');
+                    mediaRules += `${newSelector} { ${nestedRule.style.cssText} }\n`;
+                  }
+                });
+                if (mediaRules) {
+                  hostStyles += `${rule.conditionText} {\n${mediaRules}}\n`;
+                }
+              }
+            });
+
+            // Create a style block with the transformed rules
+            const variablesStyle = document.createElement('style');
+            variablesStyle.textContent = hostStyles;
+
+            shadowRootRef.current.insertBefore(variablesStyle, shadowRootRef.current.firstChild);
+          });
+        }
+      };
+
+      // Add stylesheets
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = './base-unit-tools.css';
+      link.id = 'bundled-styles';
+      shadowRootRef.current.appendChild(link);
+
+      // Wait for stylesheet to load before copying variables
+      link.onload = copyRootVariables;
 
       // Create root and render app
       rootRef.current = createRoot(container);
