@@ -50,7 +50,7 @@ export const geocoderFields = [
     default: false,
   },
   {
-    name: "census_2020",
+    name: "census_block_2020",
     display: "Census Block 2020",
     geocoderColumn: "census_block_geoid_2020",
     description: "The 2020 census block this address belongs to.",
