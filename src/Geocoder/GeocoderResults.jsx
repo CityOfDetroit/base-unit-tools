@@ -147,7 +147,6 @@ const GeocoderResults = ({
     ]);
   }
 
-  
   if (options.realted_parcel) {
     cols = cols.concat([
       {
@@ -224,6 +223,9 @@ const GeocoderResults = ({
     if (newRow.parcel_id) {
       newRow.parcel_id = `=""${newRow.parcel_id}""`;
     }
+    if (newRow.related_parcel) {
+      newRow.related_parcel = `=""${newRow.related_parcel}""`;
+    }
     if (csv) {
       newRow = { ...csv[idx], ...newRow };
     }
@@ -252,6 +254,9 @@ const GeocoderResults = ({
 
     if (newRow.parcel_id) {
       newRow.parcel_id = `${newRow.parcel_id}`;
+    }
+    if (newRow.related_parcel) {
+      newRow.related_parcel = `=""${newRow.related_parcel}""`;
     }
     if (csv) {
       newRow = { ...csv[idx], ...newRow };
