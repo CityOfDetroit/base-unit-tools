@@ -50,14 +50,7 @@ export const geocoderFields = [
     default: false,
   },
   {
-    name: "related_parcel",
-    display: "Related Parcel",
-    geocoderColumn: "relatedparcel",
-    description: "Any parcels related to this address via NEZ.",
-    default: false,
-  },
-  {
-    name: "census_block_2020",
+    name: "census_2020",
     display: "Census Block 2020",
     geocoderColumn: "census_block_geoid_2020",
     description: "The 2020 census block this address belongs to.",

@@ -38,6 +38,17 @@ const GeocoderOptions = ({ options, setOptions }) => {
               Base Unit IDs
             </Flex>
           </Text>
+          <Text as="label" size="2">
+            <Flex as="span" gap="2">
+              <Checkbox
+                size="1"
+                onCheckedChange={() =>
+                  setOptions({ ...options, realted_parcel: !options.realted_parcel })
+                }
+              />{" "}
+              Related Parcel
+            </Flex>
+          </Text>
         </Flex>
       </Card>
 

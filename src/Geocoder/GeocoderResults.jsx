@@ -147,6 +147,19 @@ const GeocoderResults = ({
     ]);
   }
 
+  
+  if (options.realted_parcel) {
+    cols = cols.concat([
+      {
+        accessor: "related_parcel",
+        Header: "Related Parcel",
+        Cell: (row) => (
+            <a target={`_blank`} href={`/map?id=${row.value}&layer=parcel`}>
+            {row.value}
+          </a>
+          )
+      }]);
+  }
   geocoderFields.forEach((cf) => {
     if (options[cf.name]) {
       cols.push({ accessor: cf.geocoderColumn, Header: cf.display });

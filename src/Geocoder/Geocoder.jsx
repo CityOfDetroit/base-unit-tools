@@ -114,6 +114,7 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
     matched: true,
     coords: true,
     ids: true,
+    realated_parcel: true
   };
 
   // add the geocoderFields to the options object
