@@ -52,27 +52,29 @@ const fetchResults = (addresses, setResults, setUnmatchedAddr) => {
     .each((f) => {
       allResults = allResults.concat(f.locations);
 
-      // extract locations where geocode fails (score=0)
+      // extract locations where geocode fails (address_id=0)
       for (let res in allResults) {
         if (allResults[res].attributes.address_id == 0){
-          console.log(allResults[res].attributes)
           let resID = allResults[res].attributes.ResultID - 1
           let input = addresses[resID]; // index input address
           // build object
           let inputAttributes = {attributes:
             {input_address: input,
-              result_add_num: allResults[res].attributes.AddNum,
-              result_prefix_direction: allResults[res].attributes.StDir,
-              result_street_name: allResults[res].attributes.StName,
-              result_street_type: allResults[res].attributes.StType,  
-              result_match_addr: allResults[res].attributes.Match_addr,
-              result_sub_address: allResults[res].attributes.SubAddr,
-              result_address_id: allResults[res].attributes.address_id,
-              result_building_id: allResults[res].attributes.building_id,
-              result_parcel_id: allResults[res].attributes.parcel_id,
-              result_street_id: allResults[res].attributes.street_id,
-              result_status: allResults[res].attributes.Status,
-              result_match_type: allResults[res].attributes.Addr_type
+              street_number_result: allResults[res].attributes.AddNum,
+              prefix_direction_result: allResults[res].attributes.StDir,
+              street_name_result: allResults[res].attributes.StName,
+              street_type_result: allResults[res].attributes.StType,  
+              match_address_result: allResults[res].attributes.Match_addr,
+              sub_address_result: allResults[res].attributes.SubAddr,
+              address_id_result: allResults[res].attributes.address_id,
+              building_id_result: allResults[res].attributes.building_id,
+              parcel_id_result: allResults[res].attributes.parcel_id,
+              street_id_result: allResults[res].attributes.street_id,
+              status_result: allResults[res].attributes.Status,
+              match_type_result: allResults[res].attributes.Addr_type,
+              score_result: allResults[res].attributes.Score,
+              lon_result: allResults[res].attributes.X,
+              lat_result: allResults[res].attributes.Y
             }};   
           // concat to array       
           failResults = failResults.concat(inputAttributes);
@@ -93,7 +95,7 @@ const fetchResults = (addresses, setResults, setUnmatchedAddr) => {
  */
 const failedAddressUpload = (unmatched) => {
 
-  let url = "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Base_Units_Unmatched_Geocoder_Addresses_view/FeatureServer/0";
+  let url = "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Base_Units_Geocoder_Failures_view/FeatureServer/0";
   addFeatures({
     url: url,
     features: unmatched
@@ -159,7 +161,6 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
 
   useEffect(() => {
     if(geocoded && unmatchedAddr.length > 0) {
-      console.log(unmatchedAddr);
       failedAddressUpload(unmatchedAddr);
       setUnmatchedAddr([]);
     };
