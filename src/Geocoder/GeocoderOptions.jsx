@@ -43,7 +43,7 @@ const GeocoderOptions = ({ options, setOptions }) => {
               <Checkbox
                 size="1"
                 onCheckedChange={() =>
-                  setOptions({ ...options, realted_parcel: !options.realted_parcel })
+                  setOptions({ ...options, related_parcel: !options.related_parcel })
                 }
               />{" "}
               Related Parcel

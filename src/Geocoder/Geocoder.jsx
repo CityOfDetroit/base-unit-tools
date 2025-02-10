@@ -94,7 +94,6 @@ const fetchResults = (addresses, setResults, setUnmatchedAddr) => {
  * @param {} unmatched 
  */
 const failedAddressUpload = (unmatched) => {
-
   let url = "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Base_Units_Geocoder_Failures_view/FeatureServer/0";
   addFeatures({
     url: url,
@@ -116,7 +115,7 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
     matched: true,
     coords: true,
     ids: true,
-    realated_parcel: true
+    related_parcel: false
   };
 
   // add the geocoderFields to the options object
