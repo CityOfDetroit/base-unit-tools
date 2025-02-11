@@ -12,6 +12,8 @@ import {
 } from "@radix-ui/react-icons";
 import { Link } from "react-router-dom";
 
+let exclude_census = ['census_block_2010', 'census_block_2020']
+
 const GeocoderResults = ({
   results,
   addresses,
@@ -147,7 +149,7 @@ const GeocoderResults = ({
     ]);
   }
 
-  if (options.realted_parcel) {
+  if (options.related_parcel) {
     cols = cols.concat([
       {
         accessor: "related_parcel",
@@ -159,11 +161,63 @@ const GeocoderResults = ({
           )
       }]);
   }
+
   geocoderFields.forEach((cf) => {
-    if (options[cf.name]) {
+    if ((options[cf.name]) & !(exclude_census.includes(cf.name))) {
       cols.push({ accessor: cf.geocoderColumn, Header: cf.display });
     }
   });
+
+  if (options.census_block_2020) {
+    cols = cols.concat([
+       {
+         accessor: (row) => row.census_block_geoid_2020.toString().slice(0, 2),
+         Header: "Census State 2020",
+         Cell: (row) => <span className="tracking-tight">{row.value}</span>
+       },
+       {
+         accessor: (row) => row.census_block_geoid_2020.toString().slice(2, 5),
+         Header: "Census County 2020",
+         Cell: (row) => <span className="tracking-tight">{row.value}</span>
+       },
+       {
+         accessor: (row) => row.census_block_geoid_2020.toString().slice(5, 11),
+         Header: "Census Tract 2020",
+         Cell: (row) => <span className="tracking-tight">{row.value}</span>
+       },
+       {
+         accessor: (row) => row.census_block_geoid_2020.toString(),
+         Header: "Census GEOID 2020",
+         Cell: (row) => <span className="tracking-tight">{row.value}</span>
+       },
+
+     ]);
+ }
+
+ if (options.census_block_2010){
+   cols = cols.concat([
+     {
+       accessor: (row) => row.census_block_geoid_2010.toString().slice(0, 2),
+       Header: "Census State 2010",
+       Cell: (row) => <span className="tracking-tight">{row.value}</span>
+     },
+     {
+       accessor: (row) => row.census_block_geoid_2020.toString().slice(2, 5),
+       Header: "Census County 2010",
+       Cell: (row) => <span className="tracking-tight">{row.value}</span>
+     },
+     {
+       accessor: (row) => row.census_block_geoid_2020.toString().slice(5, 11),
+       Header: "Census Tract 2010",
+       Cell: (row) => <span className="tracking-tight">{row.value}</span>
+     },
+     {
+       accessor: (row) => row.census_block_geoid_2010.toString(),
+       Header: "Census GEOID 2010",
+       Cell: (row) => <span className="tracking-tight">{row.value}</span>
+     },
+   ]);
+ }
 
   results.forEach((res, idx) => {
     res.attributes.input = addresses[idx];
