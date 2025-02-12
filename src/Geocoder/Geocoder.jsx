@@ -51,11 +51,18 @@ const fetchResults = (addresses, setResults, setUnmatchedAddr) => {
   )
     .each((f) => {
       allResults = allResults.concat(f.locations);
+            })
+    .then(() => {
+      setResults(
+        allResults.sort((a, b) => a.attributes.ResultID - b.attributes.ResultID)
 
+      )
       // extract locations where geocode fails (address_id=0)
       for (let res in allResults) {
-        if (allResults[res].attributes.address_id == 0){
-          let resID = allResults[res].attributes.ResultID - 1
+        let resID = allResults[res].attributes.ResultID - 1
+        if (allResults[res].attributes.address_id == 0 &&
+          addresses[resID].trim().length > 0
+        ){
           let input = addresses[resID]; // index input address
           // build object
           let inputAttributes = {attributes:
@@ -80,13 +87,9 @@ const fetchResults = (addresses, setResults, setUnmatchedAddr) => {
           failResults = failResults.concat(inputAttributes);
         }; 
       }
-    })
-    .then(() =>
-      setResults(
-        allResults.sort((a, b) => a.attributes.ResultID - b.attributes.ResultID)
-      )
+      setUnmatchedAddr(failResults)
+    }
     )
-    .then(() => setUnmatchedAddr(failResults))
 };
 
 /**
