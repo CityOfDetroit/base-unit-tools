@@ -202,12 +202,12 @@ const GeocoderResults = ({
        Cell: (row) => <span className="tracking-tight">{row.value}</span>
      },
      {
-       accessor: (row) => row.census_block_geoid_2020.toString().slice(2, 5),
+       accessor: (row) => row.census_block_geoid_2010.toString().slice(2, 5),
        Header: "Census County 2010",
        Cell: (row) => <span className="tracking-tight">{row.value}</span>
      },
      {
-       accessor: (row) => row.census_block_geoid_2020.toString().slice(5, 11),
+       accessor: (row) => row.census_block_geoid_2010.toString().slice(5, 11),
        Header: "Census Tract 2010",
        Cell: (row) => <span className="tracking-tight">{row.value}</span>
      },
