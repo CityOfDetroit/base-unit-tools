@@ -71,17 +71,12 @@ export default function demoEmbedPlugin() {
                 <h2>How to Embed</h2>
                 <p>To embed the Base Unit Tools in your website, follow these steps:</p>
                 
-                <h3>1. Include the CSS file</h3>
-                <div class="code-block">
-                  &lt;link rel="stylesheet" href="path/to/base-unit-tools.css"&gt;
-                </div>
-                
-                <h3>2. Create a container element</h3>
+                <h3>1. Create a container element</h3>
                 <div class="code-block">
                   &lt;div id="base-unit-tools-container"&gt;&lt;/div&gt;
                 </div>
                 
-                <h3>3. Import and initialize the app</h3>
+                <h3>2. Import and initialize the app</h3>
                 <div class="code-block">
                   &lt;script type="module"&gt;
                     import { initEmbeddedBaseUnitTools } from 'path/to/base-unit-tools.js';
@@ -97,10 +92,6 @@ export default function demoEmbedPlugin() {
                 </div>
               </section>
             </main>
-
-            <footer>
-              <p>Base Unit Tools - City of Detroit</p>
-            </footer>
 
             <!-- Demo implementation -->
             <link rel="stylesheet" href="./base-unit-tools.css">
