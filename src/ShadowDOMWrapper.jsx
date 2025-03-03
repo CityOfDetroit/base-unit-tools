@@ -12,7 +12,7 @@ import "@radix-ui/colors/green.css";
 import "@radix-ui/colors/gray-alpha.css";
 import "@radix-ui/colors/gray.css";
 
-const ShadowDOMWrapper = () => {
+const ShadowDOMWrapper = ({ cssPath }) => {
   const hostRef = useRef(null);
   const shadowRootRef = useRef(null);
   const rootRef = useRef(null);
@@ -75,7 +75,7 @@ const ShadowDOMWrapper = () => {
       // Add stylesheets
       const link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = './base-unit-tools.css';
+      link.href = cssPath || './base-unit-tools.css';
       link.id = 'bundled-styles';
       shadowRootRef.current.appendChild(link);
 
@@ -104,8 +104,8 @@ const ShadowDOMWrapper = () => {
   return <div ref={hostRef} className="base-unit-tools-container" />;
 };
 
-// Modified initialization function
-export const initEmbeddedBaseUnitTools = (elementId) => {
+// Initialization function
+export const initEmbeddedBaseUnitTools = (elementId, options = {}) => {
   const container = document.getElementById(elementId);
   if (!container) {
     console.error(`Container with id "${elementId}" not found`);
@@ -113,7 +113,7 @@ export const initEmbeddedBaseUnitTools = (elementId) => {
   }
 
   const root = createRoot(container);
-  root.render(<ShadowDOMWrapper />);
+  root.render(<ShadowDOMWrapper cssPath={options.cssPath} />);
 };
 
 // Export for use in embedded-index.js
