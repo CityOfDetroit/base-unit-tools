@@ -1,5 +1,4 @@
 import { initEmbeddedBaseUnitTools } from './ShadowDOMWrapper';
 
-if (document.getElementById('root')) {
-  initEmbeddedBaseUnitTools('root');
-}
+// Export the function for ES module imports
+export { initEmbeddedBaseUnitTools };
