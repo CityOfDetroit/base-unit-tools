@@ -5,7 +5,7 @@ import distance from "@turf/distance";
 import { SimpleMarker, Viewer } from "mapillary-js";
 import "mapillary-js/dist/mapillary.css";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import _ from "underscore";
 import { DataSource } from "../components/CardLink";
 
@@ -81,10 +81,12 @@ const Mapillary = ({
 
   let [center, setCenter] = useState(null);
 
+  let mlyViewerRef = useRef(null);
+
   useEffect(() => {
     const viewer = new Viewer({
       accessToken: "MLY|4690399437648324|de87555bb6015affa20c3df794ebab15",
-      container: "mly-viewer",
+      container: mlyViewerRef.current,
       component: {
         marker: true,
         bearing: false,
@@ -95,7 +97,7 @@ const Mapillary = ({
         direction: true,
       },
       imageId: null,
-    });
+    }, [mlyViewerRef]);
 
     viewer.deactivateCover();
 
@@ -224,6 +226,7 @@ const Mapillary = ({
       <div
         className="w-full sm:w-2/3 lg:w-3/4 rounded-md min-h-72"
         id="mly-viewer"
+        ref={mlyViewerRef}
       ></div>
 
       <Card size={"1"} className="w-full sm:w-1/3 lg:w-1/4">
