@@ -13,8 +13,7 @@ export const CsvInput = ({ csv, setCsv, addresses, setAddresses }) => {
           cssClass="text-xs"
           parserOptions={{ 
             header: true,
-            transformHeader: header=> 
-              header.replace("", "index")
+            transformHeader: (header) => header === '' ? 'index' : header
            }}
           onFileLoaded={(data, fileInfo) => setCsv(data)} 
           />
