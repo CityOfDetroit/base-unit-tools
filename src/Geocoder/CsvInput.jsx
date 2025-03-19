@@ -11,7 +11,11 @@ export const CsvInput = ({ csv, setCsv, addresses, setAddresses }) => {
         <Text weight="medium">Upload .csv</Text>
         <CSVReader
           cssClass="text-xs"
-          parserOptions={{ header: true }}
+          parserOptions={{ 
+            header: true,
+            transformHeader: header=> 
+              header.replace("", "index")
+           }}
           onFileLoaded={(data, fileInfo) => setCsv(data)} 
           />
       </Flex>
