@@ -7,7 +7,6 @@ let col_i = 1
 const columnIterator = (i) => {
   let blankCol = "blank_column" + col_i.toString()
   col_i += 1
-  console.log(col_i)
   return blankCol
 }
 
