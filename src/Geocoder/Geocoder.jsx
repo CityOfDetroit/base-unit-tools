@@ -51,25 +51,45 @@ const fetchResults = (addresses, setResults, setUnmatchedAddr) => {
   )
     .each((f) => {
       allResults = allResults.concat(f.locations);
-
-      // extract locations where geocode fails (score=0)
-      for (let res in allResults) {
-        if (allResults[res].score == 0){
-          let resID = allResults[res].attributes.ResultID - 1
-          let input = addresses[resID]; // index input address
-          // build object
-          let inputAttributes = {attributes:{failed_address: input}};   
-          // concat to array       
-          failResults = failResults.concat(inputAttributes);
-        };
-      }
-    })
-    .then(() =>
+            })
+    .then(() => {
       setResults(
         allResults.sort((a, b) => a.attributes.ResultID - b.attributes.ResultID)
+
       )
+      // extract locations where geocode fails (address_id=0)
+      for (let res in allResults) {
+        let resID = allResults[res].attributes.ResultID - 1
+        if (allResults[res].attributes.address_id == 0 &&
+          addresses[resID].trim().length > 0
+        ){
+          let input = addresses[resID]; // index input address
+          // build object
+          let inputAttributes = {attributes:
+            {input_address: input,
+              street_number_result: allResults[res].attributes.AddNum,
+              prefix_direction_result: allResults[res].attributes.StDir,
+              street_name_result: allResults[res].attributes.StName,
+              street_type_result: allResults[res].attributes.StType,  
+              match_address_result: allResults[res].attributes.Match_addr,
+              sub_address_result: allResults[res].attributes.SubAddr,
+              address_id_result: allResults[res].attributes.address_id,
+              building_id_result: allResults[res].attributes.building_id,
+              parcel_id_result: allResults[res].attributes.parcel_id,
+              street_id_result: allResults[res].attributes.street_id,
+              status_result: allResults[res].attributes.Status,
+              match_type_result: allResults[res].attributes.Addr_type,
+              score_result: allResults[res].attributes.Score,
+              lon_result: allResults[res].attributes.X,
+              lat_result: allResults[res].attributes.Y
+            }};   
+          // concat to array       
+          failResults = failResults.concat(inputAttributes);
+        }; 
+      }
+      setUnmatchedAddr(failResults)
+    }
     )
-    .then(() => setUnmatchedAddr(failResults))
 };
 
 /**
@@ -77,8 +97,7 @@ const fetchResults = (addresses, setResults, setUnmatchedAddr) => {
  * @param {} unmatched 
  */
 const failedAddressUpload = (unmatched) => {
-
-  let url = "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/unmatched_geocode_addresses/FeatureServer/0";
+  let url = "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Base_Units_Geocoder_Failures_view/FeatureServer/0";
   addFeatures({
     url: url,
     features: unmatched
@@ -99,6 +118,7 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
     matched: true,
     coords: true,
     ids: true,
+    related_parcel: false
   };
 
   // add the geocoderFields to the options object
@@ -143,8 +163,7 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
 
   useEffect(() => {
     if(geocoded && unmatchedAddr.length > 0) {
-      console.log(unmatchedAddr);
-      // failedAddressUpload(unmatchedAddr);
+      failedAddressUpload(unmatchedAddr);
       setUnmatchedAddr([]);
     };
   },[unmatchedAddr]);

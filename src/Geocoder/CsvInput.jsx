@@ -3,6 +3,13 @@ import React from "react";
 import CSVReader from "react-csv-reader";
 import _ from "underscore";
 
+let col_i = 1
+const columnIterator = (i) => {
+  let blankCol = "blank_column" + col_i.toString()
+  col_i += 1
+  return blankCol
+}
+
 export const CsvInput = ({ csv, setCsv, addresses, setAddresses }) => {
   return (
     <Flex direction="column" gap="4">
@@ -11,7 +18,11 @@ export const CsvInput = ({ csv, setCsv, addresses, setAddresses }) => {
         <Text weight="medium">Upload .csv</Text>
         <CSVReader
           cssClass="text-xs"
-          parserOptions={{ header: true }}
+          parserOptions={{ 
+            header: true,
+            //transformHeader: (header) => header === '' ? Math.random().toString(36).substring(2,7): header
+            transformHeader: (header) => header === '' ? columnIterator(col_i): header
+           }}
           onFileLoaded={(data, fileInfo) => setCsv(data)} 
           />
       </Flex>
