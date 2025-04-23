@@ -223,6 +223,7 @@ const BaseUnitsMap = () => {
             setSvImages,
             viewerImage,
             viewerBearing,
+            geocodedFeature
           }}
         />
       </div>

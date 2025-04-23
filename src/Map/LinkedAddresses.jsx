@@ -180,7 +180,7 @@ const LinkedAddresses = ({
                 );
               })}
             </Flex>
-            <div>
+            {formattedData.length > 1 && <div>
               <Separator size={"4"} />
               {/* add ability to Export as csv */}
               <Flex align={"end"} justify={"end"} className="w-full" mt={"2"}>
@@ -195,7 +195,7 @@ const LinkedAddresses = ({
                   </Button>
                 </CSVLink>
               </Flex>
-            </div>
+            </div>}
           </Collapsible.Content>
         )}
       </Box>

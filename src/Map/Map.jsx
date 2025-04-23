@@ -5,6 +5,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { useTheme } from "../contexts/ThemeContext";
 import layers from "../data/layers";
 import { baseStyle, darkStyle, linenStyle, satelliteStyle } from "../styles/mapstyle";
+import { geocode } from "@esri/arcgis-rest-geocoding";
+import { map } from "underscore";
 
 const MapComponent = ({
   layer,
@@ -17,6 +19,7 @@ const MapComponent = ({
   viewerImage,
   viewerBearing,
   setSvImages,
+  geocodedFeature
 }) => {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
@@ -149,30 +152,6 @@ const MapComponent = ({
     }
   }, [clickedFeatures]);
 
-  // useEffect(() => {
-  //   if (mapInstance.current && layer && mapLoaded) {
-  //     const currentLyr = layers[layer];
-
-  //     // reset all highlight filters
-  //     Object.keys(layers).forEach((lyr) => {
-  //       let layer = layers[lyr];
-  //       if (!layer.highlight) return;
-  //       mapInstance.current.setFilter(layer.highlight, ["==", "$id", ""]);
-  //     });
-
-  //     // check for clicked features
-  //     if (feature) {
-  //       // set that as the clickedFeature
-  //       let filter = [
-  //         "==",
-  //         layer === "parcel" ? "parcel_id" : currentLyr.id_column,
-  //         feature.properties[currentLyr.id_column],
-  //       ];
-  //       mapInstance.current.setFilter(currentLyr.highlight, filter);
-  //     }
-  //   }
-  // }, [layer]);
-
   // fly to centroid of selectedFeature (returned from the API)
   useEffect(() => {
     if (mapInstance.current && feature && feature.properties) {
@@ -204,6 +183,15 @@ const MapComponent = ({
         center,
         essential: true,
         zoom: zoom,
+      });
+    }
+
+    if (mapInstance.current && !feature && geocodedFeature) {
+      mapInstance.current.easeTo({
+        center: [
+          geocodedFeature?.location?.x,
+          geocodedFeature?.location?.y,
+        ]
       });
     }
   }, [feature]);
