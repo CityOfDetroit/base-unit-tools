@@ -191,10 +191,11 @@ const MapComponent = ({
         center: [
           geocodedFeature?.location?.x,
           geocodedFeature?.location?.y,
-        ]
+        ],
+        zoom: 17.51,
       });
     }
-  }, [feature]);
+  }, [feature, geocodedFeature]);
 
   useEffect(() => {
     if (mapInstance.current && linkedAddresses.length > 0 && mapLoaded && layers[layer]) {

@@ -88,6 +88,7 @@ const LinkedAddresses = ({
 
   const formattedData = linkedAddresses.map((address) => {
     let { properties: props, geometry } = address;
+
     return {
       address_id: props.address_id,
       street_number: props.street_number,
@@ -99,8 +100,8 @@ const LinkedAddresses = ({
       city: props.city,
       state: props.state,
       zip: props.zip,
-      lng: geometry.coordinates[0].toFixed(6),
-      lat: geometry.coordinates[1].toFixed(6)
+      lng: geometry?.coordinates[0].toFixed(6),
+      lat: geometry?.coordinates[1].toFixed(6)
     };
   })
 
