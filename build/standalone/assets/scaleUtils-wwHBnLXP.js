@@ -1,1 +1,0 @@
-import{d3 as c,d4 as e,d5 as o}from"./index-iOISkVKT.js";const a=96;function p(t,n){const r=t.extent,i=t.width,u=c(r==null?void 0:r.spatialReference);return r&&i?r.width/i*u*e*a:0}function h(t,n,r){return d(t,n)&&f(t,r)}function d(t,n){return n===0||o(t,n)||t<n}function f(t,n){return n===0||o(t,n)||t>n}export{h as d,p as i};

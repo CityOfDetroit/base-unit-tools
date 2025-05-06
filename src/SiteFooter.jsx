@@ -45,8 +45,8 @@ const SiteFooter = () => {
             <Text size="2" weight={"bold"}>
               Resources
             </Text>
-            <Link to="https://base-units-detroitmi.hub.arcgis.com/">
-              <Text size={"2"}>Base Units Hub</Text>
+            <Link to="/about">
+              <Text size={"2"}>About the base units</Text>
             </Link>
             <Link to="https://data.detroitmi.gov/">
               <Text size={"2"}>Open Data Portal</Text>

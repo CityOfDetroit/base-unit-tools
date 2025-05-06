@@ -17,6 +17,7 @@ import Login from "./Login";
 import BaseUnitsMap from "./Map/BaseUnitsMap";
 import Geocoder from "./Geocoder/Geocoder";
 import Mailer from "./Mailer/Mailer";
+import About from "./About";
 
 // Protected route component
 const ProtectedRoute = ({ path, children }) => {
@@ -36,6 +37,7 @@ const App = ({ mode = 'standalone', basePath = '' }) => {
           <Layout>
             <Routes>
               <Route path="/" element={<Homepage />} />
+              <Route path="/about" element={<About />} />
               <Route path="/login" element={<Login />} />
               <Route path="/map" element={<BaseUnitsMap />} />
               <Route path="/geocoder" element={<Geocoder />} />

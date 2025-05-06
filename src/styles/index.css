@@ -48,3 +48,7 @@ header, footer {
 a {
   @apply hover:underline hover:underline-offset-2;
 }
+
+p {
+  @apply py-2;
+}

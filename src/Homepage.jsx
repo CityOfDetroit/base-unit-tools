@@ -19,6 +19,11 @@ const Homepage = () => {
             Base Units are the fundamental units of measurement we use to
             describe our city.
           </p>
+          <p className="py-2">
+            <Link to="/about">
+            Read more about the Base Units.
+            </Link>
+          </p>
         </Box>
         <h3>Tools available on this site</h3>
         <Grid columns={"2"} gap={"4"} p={"3"}>
