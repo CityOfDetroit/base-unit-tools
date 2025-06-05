@@ -1,5 +1,5 @@
 // support two different servers
-let HOSTED_ROOT_DEV = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/BaseUnitFeatures/FeatureServer/`;
+let HOSTED_ROOT_DEV = `https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/BaseUnitsFeaturesDev/FeatureServer/`;
 import { GroupIcon } from "@radix-ui/react-icons";
 import moment from "moment";
 
@@ -45,7 +45,7 @@ const layers = {
     interaction: "parcel-fill",
     click: "parcel_id",
     color: "rgb(163, 200, 112)",
-    bg_color: "rgba(163, 200, 112, 0.75)",
+    bg_color: "rgba(163, 200, 112, 0.65)",
     highlight: "parcel-highlight",
     link: "parcel-linked"
   },
