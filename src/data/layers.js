@@ -45,7 +45,7 @@ const layers = {
     interaction: "parcel-fill",
     click: "parcel_id",
     color: "rgb(163, 200, 112)",
-    bg_color: "rgba(163, 200, 112, 0.75)",
+    bg_color: "rgba(163, 200, 112, 0.65)",
     highlight: "parcel-highlight",
     link: "parcel-linked"
   },

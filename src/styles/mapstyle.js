@@ -1044,8 +1044,8 @@ export const baseStyle = {
       paint: {
         "fill-color": {
           stops: [
-            [14, "#000"],
-            [19, "#fff"],
+            [14, "#222"],
+            [19, '#666']
           ],
         },
         "fill-opacity": {
