@@ -35,6 +35,22 @@ export const baseStyle = {
         "https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitServices/VectorTileServer/tile/{z}/{y}/{x}.pbf"
       ]
     },
+    bu_parcels: {
+      "type": "vector",
+      "bounds": [
+        -83.2878,
+        42.255,
+        -82.9105,
+        42.4504
+      ],
+      "minzoom": 0,
+      "maxzoom": 23,
+      "scheme": "xyz",
+      "url": "https://vectortileservices2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Parcels_(Current)_vector_tiles/VectorTileServer",
+      "tiles": [
+        "https://vectortileservices2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Parcels_(Current)_vector_tiles/VectorTileServer/tile/{z}/{y}/{x}.pbf"
+      ]
+    },
     satellite: {
       type: "raster",
       tiles: [
@@ -588,8 +604,8 @@ export const baseStyle = {
     {
       id: "parcel-linked",
       type: "fill",
-      "source": "baseunits",
-      "source-layer": "parcels",
+      "source": "bu_parcels",
+      "source-layer": "Parcels (Current)",
       minzoom: 11,
       filter: ["==", "parcel_id", ""],
       layout: {
@@ -611,8 +627,8 @@ export const baseStyle = {
     {
       id: "parcel-fill",
       type: "fill",
-      "source": "baseunits",
-      "source-layer": "parcels",
+      "source": "bu_parcels",
+      "source-layer": "Parcels (Current)",
       interactive: true,
       minzoom: 12,
       layout: {
@@ -964,9 +980,8 @@ export const baseStyle = {
     {
       id: "parcel-line",
       type: "line",
-      source: "baseunits",
-      "source": "baseunits",
-      "source-layer": "parcels",
+      "source": "bu_parcels",
+      "source-layer": "Parcels (Current)",
       minzoom: 11,
       layout: {
         visibility: "visible",
@@ -1002,8 +1017,8 @@ export const baseStyle = {
     {
       id: "parcel-highlight",
       type: "line",
-      "source": "baseunits",
-      "source-layer": "parcels",
+      "source": "bu_parcels",
+      "source-layer": "Parcels (Current)",
       minzoom: 11,
       filter: ["==", "parcel_id", ""],
       layout: {
