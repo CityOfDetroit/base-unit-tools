@@ -40,8 +40,8 @@ const Mailer = () => {
   // mode 1 is centroid
   // mode 2 is parcel
   let mailerLayers = [
-    `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/MailerLayers/FeatureServer/0`, // parcels
-    `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/MailerLayers/FeatureServer/1`, // centroids
+    `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/base_unit_mailer_points/FeatureServer/1`, // parcels
+    `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/base_unit_mailer_points/FeatureServer/0`, // centroids
   ];
   const [layer, setLayer] = useState("centroid");
 

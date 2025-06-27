@@ -5,9 +5,9 @@ import { Flex } from "@radix-ui/themes";
 const MailerTable = ({ filtered }) => {
 
   let cols = [
-    { accessor: 'fnl_priadr', Header: 'Address' },
+    { accessor: 'final_primary_address', Header: 'Address' },
     // { accessor: 'city_state_zip', Header: 'CSZ'},
-    { accessor: 'fnl_secadr', Header: 'Unit' },
+    { accessor: 'final_secondary_address', Header: 'Unit' },
     { accessor: 'usps_status', Header: 'USPS Status' },
     // { accessor: 'usps_database_month', Header: 'Month' }
   ]
