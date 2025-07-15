@@ -136,9 +136,9 @@ const LinkedAddresses = ({
               {linkedAddresses.map((address, idx) => {
                 let { properties: props } = address;
                 return (
-                  <div key={address.id}>
+                  <div key={address.properties.address_id}>
                     <Flex
-                      key={address.id}
+                      key={address.properties.address_id}
                       direction={"row"}
                       justify={"start"}
                       align={"center"}
@@ -149,7 +149,7 @@ const LinkedAddresses = ({
                         {props.street_name} {props.street_type}{" "}
                         {props.unit_type} {props.unit_number}
                       </Text>
-                      <Link to={`/map?id=${address.id}&layer=address`}>
+                      <Link to={`/map?id=${address.properties.address_id}&layer=address`}>
                         <Box
                           className="rounded-full px-1"
                           style={{
