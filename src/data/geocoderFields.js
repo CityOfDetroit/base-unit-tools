@@ -58,14 +58,14 @@ export const geocoderFields = [
   },
   {
     name: "census_block_2020",
-    display: "Census Geographies 2020",
+    display: "Census Geography 2020",
     geocoderColumn: "census_block_geoid_2020",
     description: "The 2020 census block this address belongs to.",
     default: false
   },
   {
     name: "census_block_2010",
-    display: "Census Geographies 2010",
+    display: "Census Geography 2010",
     geocoderColumn: "census_block_geoid_2010",
     description: "The 2010 census block this address belongs to.",
     default: false
