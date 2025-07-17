@@ -1,10 +1,17 @@
 
 export const geocoderFields = [
   {
-    name: "council",
-    display: "Council District",
-    geocoderColumn: "council_district",
-    description: "The city council district number this address belongs to.",
+    name: "council_2013",
+    display: "Current Council District",
+    geocoderColumn: "council_district_2013",
+    description: "The city council district number this address belongs to- Districts 2013.",
+    default: false,
+  },
+  {
+    name: "council_2026",
+    display: "Council District 2026",
+    geocoderColumn: "council_district_2026",
+    description: "The city council district number this address belongs to- Districts 2026.",
     default: false,
   },
   {
@@ -51,16 +58,19 @@ export const geocoderFields = [
   },
   {
     name: "census_block_2020",
-    display: "Census Geographies 2020",
+    display: "Census Geography 2020",
     geocoderColumn: "census_block_geoid_2020",
     description: "The 2020 census block this address belongs to.",
     default: false
   },
   {
     name: "census_block_2010",
-    display: "Census Geographies 2010",
+    display: "Census Geography 2010",
     geocoderColumn: "census_block_geoid_2010",
     description: "The 2010 census block this address belongs to.",
     default: false
+  },
+  {
+
   }
 ];
