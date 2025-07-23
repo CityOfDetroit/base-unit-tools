@@ -69,8 +69,5 @@ export const geocoderFields = [
     geocoderColumn: "census_block_geoid_2010",
     description: "The 2010 census block this address belongs to.",
     default: false
-  },
-  {
-
   }
 ];
