@@ -1,9 +1,9 @@
 
 export const geocoderFields = [
   {
-    name: "council_2013",
+    name: "council_district",
     display: "Current Council District",
-    geocoderColumn: "council_district_2013",
+    geocoderColumn: "council_district",
     description: "The city council district number this address belongs to- Districts 2013.",
     default: false,
   },
@@ -69,8 +69,5 @@ export const geocoderFields = [
     geocoderColumn: "census_block_geoid_2010",
     description: "The 2010 census block this address belongs to.",
     default: false
-  },
-  {
-
   }
 ];
