@@ -30,9 +30,9 @@ export const baseStyle = {
       "minzoom": 0,
       "maxzoom": 23,
       "scheme": "xyz",
-      "url": "https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitServices/VectorTileServer",
+      "url": "https://vectortileservices2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitFeatures_vector_tiles/VectorTileServer",
       "tiles": [
-        "https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitServices/VectorTileServer/tile/{z}/{y}/{x}.pbf"
+        "https://vectortileservices2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitFeatures_vector_tiles/VectorTileServer/tile/{z}/{y}/{x}.pbf"
       ]
     },
     bu_parcels: {
