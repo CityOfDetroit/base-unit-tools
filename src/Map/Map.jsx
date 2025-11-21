@@ -124,6 +124,7 @@ const MapComponent = ({
       // reset all highlight filters
       Object.keys(layers).forEach((lyr) => {
         let layer = layers[lyr];
+        console.log(layer.highlight)
         if (!layer.highlight) return;
         mapInstance.current.setFilter(layer.highlight, ["==", "$id", ""]);
       });
@@ -132,6 +133,7 @@ const MapComponent = ({
       if (clickedFeatures.length > 0) {
 
         let newFeature = clickedFeatures[0];
+        console.log(newFeature)
 
         const lyr = Object.keys(layers).find(
           (l) => layers[l].interaction === newFeature?.layer?.id

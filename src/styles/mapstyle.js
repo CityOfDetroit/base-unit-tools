@@ -33,7 +33,11 @@ export const baseStyle = {
       "url": "https://vectortileservices2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitFeatures_vector_tiles/VectorTileServer",
       "tiles": [
         "https://vectortileservices2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitFeatures_vector_tiles/VectorTileServer/tile/{z}/{y}/{x}.pbf"
-      ]
+      ],
+      "promoteId": {
+        "addresses": "address_id",
+        "buildings": "building_id"
+      }
     },
     bu_parcels: {
       "type": "vector",

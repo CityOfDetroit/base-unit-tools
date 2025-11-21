@@ -25,7 +25,7 @@ const layers = {
     endpoint: HOSTED_ROOT_DEV + "2",
     id_column: "building_id",
     interaction: "building-fill",
-    click: "building_id",
+    click: "id",
     color: "rgb(203, 77, 79)",
     bg_color: "rgba(203, 77, 79, 0.66)",
     filter_id: "$id",
