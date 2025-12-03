@@ -76,6 +76,14 @@ const MapComponent = ({
       });
 
       map.on("moveend", () => {
+        if (mapInstance.current.getZoom() > 16.5){
+          let flog = map.queryRenderedFeatures({ 
+            layers: ['building-fill'] });
+          console.log(flog)
+        }
+      });
+
+      map.on("moveend", () => {
         if (mapInstance.current.getZoom() > 16.5) {
           let features = map.queryRenderedFeatures({
             layers: ["mapillary-images"],
