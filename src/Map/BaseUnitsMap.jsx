@@ -108,17 +108,12 @@ const BaseUnitsMap = () => {
 
       {/* geocoding panel */}
       <Flex
-        gap={"4"}
+        gap={"2"}
         gridArea={"geocoder"}
         justify={"start"}
         align={"center"}
-        pt={{ initial: "2", sm: "2" }}
-        pb={{ initial: "2", sm: "2" }}
         p={"2"}
-        direction={{
-          initial: "column",
-          sm: "row",
-        }}
+        direction={"row"}
       >
         <Card size={"1"} className="">
           {/* mapillary bit */}

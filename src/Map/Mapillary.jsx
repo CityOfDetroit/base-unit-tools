@@ -271,7 +271,7 @@ const Mapillary = ({
                   )
                 }
                 value={viewerImage?.image._core?.sequence?.id}
-                className="max-h-72 overflow-y-auto w-full"
+                className="max-h-24 sm:max-h-72 overflow-y-auto overflow-x-auto w-full flex flex-row flex-wrap sm:flex-col gap-1"
               >
                 {sequenceImages.map((image, idx) => {
                   return (

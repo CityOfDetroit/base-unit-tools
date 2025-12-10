@@ -6,11 +6,9 @@ import Homepage from "./Homepage";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import {
   BrowserRouter,
-  MemoryRouter,
   Routes,
   Route,
-  Navigate,
-  Outlet
+  Navigate
 } from "react-router-dom";
 import { useAuth, AuthProvider } from "./contexts/AuthContext";
 import Login from "./Login";
@@ -26,14 +24,11 @@ const ProtectedRoute = ({ path, children }) => {
 };
 
 
-const App = ({ mode = 'standalone', basePath = '' }) => {
-  // Choose router based on mode
-  const Router = mode === 'standalone' ? BrowserRouter : MemoryRouter;
-
+const App = () => {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <Router>
+        <BrowserRouter>
           <Layout>
             <Routes>
               <Route path="/" element={<Homepage />} />
@@ -44,7 +39,7 @@ const App = ({ mode = 'standalone', basePath = '' }) => {
               <Route path="/mailer" element={<ProtectedRoute path="/mailer"><Mailer /></ProtectedRoute>} />
             </Routes>
           </Layout>
-        </Router>
+        </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>
   );
