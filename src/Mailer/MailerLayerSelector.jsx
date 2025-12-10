@@ -32,7 +32,7 @@ const presets = {
     name: "ZIP codes",
     singular: "zip code",
     pickColumn: "zipcode",
-    url: `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/ZipCodes/FeatureServer/0/`,
+    url: `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/City_of_Detroit_Zip_Code_Tabulation_Areas/FeatureServer/0/`,
   },
   council_districts: {
     name: "Council Districts",
