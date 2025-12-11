@@ -13,6 +13,7 @@ import Parcel from "./Parcel";
 import Street from "./Street";
 import { DataSource, FeatureLink } from "../components/CardLink";
 import { Link } from "react-router-dom";
+import IssueReporter from "./IssueReporter";
 
 export const icons = {
   parcel: <AspectRatioIcon style={{ height: 22, width: 22 }} />,
@@ -85,6 +86,7 @@ const FeatureTable = ({ layer, loading, feature, refetch }) => {
               />
             )}
             <DataSource url={dataSourceUrl} />
+            {feature && <IssueReporter feature={feature} layer={layer} />}
           </Flex>
         </Inset>
       </Card>
