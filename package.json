@@ -3,7 +3,7 @@
   "version": "1.0.3",
   "description": "Explore and inspect Detroit's base units: addresses, parcels, buildings, and streets.",
   "private": true,
-  "homepage": "https://baseunits.detroitmi.info",
+  "homepage": "https://base-unit-tools.netlify.app",
   "dependencies": {
     "@arcgis/core": "^4.30.9",
     "@esri/arcgis-rest-feature-service": "^4.0.6",
