@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { queryFeatures } from "@esri/arcgis-rest-feature-service";
 import apps from "./data/apps";
 import layers from "./data/layers";
 import {
@@ -70,10 +71,12 @@ const useFeatureCount = (endpoint) => {
   useEffect(() => {
     const fetchCount = async () => {
       try {
-        const url = `${endpoint}/query?where=1=1&returnCountOnly=true&f=json`;
-        const response = await fetch(url);
-        const data = await response.json();
-        setCount(data.count);
+        const response = await queryFeatures({
+          url: endpoint,
+          where: "1=1",
+          returnCountOnly: true,
+        });
+        setCount(response.count);
       } catch (error) {
         console.error("Error fetching count:", error);
       } finally {
@@ -130,8 +133,7 @@ const Homepage = () => {
                   City employees:
                 </Text>{" "}
                 You will need to sign in with <Link to="https://detroitmi.maps.arcgis.com">ArcGIS Online</Link> to access employee-only
-                tools. Please contact the Data Strategy and Analytics or
-                Enterprise GIS team for access.
+                tools.
               </Text>
             </Flex>
           </Box>

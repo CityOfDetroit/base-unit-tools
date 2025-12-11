@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Box, Card, Container, Flex, Text, Heading, Table } from "@radix-ui/themes";
 import { ExternalLinkIcon } from "@radix-ui/react-icons";
+import { queryFeatures } from "@esri/arcgis-rest-feature-service";
 import layers from "./data/layers";
 
 // Import MDX content
@@ -24,10 +25,12 @@ const useFeatureCount = (endpoint) => {
   useEffect(() => {
     const fetchCount = async () => {
       try {
-        const url = `${endpoint}/query?where=1=1&returnCountOnly=true&f=json`;
-        const response = await fetch(url);
-        const data = await response.json();
-        setCount(data.count);
+        const response = await queryFeatures({
+          url: endpoint,
+          where: "1=1",
+          returnCountOnly: true,
+        });
+        setCount(response.count);
       } catch (error) {
         console.error("Error fetching count:", error);
       } finally {
