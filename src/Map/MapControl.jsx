@@ -1,5 +1,5 @@
 import { Flex, Text } from "@radix-ui/themes";
-import { Link2Icon } from "@radix-ui/react-icons";
+import { CheckCircledIcon } from "@radix-ui/react-icons";
 
 /**
  * Shared wrapper for map control components (geocoder, basemap, mode, streetview).
@@ -28,7 +28,7 @@ const MapControl = ({ icon, title, children, large = false, sourceUrl }) => {
             rel="noopener noreferrer"
             className="text-gray-400 hover:text-gray-600"
           >
-            <Link2Icon width="12" height="12" />
+            <CheckCircledIcon width="12" height="12" />
           </a>
         )}
       </Flex>

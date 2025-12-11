@@ -70,10 +70,14 @@ const Mapillary = ({
   viewerImage,
   setViewerImage,
   setViewerBearing,
+  targetStreetviewDate,
+  onDateChange,
 }) => {
   let [sequenceImages, setSequenceImages] = useState([]);
 
   let [selectedImage, setSelectedImage] = useState(null);
+
+  let [lastFeatureId, setLastFeatureId] = useState(null);
 
   let [viewer, setViewer] = useState(null);
 
@@ -210,7 +214,36 @@ const Mapillary = ({
       );
 
       setSequenceImages(images);
-      setSelectedImage(images[0]);
+
+      // Get a stable feature identifier
+      const featureId = feature?.id || feature?.properties?.id || JSON.stringify(feature?.geometry?.coordinates);
+      const featureChanged = featureId !== lastFeatureId;
+
+      // Only change selected image if:
+      // 1. The feature changed (user clicked a new feature), OR
+      // 2. There's no current selection, OR
+      // 3. The current selection is no longer in the filtered images
+      const currentStillValid = selectedImage && images.some(
+        (img) => img.properties.sequence_id === selectedImage.properties?.sequence_id
+      );
+      if (featureChanged || !currentStillValid) {
+        if (images.length > 0) {
+          let imageToSelect = images[0]; // default to most recent
+
+          // If targetStreetviewDate provided, find nearest date
+          if (targetStreetviewDate) {
+            const targetMoment = moment(targetStreetviewDate, "YYYYMMDD");
+            if (targetMoment.isValid()) {
+              imageToSelect = _.min(images, (img) =>
+                Math.abs(moment(img.properties.captured_at).diff(targetMoment))
+              );
+            }
+          }
+
+          setSelectedImage(imageToSelect);
+        }
+        setLastFeatureId(featureId);
+      }
 
       setLoading(false);
     }
@@ -273,13 +306,15 @@ const Mapillary = ({
                   </Flex>
                   <Select.Root
                     value={viewerImage?.image._core?.sequence?.id}
-                    onValueChange={(value) =>
-                      setSelectedImage(
-                        sequenceImages.find(
-                          (image) => image.properties.sequence_id === value
-                        )
-                      )
-                    }
+                    onValueChange={(value) => {
+                      const newImage = sequenceImages.find(
+                        (image) => image.properties.sequence_id === value
+                      );
+                      setSelectedImage(newImage);
+                      if (onDateChange && newImage) {
+                        onDateChange(moment(newImage.properties.captured_at).format("YYYYMMDD"));
+                      }
+                    }}
                   >
                     <Select.Trigger className="w-full" />
                     <Select.Content>
@@ -325,13 +360,15 @@ const Mapillary = ({
                     </Flex>
                     <div className="flex-1 min-h-0 overflow-y-auto w-full">
                       <RadioGroup.Root
-                        onValueChange={(value) =>
-                          setSelectedImage(
-                            sequenceImages.find(
-                              (image) => image.properties.sequence_id === value
-                            )
-                          )
-                        }
+                        onValueChange={(value) => {
+                          const newImage = sequenceImages.find(
+                            (image) => image.properties.sequence_id === value
+                          );
+                          setSelectedImage(newImage);
+                          if (onDateChange && newImage) {
+                            onDateChange(moment(newImage.properties.captured_at).format("YYYYMMDD"));
+                          }
+                        }}
                         value={viewerImage?.image._core?.sequence?.id}
                         className="flex flex-col gap-1 w-full"
                       >

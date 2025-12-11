@@ -39,7 +39,7 @@ const MapGeocoder = ({
       sourceUrl={geocoderUrl}
     >
       <TextField.Root
-        placeholder="Address or parcel ID"
+        placeholder="Address, parcel, or intersection"
         onChange={(e) => setGeocodeValue(e.target.value)}
         onKeyDown={handleKeyDown}
         size="2"

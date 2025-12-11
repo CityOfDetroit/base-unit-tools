@@ -27,7 +27,8 @@ const BaseUnitsMap = () => {
   );
 
   // streetview state
-  let [streetview, setStreetview] = useState(false);
+  let [streetview, setStreetview] = useState(params?.get("streetview") === "true");
+  let targetStreetviewDate = params?.get("streetviewdate") || null;
   let [svImages, setSvImages] = useState([]);
   let [viewerImage, setViewerImage] = useState(null);
   let [viewerBearing, setViewerBearing] = useState(0);
@@ -70,13 +71,12 @@ const BaseUnitsMap = () => {
   useEffect(() => {
     if (geocodedFeature) {
       setStreetview(false);
-      setParams({
-        id:
-          layer === "parcel"
-            ? geocodedFeature.attributes["parcel_id"]
-            : geocodedFeature.attributes[layers[layer].id_column],
-        layer: layer,
-      });
+      const newParams = new URLSearchParams(params);
+      newParams.set("id", layer === "parcel"
+        ? geocodedFeature.attributes["parcel_id"]
+        : geocodedFeature.attributes[layers[layer].id_column]);
+      newParams.set("layer", layer);
+      setParams(newParams);
     }
   }, [geocodedFeature]);
 
@@ -84,12 +84,12 @@ const BaseUnitsMap = () => {
   useEffect(() => {
     setLinkedAddresses([]);
     if (feature) {
-      setParams({
-        id: feature?.properties
-          ? feature.properties[layers[layer].id_column]
-          : null,
-        layer: layer,
-      });
+      const newParams = new URLSearchParams(params);
+      newParams.set("id", feature?.properties
+        ? feature.properties[layers[layer].id_column]
+        : null);
+      newParams.set("layer", layer);
+      setParams(newParams);
     }
   }, [feature]);
 
@@ -111,6 +111,21 @@ const BaseUnitsMap = () => {
       setParams(newParams);
     }
   }, [mode]);
+
+  // sync streetview to URL
+  useEffect(() => {
+    const currentStreetview = params?.get("streetview");
+    if (streetview && currentStreetview !== "true") {
+      const newParams = new URLSearchParams(params);
+      newParams.set("streetview", "true");
+      setParams(newParams);
+    } else if (!streetview && currentStreetview) {
+      const newParams = new URLSearchParams(params);
+      newParams.delete("streetview");
+      newParams.delete("streetviewdate");
+      setParams(newParams);
+    }
+  }, [streetview]);
 
   return (
     <Grid
@@ -218,6 +233,12 @@ const BaseUnitsMap = () => {
             viewerImage,
             setViewerImage,
             setViewerBearing,
+            targetStreetviewDate,
+            onDateChange: (dateStr) => {
+              const newParams = new URLSearchParams(params);
+              newParams.set("streetviewdate", dateStr);
+              setParams(newParams);
+            },
           }}
         />
       ) : (

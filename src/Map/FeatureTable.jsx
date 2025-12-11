@@ -3,7 +3,6 @@ import {
   CubeIcon,
   DoubleArrowRightIcon,
   SewingPinIcon,
-  Link2Icon,
 } from "@radix-ui/react-icons";
 import { Box, Card, Flex, Inset, Text } from "@radix-ui/themes";
 import React from "react";

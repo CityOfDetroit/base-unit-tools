@@ -12,7 +12,7 @@ import {
 } from "@radix-ui/themes";
 import {
   InfoCircledIcon,
-  ExternalLinkIcon,
+  CheckCircledIcon,
   ChevronDownIcon,
   ChevronRightIcon,
   ExclamationTriangleIcon,
@@ -52,7 +52,7 @@ const BigNumber = ({ label, count, color, loading, endpoint, unitKey }) => {
             gap="1"
             className="hover:opacity-70 transition-opacity"
           >
-            <ExternalLinkIcon width="10" height="10" />
+            <CheckCircledIcon width="10" height="10" />
             <Text size="1" color="gray">
               source
             </Text>
