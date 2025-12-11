@@ -273,27 +273,28 @@ const MapComponent = ({
     }
   }, [mapLoaded]);
 
+  // Show/hide the Mapillary camera location on the map
   useEffect(() => {
-    if (mapInstance.current && viewerImage) {
-      let mlyLayer = "mapillary-location";
-      mapInstance.current.setFilter(mlyLayer, [
-        "==",
-        "id",
-        parseInt(viewerImage.image.id),
-      ]);
-    }
-  }, [viewerImage]);
+    if (mapInstance.current && mapLoaded) {
+      const imageFilter = viewerImage && streetview
+        ? ["==", "id", parseInt(viewerImage.image.id)]
+        : ["==", "id", ""];
 
+      mapInstance.current.setFilter("mapillary-location", imageFilter);
+      mapInstance.current.setFilter("mapillary-direction", imageFilter);
+    }
+  }, [viewerImage, streetview, mapLoaded]);
+
+  // Rotate the direction icon to match the viewer bearing
   useEffect(() => {
-    if (mapInstance.current && viewerBearing) {
-      let mlyLayer = "mapillary-location";
+    if (mapInstance.current && mapLoaded && viewerBearing !== undefined && streetview) {
       mapInstance.current.setLayoutProperty(
-        mlyLayer,
+        "mapillary-direction",
         "icon-rotate",
         viewerBearing - 90
       );
     }
-  }, [viewerBearing]);
+  }, [viewerBearing, streetview]);
 
     
   return (
@@ -302,8 +303,8 @@ const MapComponent = ({
         ref={mapRef}
         height={
           !streetview
-            ? { initial: "300px", sm: "500px", lg: "705px", xl: "900px" }
-            : { initial: "250px", sm: "350px", lg: "375px", xl: "500px" }
+            ? { initial: "300px", md: "500px", lg: "705px", xl: "900px" }
+            : { initial: "200px", md: "250px", lg: "300px", xl: "350px" }
         }
         p={"2"}
       ></Box>

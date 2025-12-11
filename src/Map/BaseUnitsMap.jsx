@@ -98,12 +98,12 @@ const BaseUnitsMap = () => {
     <Grid
       areas={{
         initial: "'streetview' 'geocoder' 'map' 'info'",
-        sm: "'info geocoder' 'info streetview' 'info map' 'info map'",
+        md: "'info geocoder' 'info streetview' 'info map' 'info map'",
       }}
-      columns={{ initial: "1fr", sm: "1fr 1fr", md: "2fr 3fr" }}
-      rows={{ initial: "auto auto auto auto", sm: "min-content 0fr 1fr 1fr" }}
-      gap={{ initial: "0", sm: "0" }}
-      p={{ initial: "0", sm: "2", lg: "4" }}
+      columns={{ initial: "1fr", md: "1fr 2fr", lg: "1fr 2fr" }}
+      rows={{ initial: "auto auto auto auto", md: "min-content 0fr 1fr 1fr" }}
+      gap={{ initial: "0", md: "0" }}
+      p={{ initial: "0", md: "2", lg: "4" }}
     >
 
       {/* geocoding panel */}

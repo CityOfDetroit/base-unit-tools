@@ -3,7 +3,7 @@ import _ from "lodash";
 
 export const baseStyle = {
   version: 8,
-  sprite: "https://www.arcgis.com/sharing/rest/content/items/46d38d6a32ea412fb5fe4cc521ede94e/resources/sprites/sprite-1689510144076",
+  sprite: "https://www.arcgis.com/sharing/rest/content/items/4776d8df881443c48630a6e02d9d26f4/resources/sprites/sprite-1765410154274",
   glyphs:
     "https://basemaps.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer/resources/fonts/{fontstack}/{range}.pbf",
   sources: {
@@ -1246,27 +1246,49 @@ export const baseStyle = {
     },
     {
       id: "mapillary-location",
+      type: "circle",
+      source: "mly",
+      "source-layer": "image",
+      filter: ["==", "id", ""],
+      layout: {
+        visibility: "visible",
+      },
+      paint: {
+        "circle-radius": {
+          base: 1,
+          stops: [
+            [14, 6],
+            [17, 10],
+            [19, 14],
+          ],
+        },
+        "circle-color": "#888",
+        "circle-opacity": 0.4,
+        "circle-stroke-color": "#fff",
+        "circle-stroke-width": 2,
+      },
+    },
+    {
+      id: "mapillary-direction",
       type: "symbol",
       source: "mly",
       "source-layer": "image",
       filter: ["==", "id", ""],
       layout: {
-        "icon-rotate": 0,
-        "icon-rotation-alignment": "map",
-        "icon-image": "video",
-        "icon-anchor": "center",
+        "icon-image": "videocamera",
         "icon-size": {
-          base: 1,
           stops: [
-            [13, 1],
-            [14, 1],
-            [17, 1],
-            [19, 3],
+            [14, 0.19],
+            [17, 0.25],
+            [19, 0.31],
           ],
         },
+        "icon-rotate": 0,
+        "icon-rotation-alignment": "map",
+        "icon-allow-overlap": true,
       },
       paint: {
-        "icon-opacity": 0.65,
+        "icon-opacity": 1,
       },
     },
     {
