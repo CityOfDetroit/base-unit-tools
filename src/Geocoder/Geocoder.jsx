@@ -8,8 +8,8 @@ import { CsvInput } from "./CsvInput";
 import { InputChoice } from "./InputChoice";
 import GeocoderOptions from "./GeocoderOptions";
 import GeocoderResults from "./GeocoderResults";
-import GeocoderStepper from "./GeocoderStepper";
-import GeocoderProgress from "./GeocoderProgress";
+import Stepper from "../components/Stepper";
+import Progress from "../components/Progress";
 import GeocoderSummary from "./GeocoderSummary";
 import { TextInput } from "./TextInput";
 import {
@@ -254,7 +254,12 @@ const Geocoder = () => {
           Geocoder
         </Text>
 
-        <GeocoderStepper
+        <Stepper
+          steps={[
+            { id: 1, label: "Input" },
+            { id: 2, label: "Options" },
+            { id: 3, label: "Results" },
+          ]}
           currentStep={currentStep}
           setCurrentStep={setCurrentStep}
           canNavigateTo={canNavigateTo}
@@ -346,7 +351,19 @@ const Geocoder = () => {
 
       {/* Right Column - Results */}
       <Flex direction="column" gap="3" className="min-h-96 min-w-0 overflow-hidden">
-        {isGeocoding && <GeocoderProgress progress={progress} />}
+        {isGeocoding && (
+          <Progress
+            progress={progress}
+            waitingText="Sending to geocoder..."
+            activeText="Geocoding in progress..."
+            waitingSubtext={`Preparing ${progress.total.toLocaleString()} addresses...`}
+            activeSubtext={
+              progress.total <= 1000
+                ? "Single batch"
+                : `${Math.ceil(progress.total / 1000)} batches of 1,000`
+            }
+          />
+        )}
 
         {results.length > 0 && !isGeocoding && (
           <>

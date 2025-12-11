@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { queryFeatures } from "@esri/arcgis-rest-feature-service";
 import layers from "../data/layers";
 import { arcgisToGeoJSON } from "@terraformer/arcgis";
 import { Button, Card, TextField, Text, Flex } from "@radix-ui/themes";
+import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import useGeocoder from "../hooks/useGeocoder";
 
 const MailerAddressSearch = ({ geom, setGeom }) => {
@@ -38,9 +39,8 @@ const MailerAddressSearch = ({ geom, setGeom }) => {
               ],
             };
             setGeom(geocodeResult);
-          }
-          else {
-            console.log(`No features found.`)
+          } else {
+            console.log(`No features found.`);
           }
         }
       });
@@ -53,21 +53,48 @@ const MailerAddressSearch = ({ geom, setGeom }) => {
     }
   };
 
+  const handleSearch = () => {
+    changeAddress(inputValue);
+  };
+
   return (
     <Card>
-      <Text weight={"medium"}>Search for an address:</Text>
-      <Flex align={"center"} gap={"2"}>
-        <TextField.Root
-          className="p-3 w-full bg-"
-          type="text"
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-        >
-          <TextField.Slot />
-        </TextField.Root>
-        <Button size={"1"} onClick={() => changeAddress(inputValue)}>
-          Search
-        </Button>
+      <Flex direction="column" gap="2">
+        <Text size="2" weight="medium">
+          Search for an address
+        </Text>
+        <Flex align="center" gap="2">
+          <TextField.Root
+            className="flex-1"
+            placeholder="Enter an address..."
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+          >
+            <TextField.Slot>
+              <MagnifyingGlassIcon height="16" width="16" />
+            </TextField.Slot>
+          </TextField.Root>
+          <Button
+            size="2"
+            onClick={handleSearch}
+            disabled={!inputValue.trim() || loading}
+            style={{ backgroundColor: "#004445" }}
+          >
+            {loading ? "..." : "Search"}
+          </Button>
+        </Flex>
+        {error && (
+          <Text size="1" color="red">
+            {error}
+          </Text>
+        )}
+        {feature && !loading && (
+          <Text size="1" color="gray" className="text-green-600">
+            Found: {feature.attributes?.Match_addr || address}
+          </Text>
+        )}
       </Flex>
     </Card>
   );

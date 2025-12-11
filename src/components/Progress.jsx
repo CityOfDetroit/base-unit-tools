@@ -1,9 +1,22 @@
 import { Card, Flex, Text } from "@radix-ui/themes";
 
-const GeocoderProgress = ({ progress }) => {
+/**
+ * Reusable progress bar component.
+ *
+ * @param {object} progress - Progress object with { current, total, percent }
+ * @param {string} waitingText - Text to show while waiting (percent === 0)
+ * @param {string} activeText - Text to show while processing
+ * @param {string} waitingSubtext - Subtext while waiting (optional)
+ * @param {string} activeSubtext - Subtext while processing (optional)
+ */
+const Progress = ({
+  progress,
+  waitingText = "Loading...",
+  activeText = "Processing...",
+  waitingSubtext,
+  activeSubtext,
+}) => {
   const { current, total, percent } = progress;
-  const numBatches = Math.ceil(total / 1000);
-  const isSmallDataset = total <= 1000;
   const isWaiting = percent === 0;
 
   return (
@@ -11,7 +24,7 @@ const GeocoderProgress = ({ progress }) => {
       <Flex direction="column" gap="3" p="2">
         <Flex justify="between" align="center">
           <Text size="3" weight="bold" className="text-[#004445]">
-            {isWaiting ? "Sending to geocoder..." : "Geocoding in progress..."}
+            {isWaiting ? waitingText : activeText}
           </Text>
           <Text size="2" color="gray">
             {percent}%
@@ -41,18 +54,18 @@ const GeocoderProgress = ({ progress }) => {
         <Flex justify="between" align="center">
           <Text size="2" color="gray">
             {isWaiting
-              ? `Preparing ${total.toLocaleString()} addresses...`
-              : `${current.toLocaleString()} of ${total.toLocaleString()} addresses`}
+              ? (waitingSubtext || `Preparing ${total.toLocaleString()} items...`)
+              : `${current.toLocaleString()} of ${total.toLocaleString()}`}
           </Text>
-          <Text size="1" color="gray">
-            {isSmallDataset
-              ? "Single batch"
-              : `${numBatches} batches of 1,000`}
-          </Text>
+          {activeSubtext && !isWaiting && (
+            <Text size="1" color="gray">
+              {activeSubtext}
+            </Text>
+          )}
         </Flex>
       </Flex>
     </Card>
   );
 };
 
-export default GeocoderProgress;
+export default Progress;

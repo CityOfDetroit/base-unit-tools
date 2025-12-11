@@ -1,13 +1,15 @@
 import { Flex, Text } from "@radix-ui/themes";
 import { CheckIcon } from "@radix-ui/react-icons";
 
-const steps = [
-  { id: 1, label: "Input" },
-  { id: 2, label: "Options" },
-  { id: 3, label: "Results" },
-];
-
-const GeocoderStepper = ({ currentStep, setCurrentStep, canNavigateTo }) => {
+/**
+ * Reusable stepper component for flows.
+ *
+ * @param {Array} steps - Array of step objects with { id, label }
+ * @param {number} currentStep - Current active step id
+ * @param {function} setCurrentStep - Function to set current step
+ * @param {function} canNavigateTo - Function that returns boolean for if step is navigable
+ */
+const Stepper = ({ steps, currentStep, setCurrentStep, canNavigateTo }) => {
   return (
     <Flex align="center" justify="center" className="w-full mb-4">
       {steps.map((step, index) => {
@@ -66,4 +68,4 @@ const GeocoderStepper = ({ currentStep, setCurrentStep, canNavigateTo }) => {
   );
 };
 
-export default GeocoderStepper;
+export default Stepper;
