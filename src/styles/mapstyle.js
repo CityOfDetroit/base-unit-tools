@@ -34,6 +34,22 @@ export const baseStyle = {
         "https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitServices/VectorTileServer/tile/{z}/{y}/{x}.pbf"
       ]
     },
+    bu_features: {
+      "type": "vector",
+      "bounds": [
+        -83.2878,
+        42.255,
+        -82.9105,
+        42.4504
+      ],
+      "minzoom": 0,
+      "maxzoom": 23,
+      "scheme": "xyz",
+      "url": "https://vectortileservices2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitFeatures_vector_tiles/VectorTileServer",
+      "tiles": [
+        "https://vectortileservices2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitFeatures_vector_tiles/VectorTileServer/tile/{z}/{y}/{x}.pbf"
+      ]
+    },
     bu_parcels: {
       "type": "vector",
       "bounds": [
@@ -1048,7 +1064,7 @@ export const baseStyle = {
     {
       id: "building-fill",
       type: "fill",
-      source: "baseunits",
+      source: "bu_features",
       "source-layer": "buildings",
       interactive: true,
       minzoom: 12,
@@ -1073,7 +1089,7 @@ export const baseStyle = {
     {
       id: "building-linked",
       type: "fill",
-      source: "baseunits",
+      source: "bu_features",
       "source-layer": "buildings",
       minzoom: 11,
       filter: ["==", "id", ""],
@@ -1096,7 +1112,7 @@ export const baseStyle = {
     {
       id: "building-highlight",
       type: "line",
-      source: "baseunits",
+      source: "bu_features",
       "source-layer": "buildings",
       minzoom: 11,
       filter: ["==", "id", ""],
@@ -1128,7 +1144,7 @@ export const baseStyle = {
     {
       id: "address-highlight",
       type: "circle",
-      source: "baseunits",
+      source: "bu_features",
       "source-layer": "addresses",
       minzoom: 11,
       filter: ["==", "id", ""],
@@ -1153,7 +1169,7 @@ export const baseStyle = {
     {
       id: "address-linked",
       type: "circle",
-      source: "baseunits",
+      source: "bu_features",
       "source-layer": "addresses",
       minzoom: 11,
       filter: ["==", "id", ""],
@@ -1178,7 +1194,7 @@ export const baseStyle = {
     {
       id: "address-point",
       type: "circle",
-      source: "baseunits",
+      source: "bu_features",
       "source-layer": "addresses",
       minzoom: 13,
       layout: {
@@ -1199,7 +1215,7 @@ export const baseStyle = {
     },
     {
       id: "address-point-label",
-      source: "baseunits",
+      source: "bu_features",
       "source-layer": "addresses",
       type: "symbol",
       minzoom: 18,

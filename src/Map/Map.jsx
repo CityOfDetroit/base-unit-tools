@@ -192,14 +192,14 @@ const MapComponent = ({
           (l) => layers[l].interaction === newFeature?.layer?.id
         );
 
-        refetch(
-          lyr === "parcel" ? newFeature?.properties.parcel_id : newFeature?.id,
-          lyr
-        );
+        const clickProp = layers[lyr]?.click;
+        const clickId = clickProp ? newFeature?.properties[clickProp] : newFeature?.id;
+        refetch(clickId, lyr);
         setLayer(lyr);
 
         // get the layer that was clicked
-        let filter = ["==", "$id", newFeature?.id];
+        const filterProp = layers[lyr]?.filter_id || "$id";
+        let filter = ["==", filterProp, clickId];
         if (lyr) {
           mapInstance.current.setFilter(layers[lyr]?.highlight, filter);
         }
@@ -219,9 +219,10 @@ const MapComponent = ({
       });
 
       // set that as the clickedFeature
+      const filterProp = currentLyr.filter_id || "$id";
       let filter = [
         "==",
-        layer === "parcel" ? "parcel_id" : "$id",
+        filterProp,
         feature.properties[currentLyr.id_column],
       ];
       mapInstance.current.setFilter(currentLyr.highlight, filter);
@@ -270,7 +271,8 @@ const MapComponent = ({
 
         ids = ids.filter((id) => id !== null);
 
-        let filter = ["in", l === "parcel" ? "parcel_id" : "$id"].concat(
+        const filterProp = lyr.filter_id || "$id";
+        let filter = ["in", filterProp].concat(
           Array.from(new Set(ids))
         );
 
@@ -289,9 +291,10 @@ const MapComponent = ({
         let lyr = layers[l];
         if (!lyr.link) return;
 
+        const filterProp = lyr.filter_id || "$id";
         let filter = [
           "==",
-          l === "parcel" ? "parcel_id" : "$id",
+          filterProp,
           feature.properties[lyr.id_column],
         ];
 
