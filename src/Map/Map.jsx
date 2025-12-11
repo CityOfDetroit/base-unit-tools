@@ -324,6 +324,28 @@ const MapComponent = ({
         mapInstance.current.setFilter(lyr.link, ["==", "$id", ""]);
       });
     }
+
+    // Update address clusters when linkedAddresses changes
+    if (mapInstance.current && mapLoaded) {
+      const source = mapInstance.current.getSource("address-clusters");
+      if (source && linkedAddresses.length > 0) {
+        // Convert linkedAddresses to GeoJSON for clustering
+        const addressFeatures = linkedAddresses
+          .filter(a => a.geometry)
+          .map(a => ({
+            type: "Feature",
+            geometry: a.geometry,
+            properties: a.properties,
+          }));
+
+        source.setData({
+          type: "FeatureCollection",
+          features: addressFeatures,
+        });
+      } else if (source) {
+        source.setData({ type: "FeatureCollection", features: [] });
+      }
+    }
   }, [linkedAddresses]);
 
   useEffect(() => {

@@ -85,6 +85,17 @@ export const baseStyle = {
         features: [],
       },
     },
+    "address-clusters": {
+      type: "geojson",
+      data: {
+        type: "FeatureCollection",
+        features: [],
+      },
+      cluster: true,
+      clusterMaxZoom: 19,
+      clusterRadius: 1,
+      clusterMinPoints: 3,
+    },
     "new-point": {
       type: "geojson",
       data: {
@@ -124,7 +135,7 @@ export const baseStyle = {
       maxzoom: 22,
       paint: {
         "raster-opacity": 1,
-        "raster-saturation": -0.75,
+        "raster-saturation": -0.25,
       },
       layout: {
         visibility: "none",
@@ -1141,96 +1152,7 @@ export const baseStyle = {
         },
       },
     },
-    {
-      id: "address-highlight",
-      type: "circle",
-      source: "bu_features",
-      "source-layer": "addresses",
-      minzoom: 11,
-      filter: ["==", "id", ""],
-      layout: {
-        visibility: "visible",
-      },
-      paint: {
-        "circle-radius": {
-          base: 1,
-          stops: [
-            [12.5, 0.2],
-            [13.5, 1],
-            [16.5, 3],
-            [19, 12],
-          ],
-        },
-        "circle-color": layers["address"].color,
-        "circle-stroke-color": "#333",
-        "circle-stroke-width": 1,
-      },
-    },
-    {
-      id: "address-linked",
-      type: "circle",
-      source: "bu_features",
-      "source-layer": "addresses",
-      minzoom: 11,
-      filter: ["==", "id", ""],
-      layout: {
-        visibility: "visible",
-      },
-      paint: {
-        "circle-radius": {
-          base: 1,
-          stops: [
-            [12.5, 0.2],
-            [13.5, 1],
-            [16.5, 3],
-            [19, 12],
-          ],
-        },
-        "circle-color": layers["address"].color,
-        "circle-stroke-color": "#333",
-        "circle-stroke-width": 1,
-      },
-    },
-    {
-      id: "address-point",
-      type: "circle",
-      source: "bu_features",
-      "source-layer": "addresses",
-      minzoom: 13,
-      layout: {
-        visibility: "none",
-      },
-      paint: {
-        "circle-radius": {
-          base: 1,
-          stops: [
-            [13, 0.1],
-            [14, 1],
-            [17, 4],
-            [19, 8],
-          ],
-        },
-        "circle-color": "#aaa",
-      },
-    },
-    {
-      id: "address-point-label",
-      source: "bu_features",
-      "source-layer": "addresses",
-      type: "symbol",
-      minzoom: 18,
-      layout: {
-        "text-field": ["get", "street_number"],
-        "text-font": ["Noto Sans Bold"],
-        "text-offset": [0, -1],
-        visibility: "none",
-      },
-      paint: {
-        "text-halo-color": "white",
-        "text-halo-width": 2,
-      },
-    },
-    {
+        {
       id: "mapillary-images",
       type: "circle",
       source: "mly",
@@ -1364,6 +1286,67 @@ export const baseStyle = {
         "line-color": "rgba(0,0,0,0.25)",
         "line-width": 3,
       },
+    },
+    {
+      id: "address-cluster-circle",
+      type: "circle",
+      source: "address-clusters",
+      filter: ["has", "point_count"],
+      minzoom: 11,
+      paint: {
+        "circle-radius": {
+          base: 1,
+          stops: [
+            [12, 6],
+            [15, 10],
+            [17, 14],
+            [19, 18],
+          ],
+        },
+        "circle-color": layers["address"].color,
+        "circle-opacity": 0.7,
+        "circle-stroke-color": "#333",
+        "circle-stroke-width": 1.5,
+        "circle-stroke-opacity": 0.7,
+      },
+    },
+    {
+      id: "address-cluster-count",
+      type: "symbol",
+      source: "address-clusters",
+      filter: ["has", "point_count"],
+      minzoom: 11,
+      layout: {
+        "text-field": "{point_count_abbreviated}",
+        "text-font": ["Noto Sans Bold"],
+        "text-size": 13,
+      },
+      paint: {
+        "text-color": "#333",
+      },
+    },
+    {
+      id: "address-single",
+      type: "circle",
+      source: "address-clusters",
+      filter: ["!", ["has", "point_count"]],
+      minzoom: 11,
+      paint: {
+        "circle-radius": {
+          base: 1,
+          stops: [
+            [12.5, 2],
+            [13.5, 3],
+            [16.5, 5],
+            [19, 12],
+          ],
+        },
+        "circle-color": layers["address"].color,
+        "circle-opacity": 0.7,
+        "circle-stroke-color": "#333",
+        "circle-stroke-width": 1,
+        "circle-stroke-opacity": 0.7,
+      },
     }
   ],
   metadata: {
@@ -1395,31 +1378,35 @@ export const satelliteStyle = () => {
     }
   });
 
-  // adjust colors for satellite
+  // adjust colors for satellite - use muted/semi-transparent colors
   satStyle.layers.forEach((l, i) => {
     if (l.id === "streets-line") {
-      satStyle.layers[i].paint["line-color"] = layers["street"].color;
-      satStyle.layers[i].paint["line-opacity"] = 0.65;
+      satStyle.layers[i].paint["line-color"] = "rgba(148, 70, 109, 0.5)";
+      satStyle.layers[i].paint["line-opacity"] = 0.6;
     }
     if (l.id === "streets-highlight") {
-      satStyle.layers[i].paint["line-color"] = "#fff";
-      satStyle.layers[i].paint["line-opacity"] = 0.65;
+      satStyle.layers[i].paint["line-color"] = "rgba(148, 70, 109, 0.8)";
+      satStyle.layers[i].paint["line-opacity"] = 0.7;
     }
     if (l.id === "streets-linked") {
-      satStyle.layers[i].paint["line-color"] = "#333";
-      satStyle.layers[i].paint["line-opacity"] = 0.55;
+      satStyle.layers[i].paint["line-color"] = "rgba(148, 70, 109, 0.6)";
+      satStyle.layers[i].paint["line-opacity"] = 0.5;
     }
     if (l.id === 'parcel-line') {
-      satStyle.layers[i].paint['line-color'] = layers.parcel.color;
-      satStyle.layers[i].paint["line-opacity"] = 0.65;
+      satStyle.layers[i].paint['line-color'] = "rgba(163, 200, 112, 0.5)";
+      satStyle.layers[i].paint["line-opacity"] = 0.6;
     }
     if (l.id === 'parcel-highlight') {
-      satStyle.layers[i].paint["line-color"] = "#fff";
-      satStyle.layers[i].paint["line-opacity"] = 0.65;
+      satStyle.layers[i].paint["line-color"] = "rgba(163, 200, 112, 0.8)";
+      satStyle.layers[i].paint["line-opacity"] = 0.7;
     }
-    if (l.id === 'building-line') {
-      satStyle.layers[i].paint['line-color'] = layers.building.color;
-      satStyle.layers[i].paint["line-opacity"] = 0.65;
+    if (l.id === 'building-fill') {
+      satStyle.layers[i].paint['fill-color'] = "rgba(203, 77, 79, 0.3)";
+      satStyle.layers[i].paint["fill-opacity"] = 0.4;
+    }
+    if (l.id === 'building-highlight') {
+      satStyle.layers[i].paint['line-color'] = "rgba(203, 77, 79, 0.8)";
+      satStyle.layers[i].paint["line-opacity"] = 0.7;
     }
   });
 
