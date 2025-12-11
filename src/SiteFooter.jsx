@@ -24,21 +24,22 @@ const SiteFooter = () => {
           rows={{ initial: "auto", sm: "1" }}
           gap={"4"}
         >
-          <Flex direction={"column"} gap={"2"}>
-            <Flex direction={"column"} gap={"2"}>
-              {filteredApps.map((key) => {
-                return (
-                  <Link to={apps[key].url} key={key}>
-                    <Flex align="center" gap="2">
-                      <Icon name={apps[key].icon} />
-                      <Text size={"2"} weight="medium">
-                        {apps[key].name}
-                      </Text>
-                    </Flex>
-                  </Link>
-                );
-              })}
-            </Flex>
+          <Flex direction={"column"} gap={"1"}>
+            <Text size="2" weight={"bold"}>
+              Tools
+            </Text>
+            {filteredApps.map((key) => {
+              return (
+                <Link to={apps[key].url} key={key}>
+                  <Flex align="center" gap="2">
+                    <Icon name={apps[key].icon} />
+                    <Text size={"2"}>
+                      {apps[key].name}
+                    </Text>
+                  </Flex>
+                </Link>
+              );
+            })}
           </Flex>
 
           <Flex direction={"column"} gap={"1"}>
@@ -52,8 +53,23 @@ const SiteFooter = () => {
               <Text size={"2"}>Open Data Portal</Text>
             </Link>
           </Flex>
-          <div>
-          </div>
+          <Flex direction={"column"} gap={"1"}>
+            <Text size="2" weight={"bold"}>
+              Base Units
+            </Text>
+            <Link to="/base-unit/address">
+              <Text size={"2"}>Addresses</Text>
+            </Link>
+            <Link to="/base-unit/building">
+              <Text size={"2"}>Buildings</Text>
+            </Link>
+            <Link to="/base-unit/parcel">
+              <Text size={"2"}>Parcels</Text>
+            </Link>
+            <Link to="/base-unit/street">
+              <Text size={"2"}>Streets</Text>
+            </Link>
+          </Flex>
           <Flex direction="column" gap="2">
             <Text size="2" weight={"bold"}>
               About this site

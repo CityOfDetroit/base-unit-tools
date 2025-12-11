@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import FeatureLayer from '@arcgis/core/layers/FeatureLayer';
-import Query from '@arcgis/core/rest/support/Query';
+import { queryFeatures } from "@esri/arcgis-rest-feature-service";
 import layers from '../data/layers';
-import { arcgisToGeoJSON } from "@terraformer/arcgis"
 
 const useBaseFeature = (initialId, initialLayer) => {
   const [data, setData] = useState(null);
@@ -19,27 +17,21 @@ const useBaseFeature = (initialId, initialLayer) => {
 
     try {
       const layerUrl = getLayerUrl(newLayer);
-      const featureLayer = new FeatureLayer({ url: layerUrl });
 
-      const query = new Query();
+      const where = newLayer === 'parcel'
+        ? `parcel_id = '${newId}'`
+        : `${lyr.id_column} = ${newId}`;
 
-      if (newLayer === 'parcel') {
-        query.where = `parcel_id = '${newId}'`;
-      }
-      else {
-        query.where = `${lyr.id_column} = ${newId}`;
-      }
-      query.outFields = ['*'];
-      query.returnGeometry = true;
-      query.f = 'geojson';
-      query.outSpatialReference = 4326;
+      const response = await queryFeatures({
+        url: layerUrl,
+        where,
+        outFields: "*",
+        returnGeometry: true,
+        f: "geojson",
+      });
 
-      const featureSet = await featureLayer.queryFeatures(query);
-
-      let geojson = arcgisToGeoJSON(featureSet.toJSON());
-      
-      if (featureSet.features.length > 0) {
-        setData(geojson.features[0]);
+      if (response.features?.length > 0) {
+        setData(response.features[0]);
       } else {
         setData(null);
       }

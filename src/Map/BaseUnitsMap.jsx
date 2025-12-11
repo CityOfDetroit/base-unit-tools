@@ -1,12 +1,11 @@
-import { Card, Flex, Grid, Select, Text } from "@radix-ui/themes";
-import React, { useEffect, useState } from "react";
+import { Card, Flex, Grid } from "@radix-ui/themes";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import layers from "../data/layers";
 import useBaseFeature from "../hooks/useBaseFeature";
 import useGeocoder from "../hooks/useGeocoder";
 import AddressLinks from "./AddressLinks";
 import FeatureTable from "./FeatureTable";
-import LayerSwitcher from "./LayerSwitcher";
 import LinkedAddresses from "./LinkedAddresses";
 import LinkedBuildings from "./LinkedBuildings";
 import MapComponent from "./Map";
@@ -15,9 +14,23 @@ import Mapillary from "./Mapillary";
 import MapillarySwitch from "./MapillarySwitch";
 import BuildingLinks from "./BuildingLinks";
 import BasemapSelector from "./BasemapSelector";
+import ModeSelector from "./ModeSelector";
+import ResizeHandle from "./ResizeHandle";
 
 const BaseUnitsMap = () => {
   const [params, setParams] = useSearchParams();
+  const gridRef = useRef(null);
+
+  // Column width state (persisted to localStorage)
+  const [leftColumnWidth, setLeftColumnWidth] = useState(() => {
+    const saved = localStorage.getItem("mapLayoutLeftWidth");
+    return saved ? parseFloat(saved) : 33;
+  });
+
+  // Persist column width to localStorage
+  useEffect(() => {
+    localStorage.setItem("mapLayoutLeftWidth", leftColumnWidth.toString());
+  }, [leftColumnWidth]);
 
   // main pieces of state
   // the currently selected layer
@@ -26,7 +39,8 @@ const BaseUnitsMap = () => {
   );
 
   // streetview state
-  let [streetview, setStreetview] = useState(false);
+  let [streetview, setStreetview] = useState(params?.get("streetview") === "true");
+  let targetStreetviewDate = params?.get("streetviewdate") || null;
   let [svImages, setSvImages] = useState([]);
   let [viewerImage, setViewerImage] = useState(null);
   let [viewerBearing, setViewerBearing] = useState(0);
@@ -34,18 +48,18 @@ const BaseUnitsMap = () => {
   // map state
   let [style, setStyle] = useState("streets");
 
+  // selection mode state (all, parcel, building, street)
+  const [mode, setMode] = useState(params?.get("mode") || "all");
+
   // the primary hook for fetching the current feature
   const {
     data: feature,
     loading,
-    error,
     refetch,
-    nullify,
   } = useBaseFeature(params?.get("id"), layer);
 
   const {
     feature: geocodedFeature,
-    loading: geocodeLoading,
     error: geocodeError,
     changeAddress: geocodeRefetch,
   } = useGeocoder();
@@ -66,13 +80,12 @@ const BaseUnitsMap = () => {
   useEffect(() => {
     if (geocodedFeature) {
       setStreetview(false);
-      setParams({
-        id:
-          layer === "parcel"
-            ? geocodedFeature.attributes["parcel_id"]
-            : geocodedFeature.attributes[layers[layer].id_column],
-        layer: layer,
-      });
+      const newParams = new URLSearchParams(params);
+      newParams.set("id", layer === "parcel"
+        ? geocodedFeature.attributes["parcel_id"]
+        : geocodedFeature.attributes[layers[layer].id_column]);
+      newParams.set("layer", layer);
+      setParams(newParams);
     }
   }, [geocodedFeature]);
 
@@ -80,12 +93,12 @@ const BaseUnitsMap = () => {
   useEffect(() => {
     setLinkedAddresses([]);
     if (feature) {
-      setParams({
-        id: feature?.properties
-          ? feature.properties[layers[layer].id_column]
-          : null,
-        layer: layer,
-      });
+      const newParams = new URLSearchParams(params);
+      newParams.set("id", feature?.properties
+        ? feature.properties[layers[layer].id_column]
+        : null);
+      newParams.set("layer", layer);
+      setParams(newParams);
     }
   }, [feature]);
 
@@ -94,31 +107,58 @@ const BaseUnitsMap = () => {
     setLinkedAddresses([]);
   }, [layer]);
 
+  // sync mode to URL
+  useEffect(() => {
+    const currentMode = params?.get("mode");
+    if (mode === "all" && currentMode) {
+      const newParams = new URLSearchParams(params);
+      newParams.delete("mode");
+      setParams(newParams);
+    } else if (mode !== "all" && currentMode !== mode) {
+      const newParams = new URLSearchParams(params);
+      newParams.set("mode", mode);
+      setParams(newParams);
+    }
+  }, [mode]);
+
+  // sync streetview to URL
+  useEffect(() => {
+    const currentStreetview = params?.get("streetview");
+    if (streetview && currentStreetview !== "true") {
+      const newParams = new URLSearchParams(params);
+      newParams.set("streetview", "true");
+      setParams(newParams);
+    } else if (!streetview && currentStreetview) {
+      const newParams = new URLSearchParams(params);
+      newParams.delete("streetview");
+      newParams.delete("streetviewdate");
+      setParams(newParams);
+    }
+  }, [streetview]);
+
   return (
     <Grid
+      ref={gridRef}
       areas={{
         initial: "'streetview' 'geocoder' 'map' 'info'",
-        sm: "'info geocoder' 'info streetview' 'info map' 'info map'",
+        md: "'info geocoder' 'info streetview' 'info map' 'info map'",
       }}
-      columns={{ initial: "1fr", sm: "1fr 1fr", md: "2fr 3fr" }}
-      rows={{ initial: "auto auto auto auto", sm: "min-content 0fr 1fr 1fr" }}
-      gap={{ initial: "0", sm: "0" }}
-      p={{ initial: "0", sm: "2", lg: "4" }}
+      columns={{ initial: "1fr", md: `${leftColumnWidth}% 1fr` }}
+      rows={{ initial: "auto auto auto auto", md: "min-content 0fr 1fr 1fr" }}
+      gap={{ initial: "0", md: "0" }}
+      p={{ initial: "0", md: "2", lg: "4" }}
+      className="relative"
     >
+      <ResizeHandle onResize={setLeftColumnWidth} containerRef={gridRef} />
 
       {/* geocoding panel */}
       <Flex
-        gap={"4"}
+        gap={"2"}
         gridArea={"geocoder"}
         justify={"start"}
         align={"center"}
-        pt={{ initial: "2", sm: "2" }}
-        pb={{ initial: "2", sm: "2" }}
         p={"2"}
-        direction={{
-          initial: "column",
-          sm: "row",
-        }}
+        direction={"row"}
       >
         <Card size={"1"} className="">
           {/* mapillary bit */}
@@ -126,6 +166,9 @@ const BaseUnitsMap = () => {
         </Card>
         <Card>
           <BasemapSelector {...{ style, setStyle }} />
+        </Card>
+        <Card>
+          <ModeSelector {...{ mode, setMode }} />
         </Card>
       </Flex>
 
@@ -202,6 +245,12 @@ const BaseUnitsMap = () => {
             viewerImage,
             setViewerImage,
             setViewerBearing,
+            targetStreetviewDate,
+            onDateChange: (dateStr) => {
+              const newParams = new URLSearchParams(params);
+              newParams.set("streetviewdate", dateStr);
+              setParams(newParams);
+            },
           }}
         />
       ) : (
@@ -223,7 +272,8 @@ const BaseUnitsMap = () => {
             setSvImages,
             viewerImage,
             viewerBearing,
-            geocodedFeature
+            geocodedFeature,
+            mode
           }}
         />
       </div>

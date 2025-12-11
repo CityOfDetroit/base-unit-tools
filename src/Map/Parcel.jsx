@@ -36,7 +36,7 @@ const Parcel = ({ parcel, loading }) => {
         />
       </Category>
 
-      <Category label="Usage & classification" startOpen={false}>
+      <Category label="Usage & classification">
         {Object.entries({
           "Property Class": `${props.property_class} - ${props.property_class_description}`,
           "Property Use": `${props.use_code} - ${props.use_code_description}`,
@@ -48,7 +48,7 @@ const Parcel = ({ parcel, loading }) => {
         })}
       </Category>
 
-      <Category label="Taxation" startOpen={false}>
+      <Category label="Taxation">
         <Attribute
           label="Taxable status"
           value={props.tax_status_description}
@@ -62,7 +62,7 @@ const Parcel = ({ parcel, loading }) => {
           value={`$${parseInt(props.amt_assessed_value).toLocaleString()}`}
         />
       </Category>
-      <Category label="Dimensions" startOpen={false}>
+      <Category label="Dimensions">
         {Object.entries({
           "Total Acreage": props.total_acreage,
           "Total Square Footage": props.total_square_footage,

@@ -1,105 +1,207 @@
-import * as Tooltip from "@radix-ui/react-tooltip";
 import { geocoderFields } from "../data/geocoderFields";
-import { InfoCircledIcon } from "@radix-ui/react-icons";
 import {
   Text,
   Button,
   Card,
   Flex,
-  CheckboxGroup,
   Checkbox,
+  Tooltip,
 } from "@radix-ui/themes";
+import * as Accordion from "@radix-ui/react-accordion";
+import { ChevronDownIcon, InfoCircledIcon } from "@radix-ui/react-icons";
+
+// Group the geocoder fields by category
+const fieldGroups = {
+  political: {
+    label: "Political Boundaries",
+    fields: ["council_district", "council_2026", "congressional_district", "county_commission_district"],
+  },
+  geographic: {
+    label: "Geographic Boundaries",
+    fields: ["neighborhood", "master_plan_nhood"],
+  },
+  census: {
+    label: "Census Data",
+    fields: ["census_block_2020", "census_block_2010", "qct"],
+  },
+  other: {
+    label: "Other",
+    fields: ["scout_car_area"],
+  },
+};
+
+const presets = [
+  {
+    id: "basic",
+    label: "Basic",
+    description: "Coordinates and IDs only",
+    apply: (options, setOptions) => {
+      const newOpts = { ...options, coords: true, ids: true, related_parcel: false };
+      geocoderFields.forEach((f) => (newOpts[f.name] = false));
+      setOptions(newOpts);
+    },
+  },
+  {
+    id: "all",
+    label: "All Boundaries",
+    description: "Include all available data",
+    apply: (options, setOptions) => {
+      const newOpts = { ...options, coords: true, ids: true, related_parcel: true };
+      geocoderFields.forEach((f) => (newOpts[f.name] = true));
+      setOptions(newOpts);
+    },
+  },
+  {
+    id: "census",
+    label: "Census Only",
+    description: "Census geography fields",
+    apply: (options, setOptions) => {
+      const newOpts = { ...options, coords: true, ids: true, related_parcel: false };
+      geocoderFields.forEach((f) => {
+        newOpts[f.name] = fieldGroups.census.fields.includes(f.name);
+      });
+      setOptions(newOpts);
+    },
+  },
+  {
+    id: "clear",
+    label: "Clear All",
+    description: "Reset to minimum",
+    apply: (options, setOptions) => {
+      const newOpts = { ...options, coords: false, ids: false, related_parcel: false };
+      geocoderFields.forEach((f) => (newOpts[f.name] = false));
+      setOptions(newOpts);
+    },
+  },
+];
 
 const GeocoderOptions = ({ options, setOptions }) => {
+  const getFieldByName = (name) => geocoderFields.find((f) => f.name === name);
+
   return (
-    <>
+    <Flex direction="column" gap="3">
+      {/* Presets */}
       <Card>
-        <Text weight={"bold"}>Attach fields</Text>
-        <Flex gap="4" pt={"1"}>
-          <Text as="label" size="2">
-            <Flex as="span" gap="2">
-              <Checkbox
-                size="1"
-                defaultChecked
-                onCheckedChange={() =>
-                  setOptions({ ...options, coords: !options.coords })
-                }
-              />{" "}
-              Coordinates (Lat/Lng)
-            </Flex>
+        <Flex direction="column" gap="2">
+          <Text weight="bold" size="3">
+            Quick Presets
           </Text>
-          <Text as="label" size="2">
-            <Flex as="span" gap="2">
-              <Checkbox
-                size="1"
-                defaultChecked
-                onCheckedChange={() => setOptions({ ...options, ids: !options.ids })}
-              />{" "}
-              Base Unit IDs
-            </Flex>
-          </Text>
-          <Text as="label" size="2">
-            <Flex as="span" gap="2">
-              <Checkbox
-                size="1"
-                onCheckedChange={() =>
-                  setOptions({ ...options, related_parcel: !options.related_parcel })
-                }
-              />{" "}
-              Related Parcel
-            </Flex>
-          </Text>
-        </Flex>
-      </Card>
-
-      <Card>
-        <Flex items="center" justify={"between"} pb={"2"}>
-          <Text weight={"bold"}>Attach boundaries</Text>
-          <div className="flex items-center gap-1">
-            {[true, false].map((b) => (
-              <Button
-                size={"1"}
-                key={b}
-                onClick={() => {
-                  let newOpts = {};
-                  geocoderFields.forEach((field) => {
-                    newOpts[field.name] = b;
-                  });
-                  let setOpts = {...options, ...newOpts}
-                  (setOpts);
-                }}
-              >
-                <Text>{b ? "All" : "None"}</Text>
-              </Button>
+          <Flex gap="2" wrap="wrap">
+            {presets.map((preset) => (
+              <Tooltip key={preset.id} content={preset.description}>
+                <Button
+                  variant="soft"
+                  size="1"
+                  onClick={() => preset.apply(options, setOptions)}
+                >
+                  {preset.label}
+                </Button>
+              </Tooltip>
             ))}
-          </div>
+          </Flex>
         </Flex>
-        <CheckboxGroup.Root
-          onValueChange={(value) => {
-            let newOpts = {};
-
-            geocoderFields.forEach((f) => {
-              newOpts[f.name] = false;
-              if (value.includes(f.name)) {
-                newOpts[f.name] = true;
-              }
-            });
-            setOptions({ ...options, ...newOpts });
-          }}
-        >
-          {geocoderFields.map((field) => (
-            <CheckboxGroup.Item
-              className="checkbox-option flex items-center gap-1"
-              key={field.name}
-              value={field.name}
-              checked={options[field.name]}
-            >
-              {field.display}
-            </CheckboxGroup.Item>
-          ))}
-        </CheckboxGroup.Root>
       </Card>
-    </>
+
+      {/* Basic Fields */}
+      <Card>
+        <Text weight="bold" size="3" className="mb-2">
+          Basic Fields
+        </Text>
+        <Flex direction="column" gap="2" className="mt-2">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <Checkbox
+              size="1"
+              checked={options.coords}
+              onCheckedChange={() =>
+                setOptions({ ...options, coords: !options.coords })
+              }
+            />
+            <Text size="2">Coordinates (Lat/Lng)</Text>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <Checkbox
+              size="1"
+              checked={options.ids}
+              onCheckedChange={() =>
+                setOptions({ ...options, ids: !options.ids })
+              }
+            />
+            <Text size="2">Base Unit IDs</Text>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <Checkbox
+              size="1"
+              checked={options.related_parcel}
+              onCheckedChange={() =>
+                setOptions({ ...options, related_parcel: !options.related_parcel })
+              }
+            />
+            <Text size="2">Related Parcel</Text>
+          </label>
+        </Flex>
+      </Card>
+
+      {/* Boundary Groups - Accordion */}
+      <Card className="p-0 overflow-hidden">
+        <Accordion.Root type="multiple" defaultValue={["political"]}>
+          {Object.entries(fieldGroups).map(([groupKey, group]) => (
+            <Accordion.Item
+              key={groupKey}
+              value={groupKey}
+              className="border-b border-gray-200 last:border-b-0"
+            >
+              <Accordion.Header>
+                <Accordion.Trigger className="flex items-center justify-between w-full p-3 text-left hover:bg-gray-50 transition-colors group">
+                  <Text size="2" weight="medium">
+                    {group.label}
+                  </Text>
+                  <ChevronDownIcon
+                    className="text-gray-500 transition-transform duration-200 group-data-[state=open]:rotate-180"
+                    width="16"
+                    height="16"
+                  />
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content className="px-3 pb-3 data-[state=open]:animate-slideDown data-[state=closed]:animate-slideUp overflow-hidden">
+                <Flex direction="column" gap="2">
+                  {group.fields.map((fieldName) => {
+                    const field = getFieldByName(fieldName);
+                    if (!field) return null;
+                    return (
+                      <label
+                        key={field.name}
+                        className="flex items-center gap-2 cursor-pointer"
+                      >
+                        <Checkbox
+                          size="1"
+                          checked={options[field.name]}
+                          onCheckedChange={() =>
+                            setOptions({
+                              ...options,
+                              [field.name]: !options[field.name],
+                            })
+                          }
+                        />
+                        <Text size="2">{field.display}</Text>
+                        {field.description && (
+                          <Tooltip content={field.description}>
+                            <InfoCircledIcon
+                              width="12"
+                              height="12"
+                              className="text-gray-400 cursor-help"
+                            />
+                          </Tooltip>
+                        )}
+                      </label>
+                    );
+                  })}
+                </Flex>
+              </Accordion.Content>
+            </Accordion.Item>
+          ))}
+        </Accordion.Root>
+      </Card>
+    </Flex>
   );
 };
 

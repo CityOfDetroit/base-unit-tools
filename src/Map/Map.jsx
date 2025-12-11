@@ -19,13 +19,20 @@ const MapComponent = ({
   viewerImage,
   viewerBearing,
   setSvImages,
-  geocodedFeature
+  geocodedFeature,
+  mode = "all"
 }) => {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
+  const modeRef = useRef(mode);
   const { isDarkMode } = useTheme();
   const [mapLoaded, setMapLoaded] = useState(false);
   const [clickedFeatures, setClickedFeatures] = useState([]);
+
+  // Keep mode ref in sync
+  useEffect(() => {
+    modeRef.current = mode;
+  }, [mode]);
 
   let mapStyles = {
     streets: baseStyle,
@@ -64,25 +71,78 @@ const MapComponent = ({
 
       map.on("load", () => {
         setMapLoaded(true);
-
       });
+
+      // Add navigation controls (zoom in/out)
+      map.addControl(new maplibregl.NavigationControl(), "top-right");
+
+      // Add geolocate control (find me)
+      const geolocate = new maplibregl.GeolocateControl({
+        positionOptions: {
+          enableHighAccuracy: true,
+        },
+        trackUserLocation: false,
+      });
+
+      geolocate.on("geolocate", (e) => {
+        const { latitude, longitude } = e.coords;
+
+        // Detroit bounding box (with some buffer)
+        const detroitBounds = {
+          minLat: 42.25,
+          maxLat: 42.50,
+          minLng: -83.30,
+          maxLng: -82.90,
+        };
+
+        // Check if user is within or near Detroit
+        if (
+          latitude >= detroitBounds.minLat &&
+          latitude <= detroitBounds.maxLat &&
+          longitude >= detroitBounds.minLng &&
+          longitude <= detroitBounds.maxLng
+        ) {
+          map.flyTo({
+            center: [longitude, latitude],
+            zoom: 17.5,
+          });
+        }
+        // If outside Detroit, don't move the map
+      });
+
+      map.addControl(geolocate, "top-right");
  
       map.on("click", (e) => {
+        // Filter layers based on current mode
+        const queryLayers = modeRef.current === "all"
+          ? Object.keys(layers).map((lyr) => layers[lyr].interaction)
+          : [layers[modeRef.current]?.interaction].filter(Boolean);
+
         const features = map.queryRenderedFeatures(e.point, {
-          layers: Object.keys(layers).map((lyr) => layers[lyr].interaction),
+          layers: queryLayers,
         });
 
         setClickedFeatures(features);
       });
 
-      map.on("moveend", () => {
-        if (mapInstance.current.getZoom() > 16.5) {
-          let features = map.queryRenderedFeatures({
+      // Query Mapillary images when zoom is sufficient
+      const queryMapillaryImages = () => {
+        if (mapInstance.current && mapInstance.current.getZoom() > 16.5) {
+          let features = mapInstance.current.queryRenderedFeatures({
             layers: ["mapillary-images"],
           });
           setSvImages(features);
         } else {
           setSvImages([]);
+        }
+      };
+
+      map.on("moveend", queryMapillaryImages);
+
+      // Re-query when Mapillary tiles finish loading (fixes race condition)
+      map.on("sourcedata", (e) => {
+        if (e.sourceId === "mly" && e.isSourceLoaded) {
+          queryMapillaryImages();
         }
       });
 
@@ -121,6 +181,11 @@ const MapComponent = ({
     if (mapInstance.current && layer && mapLoaded) {
       const currentLyr = layers[layer];
 
+      // If in a specific mode and no features found, don't blank out current selection
+      if (clickedFeatures.length === 0 && mode !== "all") {
+        return;
+      }
+
       // reset all highlight filters
       Object.keys(layers).forEach((lyr) => {
         let layer = layers[lyr];
@@ -137,14 +202,14 @@ const MapComponent = ({
           (l) => layers[l].interaction === newFeature?.layer?.id
         );
 
-        refetch(
-          lyr === "parcel" ? newFeature?.properties.parcel_id : newFeature?.id,
-          lyr
-        );
+        const clickProp = layers[lyr]?.click;
+        const clickId = clickProp ? newFeature?.properties[clickProp] : newFeature?.id;
+        refetch(clickId, lyr);
         setLayer(lyr);
 
         // get the layer that was clicked
-        let filter = ["==", "$id", newFeature?.id];
+        const filterProp = layers[lyr]?.filter_id || "$id";
+        let filter = ["==", filterProp, clickId];
         if (lyr) {
           mapInstance.current.setFilter(layers[lyr]?.highlight, filter);
         }
@@ -164,9 +229,10 @@ const MapComponent = ({
       });
 
       // set that as the clickedFeature
+      const filterProp = currentLyr.filter_id || "$id";
       let filter = [
         "==",
-        layer === "parcel" ? "parcel_id" : "$id",
+        filterProp,
         feature.properties[currentLyr.id_column],
       ];
       mapInstance.current.setFilter(currentLyr.highlight, filter);
@@ -215,7 +281,8 @@ const MapComponent = ({
 
         ids = ids.filter((id) => id !== null);
 
-        let filter = ["in", l === "parcel" ? "parcel_id" : "$id"].concat(
+        const filterProp = lyr.filter_id || "$id";
+        let filter = ["in", filterProp].concat(
           Array.from(new Set(ids))
         );
 
@@ -234,9 +301,10 @@ const MapComponent = ({
         let lyr = layers[l];
         if (!lyr.link) return;
 
+        const filterProp = lyr.filter_id || "$id";
         let filter = [
           "==",
-          l === "parcel" ? "parcel_id" : "$id",
+          filterProp,
           feature.properties[lyr.id_column],
         ];
 
@@ -273,27 +341,28 @@ const MapComponent = ({
     }
   }, [mapLoaded]);
 
+  // Show/hide the Mapillary camera location on the map
   useEffect(() => {
-    if (mapInstance.current && viewerImage) {
-      let mlyLayer = "mapillary-location";
-      mapInstance.current.setFilter(mlyLayer, [
-        "==",
-        "id",
-        parseInt(viewerImage.image.id),
-      ]);
-    }
-  }, [viewerImage]);
+    if (mapInstance.current && mapLoaded) {
+      const imageFilter = viewerImage && streetview
+        ? ["==", "id", parseInt(viewerImage.image.id)]
+        : ["==", "id", ""];
 
+      mapInstance.current.setFilter("mapillary-location", imageFilter);
+      mapInstance.current.setFilter("mapillary-direction", imageFilter);
+    }
+  }, [viewerImage, streetview, mapLoaded]);
+
+  // Rotate the direction icon to match the viewer bearing
   useEffect(() => {
-    if (mapInstance.current && viewerBearing) {
-      let mlyLayer = "mapillary-location";
+    if (mapInstance.current && mapLoaded && viewerBearing !== undefined && streetview) {
       mapInstance.current.setLayoutProperty(
-        mlyLayer,
+        "mapillary-direction",
         "icon-rotate",
         viewerBearing - 90
       );
     }
-  }, [viewerBearing]);
+  }, [viewerBearing, streetview]);
 
     
   return (
@@ -302,8 +371,8 @@ const MapComponent = ({
         ref={mapRef}
         height={
           !streetview
-            ? { initial: "300px", sm: "500px", lg: "705px", xl: "900px" }
-            : { initial: "250px", sm: "350px", lg: "375px", xl: "500px" }
+            ? { initial: "300px", md: "500px", lg: "705px", xl: "900px" }
+            : { initial: "200px", md: "350px", lg: "400px", xl: "450px" }
         }
         p={"2"}
       ></Box>

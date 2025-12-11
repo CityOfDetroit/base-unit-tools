@@ -1,4 +1,5 @@
-import { Card, Flex, RadioGroup, Text } from "@radix-ui/themes";
+import { Card, Flex, RadioGroup, Select, Separator, Text } from "@radix-ui/themes";
+import { CalendarIcon, CameraIcon, ExternalLinkIcon } from "@radix-ui/react-icons";
 import bearing from "@turf/bearing";
 import centroid from "@turf/centroid";
 import distance from "@turf/distance";
@@ -7,7 +8,6 @@ import "mapillary-js/dist/mapillary.css";
 import moment from "moment";
 import React, { useEffect, useState, useRef } from "react";
 import _ from "underscore";
-import { DataSource } from "../components/CardLink";
 
 /**
  * Wrap a value on the interval [min, max].
@@ -70,10 +70,14 @@ const Mapillary = ({
   viewerImage,
   setViewerImage,
   setViewerBearing,
+  targetStreetviewDate,
+  onDateChange,
 }) => {
   let [sequenceImages, setSequenceImages] = useState([]);
 
   let [selectedImage, setSelectedImage] = useState(null);
+
+  let [lastFeatureId, setLastFeatureId] = useState(null);
 
   let [viewer, setViewer] = useState(null);
 
@@ -130,9 +134,15 @@ const Mapillary = ({
     setViewer(viewer);
   }, []);
 
+  // Add marker only when feature changes, not on every date switch
   useEffect(() => {
-    if (viewer && selectedImage) {
+    if (viewer && feature) {
       let coords = centroid(feature).geometry.coordinates;
+      let markerComponent = viewer.getComponent("marker");
+
+      // Remove existing marker before adding new one
+      markerComponent.remove(["default-id"]);
+
       let defaultMarker = new SimpleMarker(
         "default-id",
         { lat: coords[1], lng: coords[0] },
@@ -145,9 +155,13 @@ const Mapillary = ({
           radius: 2.5,
         }
       );
-      let markerComponent = viewer.getComponent("marker");
       markerComponent.add([defaultMarker]);
+    }
+  }, [feature, viewer]);
 
+  // Handle image navigation separately
+  useEffect(() => {
+    if (viewer && selectedImage) {
       viewer
         .moveTo(selectedImage.properties.id, { transition: 0.1 })
         .then((i) => {
@@ -200,14 +214,40 @@ const Mapillary = ({
       );
 
       setSequenceImages(images);
-      setSelectedImage(images[0]);
+
+      // Get a stable feature identifier
+      const featureId = feature?.id || feature?.properties?.id || JSON.stringify(feature?.geometry?.coordinates);
+      const featureChanged = featureId !== lastFeatureId;
+
+      // Only change selected image if:
+      // 1. The feature changed (user clicked a new feature), OR
+      // 2. There's no current selection, OR
+      // 3. The current selection is no longer in the filtered images
+      const currentStillValid = selectedImage && images.some(
+        (img) => img.properties.sequence_id === selectedImage.properties?.sequence_id
+      );
+      if (featureChanged || !currentStillValid) {
+        if (images.length > 0) {
+          let imageToSelect = images[0]; // default to most recent
+
+          // If targetStreetviewDate provided, find nearest date
+          if (targetStreetviewDate) {
+            const targetMoment = moment(targetStreetviewDate, "YYYYMMDD");
+            if (targetMoment.isValid()) {
+              imageToSelect = _.min(images, (img) =>
+                Math.abs(moment(img.properties.captured_at).diff(targetMoment))
+              );
+            }
+          }
+
+          setSelectedImage(imageToSelect);
+        }
+        setLastFeatureId(featureId);
+      }
 
       setLoading(false);
     }
   }, [svImages, feature]);
-
-  console.log(selectedImage);
-  console.log(viewer);
 
   let url;
 
@@ -217,85 +257,154 @@ const Mapillary = ({
 
   return (
     <Flex
-      className="h-auto sm:h-96"
+      className="h-auto sm:h-[450px] lg:h-[500px] xl:h-[550px] flex-col sm:flex-row"
       p={"2"}
-      gap={"4"}
+      gap={"2"}
       gridArea={"streetview"}
-      direction={{ initial: "column", sm: "row" }}
     >
       <div
-        className="w-full sm:w-2/3 lg:w-3/4 rounded-md min-h-72"
+        className="w-full sm:w-2/3 lg:w-3/4 rounded-lg overflow-hidden min-h-72 shadow-sm"
         id="mly-viewer"
         ref={mlyViewerRef}
       ></div>
 
-      <Card size={"1"} className="w-full sm:w-1/3 lg:w-1/4">
-        <Flex
-          direction={{ initial: "row", sm: "column" }}
-          justify={{ initial: "between", sm: "start" }}
-          align={{ initial: "start", sm: "start" }}
-        >
-          {viewerImage && (
-            <Flex direction="column">
-              <Text size={"1"}>Image taken on:</Text>
-              <Text size={"3"} weight="bold">
-                {moment(viewerImage.image._spatial.captured_at).format(
-                  "MMM DD, YYYY"
-                )}
-              </Text>
+      <Card size={"1"} className="w-full sm:w-1/3 lg:w-1/4 sm:h-full">
+        <Flex direction="column" gap="3" className="h-full">
+          {/* Loading state */}
+          {loading && (
+            <Text size="1" color="gray">Loading imagery...</Text>
+          )}
+
+          {/* No images state */}
+          {svImages.length === 0 && !loading && (
+            <Flex direction="column" gap="1" className="py-2">
+              <Text size="2" color="gray">No nearby images found</Text>
+              <Text size="1" color="gray">Zoom in on the map to load street imagery.</Text>
             </Flex>
           )}
-          <Flex
-            direction={{ initial: "column" }}
-            align={"start"}
-            className="w-full"
-          >
-            {loading && <Text size={"1"}>Loading...</Text>}
-            {svImages.length === 0 && (
-              <Text size={"1"}>
-                No nearby images found; Zoom in on the map to load imagery.
-              </Text>
-            )}
-            {sequenceImages.length > 0 && (
-              <Text size={"1"} weight={"medium"} mb={"1"}>
-                Select another date:
-              </Text>
-            )}
-            {sequenceImages?.length > 0 && !loading && viewerImage && (
-              <RadioGroup.Root
-                onValueChange={(value) =>
-                  setSelectedImage(
-                    sequenceImages.find(
-                      (image) => image.properties.sequence_id === value
-                    )
-                  )
-                }
-                value={viewerImage?.image._core?.sequence?.id}
-                className="max-h-72 overflow-y-auto w-full"
-              >
-                {sequenceImages.map((image, idx) => {
-                  return (
-                    <RadioGroup.Item
-                      value={image.properties.sequence_id}
-                      key={image.properties.sequence_id}
-                      color="gray"
-                      size={"1"}
-                    >
-                      <Text size={1}>
-                        {moment(image.properties.captured_at).format(
-                          "MM-DD-YY"
-                        )}
+
+          {/* Mobile: horizontal layout for current image + date selector */}
+          {viewerImage && (
+            <div className="block sm:hidden">
+            <Flex direction="row" gap="3" align="start">
+              <Flex direction="column" gap="1" className="flex-1">
+                <Flex align="center" gap="2">
+                  <CameraIcon width="14" height="14" color="gray" />
+                  <Text size="1" color="gray">Current image</Text>
+                </Flex>
+                <Text size="3" weight="bold">
+                  {moment(viewerImage.image._spatial.captured_at).format("MMM D, YYYY")}
+                </Text>
+              </Flex>
+              {sequenceImages?.length > 1 && !loading && (
+                <Flex direction="column" gap="1" className="flex-1">
+                  <Flex align="center" gap="2">
+                    <CalendarIcon width="14" height="14" color="gray" />
+                    <Text size="1" color="gray">
+                      {sequenceImages.length} dates
+                    </Text>
+                  </Flex>
+                  <Select.Root
+                    value={viewerImage?.image._core?.sequence?.id}
+                    onValueChange={(value) => {
+                      const newImage = sequenceImages.find(
+                        (image) => image.properties.sequence_id === value
+                      );
+                      setSelectedImage(newImage);
+                      if (onDateChange && newImage) {
+                        onDateChange(moment(newImage.properties.captured_at).format("YYYYMMDD"));
+                      }
+                    }}
+                  >
+                    <Select.Trigger className="w-full" />
+                    <Select.Content>
+                      {sequenceImages.map((image) => (
+                        <Select.Item
+                          value={image.properties.sequence_id}
+                          key={image.properties.sequence_id}
+                        >
+                          {moment(image.properties.captured_at).format("MMM D, YYYY")}
+                        </Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select.Root>
+                </Flex>
+              )}
+            </Flex>
+            </div>
+          )}
+
+          {/* Desktop: vertical layout */}
+          {viewerImage && (
+            <div className="hidden sm:flex sm:flex-1 sm:min-h-0">
+            <Flex direction="column" gap="3" className="flex-1 min-h-0">
+              <Flex direction="column" gap="1">
+                <Flex align="center" gap="2">
+                  <CameraIcon width="14" height="14" color="gray" />
+                  <Text size="1" color="gray">Current image</Text>
+                </Flex>
+                <Text size="4" weight="bold">
+                  {moment(viewerImage.image._spatial.captured_at).format("MMM D, YYYY")}
+                </Text>
+              </Flex>
+
+              {sequenceImages?.length > 1 && !loading && (
+                <>
+                  <Separator size="4" />
+                  <Flex direction="column" gap="2" className="flex-1 min-h-0">
+                    <Flex align="center" gap="2">
+                      <CalendarIcon width="14" height="14" color="gray" />
+                      <Text size="1" color="gray">
+                        {sequenceImages.length} dates available
                       </Text>
-                    </RadioGroup.Item>
-                  );
-                })}
-              </RadioGroup.Root>
-            )}
-          </Flex>
+                    </Flex>
+                    <div className="flex-1 min-h-0 overflow-y-auto w-full">
+                      <RadioGroup.Root
+                        onValueChange={(value) => {
+                          const newImage = sequenceImages.find(
+                            (image) => image.properties.sequence_id === value
+                          );
+                          setSelectedImage(newImage);
+                          if (onDateChange && newImage) {
+                            onDateChange(moment(newImage.properties.captured_at).format("YYYYMMDD"));
+                          }
+                        }}
+                        value={viewerImage?.image._core?.sequence?.id}
+                        className="flex flex-col gap-1 w-full"
+                      >
+                        {sequenceImages.map((image) => (
+                          <RadioGroup.Item
+                            value={image.properties.sequence_id}
+                            key={image.properties.sequence_id}
+                            size="1"
+                          >
+                            <Text size="1">
+                              {moment(image.properties.captured_at).format("MMM D, YYYY")}
+                            </Text>
+                          </RadioGroup.Item>
+                        ))}
+                      </RadioGroup.Root>
+                    </div>
+                  </Flex>
+                </>
+              )}
+            </Flex>
+            </div>
+          )}
+
+          {/* External link */}
+          {url && (
+            <>
+              <Separator size="4" />
+              <a href={url} target="_blank" rel="noopener noreferrer" className="no-underline">
+                <Flex align="center" gap="1" className="hover:opacity-70 transition-opacity">
+                  <ExternalLinkIcon width="12" height="12" />
+                  <Text size="1" color="gray">Open in Mapillary</Text>
+                </Flex>
+              </a>
+            </>
+          )}
         </Flex>
-        {url && (
-          <DataSource url={url} />
-        )}
       </Card>
     </Flex>
   );

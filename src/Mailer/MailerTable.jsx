@@ -1,26 +1,52 @@
-import { useMemo } from "react"
-import { usePagination, useTable } from 'react-table'
-import { Flex } from "@radix-ui/themes";
+import { useMemo } from "react";
+import { usePagination, useTable, useSortBy } from "react-table";
+import { Card, Flex, Text } from "@radix-ui/themes";
+import {
+  CaretSortIcon,
+  CaretUpIcon,
+  CaretDownIcon,
+} from "@radix-ui/react-icons";
+import PaginationControls from "../components/PaginationControls";
 
 const MailerTable = ({ filtered }) => {
+  const columns = useMemo(
+    () => [
+      {
+        accessor: "final_primary_address",
+        Header: "Address",
+      },
+      {
+        accessor: "final_secondary_address",
+        Header: "Unit",
+      },
+      {
+        accessor: "usps_status",
+        Header: "USPS Status",
+        Cell: ({ value }) => (
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-medium ${
+              value === "Deliverable"
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
+            {value || "Unknown"}
+          </span>
+        ),
+      },
+    ],
+    []
+  );
 
-  let cols = [
-    { accessor: 'final_primary_address', Header: 'Address' },
-    // { accessor: 'city_state_zip', Header: 'CSZ'},
-    { accessor: 'final_secondary_address', Header: 'Unit' },
-    { accessor: 'usps_status', Header: 'USPS Status' },
-    // { accessor: 'usps_database_month', Header: 'Month' }
-  ]
-
-  let columns = useMemo(() => cols, [filtered])
-
-  let data = useMemo(() => filtered.map(f => f.attributes), [filtered])
+  const data = useMemo(
+    () => filtered.map((f) => f.attributes),
+    [filtered]
+  );
 
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
-    rows,
     prepareRow,
     page,
     canPreviousPage,
@@ -30,76 +56,94 @@ const MailerTable = ({ filtered }) => {
     gotoPage,
     nextPage,
     previousPage,
-    setPageSize,
-    state: { pageIndex, pageSize },
-  } = useTable({
-    columns,
-    data,
-    initialState: { pageIndex: 0, pageSize: 15 }
-  },
-  usePagination
-  )
-
+    state: { pageIndex },
+  } = useTable(
+    {
+      columns,
+      data,
+      initialState: { pageIndex: 0, pageSize: 15 },
+    },
+    useSortBy,
+    usePagination
+  );
 
   return (
-    <Flex gridColumn={"span 2"} direction="column">
-      <table {...getTableProps()} className="w-full">
-        <thead >
-          {headerGroups.map(headerGroup => (
-            <tr {...headerGroup.getHeaderGroupProps()} >
-              {headerGroup.headers.map(column => (
-                <th {...column.getHeaderProps()} className='bg-gray-300 m-0 py-2 pl-2'>{column.render('Header')}</th>
+    <Card className="overflow-hidden">
+      <Flex direction="column" gap="3">
+        <Text size="3" weight="bold" className="text-[#004445]">
+          Address List
+        </Text>
+
+        {/* Table wrapper with horizontal scroll */}
+        <div className="overflow-x-auto max-w-full">
+          <table {...getTableProps()} className="w-full min-w-max">
+            <thead>
+              {headerGroups.map((headerGroup) => (
+                <tr {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map((column) => (
+                    <th
+                      {...column.getHeaderProps(column.getSortByToggleProps())}
+                      className="bg-gray-100 text-left py-2 px-3 text-sm font-medium text-gray-700 cursor-pointer hover:bg-gray-200 transition-colors border-b border-gray-200"
+                    >
+                      <Flex align="center" gap="1">
+                        {column.render("Header")}
+                        <span className="text-gray-400">
+                          {column.isSorted ? (
+                            column.isSortedDesc ? (
+                              <CaretDownIcon />
+                            ) : (
+                              <CaretUpIcon />
+                            )
+                          ) : (
+                            <CaretSortIcon />
+                          )}
+                        </span>
+                      </Flex>
+                    </th>
+                  ))}
+                </tr>
               ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {page.map((row, i) => {
-            prepareRow(row)
-            return (
-              <tr key={row.id} {...row.getRowProps()}>
-                {row.cells.map(cell => {
-                  return <td {...cell.getCellProps()} className="pl-2 border border-bottom-1">{cell.render('Cell')}</td>
-                })}
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
-      <div className="p-2">
-        <button className="p-1 bg-gray-100 border border-black w-12" onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
-          {'<<'}
-        </button>{' '}
-        <button className="p-1 bg-gray-100 border border-black w-12" onClick={() => previousPage()} disabled={!canPreviousPage}>
-          {'<'}
-        </button>{' '}
-        <button className="p-1 bg-gray-100 border border-black w-12" onClick={() => nextPage()} disabled={!canNextPage}>
-          {'>'}
-        </button>{' '}
-        <button className="p-1 bg-gray-100 border border-black w-12" onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
-          {'>>'}
-        </button>{' '}
-        <span>
-          Page{' '}
-          <strong>
-            {pageIndex + 1} of {pageOptions.length}
-          </strong>{' '}
-        </span>
-        <span>
-          | Go to page:{' '}
-          <input
-            type="number"
-            defaultValue={pageIndex + 1}
-            onChange={e => {
-              const page = e.target.value ? Number(e.target.value) - 1 : 0
-              gotoPage(page)
-            }}
-            style={{ width: '100px' }}
+            </thead>
+            <tbody {...getTableBodyProps()}>
+              {page.map((row) => {
+                prepareRow(row);
+                return (
+                  <tr
+                    {...row.getRowProps()}
+                    className="hover:bg-gray-50 transition-colors"
+                  >
+                    {row.cells.map((cell) => (
+                      <td
+                        {...cell.getCellProps()}
+                        className="py-2 px-3 text-sm border-b border-gray-100"
+                      >
+                        {cell.render("Cell")}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        <div className="pt-2">
+          <PaginationControls
+            pageIndex={pageIndex}
+            pageCount={pageCount}
+            pageOptions={pageOptions}
+            canPreviousPage={canPreviousPage}
+            canNextPage={canNextPage}
+            gotoPage={gotoPage}
+            previousPage={previousPage}
+            nextPage={nextPage}
+            totalCount={data.length}
           />
-        </span>{' '}
-      </div>
-    </Flex>
-  )
-}
+        </div>
+      </Flex>
+    </Card>
+  );
+};
 
 export default MailerTable;

@@ -1,24 +1,51 @@
-import { Text, TextArea } from "@radix-ui/themes";
-import React, { useEffect, useMemo, useState } from "react";
+import { Flex, Text, TextArea } from "@radix-ui/themes";
+import { useEffect, useMemo, useState } from "react";
 
 export const TextInput = ({ setAddresses }) => {
-  // we store the user input in value
-  let [value, setValue] = useState("");
+  const [value, setValue] = useState("");
 
-  const addresses = useMemo(() => value.split("\n").filter((a) => a !== ""));
+  const addresses = useMemo(
+    () => value.split("\n").filter((a) => a.trim() !== ""),
+    [value]
+  );
+
+  const lineCount = value.split("\n").length;
+  const charCount = value.length;
 
   useEffect(() => {
     setAddresses(addresses);
-  }, [value]);
+  }, [value, addresses, setAddresses]);
 
   return (
-    <>
-      <Text weight="medium">Type one address per line</Text>
+    <Flex direction="column" gap="2">
+      <Text size="2" weight="medium">
+        Type or paste addresses
+      </Text>
+      <Text size="1" color="gray">
+        One address per line
+      </Text>
       <TextArea
         value={value}
         rows={8}
-        type="text"
-        onChange={(e) => setValue(e.target.value)} />
-    </>
+        placeholder={"123 Main St\n456 Oak Ave Apt 2\n789 Elm Blvd"}
+        onChange={(e) => setValue(e.target.value)}
+        className="font-mono text-sm"
+      />
+      <Flex justify="between" align="center" className="px-1">
+        <Text size="1" color="gray">
+          {charCount.toLocaleString()} characters
+        </Text>
+        <Flex gap="3">
+          <Text size="1" color="gray">
+            {lineCount} {lineCount === 1 ? "line" : "lines"}
+          </Text>
+          {addresses.length > 0 && (
+            <Text size="1" weight="medium" style={{ color: "#279989" }}>
+              {addresses.length} {addresses.length === 1 ? "address" : "addresses"}
+            </Text>
+          )}
+        </Flex>
+      </Flex>
+    </Flex>
   );
 };

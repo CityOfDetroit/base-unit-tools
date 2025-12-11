@@ -3,7 +3,6 @@ import {
   CubeIcon,
   DoubleArrowRightIcon,
   SewingPinIcon,
-  Link2Icon,
 } from "@radix-ui/react-icons";
 import { Box, Card, Flex, Inset, Text } from "@radix-ui/themes";
 import React from "react";
@@ -94,10 +93,10 @@ const FeatureTable = ({ layer, loading, feature, refetch }) => {
           align={"start"}
           justify={"between"}
           direction={"column"}
-          p={"3"}
-          mt={"3"}
-          gap={"4"}
-          className="max-h-72 sm:max-h-[30vh] md:max-h-[45vh] lg:max-h-[60vh] xl:max-h-[70vh] overflow-y-auto"
+          p={"2"}
+          mt={"2"}
+          gap={"3"}
+          className=""
         >
           {layer === "parcel" && <Parcel parcel={feature} loading={loading} />}
           {layer === "street" && <Street street={feature} />}

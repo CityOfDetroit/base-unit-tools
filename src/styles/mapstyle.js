@@ -1,9 +1,8 @@
 import layers from "../data/layers";
-import _ from "lodash";
 
 export const baseStyle = {
   version: 8,
-  sprite: "https://www.arcgis.com/sharing/rest/content/items/46d38d6a32ea412fb5fe4cc521ede94e/resources/sprites/sprite-1689510144076",
+  sprite: "https://www.arcgis.com/sharing/rest/content/items/4776d8df881443c48630a6e02d9d26f4/resources/sprites/sprite-1765410154274",
   glyphs:
     "https://basemaps.arcgis.com/arcgis/rest/services/World_Basemap_v2/VectorTileServer/resources/fonts/{fontstack}/{range}.pbf",
   sources: {
@@ -33,6 +32,22 @@ export const baseStyle = {
       "url": "https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitServices/VectorTileServer",
       "tiles": [
         "https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitServices/VectorTileServer/tile/{z}/{y}/{x}.pbf"
+      ]
+    },
+    bu_features: {
+      "type": "vector",
+      "bounds": [
+        -83.2878,
+        42.255,
+        -82.9105,
+        42.4504
+      ],
+      "minzoom": 0,
+      "maxzoom": 23,
+      "scheme": "xyz",
+      "url": "https://vectortileservices2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitFeatures_vector_tiles/VectorTileServer",
+      "tiles": [
+        "https://vectortileservices2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitFeatures_vector_tiles/VectorTileServer/tile/{z}/{y}/{x}.pbf"
       ]
     },
     bu_parcels: {
@@ -1049,7 +1064,7 @@ export const baseStyle = {
     {
       id: "building-fill",
       type: "fill",
-      source: "baseunits",
+      source: "bu_features",
       "source-layer": "buildings",
       interactive: true,
       minzoom: 12,
@@ -1074,7 +1089,7 @@ export const baseStyle = {
     {
       id: "building-linked",
       type: "fill",
-      source: "baseunits",
+      source: "bu_features",
       "source-layer": "buildings",
       minzoom: 11,
       filter: ["==", "id", ""],
@@ -1097,7 +1112,7 @@ export const baseStyle = {
     {
       id: "building-highlight",
       type: "line",
-      source: "baseunits",
+      source: "bu_features",
       "source-layer": "buildings",
       minzoom: 11,
       filter: ["==", "id", ""],
@@ -1129,7 +1144,7 @@ export const baseStyle = {
     {
       id: "address-highlight",
       type: "circle",
-      source: "baseunits",
+      source: "bu_features",
       "source-layer": "addresses",
       minzoom: 11,
       filter: ["==", "id", ""],
@@ -1154,7 +1169,7 @@ export const baseStyle = {
     {
       id: "address-linked",
       type: "circle",
-      source: "baseunits",
+      source: "bu_features",
       "source-layer": "addresses",
       minzoom: 11,
       filter: ["==", "id", ""],
@@ -1179,7 +1194,7 @@ export const baseStyle = {
     {
       id: "address-point",
       type: "circle",
-      source: "baseunits",
+      source: "bu_features",
       "source-layer": "addresses",
       minzoom: 13,
       layout: {
@@ -1200,7 +1215,7 @@ export const baseStyle = {
     },
     {
       id: "address-point-label",
-      source: "baseunits",
+      source: "bu_features",
       "source-layer": "addresses",
       type: "symbol",
       minzoom: 18,
@@ -1246,27 +1261,49 @@ export const baseStyle = {
     },
     {
       id: "mapillary-location",
+      type: "circle",
+      source: "mly",
+      "source-layer": "image",
+      filter: ["==", "id", ""],
+      layout: {
+        visibility: "visible",
+      },
+      paint: {
+        "circle-radius": {
+          base: 1,
+          stops: [
+            [14, 6],
+            [17, 10],
+            [19, 14],
+          ],
+        },
+        "circle-color": "#888",
+        "circle-opacity": 0.4,
+        "circle-stroke-color": "#fff",
+        "circle-stroke-width": 2,
+      },
+    },
+    {
+      id: "mapillary-direction",
       type: "symbol",
       source: "mly",
       "source-layer": "image",
       filter: ["==", "id", ""],
       layout: {
-        "icon-rotate": 0,
-        "icon-rotation-alignment": "map",
-        "icon-image": "video",
-        "icon-anchor": "center",
+        "icon-image": "videocamera",
         "icon-size": {
-          base: 1,
           stops: [
-            [13, 1],
-            [14, 1],
-            [17, 1],
-            [19, 3],
+            [14, 0.19],
+            [17, 0.25],
+            [19, 0.31],
           ],
         },
+        "icon-rotate": 0,
+        "icon-rotation-alignment": "map",
+        "icon-allow-overlap": true,
       },
       paint: {
-        "icon-opacity": 0.65,
+        "icon-opacity": 1,
       },
     },
     {
@@ -1340,7 +1377,7 @@ export const baseStyle = {
 // satelliteStyle()
 export const satelliteStyle = () => {
   // clone the baseStyle into a new object to we can make changes
-  let satStyle = _.cloneDeep(baseStyle);
+  let satStyle = JSON.parse(JSON.stringify(baseStyle));
 
   // set the satellite layer, which is first, to visible
   satStyle.layers[0].layout.visibility = "visible";
@@ -1392,7 +1429,7 @@ export const satelliteStyle = () => {
 
 export const linenStyle = () => {
   // clone the baseStyle into a new object to we can make changes
-  let linenStyle = _.cloneDeep(baseStyle);
+  let linenStyle = JSON.parse(JSON.stringify(baseStyle));
 
   // set the linenmap layer, which is second, to visible
   linenStyle.layers[0].layout.visibility = "none";
@@ -1416,7 +1453,7 @@ export const linenStyle = () => {
 
 export const darkStyle = () => {
   // clone the baseStyle into a new object to we can make changes
-  let darkStyle = _.cloneDeep(baseStyle);
+  let darkStyle = JSON.parse(JSON.stringify(baseStyle));
 
   // return the object
   return darkStyle;

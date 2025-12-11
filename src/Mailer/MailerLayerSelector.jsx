@@ -1,7 +1,8 @@
 import simplify from "@turf/simplify";
 import { useEffect, useState } from "react";
 import { queryFeatures } from "@esri/arcgis-rest-feature-service";
-import { Card, Select, Text, Flex, Button } from "@radix-ui/themes";
+import { Card, Select, Text, Flex } from "@radix-ui/themes";
+import { LayersIcon } from "@radix-ui/react-icons";
 
 const presets = {
   census_tracts: {
@@ -32,7 +33,7 @@ const presets = {
     name: "ZIP codes",
     singular: "zip code",
     pickColumn: "zipcode",
-    url: `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/ZipCodes/FeatureServer/0/`,
+    url: `https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/City_of_Detroit_Zip_Code_Tabulation_Areas/FeatureServer/0/`,
   },
   council_districts: {
     name: "Council Districts",
@@ -58,21 +59,23 @@ const MailerLayerSelector = ({ geom, setGeom }) => {
   const [currentLayer, setCurrentLayer] = useState("");
   const [layerFeatures, setLayerFeatures] = useState([]);
   const [currentFeature, setCurrentFeature] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (currentLayer !== "") {
+      setIsLoading(true);
       queryFeatures({
         url: presets[currentLayer].url,
         geometryPrecision: 5,
         f: "geojson",
       }).then((d) => {
-        // setLayerFeatures(d.features)
         let features = d.features.sort(
           (a, b) =>
             a.properties[presets[currentLayer].pickColumn] >
             b.properties[presets[currentLayer].pickColumn]
         );
         setLayerFeatures(features);
+        setIsLoading(false);
       });
     }
   }, [currentLayer]);
@@ -94,9 +97,16 @@ const MailerLayerSelector = ({ geom, setGeom }) => {
 
   return (
     <Card>
-      <Flex direction="column" gap="1">
-        <Text weight="medium">Choose from existing boundaries</Text>
-        <Text size="1">Choose your layer, then choose a feature within that layer.</Text>
+      <Flex direction="column" gap="2">
+        <Flex align="center" gap="2">
+          <LayersIcon width="16" height="16" className="text-gray-500" />
+          <Text size="2" weight="medium">
+            Choose from existing boundaries
+          </Text>
+        </Flex>
+        <Text size="1" color="gray">
+          Select a layer type, then choose a specific feature.
+        </Text>
 
         <Select.Root
           onValueChange={(value) => {
@@ -105,7 +115,7 @@ const MailerLayerSelector = ({ geom, setGeom }) => {
           }}
           value={currentLayer}
         >
-          <Select.Trigger />
+          <Select.Trigger placeholder="Select layer type..." />
           <Select.Content>
             {Object.keys(presets).map((l) => (
               <Select.Item value={l} key={l}>
@@ -114,18 +124,24 @@ const MailerLayerSelector = ({ geom, setGeom }) => {
             ))}
           </Select.Content>
         </Select.Root>
-        
+
+        {isLoading && (
+          <Text size="1" color="gray">
+            Loading features...
+          </Text>
+        )}
+
         {layerFeatures.length > 0 && (
           <Select.Root
             onValueChange={(value) => {
               setCurrentFeature(value);
             }}
           >
-            <Select.Trigger />
+            <Select.Trigger placeholder={`Select ${presets[currentLayer]?.singular || "feature"}...`} />
             <Select.Content>
               {layerFeatures.map((ft) => (
                 <Select.Item key={ft.id} value={ft.id}>
-                  {ft.properties[presets[currentLayer].pickColumn].slice(0, 40)}
+                  {ft.properties[presets[currentLayer].pickColumn]?.slice(0, 40) || `Feature ${ft.id}`}
                 </Select.Item>
               ))}
             </Select.Content>

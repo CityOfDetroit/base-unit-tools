@@ -1,63 +1,86 @@
-# Getting Started with Vite
+# Base Unit Tools
 
-This project uses [Vite](https://vitejs.dev/) for fast and optimized development.
+A City of Detroit web application for exploring and inspecting the city's base units: **addresses**, **parcels**, **buildings**, and **streets**.
 
-## Available Scripts
+**Live site:** https://base-unit-tools.netlify.app
 
-In the project directory, you can run:
+## What are Base Units?
 
-### `npm start`
+Base units are the fundamental geographic units used to describe Detroit. Every location in the city can be identified by its relationship to these four types:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Addresses** - Street addresses (e.g., 2 Woodward Ave)
+- **Parcels** - Land parcels identified by parcel ID
+- **Buildings** - Building footprints
+- **Streets** - Street segments
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Tools
 
-### `npm test`
+### Map Explorer (`/map`)
+Interactive map for inspecting base units. Click any feature to view its attributes and relationships.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Search by address, parcel ID, or intersection
+- Filter click interactions by mode (parcels, buildings, or streets)
+- View Mapillary street imagery with historical date selection
+- Drag the divider to resize panel widths
 
-### `npm run build`
+#### URL Parameters
 
-Builds the app for production to the `dist` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+| Parameter | Description | Example |
+|-----------|-------------|---------|
+| `id` | Feature ID to select | `id=01001234.` (parcel) or `id=12345` (building/street) |
+| `layer` | Layer type | `layer=parcel`, `layer=building`, `layer=street`, `layer=address` |
+| `mode` | Click interaction mode | `mode=all` (default), `mode=parcel`, `mode=building`, `mode=street` |
+| `streetview` | Open street view panel | `streetview=true` |
+| `streetviewdate` | Select imagery nearest to date | `streetviewdate=20240315` (YYYYMMDD format) |
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+**Example URLs:**
+- `/map?id=01001234.&layer=parcel` - View a specific parcel
+- `/map?id=12345&layer=building&streetview=true` - View building with street view open
+- `/map?id=01001234.&layer=parcel&streetview=true&streetviewdate=20230601` - Parcel with June 2023 imagery
 
-### `npm run serve`
+### Geocoder (`/geocoder`)
+Batch geocoding tool for enriching address data.
 
-Serves the production build from the `dist` folder.\
-Useful for previewing the production build locally.
+- Upload a CSV containing Detroit addresses
+- Each address is matched against the City's geocoder
+- Download results with parcel IDs, coordinates, council district, and other attributes
+- Supports partial matches and displays match quality scores
 
-## Learn More
+### Mailer (`/mailer`)
+*City employees only.* Generate mailing lists of property owners within a geographic area.
 
-You can learn more in the [Vite documentation](https://vitejs.dev/guide/).
+- Draw a polygon, line, or point on the map
+- Or select from preset boundaries (neighborhoods, council districts, etc.)
+- Apply buffers to expand or create ring-shaped selections
+- Download address lists as CSV for mail campaigns
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Development
 
-### Code Splitting
+```bash
+npm install    # Install dependencies
+npm start      # Start dev server at http://localhost:5173
+npm run build  # Production build to dist/
+npm run serve  # Preview production build
+```
 
-Vite automatically handles code splitting for you.
+## Tech Stack
 
-### Analyzing the Bundle Size
+- **React 18** + **Vite**
+- **MapLibre GL JS** for mapping
+- **Radix UI** + **Tailwind CSS** for styling
+- **ArcGIS REST APIs** for feature services and geocoding
+- **Mapillary** for street-level imagery
 
-You can use tools like [source-map-explorer](https://www.npmjs.com/package/source-map-explorer) to analyze the bundle size.
+## Deployment
 
-### Making a Progressive Web App
+Deployed to Netlify and Cloudflare Pages. Build output is the `dist/` folder.
 
-Vite does not include built-in support for making a Progressive Web App, but you can follow the [Vite PWA Plugin](https://vite-plugin-pwa.netlify.app/) guide to add this feature.
+## Data Sources
 
-### Advanced Configuration
+- Feature services hosted on ArcGIS Online (`services2.arcgis.com`)
+- City of Detroit Geocoder (`opengis.detroitmi.gov`)
+- Mapillary street imagery (captured by `codgis`)
 
-See the [Vite configuration guide](https://vitejs.dev/config/) for more advanced configuration options.
+## License
 
-### Deployment
-
-You can deploy the production build from the `dist` folder to any static hosting service.
-
-### `npm run build` fails to minify
-
-If `npm run build` fails to minify, see the [Vite troubleshooting guide](https://vitejs.dev/guide/troubleshooting.html).
+MIT License - see [LICENSE](LICENSE)
