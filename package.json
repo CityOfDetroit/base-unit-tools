@@ -39,7 +39,8 @@
     "react-table": "^7.8.0",
     "remark-gfm": "^4.0.1",
     "underscore": "^1.13.7",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "start": "vite",

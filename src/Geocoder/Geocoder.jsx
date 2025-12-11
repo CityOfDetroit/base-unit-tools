@@ -1,6 +1,6 @@
 import { bulkGeocode } from "@esri/arcgis-rest-geocoding";
 import { Promise } from "bluebird";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Card, Flex, Grid, Text } from "@radix-ui/themes";
 import { geocoderFields } from "../data/geocoderFields";
 import { geocoders } from "../hooks/useGeocoder";
@@ -8,17 +8,27 @@ import { CsvInput } from "./CsvInput";
 import { InputChoice } from "./InputChoice";
 import GeocoderOptions from "./GeocoderOptions";
 import GeocoderResults from "./GeocoderResults";
+import GeocoderStepper from "./GeocoderStepper";
+import GeocoderProgress from "./GeocoderProgress";
+import GeocoderSummary from "./GeocoderSummary";
 import { TextInput } from "./TextInput";
-import { CheckCircledIcon, LinkNone1Icon } from "@radix-ui/react-icons";
+import {
+  CheckCircledIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
+} from "@radix-ui/react-icons";
 import { addFeatures } from "@esri/arcgis-rest-feature-service";
 
 /**
  * This function chunks addresses in batches of 1000 and geocodes them.
- * @param {} addresses
- * @param {} setResults
- * @param {} setUnmatchedAddr
  */
-const fetchResults = (addresses, setResults, setUnmatchedAddr) => {
+const fetchResults = (
+  addresses,
+  setResults,
+  setUnmatchedAddr,
+  setProgress,
+  setIsGeocoding
+) => {
   let allResults = [];
   let failResults = [];
   let dataToSend = addresses.map((a, i) => {
@@ -26,12 +36,11 @@ const fetchResults = (addresses, setResults, setUnmatchedAddr) => {
   });
 
   const chunkSize = 1000;
-
   let allParams = [];
+  let completedChunks = 0;
 
   for (let i = 0; i < dataToSend.length; i += chunkSize) {
     const chunk = dataToSend.slice(i, i + chunkSize);
-
     allParams.push({
       addresses: chunk,
       endpoint: geocoders.prod,
@@ -42,35 +51,51 @@ const fetchResults = (addresses, setResults, setUnmatchedAddr) => {
     });
   }
 
+  setIsGeocoding(true);
+  setProgress({ current: 0, total: addresses.length, percent: 0 });
+
   Promise.map(
     allParams,
     (params) => {
-      return bulkGeocode(params);
+      return bulkGeocode(params).then((result) => {
+        // Update progress as each batch completes
+        allResults = allResults.concat(result.locations);
+        completedChunks++;
+        const processedCount = Math.min(
+          completedChunks * chunkSize,
+          addresses.length
+        );
+        setProgress({
+          current: processedCount,
+          total: addresses.length,
+          percent: Math.round((processedCount / addresses.length) * 100),
+        });
+        return result;
+      });
     },
     { concurrency: 3 }
   )
-    .each((f) => {
-      allResults = allResults.concat(f.locations);
-            })
     .then(() => {
       setResults(
         allResults.sort((a, b) => a.attributes.ResultID - b.attributes.ResultID)
+      );
+      setIsGeocoding(false);
 
-      )
       // extract locations where geocode fails (address_id=0)
       for (let res in allResults) {
-        let resID = allResults[res].attributes.ResultID - 1
-        if (allResults[res].attributes.address_id == 0 &&
+        let resID = allResults[res].attributes.ResultID - 1;
+        if (
+          allResults[res].attributes.address_id == 0 &&
           addresses[resID].trim().length > 0
-        ){
-          let input = addresses[resID]; // index input address
-          // build object
-          let inputAttributes = {attributes:
-            {input_address: input,
+        ) {
+          let input = addresses[resID];
+          let inputAttributes = {
+            attributes: {
+              input_address: input,
               street_number_result: allResults[res].attributes.AddNum,
               prefix_direction_result: allResults[res].attributes.StDir,
               street_name_result: allResults[res].attributes.StName,
-              street_type_result: allResults[res].attributes.StType,  
+              street_type_result: allResults[res].attributes.StType,
               match_address_result: allResults[res].attributes.Match_addr,
               sub_address_result: allResults[res].attributes.SubAddr,
               address_id_result: allResults[res].attributes.address_id,
@@ -81,35 +106,32 @@ const fetchResults = (addresses, setResults, setUnmatchedAddr) => {
               match_type_result: allResults[res].attributes.Addr_type,
               score_result: allResults[res].attributes.Score,
               lon_result: allResults[res].attributes.X,
-              lat_result: allResults[res].attributes.Y
-            }};   
-          // concat to array       
+              lat_result: allResults[res].attributes.Y,
+            },
+          };
           failResults = failResults.concat(inputAttributes);
-        }; 
+        }
       }
-      setUnmatchedAddr(failResults)
-    }
-    )
+      setUnmatchedAddr(failResults);
+    });
 };
 
-/**
- * 
- * @param {} unmatched 
- */
 const failedAddressUpload = (unmatched) => {
-  let url = "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Base_Units_Geocoder_Failures_view/FeatureServer/0";
+  let url =
+    "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Base_Units_Geocoder_Failures_view/FeatureServer/0";
   addFeatures({
     url: url,
-    features: unmatched
+    features: unmatched,
   });
-
 };
 
+const Geocoder = () => {
+  // Step state
+  const [currentStep, setCurrentStep] = useState(1);
 
-const Geocoder = ({ session, setSession, login, setLogin }) => {
   // csv upload
   let [csv, setCsv] = useState(null);
-  // and split on a newline to get a list of addresses to geocode
+  // addresses to geocode
   let [addresses, setAddresses] = useState([]);
 
   // create a default options object
@@ -118,7 +140,7 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
     matched: true,
     coords: true,
     ids: true,
-    related_parcel: false
+    related_parcel: false,
   };
 
   // add the geocoderFields to the options object
@@ -136,6 +158,10 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
 
   // container for unmatched addresses
   let [unmatchedAddr, setUnmatchedAddr] = useState([]);
+
+  // geocoding state
+  let [isGeocoding, setIsGeocoding] = useState(false);
+  let [progress, setProgress] = useState({ current: 0, total: 0, percent: 0 });
 
   // state to display "geocode addresses" button
   let [geocoded, setGeocoded] = useState(false);
@@ -156,35 +182,91 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
 
   useEffect(() => {
     if (payload.length > 0) {
-      fetchResults(addresses, setResults, setUnmatchedAddr);
+      fetchResults(
+        addresses,
+        setResults,
+        setUnmatchedAddr,
+        setProgress,
+        setIsGeocoding
+      );
       setGeocoded(true);
+      setCurrentStep(3);
     }
   }, [payload]);
 
   useEffect(() => {
-    if(geocoded && unmatchedAddr.length > 0) {
+    if (geocoded && unmatchedAddr.length > 0) {
       failedAddressUpload(unmatchedAddr);
       setUnmatchedAddr([]);
-    };
-  },[unmatchedAddr]);
+    }
+  }, [unmatchedAddr]);
 
   useEffect(() => {
     setGeocoded(false);
   }, [addresses]);
 
-  return (
-    <>
-      <Grid
-        columns={{ initial: "1fr", sm: "1fr 3fr" }}
-        gap={{ initial: "0", sm: "4" }}
-        p={{ initial: "0", sm: "2", lg: "4" }}
-      >
-        <Flex direction={"column"} className="min-w-96" gap="2">
-          <Text size={"5"}>Geocoder</Text>
+  // Navigation helpers
+  const canNavigateTo = (step) => {
+    if (step === 1) return true;
+    if (step === 2) return addresses.length > 0;
+    if (step === 3) return results.length > 0;
+    return false;
+  };
 
+  const handleNext = () => {
+    if (currentStep === 1 && addresses.length > 0) {
+      setCurrentStep(2);
+    } else if (currentStep === 2) {
+      // Trigger geocoding
+      if (addresses.length > 0 && !geocoded) {
+        setPayload(addresses);
+      }
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleStartOver = () => {
+    setCsv(null);
+    setAddresses([]);
+    setPayload([]);
+    setResults([]);
+    setUnmatchedAddr([]);
+    setGeocoded(false);
+    setIsGeocoding(false);
+    setProgress({ current: 0, total: 0, percent: 0 });
+    setCurrentStep(1);
+  };
+
+  return (
+    <Grid
+      columns={{ initial: "1fr", sm: "1fr 3fr" }}
+      gap={{ initial: "0", sm: "4" }}
+      p={{ initial: "2", sm: "2", lg: "4" }}
+    >
+      {/* Left Sidebar */}
+      <Flex direction="column" className="min-w-80" gap="3">
+        <Text size="5" weight="bold" className="text-[#004445]">
+          Geocoder
+        </Text>
+
+        <GeocoderStepper
+          currentStep={currentStep}
+          setCurrentStep={setCurrentStep}
+          canNavigateTo={canNavigateTo}
+        />
+
+        {/* Step 1: Input */}
+        {currentStep === 1 && (
           <Card>
-            <Flex gap={"2"} direction="column">
-              <Text weight="bold">Address input</Text>
+            <Flex gap="3" direction="column">
+              <Text weight="bold" size="3">
+                Address Input
+              </Text>
               <InputChoice setOptions={setOptions} options={options} />
               {options.mode === "upload" && (
                 <CsvInput {...{ setCsv, csv, addresses, setAddresses }} />
@@ -192,41 +274,111 @@ const Geocoder = ({ session, setSession, login, setLogin }) => {
               {options.mode === "manual" && <TextInput {...{ setAddresses }} />}
             </Flex>
           </Card>
+        )}
 
+        {/* Step 2: Options */}
+        {currentStep === 2 && (
           <GeocoderOptions {...{ options, setOptions }} />
-          {addresses.length > 0 && !geocoded && (
-            <Button
-              size={"1"}
-              active={addresses.length > 0}
-              //disabled={addresses.length === 0}
-              onClick={() => {
-                addresses.length > 0 && setPayload(addresses);
-              }}
-            >
-              <Text>
-                {addresses.length > 0
-                  ? payload.length > 0 && results.length === 0
-                    ? `Geocoding...`
-                    : `Geocode ${addresses.length} addresses`
-                  : "Input addresses to geocode"}
+        )}
+
+        {/* Step 3: Results Summary in Sidebar */}
+        {currentStep === 3 && results.length > 0 && (
+          <Card>
+            <Flex direction="column" gap="2">
+              <Text weight="bold" size="3">
+                Geocoding Complete
               </Text>
-              <CheckCircledIcon />
+              <Text size="2" color="gray">
+                View your results in the panel to the right. You can go back to
+                modify your input or options and re-run.
+              </Text>
+              <Button
+                variant="outline"
+                size="2"
+                onClick={handleStartOver}
+                className="mt-2"
+              >
+                Start Over
+              </Button>
+            </Flex>
+          </Card>
+        )}
+
+        {/* Navigation Buttons */}
+        <Flex gap="2" justify="between" className="mt-2">
+          {currentStep > 1 && (
+            <Button variant="soft" size="2" onClick={handleBack}>
+              <ArrowLeftIcon />
+              Back
+            </Button>
+          )}
+          {currentStep === 1 && addresses.length > 0 && (
+            <Button
+              size="2"
+              onClick={handleNext}
+              className="ml-auto"
+              style={{ backgroundColor: "#004445" }}
+            >
+              Next: Options
+              <ArrowRightIcon />
+            </Button>
+          )}
+          {currentStep === 2 && (
+            <Button
+              size="2"
+              onClick={handleNext}
+              disabled={addresses.length === 0 || isGeocoding}
+              className="ml-auto"
+              style={{ backgroundColor: "#004445" }}
+            >
+              {isGeocoding ? (
+                "Geocoding..."
+              ) : (
+                <>
+                  Geocode {addresses.length} addresses
+                  <CheckCircledIcon />
+                </>
+              )}
             </Button>
           )}
         </Flex>
+      </Flex>
 
-        {results.length > 0 && (
-          <GeocoderResults
-            results={results}
-            addresses={payload}
-            options={options}
-            geocoderFields={geocoderFields}
-            setUnmatchedAddr={setUnmatchedAddr}
-            csv={csv}
-          />
+      {/* Right Column - Results */}
+      <Flex direction="column" gap="3" className="min-h-96 min-w-0 overflow-hidden">
+        {isGeocoding && <GeocoderProgress progress={progress} />}
+
+        {results.length > 0 && !isGeocoding && (
+          <>
+            <GeocoderSummary results={results} addresses={payload} />
+            <GeocoderResults
+              results={results}
+              addresses={payload}
+              options={options}
+              geocoderFields={geocoderFields}
+              setUnmatchedAddr={setUnmatchedAddr}
+              csv={csv}
+            />
+          </>
         )}
-      </Grid>
-    </>
+
+        {!isGeocoding && results.length === 0 && (
+          <Flex
+            direction="column"
+            align="center"
+            justify="center"
+            className="h-full min-h-64 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200"
+          >
+            <Text size="3" color="gray" weight="medium">
+              Results will appear here
+            </Text>
+            <Text size="2" color="gray" className="mt-1">
+              Enter addresses and configure options to get started
+            </Text>
+          </Flex>
+        )}
+      </Flex>
+    </Grid>
   );
 };
 

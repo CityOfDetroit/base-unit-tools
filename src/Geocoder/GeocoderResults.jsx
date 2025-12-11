@@ -1,7 +1,7 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { CSVLink } from "react-csv";
-import { usePagination, useTable } from "react-table";
-import { Button, Flex, Text } from "@radix-ui/themes";
+import { usePagination, useTable, useSortBy } from "react-table";
+import { Button, Flex, Text, Badge, SegmentedControl } from "@radix-ui/themes";
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
@@ -9,10 +9,13 @@ import {
   DoubleArrowRightIcon,
   DownloadIcon,
   ExclamationTriangleIcon,
+  CheckCircledIcon,
+  CaretSortIcon,
+  CaretUpIcon,
+  CaretDownIcon,
 } from "@radix-ui/react-icons";
-import { Link } from "react-router-dom";
 
-let exclude_census = ['census_block_2010', 'census_block_2020']
+let exclude_census = ["census_block_2010", "census_block_2020"];
 
 const GeocoderResults = ({
   results,
@@ -22,31 +25,64 @@ const GeocoderResults = ({
   setUnmatchedAddr,
   csv,
 }) => {
+  const [filterMode, setFilterMode] = useState("all");
+
+  // Filter results based on mode
+  const filteredResults = useMemo(() => {
+    if (filterMode === "all") return results;
+    if (filterMode === "matched")
+      return results.filter((r) => r.attributes.StAddr !== "");
+    if (filterMode === "unmatched")
+      return results.filter((r) => r.attributes.StAddr === "");
+    return results;
+  }, [results, filterMode]);
+
   let cols = [
     {
       accessor: "input",
       Header: "Input",
-      Cell: (row) => <div className="w-32">{row.value}</div>,
+      Cell: (row) => (
+        <div className="max-w-[200px] truncate" title={row.value}>
+          {row.value}
+        </div>
+      ),
     },
     {
       accessor: "StAddr",
       Header: "Match",
       Cell: (row) =>
         row.value !== "" ? (
-          <div className="w-32">
-            <span className="">{row.value}</span>
+          <div className="max-w-[200px] truncate" title={row.value}>
+            {row.value}
           </div>
         ) : (
-          <div className="w-32">
-            <ExclamationTriangleIcon
-              className="ml-1 text-gray-500 hover:text-gray-700"
-              onClick={() => {
-                setUnmatchedAddr(row.row.values.input);
-              }}
-            />
-          </div>
+          <Flex align="center" gap="1">
+            <ExclamationTriangleIcon className="text-red-500" />
+            <Text size="1" color="red">
+              No match
+            </Text>
+          </Flex>
         ),
     },
+    {
+      accessor: "matchStatus",
+      Header: "Status",
+      Cell: (row) => (
+        <Badge
+          color={row.row.original.StAddr !== "" ? "green" : "red"}
+          variant="soft"
+          size="1"
+        >
+          {row.row.original.StAddr !== "" ? "Matched" : "Unmatched"}
+        </Badge>
+      ),
+    },
+  ];
+
+  // These columns are hidden on mobile
+  const desktopOnlyCols = [];
+
+  desktopOnlyCols.push(
     {
       accessor: "AddNum",
       Header: "Street #",
@@ -54,7 +90,7 @@ const GeocoderResults = ({
     },
     {
       accessor: "StPreDir",
-      Header: "Street Prefix",
+      Header: "Prefix",
       Cell: (row) => <span className="tracking-tight">{row.value}</span>,
     },
     {
@@ -64,7 +100,7 @@ const GeocoderResults = ({
     },
     {
       accessor: "StType",
-      Header: "Street Type",
+      Header: "Type",
       Cell: (row) => <span className="tracking-tight">{row.value}</span>,
     },
     {
@@ -74,23 +110,28 @@ const GeocoderResults = ({
     },
     {
       accessor: "UnitName",
-      Header: "Unit Name",
+      Header: "Unit #",
       Cell: (row) => <span className="tracking-tight">{row.value}</span>,
     },
     {
       accessor: "Postal",
-      Header: "Zip Code",
+      Header: "Zip",
       Cell: (row) => <span className="tracking-tight">{row.value}</span>,
-    },
-  ];
+    }
+  );
 
   if (options.ids) {
-    cols = cols.concat([
+    desktopOnlyCols.push(
       {
         accessor: "address_id",
         Header: "Address ID",
         Cell: (row) => (
-          <a target={`_blank`} href={`/map?id=${row.value}&layer=address`}>
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href={`/map?id=${row.value}&layer=address`}
+            className="text-blue-600 hover:underline"
+          >
             {row.value}
           </a>
         ),
@@ -99,17 +140,26 @@ const GeocoderResults = ({
         accessor: "building_id",
         Header: "Building ID",
         Cell: (row) => (
-          <a target={`_blank`} href={`/map?id=${row.value}&layer=building`}>
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href={`/map?id=${row.value}&layer=building`}
+            className="text-blue-600 hover:underline"
+          >
             {row.value}
           </a>
         ),
       },
       {
         accessor: "parcel_id",
-        maxWidth: 15,
         Header: "Parcel ID",
         Cell: (row) => (
-          <a target={`_blank`} href={`/map?id=${row.value}&layer=parcel`}>
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href={`/map?id=${row.value}&layer=parcel`}
+            className="text-blue-600 hover:underline"
+          >
             {row.value}
           </a>
         ),
@@ -118,18 +168,24 @@ const GeocoderResults = ({
         accessor: "street_id",
         Header: "Street ID",
         Cell: (row) => (
-          <a target={`_blank`} href={`/map?id=${row.value}&layer=street`}>
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href={`/map?id=${row.value}&layer=street`}
+            className="text-blue-600 hover:underline"
+          >
             {row.value}
           </a>
         ),
-      },
-    ]);
+      }
+    );
   }
 
   if (options.coords) {
-    cols = cols.concat([
+    desktopOnlyCols.push(
       {
-        accessor: (row) => row.Y.toFixed(5),
+        accessor: (row) => row.Y?.toFixed(5),
+        id: "lat",
         Header: "Lat",
         Cell: (row) => (
           <span className="tracking-tight">
@@ -138,95 +194,106 @@ const GeocoderResults = ({
         ),
       },
       {
-        accessor: (row) => row.X.toFixed(5),
+        accessor: (row) => row.X?.toFixed(5),
+        id: "lon",
         Header: "Lon",
         Cell: (row) => (
           <span className="tracking-tight">
             {row.value < 0 ? row.value : null}
           </span>
         ),
-      },
-    ]);
+      }
+    );
   }
 
   if (options.related_parcel) {
-    cols = cols.concat([
-      {
-        accessor: "related_parcel",
-        Header: "Related Parcel",
-        Cell: (row) => (
-            <a target={`_blank`} href={`/map?id=${row.value}&layer=parcel`}>
-            {row.value}
-          </a>
-          )
-      }]);
+    desktopOnlyCols.push({
+      accessor: "related_parcel",
+      Header: "Related Parcel",
+      Cell: (row) => (
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href={`/map?id=${row.value}&layer=parcel`}
+          className="text-blue-600 hover:underline"
+        >
+          {row.value}
+        </a>
+      ),
+    });
   }
 
   geocoderFields.forEach((cf) => {
-    if ((options[cf.name]) & !(exclude_census.includes(cf.name))) {
-      cols.push({ accessor: cf.geocoderColumn, Header: cf.display });
+    if (options[cf.name] && !exclude_census.includes(cf.name)) {
+      desktopOnlyCols.push({ accessor: cf.geocoderColumn, Header: cf.display });
     }
   });
 
   if (options.census_block_2020) {
-    cols = cols.concat([
-       {
-         accessor: (row) => row.census_block_geoid_2020.toString().slice(0, 2),
-         Header: "Census State 2020",
-         Cell: (row) => <span className="tracking-tight">{row.value}</span>
-       },
-       {
-         accessor: (row) => row.census_block_geoid_2020.toString().slice(2, 5),
-         Header: "Census County 2020",
-         Cell: (row) => <span className="tracking-tight">{row.value}</span>
-       },
-       {
-         accessor: (row) => row.census_block_geoid_2020.toString().slice(5, 11),
-         Header: "Census Tract 2020",
-         Cell: (row) => <span className="tracking-tight">{row.value}</span>
-       },
-       {
-         accessor: (row) => row.census_block_geoid_2020.toString(),
-         Header: "Census GEOID 2020",
-         Cell: (row) => <span className="tracking-tight">{row.value}</span>
-       },
+    desktopOnlyCols.push(
+      {
+        accessor: (row) => row.census_block_geoid_2020?.toString().slice(0, 2),
+        id: "census_state_2020",
+        Header: "State 2020",
+      },
+      {
+        accessor: (row) => row.census_block_geoid_2020?.toString().slice(2, 5),
+        id: "census_county_2020",
+        Header: "County 2020",
+      },
+      {
+        accessor: (row) => row.census_block_geoid_2020?.toString().slice(5, 11),
+        id: "census_tract_2020",
+        Header: "Tract 2020",
+      },
+      {
+        accessor: (row) => row.census_block_geoid_2020?.toString(),
+        id: "census_geoid_2020",
+        Header: "GEOID 2020",
+      }
+    );
+  }
 
-     ]);
- }
+  if (options.census_block_2010) {
+    desktopOnlyCols.push(
+      {
+        accessor: (row) => row.census_block_geoid_2010?.toString().slice(0, 2),
+        id: "census_state_2010",
+        Header: "State 2010",
+      },
+      {
+        accessor: (row) => row.census_block_geoid_2010?.toString().slice(2, 5),
+        id: "census_county_2010",
+        Header: "County 2010",
+      },
+      {
+        accessor: (row) => row.census_block_geoid_2010?.toString().slice(5, 11),
+        id: "census_tract_2010",
+        Header: "Tract 2010",
+      },
+      {
+        accessor: (row) => row.census_block_geoid_2010?.toString(),
+        id: "census_geoid_2010",
+        Header: "GEOID 2010",
+      }
+    );
+  }
 
- if (options.census_block_2010){
-   cols = cols.concat([
-     {
-       accessor: (row) => row.census_block_geoid_2010.toString().slice(0, 2),
-       Header: "Census State 2010",
-       Cell: (row) => <span className="tracking-tight">{row.value}</span>
-     },
-     {
-       accessor: (row) => row.census_block_geoid_2010.toString().slice(2, 5),
-       Header: "Census County 2010",
-       Cell: (row) => <span className="tracking-tight">{row.value}</span>
-     },
-     {
-       accessor: (row) => row.census_block_geoid_2010.toString().slice(5, 11),
-       Header: "Census Tract 2010",
-       Cell: (row) => <span className="tracking-tight">{row.value}</span>
-     },
-     {
-       accessor: (row) => row.census_block_geoid_2010.toString(),
-       Header: "Census GEOID 2010",
-       Cell: (row) => <span className="tracking-tight">{row.value}</span>
-     },
-   ]);
- }
+  // Combine cols - mobile shows only first 3, desktop shows all
+  const allCols = [...cols, ...desktopOnlyCols];
 
-  results.forEach((res, idx) => {
+  filteredResults.forEach((res, idx) => {
     res.attributes.input = addresses[idx];
     if (res.attributes.address_id === 0) {
       res.attributes.address_id = null;
     }
   });
-  let columns = useMemo(() => cols, [results, options]);
-  let data = useMemo(() => results.map((r) => r.attributes), [results]);
+
+  let columns = useMemo(() => allCols, [filteredResults, options]);
+  let data = useMemo(
+    () => filteredResults.map((r) => r.attributes),
+    [filteredResults]
+  );
 
   const {
     getTableProps,
@@ -242,21 +309,20 @@ const GeocoderResults = ({
     gotoPage,
     nextPage,
     previousPage,
-    setPageSize,
-    state: { pageIndex, pageSize },
+    state: { pageIndex },
   } = useTable(
     {
       columns,
       data,
       initialState: { pageIndex: 0, pageSize: 10 },
     },
+    useSortBy,
     usePagination
   );
 
-  //
+  // Export data preparation
   let dataForExcelExport = rows.map((row, idx) => {
     let newRow = { ...row.values };
-
     newRow["Address"] = newRow["StAddr"];
     delete newRow["StAddr"];
     newRow["Street Number"] = newRow["AddNum"];
@@ -273,6 +339,7 @@ const GeocoderResults = ({
     delete newRow["UnitName"];
     newRow["Zip Code"] = newRow["Postal"];
     delete newRow["Postal"];
+    delete newRow["matchStatus"];
 
     if (newRow.parcel_id) {
       newRow.parcel_id = `=""${newRow.parcel_id}""`;
@@ -288,7 +355,6 @@ const GeocoderResults = ({
 
   let dataForCsvExport = rows.map((row, idx) => {
     let newRow = { ...row.values };
-
     newRow["Address"] = newRow["StAddr"];
     delete newRow["StAddr"];
     newRow["Street Number"] = newRow["AddNum"];
@@ -305,6 +371,7 @@ const GeocoderResults = ({
     delete newRow["UnitName"];
     newRow["Zip Code"] = newRow["Postal"];
     delete newRow["Postal"];
+    delete newRow["matchStatus"];
 
     if (newRow.parcel_id) {
       newRow.parcel_id = `${newRow.parcel_id}`;
@@ -318,143 +385,195 @@ const GeocoderResults = ({
     return newRow;
   });
 
-  return (
-    <Flex direction="column" p={"2"} gap="2" className="overflow-auto">
-      <Text size={"4"}>Results</Text>
-      <Flex direction={{initial: "column", sm:"row"}} gap={"3"} align={{initial: "start", sm: "center"}} justify={"start"}>
-        <Text size={"1"} weight="bold">
-          {results.filter((r) => r.attributes.StAddr !== "").length}/
-          {addresses.length} matches
-        </Text>
-        <Text size={"1"} weight="medium">
-          {(
-            (results.filter((r) => r.attributes.StAddr !== "").length * 100) /
-            addresses.length
-          ).toFixed(1)}
-          % rate
-        </Text>
+  const matchedCount = results.filter((r) => r.attributes.StAddr !== "").length;
+  const unmatchedCount = results.length - matchedCount;
 
-        <CSVLink
-          data={dataForExcelExport}
-          filename={`geocode_results_${new Date().getTime()}.csv`}
+  return (
+    <Flex direction="column" gap="3" className="overflow-hidden min-w-0">
+      {/* Filter and Download Controls */}
+      <Flex
+        direction={{ initial: "column", sm: "row" }}
+        gap="3"
+        align={{ initial: "stretch", sm: "center" }}
+        justify="between"
+        className="flex-wrap"
+      >
+        {/* Filter Tabs */}
+        <SegmentedControl.Root
+          value={filterMode}
+          onValueChange={setFilterMode}
+          size="1"
         >
-          <Button
-            active={results.length > 0}
-            disabled={results.length === 0}
-            size={"1"}
+          <SegmentedControl.Item value="all">
+            All ({results.length})
+          </SegmentedControl.Item>
+          <SegmentedControl.Item value="matched">
+            <Flex align="center" gap="1">
+              <CheckCircledIcon width="12" height="12" className="text-green-600" />
+              Matched ({matchedCount})
+            </Flex>
+          </SegmentedControl.Item>
+          <SegmentedControl.Item value="unmatched">
+            <Flex align="center" gap="1">
+              <ExclamationTriangleIcon width="12" height="12" className="text-red-500" />
+              Unmatched ({unmatchedCount})
+            </Flex>
+          </SegmentedControl.Item>
+        </SegmentedControl.Root>
+
+        {/* Download Buttons */}
+        <Flex gap="2">
+          <CSVLink
+            data={dataForExcelExport}
+            filename={`geocode_results_${new Date().getTime()}.csv`}
           >
-            <DownloadIcon />
-            <Text>Download .csv for Excel</Text>
-          </Button>
-        </CSVLink>
-        <CSVLink
-          data={dataForCsvExport}
-          filename={`geocode_results_${new Date().getTime()}.csv`}
-        >
-          <Button
-            active={results.length > 0}
-            disabled={results.length === 0}
-            size={"1"}
+            <Button variant="soft" size="1">
+              <DownloadIcon />
+              Excel CSV
+            </Button>
+          </CSVLink>
+          <CSVLink
+            data={dataForCsvExport}
+            filename={`geocode_results_${new Date().getTime()}.csv`}
           >
-            <DownloadIcon />
-            <Text>Download .csv</Text>
-          </Button>
-        </CSVLink>
+            <Button variant="soft" size="1">
+              <DownloadIcon />
+              Standard CSV
+            </Button>
+          </CSVLink>
+        </Flex>
       </Flex>
-      <div className="overflow-auto">
-        <table {...getTableProps()} className="text-xs overflow-auto">
-          <thead>
+
+      {/* Results Table */}
+      <div className="overflow-x-auto border rounded-lg max-w-full">
+        <table {...getTableProps()} className="text-xs min-w-max">
+          <thead className="sticky top-0 z-10 bg-white">
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column) => (
+                {headerGroup.headers.map((column, colIdx) => (
                   <th
-                    {...column.getHeaderProps()}
-                    className="bg-gray-300 p-2 text-gray-600 tracking-tight leading-3 text-left border-r-2 border-gray-100"
+                    {...column.getHeaderProps(column.getSortByToggleProps())}
+                    className={`
+                      bg-gray-100 p-2 text-gray-700 tracking-tight leading-3 text-left
+                      border-b border-gray-200 cursor-pointer hover:bg-gray-200 transition-colors
+                      whitespace-nowrap
+                      ${colIdx > 2 ? "hidden sm:table-cell" : ""}
+                    `}
                   >
-                    {column.render("Header")}
+                    <Flex align="center" gap="1">
+                      {column.render("Header")}
+                      {column.isSorted ? (
+                        column.isSortedDesc ? (
+                          <CaretDownIcon width="12" height="12" />
+                        ) : (
+                          <CaretUpIcon width="12" height="12" />
+                        )
+                      ) : (
+                        <CaretSortIcon
+                          width="12"
+                          height="12"
+                          className="text-gray-400"
+                        />
+                      )}
+                    </Flex>
                   </th>
                 ))}
-                <th></th>
               </tr>
             ))}
           </thead>
 
           <tbody {...getTableBodyProps()}>
-            {page.map((row, i) => {
+            {page.map((row) => {
               prepareRow(row);
+              const isUnmatched = row.values.StAddr === "";
               return (
                 <tr
                   {...row.getRowProps()}
-                  className={
-                    row.values.StAddr === "" ? "bg-red-50 h-12" : "h-12"
-                  }
+                  className={`
+                    h-10 hover:bg-gray-50 transition-colors
+                    ${isUnmatched ? "bg-red-50/50" : ""}
+                  `}
                 >
-                  {row.cells.map((cell) => {
-                    return (
-                      <td
-                        {...cell.getCellProps()}
-                        className="px-2 border border-bottom-1"
-                      >
-                        {cell.render("Cell")}
-                      </td>
-                    );
-                  })}
+                  {row.cells.map((cell, cellIdx) => (
+                    <td
+                      {...cell.getCellProps()}
+                      className={`
+                        px-2 py-1 border-b border-gray-100
+                        ${cellIdx > 2 ? "hidden sm:table-cell" : ""}
+                      `}
+                    >
+                      {cell.render("Cell")}
+                    </td>
+                  ))}
                 </tr>
               );
             })}
           </tbody>
         </table>
       </div>
-      <Flex align="center" justify={"between"}>
-        <div>
-          <button
-            className="bg-gray-300 hover:bg-gray-200 p-3"
+
+      {/* Pagination */}
+      <Flex align="center" justify="between" className="flex-wrap gap-2">
+        <Flex gap="1">
+          <Button
+            variant="soft"
+            size="1"
             onClick={() => gotoPage(0)}
             disabled={!canPreviousPage}
           >
             <DoubleArrowLeftIcon />
-          </button>
-          <button
-            className="bg-gray-300 hover:bg-gray-200 p-3"
+          </Button>
+          <Button
+            variant="soft"
+            size="1"
             onClick={() => previousPage()}
             disabled={!canPreviousPage}
           >
             <ArrowLeftIcon />
-          </button>
-        </div>
-        <div>
-          <strong>
-            {pageIndex + 1} of {pageOptions.length}
-          </strong>{" "}
-          <span>
-            | Go to page:
+          </Button>
+        </Flex>
+
+        <Flex align="center" gap="2">
+          <Text size="2">
+            Page <strong>{pageIndex + 1}</strong> of{" "}
+            <strong>{pageOptions.length}</strong>
+          </Text>
+          <Flex align="center" gap="1">
+            <Text size="1" color="gray">
+              Go to:
+            </Text>
             <input
               type="number"
+              min={1}
+              max={pageCount}
               defaultValue={pageIndex + 1}
               onChange={(e) => {
                 const page = e.target.value ? Number(e.target.value) - 1 : 0;
                 gotoPage(page);
               }}
-              className="p-2 w-24"
+              className="w-16 px-2 py-1 text-sm border rounded"
             />
-          </span>
-        </div>
-        <div className="flex items-center">
-          <button
+          </Flex>
+        </Flex>
+
+        <Flex gap="1">
+          <Button
+            variant="soft"
+            size="1"
             onClick={() => nextPage()}
             disabled={!canNextPage}
-            className="bg-gray-300 hover:bg-gray-200 p-3"
           >
             <ArrowRightIcon />
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="soft"
+            size="1"
             onClick={() => gotoPage(pageCount - 1)}
             disabled={!canNextPage}
-            className="bg-gray-300 hover:bg-gray-200 p-3"
           >
             <DoubleArrowRightIcon />
-          </button>
-        </div>
+          </Button>
+        </Flex>
       </Flex>
     </Flex>
   );
