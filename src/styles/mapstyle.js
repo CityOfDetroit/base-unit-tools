@@ -1,5 +1,4 @@
 import layers from "../data/layers";
-import _ from "lodash";
 
 export const baseStyle = {
   version: 8,
@@ -1362,7 +1361,7 @@ export const baseStyle = {
 // satelliteStyle()
 export const satelliteStyle = () => {
   // clone the baseStyle into a new object to we can make changes
-  let satStyle = _.cloneDeep(baseStyle);
+  let satStyle = JSON.parse(JSON.stringify(baseStyle));
 
   // set the satellite layer, which is first, to visible
   satStyle.layers[0].layout.visibility = "visible";
@@ -1414,7 +1413,7 @@ export const satelliteStyle = () => {
 
 export const linenStyle = () => {
   // clone the baseStyle into a new object to we can make changes
-  let linenStyle = _.cloneDeep(baseStyle);
+  let linenStyle = JSON.parse(JSON.stringify(baseStyle));
 
   // set the linenmap layer, which is second, to visible
   linenStyle.layers[0].layout.visibility = "none";
@@ -1438,7 +1437,7 @@ export const linenStyle = () => {
 
 export const darkStyle = () => {
   // clone the baseStyle into a new object to we can make changes
-  let darkStyle = _.cloneDeep(baseStyle);
+  let darkStyle = JSON.parse(JSON.stringify(baseStyle));
 
   // return the object
   return darkStyle;
