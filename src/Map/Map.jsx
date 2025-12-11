@@ -125,14 +125,24 @@ const MapComponent = ({
         setClickedFeatures(features);
       });
 
-      map.on("moveend", () => {
-        if (mapInstance.current.getZoom() > 16.5) {
-          let features = map.queryRenderedFeatures({
+      // Query Mapillary images when zoom is sufficient
+      const queryMapillaryImages = () => {
+        if (mapInstance.current && mapInstance.current.getZoom() > 16.5) {
+          let features = mapInstance.current.queryRenderedFeatures({
             layers: ["mapillary-images"],
           });
           setSvImages(features);
         } else {
           setSvImages([]);
+        }
+      };
+
+      map.on("moveend", queryMapillaryImages);
+
+      // Re-query when Mapillary tiles finish loading (fixes race condition)
+      map.on("sourcedata", (e) => {
+        if (e.sourceId === "mly" && e.isSourceLoaded) {
+          queryMapillaryImages();
         }
       });
 
