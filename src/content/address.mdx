@@ -1,0 +1,22 @@
+# What is an address?
+
+Fundamentally, an address is a descriptive tag for a location like a parcel, building, or building unit.
+
+Addresses are created by combining many different pieces of information:
+
+- Street Number
+- Street Prefix/Direction
+- Street Name
+- Street Type
+- Unit Type
+- Unit Number
+
+There is often variation in the ways that these elements are written, arranged, and grouped.
+
+For example, `123 E Main St. Apt 2` could also be written as `123 Main St. E Upper` and you'd still be able to figure out that they mean the same location. However, this variation can cause trouble for computers trying to interpret addresses. We've built a [geocoding tool](/geocoder) that takes in a list of Detroit addresses and standardizes them to the format used by the Enterprise Addresses database.
+
+## Important attributes
+
+- Links to the other base units that are described by that address (parcel, building, and unit)
+- Link to the road segment that the address gets its street name information from
+- ZIP code and deliverability status from the US Postal Service
