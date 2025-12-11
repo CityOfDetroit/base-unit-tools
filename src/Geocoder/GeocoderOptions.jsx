@@ -143,7 +143,7 @@ const GeocoderOptions = ({ options, setOptions }) => {
 
       {/* Boundary Groups - Accordion */}
       <Card className="p-0 overflow-hidden">
-        <Accordion.Root type="multiple" defaultValue={["political"]}>
+        <Accordion.Root type="multiple" defaultValue={["political", "geographic", "census", "other"]}>
           {Object.entries(fieldGroups).map(([groupKey, group]) => (
             <Accordion.Item
               key={groupKey}

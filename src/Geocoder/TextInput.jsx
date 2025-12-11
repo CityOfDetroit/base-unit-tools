@@ -27,7 +27,7 @@ export const TextInput = ({ setAddresses }) => {
       <TextArea
         value={value}
         rows={8}
-        placeholder={"123 Main St\n456 Oak Ave Apt 2\n789 Elm Blvd"}
+        placeholder={"2 Woodward\n1301 3rd St"}
         onChange={(e) => setValue(e.target.value)}
         className="font-mono text-sm"
       />
