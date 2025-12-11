@@ -1,12 +1,11 @@
-import { Card, Flex, Grid, Select, Text } from "@radix-ui/themes";
-import React, { useEffect, useState } from "react";
+import { Card, Flex, Grid } from "@radix-ui/themes";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import layers from "../data/layers";
 import useBaseFeature from "../hooks/useBaseFeature";
 import useGeocoder from "../hooks/useGeocoder";
 import AddressLinks from "./AddressLinks";
 import FeatureTable from "./FeatureTable";
-import LayerSwitcher from "./LayerSwitcher";
 import LinkedAddresses from "./LinkedAddresses";
 import LinkedBuildings from "./LinkedBuildings";
 import MapComponent from "./Map";
@@ -16,9 +15,22 @@ import MapillarySwitch from "./MapillarySwitch";
 import BuildingLinks from "./BuildingLinks";
 import BasemapSelector from "./BasemapSelector";
 import ModeSelector from "./ModeSelector";
+import ResizeHandle from "./ResizeHandle";
 
 const BaseUnitsMap = () => {
   const [params, setParams] = useSearchParams();
+  const gridRef = useRef(null);
+
+  // Column width state (persisted to localStorage)
+  const [leftColumnWidth, setLeftColumnWidth] = useState(() => {
+    const saved = localStorage.getItem("mapLayoutLeftWidth");
+    return saved ? parseFloat(saved) : 33;
+  });
+
+  // Persist column width to localStorage
+  useEffect(() => {
+    localStorage.setItem("mapLayoutLeftWidth", leftColumnWidth.toString());
+  }, [leftColumnWidth]);
 
   // main pieces of state
   // the currently selected layer
@@ -43,14 +55,11 @@ const BaseUnitsMap = () => {
   const {
     data: feature,
     loading,
-    error,
     refetch,
-    nullify,
   } = useBaseFeature(params?.get("id"), layer);
 
   const {
     feature: geocodedFeature,
-    loading: geocodeLoading,
     error: geocodeError,
     changeAddress: geocodeRefetch,
   } = useGeocoder();
@@ -129,15 +138,18 @@ const BaseUnitsMap = () => {
 
   return (
     <Grid
+      ref={gridRef}
       areas={{
         initial: "'streetview' 'geocoder' 'map' 'info'",
         md: "'info geocoder' 'info streetview' 'info map' 'info map'",
       }}
-      columns={{ initial: "1fr", md: "1fr 2fr", lg: "1fr 2fr" }}
+      columns={{ initial: "1fr", md: `${leftColumnWidth}% 1fr` }}
       rows={{ initial: "auto auto auto auto", md: "min-content 0fr 1fr 1fr" }}
       gap={{ initial: "0", md: "0" }}
       p={{ initial: "0", md: "2", lg: "4" }}
+      className="relative"
     >
+      <ResizeHandle onResize={setLeftColumnWidth} containerRef={gridRef} />
 
       {/* geocoding panel */}
       <Flex

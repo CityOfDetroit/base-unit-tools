@@ -71,8 +71,46 @@ const MapComponent = ({
 
       map.on("load", () => {
         setMapLoaded(true);
-
       });
+
+      // Add navigation controls (zoom in/out)
+      map.addControl(new maplibregl.NavigationControl(), "top-right");
+
+      // Add geolocate control (find me)
+      const geolocate = new maplibregl.GeolocateControl({
+        positionOptions: {
+          enableHighAccuracy: true,
+        },
+        trackUserLocation: false,
+      });
+
+      geolocate.on("geolocate", (e) => {
+        const { latitude, longitude } = e.coords;
+
+        // Detroit bounding box (with some buffer)
+        const detroitBounds = {
+          minLat: 42.25,
+          maxLat: 42.50,
+          minLng: -83.30,
+          maxLng: -82.90,
+        };
+
+        // Check if user is within or near Detroit
+        if (
+          latitude >= detroitBounds.minLat &&
+          latitude <= detroitBounds.maxLat &&
+          longitude >= detroitBounds.minLng &&
+          longitude <= detroitBounds.maxLng
+        ) {
+          map.flyTo({
+            center: [longitude, latitude],
+            zoom: 17.5,
+          });
+        }
+        // If outside Detroit, don't move the map
+      });
+
+      map.addControl(geolocate, "top-right");
  
       map.on("click", (e) => {
         // Filter layers based on current mode
@@ -321,7 +359,7 @@ const MapComponent = ({
         height={
           !streetview
             ? { initial: "300px", md: "500px", lg: "705px", xl: "900px" }
-            : { initial: "200px", md: "250px", lg: "300px", xl: "350px" }
+            : { initial: "200px", md: "350px", lg: "400px", xl: "450px" }
         }
         p={"2"}
       ></Box>
