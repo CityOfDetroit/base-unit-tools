@@ -1,7 +1,6 @@
 // src/App.js
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import Layout from "./Layout";
-import MapComponent from "./Map/Map";
 import Homepage from "./Homepage";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import {
@@ -12,11 +11,13 @@ import {
 } from "react-router-dom";
 import { useAuth, AuthProvider } from "./contexts/AuthContext";
 import Login from "./Login";
-import BaseUnitsMap from "./Map/BaseUnitsMap";
-import Geocoder from "./Geocoder/Geocoder";
-import Mailer from "./Mailer/Mailer";
-import About from "./About";
-import BaseUnitPage from "./BaseUnitPage";
+
+// Lazy load route components
+const BaseUnitsMap = lazy(() => import("./Map/BaseUnitsMap"));
+const Geocoder = lazy(() => import("./Geocoder/Geocoder"));
+const Mailer = lazy(() => import("./Mailer/Mailer"));
+const About = lazy(() => import("./About"));
+const BaseUnitPage = lazy(() => import("./BaseUnitPage"));
 
 // Protected route component
 const ProtectedRoute = ({ path, children }) => {
@@ -31,15 +32,17 @@ const App = () => {
       <AuthProvider>
         <BrowserRouter>
           <Layout>
-            <Routes>
-              <Route path="/" element={<Homepage />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/map" element={<BaseUnitsMap />} />
-              <Route path="/geocoder" element={<Geocoder />} />
-              <Route path="/mailer" element={<ProtectedRoute path="/mailer"><Mailer /></ProtectedRoute>} />
-              <Route path="/base-unit/:unit" element={<BaseUnitPage />} />
-            </Routes>
+            <Suspense fallback={<div className="p-4">Loading...</div>}>
+              <Routes>
+                <Route path="/" element={<Homepage />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/map" element={<BaseUnitsMap />} />
+                <Route path="/geocoder" element={<Geocoder />} />
+                <Route path="/mailer" element={<ProtectedRoute path="/mailer"><Mailer /></ProtectedRoute>} />
+                <Route path="/base-unit/:unit" element={<BaseUnitPage />} />
+              </Routes>
+            </Suspense>
           </Layout>
         </BrowserRouter>
       </AuthProvider>
