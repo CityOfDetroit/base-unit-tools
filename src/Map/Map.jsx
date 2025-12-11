@@ -19,13 +19,20 @@ const MapComponent = ({
   viewerImage,
   viewerBearing,
   setSvImages,
-  geocodedFeature
+  geocodedFeature,
+  mode = "all"
 }) => {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
+  const modeRef = useRef(mode);
   const { isDarkMode } = useTheme();
   const [mapLoaded, setMapLoaded] = useState(false);
   const [clickedFeatures, setClickedFeatures] = useState([]);
+
+  // Keep mode ref in sync
+  useEffect(() => {
+    modeRef.current = mode;
+  }, [mode]);
 
   let mapStyles = {
     streets: baseStyle,
@@ -68,8 +75,13 @@ const MapComponent = ({
       });
  
       map.on("click", (e) => {
+        // Filter layers based on current mode
+        const queryLayers = modeRef.current === "all"
+          ? Object.keys(layers).map((lyr) => layers[lyr].interaction)
+          : [layers[modeRef.current]?.interaction].filter(Boolean);
+
         const features = map.queryRenderedFeatures(e.point, {
-          layers: Object.keys(layers).map((lyr) => layers[lyr].interaction),
+          layers: queryLayers,
         });
 
         setClickedFeatures(features);
@@ -120,6 +132,11 @@ const MapComponent = ({
   useEffect(() => {
     if (mapInstance.current && layer && mapLoaded) {
       const currentLyr = layers[layer];
+
+      // If in a specific mode and no features found, don't blank out current selection
+      if (clickedFeatures.length === 0 && mode !== "all") {
+        return;
+      }
 
       // reset all highlight filters
       Object.keys(layers).forEach((lyr) => {

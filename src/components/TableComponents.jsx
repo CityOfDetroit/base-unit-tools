@@ -5,8 +5,8 @@ import { CaretDownIcon, CaretRightIcon } from "@radix-ui/react-icons";
 
 export const Attribute = ({ label, value, odd }) => {
   return (
-    <DataList.Item align={"center"}>
-      <DataList.Label className="font-normal w-12">
+    <DataList.Item align={"center"} className="py-px">
+      <DataList.Label className="font-normal text-xs text-gray-500">
         {label}
       </DataList.Label>
       <DataList.Value>
@@ -27,11 +27,11 @@ export const Category = ({ label, startOpen = true, children = [] }) => {
 
   return (
     <Collapsible.Root open={open} onOpenChange={setOpen} className="w-full">
-      <Flex direction="column">
+      <Flex direction="column" gap="0">
         <Collapsible.Trigger as={Button}>
           <Flex className="w-full" align={"center"} justify={"between"}>
             <Text
-              size={"3"}
+              size={"2"}
               weight={"bold"}
               className="dark:text-slate-300 text-gray-500"
             >
@@ -40,10 +40,10 @@ export const Category = ({ label, startOpen = true, children = [] }) => {
             {open ? <CaretDownIcon /> : <CaretRightIcon />}
           </Flex>
         </Collapsible.Trigger>
-        <Separator size="4" mb={"2"} />
+        <Separator size="4" mb={"1"} />
 
         <Collapsible.Content>
-          <DataList.Root size={"2"}>{children}</DataList.Root>
+          <DataList.Root size={"1"}>{children}</DataList.Root>
         </Collapsible.Content>
       </Flex>
     </Collapsible.Root>

@@ -15,6 +15,7 @@ import Mapillary from "./Mapillary";
 import MapillarySwitch from "./MapillarySwitch";
 import BuildingLinks from "./BuildingLinks";
 import BasemapSelector from "./BasemapSelector";
+import ModeSelector from "./ModeSelector";
 
 const BaseUnitsMap = () => {
   const [params, setParams] = useSearchParams();
@@ -33,6 +34,9 @@ const BaseUnitsMap = () => {
 
   // map state
   let [style, setStyle] = useState("streets");
+
+  // selection mode state (all, parcel, building, street)
+  const [mode, setMode] = useState(params?.get("mode") || "all");
 
   // the primary hook for fetching the current feature
   const {
@@ -94,6 +98,20 @@ const BaseUnitsMap = () => {
     setLinkedAddresses([]);
   }, [layer]);
 
+  // sync mode to URL
+  useEffect(() => {
+    const currentMode = params?.get("mode");
+    if (mode === "all" && currentMode) {
+      const newParams = new URLSearchParams(params);
+      newParams.delete("mode");
+      setParams(newParams);
+    } else if (mode !== "all" && currentMode !== mode) {
+      const newParams = new URLSearchParams(params);
+      newParams.set("mode", mode);
+      setParams(newParams);
+    }
+  }, [mode]);
+
   return (
     <Grid
       areas={{
@@ -121,6 +139,9 @@ const BaseUnitsMap = () => {
         </Card>
         <Card>
           <BasemapSelector {...{ style, setStyle }} />
+        </Card>
+        <Card>
+          <ModeSelector {...{ mode, setMode }} />
         </Card>
       </Flex>
 
@@ -218,7 +239,8 @@ const BaseUnitsMap = () => {
             setSvImages,
             viewerImage,
             viewerBearing,
-            geocodedFeature
+            geocodedFeature,
+            mode
           }}
         />
       </div>
