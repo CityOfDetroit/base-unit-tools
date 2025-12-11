@@ -31,10 +31,10 @@ const ResizeHandle = ({ onResize, containerRef }) => {
   return (
     <div
       onMouseDown={handleMouseDown}
-      className="hidden md:flex w-2 cursor-col-resize hover:bg-blue-300 bg-transparent items-center justify-center group"
+      className="hidden md:flex w-2 cursor-col-resize bg-transparent items-center justify-center group"
       style={{ gridColumn: "1 / 2", gridRow: "1 / -1", justifySelf: "end", zIndex: 10 }}
     >
-      <div className="w-0.5 h-16 bg-gray-300 group-hover:bg-blue-400 rounded-full" />
+      <div className="w-0.5 h-16 bg-gray-300 group-hover:bg-gray-400 rounded-full" />
     </div>
   );
 };
