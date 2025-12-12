@@ -22,7 +22,8 @@ import { Link } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 import Icon from "./components/Icon";
 
-const BigNumber = ({ label, count, color, loading, endpoint, unitKey }) => {
+const BigNumber = ({ label, count, color, loading, agoItemId, layerNumber, unitKey }) => {
+  const agoItemUrl = `https://detroitmi.maps.arcgis.com/home/item.html?id=${agoItemId}&sublayer=${layerNumber}`;
   return (
     <Card size="2">
       <Link to={`/base-unit/${unitKey}`} className="no-underline">
@@ -43,7 +44,7 @@ const BigNumber = ({ label, count, color, loading, endpoint, unitKey }) => {
       </Link>
       <Flex justify="end">
         <a
-          href={endpoint}
+          href={agoItemUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="no-underline"
@@ -217,7 +218,8 @@ const Homepage = () => {
               count={addresses.count}
               loading={addresses.loading}
               color={layers.address.color}
-              endpoint={layers.address.endpoint}
+              agoItemId={layers.address.ago_item_id}
+              layerNumber={layers.address.layer_number}
               unitKey="address"
             />
             <BigNumber
@@ -225,7 +227,8 @@ const Homepage = () => {
               count={buildings.count}
               loading={buildings.loading}
               color={layers.building.color}
-              endpoint={layers.building.endpoint}
+              agoItemId={layers.building.ago_item_id}
+              layerNumber={layers.building.layer_number}
               unitKey="building"
             />
             <BigNumber
@@ -233,7 +236,8 @@ const Homepage = () => {
               count={parcels.count}
               loading={parcels.loading}
               color={layers.parcel.color}
-              endpoint={layers.parcel.endpoint}
+              agoItemId={layers.parcel.ago_item_id}
+              layerNumber={layers.parcel.layer_number}
               unitKey="parcel"
             />
             <BigNumber
@@ -241,7 +245,8 @@ const Homepage = () => {
               count={streets.count}
               loading={streets.loading}
               color={layers.street.color}
-              endpoint={layers.street.endpoint}
+              agoItemId={layers.street.ago_item_id}
+              layerNumber={layers.street.layer_number}
               unitKey="street"
             />
           </Grid>
