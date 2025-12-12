@@ -190,6 +190,7 @@ const Homepage = () => {
             {Object.keys(apps)
               .slice(1)
               .map((app) => {
+                if (apps[app].show === false) return null;
                 if (apps[app].private && !isAuthenticated) return null;
                 return (
                   <Link to={apps[app].url} key={app}>

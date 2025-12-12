@@ -43,6 +43,17 @@ export const apps = {
         icon: "EnvelopeOpenIcon",
         private: true,
         show: true
+    },
+    'geoguess': {
+        name: 'Geoguess',
+        url: `/geoguess`,
+        description: 'Test your knowledge of Detroit streets using Mapillary imagery.',
+        questions: [
+            `I want to play a game guessing locations in Detroit.`
+        ],
+        icon: "GlobeIcon",
+        private: false,
+        show: false
     }
 }
 

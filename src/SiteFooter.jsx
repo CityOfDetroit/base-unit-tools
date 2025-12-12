@@ -12,6 +12,7 @@ const SiteFooter = () => {
   const { isAuthenticated, username, handleSignIn, handleSignOut } = useAuth();
 
   let filteredApps = Object.keys(apps).filter((app) => {
+    if (apps[app].show === false) return false;
     if (apps[app].private && !isAuthenticated) return false;
     return true;
   });

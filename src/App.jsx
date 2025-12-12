@@ -18,6 +18,7 @@ const Geocoder = lazy(() => import("./Geocoder/Geocoder"));
 const Mailer = lazy(() => import("./Mailer/Mailer"));
 const About = lazy(() => import("./About"));
 const BaseUnitPage = lazy(() => import("./BaseUnitPage"));
+const Geoguess = lazy(() => import("./Geoguess/Geoguess"));
 
 // Protected route component
 const ProtectedRoute = ({ path, children }) => {
@@ -41,6 +42,7 @@ const App = () => {
                 <Route path="/geocoder" element={<Geocoder />} />
                 <Route path="/mailer" element={<ProtectedRoute path="/mailer"><Mailer /></ProtectedRoute>} />
                 <Route path="/base-unit/:unit" element={<BaseUnitPage />} />
+                <Route path="/geoguess" element={<Geoguess />} />
               </Routes>
             </Suspense>
           </Layout>
