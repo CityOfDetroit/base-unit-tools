@@ -54,6 +54,10 @@ Batch geocoding tool for enriching address data.
 - Apply buffers to expand or create ring-shaped selections
 - Download address lists as CSV for mail campaigns
 
+### Geoguess (`/geoguess`)
+
+...
+
 ## Development
 
 ```bash
