@@ -21,7 +21,7 @@ const SiteHeader = () => {
               <Link to="/">
                 <h1 className="cod-style">Base Unit Tools</h1>
               </Link>
-              <span className="text-xs w-96 hidden lg:block leading-4">
+              <span className="text-xs w-96 hidden md:block leading-4">
                 Explore Detroit's addresses, buildings, parcels, and streets.
               </span>
             </div>
