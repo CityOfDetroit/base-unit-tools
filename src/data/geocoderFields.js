@@ -2,15 +2,15 @@
 export const geocoderFields = [
   {
     name: "council_district",
-    display: "Current Council District",
-    geocoderColumn: "council_district",
+    display: "Previous Council District 2013",
+    geocoderColumn: "council_district_2013",
     description: "The city council district number this address belongs to- Districts 2013.",
     default: false,
   },
   {
     name: "council_2026",
-    display: "Council District 2026",
-    geocoderColumn: "council_district_2026",
+    display: "Current Council District",
+    geocoderColumn: "council_district",
     description: "The city council district number this address belongs to- Districts 2026.",
     default: false,
   },
