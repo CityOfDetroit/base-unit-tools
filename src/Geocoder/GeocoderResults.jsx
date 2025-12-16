@@ -229,16 +229,6 @@ const GeocoderResults = ({
   if (options.census_block_2020) {
     desktopOnlyCols.push(
       {
-        accessor: (row) => row.census_block_geoid_2020?.toString().slice(0, 2),
-        id: "census_state_2020",
-        Header: "State 2020",
-      },
-      {
-        accessor: (row) => row.census_block_geoid_2020?.toString().slice(2, 5),
-        id: "census_county_2020",
-        Header: "County 2020",
-      },
-      {
         accessor: (row) => row.census_block_geoid_2020?.toString().slice(5, 11),
         id: "census_tract_2020",
         Header: "Tract 2020",
@@ -253,16 +243,6 @@ const GeocoderResults = ({
 
   if (options.census_block_2010) {
     desktopOnlyCols.push(
-      {
-        accessor: (row) => row.census_block_geoid_2010?.toString().slice(0, 2),
-        id: "census_state_2010",
-        Header: "State 2010",
-      },
-      {
-        accessor: (row) => row.census_block_geoid_2010?.toString().slice(2, 5),
-        id: "census_county_2010",
-        Header: "County 2010",
-      },
       {
         accessor: (row) => row.census_block_geoid_2010?.toString().slice(5, 11),
         id: "census_tract_2010",
