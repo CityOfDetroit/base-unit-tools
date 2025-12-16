@@ -1,4 +1,4 @@
-import { geocoderFields } from "../data/geocoderFields";
+import { geocoderFields, fieldGroups } from "../data/geocoderFields";
 import {
   Text,
   Button,
@@ -10,25 +10,14 @@ import {
 import * as Accordion from "@radix-ui/react-accordion";
 import { ChevronDownIcon, InfoCircledIcon } from "@radix-ui/react-icons";
 
-// Group the geocoder fields by category
-const fieldGroups = {
-  political: {
-    label: "Political Boundaries",
-    fields: ["council_district", "council_district_2013", "congressional_district", "county_commission_district"],
-  },
-  geographic: {
-    label: "Geographic Boundaries",
-    fields: ["neighborhood", "master_plan_nhood"],
-  },
-  census: {
-    label: "Census Data",
-    fields: ["census_block_2020", "census_block_2010", "qct"],
-  },
-  other: {
-    label: "Other",
-    fields: ["scout_car_area"],
-  },
-};
+// Derive grouped fields from geocoderFields using their group property
+const groupedFields = Object.keys(fieldGroups).reduce((acc, groupKey) => {
+  acc[groupKey] = {
+    label: fieldGroups[groupKey].label,
+    fields: geocoderFields.filter((f) => f.group === groupKey),
+  };
+  return acc;
+}, {});
 
 const presets = [
   {
@@ -58,7 +47,7 @@ const presets = [
     apply: (options, setOptions) => {
       const newOpts = { ...options, coords: true, ids: true, related_parcel: false };
       geocoderFields.forEach((f) => {
-        newOpts[f.name] = fieldGroups.census.fields.includes(f.name);
+        newOpts[f.name] = f.group === "census";
       });
       setOptions(newOpts);
     },
@@ -76,8 +65,6 @@ const presets = [
 ];
 
 const GeocoderOptions = ({ options, setOptions }) => {
-  const getFieldByName = (name) => geocoderFields.find((f) => f.name === name);
-
   return (
     <Flex direction="column" gap="3">
       {/* Presets */}
@@ -143,8 +130,8 @@ const GeocoderOptions = ({ options, setOptions }) => {
 
       {/* Boundary Groups - Accordion */}
       <Card className="p-0 overflow-hidden">
-        <Accordion.Root type="multiple" defaultValue={["political", "geographic", "census", "other"]}>
-          {Object.entries(fieldGroups).map(([groupKey, group]) => (
+        <Accordion.Root type="multiple" defaultValue={Object.keys(groupedFields)}>
+          {Object.entries(groupedFields).map(([groupKey, group]) => (
             <Accordion.Item
               key={groupKey}
               value={groupKey}
@@ -164,37 +151,33 @@ const GeocoderOptions = ({ options, setOptions }) => {
               </Accordion.Header>
               <Accordion.Content className="px-3 pb-3 data-[state=open]:animate-slideDown data-[state=closed]:animate-slideUp overflow-hidden">
                 <Flex direction="column" gap="2">
-                  {group.fields.map((fieldName) => {
-                    const field = getFieldByName(fieldName);
-                    if (!field) return null;
-                    return (
-                      <label
-                        key={field.name}
-                        className="flex items-center gap-2 cursor-pointer"
-                      >
-                        <Checkbox
-                          size="1"
-                          checked={options[field.name]}
-                          onCheckedChange={() =>
-                            setOptions({
-                              ...options,
-                              [field.name]: !options[field.name],
-                            })
-                          }
-                        />
-                        <Text size="2">{field.display}</Text>
-                        {field.description && (
-                          <Tooltip content={field.description}>
-                            <InfoCircledIcon
-                              width="12"
-                              height="12"
-                              className="text-gray-400 cursor-help"
-                            />
-                          </Tooltip>
-                        )}
-                      </label>
-                    );
-                  })}
+                  {group.fields.map((field) => (
+                    <label
+                      key={field.name}
+                      className="flex items-center gap-2 cursor-pointer"
+                    >
+                      <Checkbox
+                        size="1"
+                        checked={options[field.name]}
+                        onCheckedChange={() =>
+                          setOptions({
+                            ...options,
+                            [field.name]: !options[field.name],
+                          })
+                        }
+                      />
+                      <Text size="2">{field.display}</Text>
+                      {field.description && (
+                        <Tooltip content={field.description}>
+                          <InfoCircledIcon
+                            width="12"
+                            height="12"
+                            className="text-gray-400 cursor-help"
+                          />
+                        </Tooltip>
+                      )}
+                    </label>
+                  ))}
                 </Flex>
               </Accordion.Content>
             </Accordion.Item>
