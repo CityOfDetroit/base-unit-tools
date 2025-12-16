@@ -14,7 +14,7 @@ import { ChevronDownIcon, InfoCircledIcon } from "@radix-ui/react-icons";
 const fieldGroups = {
   political: {
     label: "Political Boundaries",
-    fields: ["council_district", "council_2026", "congressional_district", "county_commission_district"],
+    fields: ["council_district", "council_district_2013", "congressional_district", "county_commission_district"],
   },
   geographic: {
     label: "Geographic Boundaries",
