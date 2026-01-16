@@ -219,6 +219,22 @@ const GeocoderResults = ({
       ),
     });
   }
+    if (options.condo_plan_number) {
+    desktopOnlyCols.push({
+      accessor: "condo_plan_number",
+      Header: "Condo Plan Number",
+      Cell: (row) => (
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          //href={`/map?id=${row.value}&layer=parcel`}
+          className="text-blue-600 hover:underline"
+        >
+          {row.value}
+        </a>
+      ),
+    });
+  }
 
   geocoderFields.forEach((cf) => {
     if (options[cf.name] && !exclude_census.includes(cf.name)) {
