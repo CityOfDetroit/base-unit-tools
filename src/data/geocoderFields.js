@@ -89,8 +89,8 @@ export const geocoderFields = [
   },
   {
     name: "nrsa_zone",
-    display: "Neighborhood Revitalization Strategy Area",
-    geocoder_column: "nrsa_zone",
+    display: "NRSA",
+    geocoder_column: "nrsa_area_2020",
     description: "The NRSA this address belongs to.",
     group: "other",
     default: false
