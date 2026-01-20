@@ -82,7 +82,7 @@ export const geocoderFields = [
   {
     name: "nrsa_area_2020",
     display: "NRSA Zone",
-    geocoder_column: "nrsa_area_2020",
+    geocoderColumn: "nrsa_area_2020",
     description: "The NRSA this address belongs to.",
     group: "other",
     default: false,
