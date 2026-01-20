@@ -80,6 +80,14 @@ export const geocoderFields = [
     default: false,
   },
   {
+    name: "nrsa_area_2020",
+    display: "NRSA Zone",
+    geocoder_column: "nrsa_area_2020",
+    description: "The NRSA this address belongs to.",
+    group: "other",
+    default: false,
+  },
+  {
     name: "scout_car_area",
     display: "Police Scout Car Area",
     geocoderColumn: "scout_car_area",
@@ -87,13 +95,6 @@ export const geocoderFields = [
     group: "other",
     default: false,
   },
-  {
-    name: "nrsa_zone",
-    display: "NRSA",
-    geocoder_column: "nrsa_area_2020",
-    description: "The NRSA this address belongs to.",
-    group: "other",
-    default: false
-  }
+
 
 ];
