@@ -141,6 +141,7 @@ const Geocoder = () => {
     coords: true,
     ids: true,
     related_parcel: false,
+    condo_plan_number: false,
   };
 
   // add the geocoderFields to the options object

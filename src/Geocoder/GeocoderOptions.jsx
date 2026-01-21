@@ -25,7 +25,7 @@ const presets = [
     label: "Basic",
     description: "Coordinates and IDs only",
     apply: (options, setOptions) => {
-      const newOpts = { ...options, coords: true, ids: true, related_parcel: false };
+      const newOpts = { ...options, coords: true, ids: true, related_parcel: false, condo_plan_number: false, };
       geocoderFields.forEach((f) => (newOpts[f.name] = false));
       setOptions(newOpts);
     },
@@ -35,7 +35,7 @@ const presets = [
     label: "All Boundaries",
     description: "Include all available data",
     apply: (options, setOptions) => {
-      const newOpts = { ...options, coords: true, ids: true, related_parcel: true };
+      const newOpts = { ...options, coords: true, ids: true, related_parcel: true, condo_plan_number: true, };
       geocoderFields.forEach((f) => (newOpts[f.name] = true));
       setOptions(newOpts);
     },
@@ -57,7 +57,7 @@ const presets = [
     label: "Clear All",
     description: "Reset to minimum",
     apply: (options, setOptions) => {
-      const newOpts = { ...options, coords: false, ids: false, related_parcel: false };
+      const newOpts = { ...options, coords: false, ids: false, related_parcel: false, condo_plan_number: false, };
       geocoderFields.forEach((f) => (newOpts[f.name] = false));
       setOptions(newOpts);
     },
@@ -124,6 +124,16 @@ const GeocoderOptions = ({ options, setOptions }) => {
               }
             />
             <Text size="2">Related Parcel</Text>
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <Checkbox
+              size="1"
+              checked={options.condo_plan_number}
+              onCheckedChange={() =>
+                setOptions({ ...options, condo_plan_number: !options.condo_plan_number })
+              }
+            />
+            <Text size="2">Condo Plan Number</Text>
           </label>
         </Flex>
       </Card>
