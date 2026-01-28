@@ -44,7 +44,7 @@ const presets = {
   cbo: {
     name: "CBOs",
     singular: "CBO area",
-    url: "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/CBO_Impact_Areas/FeatureServer/0/",
+    url: "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/CBO_Impact_Area/FeatureServer/0/",
     pickColumn: "Name",
   },
   pdd_planning_areas: {
