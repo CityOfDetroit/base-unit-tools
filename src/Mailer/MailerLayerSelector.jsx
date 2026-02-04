@@ -39,7 +39,7 @@ const presets = {
     name: "Council Districts",
     singular: "Council district",
     pickColumn: "Name",
-    url: "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/CouncilDistricts/FeatureServer/0/",
+    url: "https://services2.arcgis.com/qvkbeam7Wirps6zC/ArcGIS/rest/services/Council_Districts/FeatureServer/0/",
   },
   cbo: {
     name: "CBOs",
