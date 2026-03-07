@@ -3,6 +3,12 @@
   publish = "dist"
 
 [[redirects]]
+  from = "https://base-unit-tools.netlify.app/*"
+  to = "https://baseunits.detroitmi.gov/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
