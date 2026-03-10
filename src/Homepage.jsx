@@ -138,48 +138,6 @@ const Homepage = () => {
               </Text>
             </Flex>
           </Box>
-          <Box
-            className="px-4 py-2 cursor-pointer transition-colors"
-            style={{ backgroundColor: "rgba(0,0,0,0.2)" }}
-            onClick={() => setChromeNoticeOpen(!chromeNoticeOpen)}
-          >
-            <Flex align="center" gap="2">
-              {chromeNoticeOpen ? (
-                <ChevronDownIcon
-                  width="14"
-                  height="14"
-                  style={{ color: "#9fd5b3" }}
-                />
-              ) : (
-                <ChevronRightIcon
-                  width="14"
-                  height="14"
-                  style={{ color: "#9fd5b3" }}
-                />
-              )}
-              <ExclamationTriangleIcon
-                width="14"
-                height="14"
-                style={{ color: "#feb70d" }}
-              />
-              <Text size="2" style={{ color: "#9fd5b3" }}>
-                Chrome users on City network or VPN
-              </Text>
-            </Flex>
-          </Box>
-          {chromeNoticeOpen && (
-            <Box
-              className="px-4 pb-4 pt-2"
-              style={{ backgroundColor: "rgba(0,0,0,0.2)" }}
-            >
-              <Text size="2" style={{ color: "#f2f2f2" }}>
-                If you're experiencing issues loading data, you may need to
-                allow "Private network access" in Chrome. Click the icon in the
-                address bar (left of the URL) and enable access to internal
-                network resources.
-              </Text>
-            </Box>
-          )}
         </Box>
 
         <Box mb="5">
