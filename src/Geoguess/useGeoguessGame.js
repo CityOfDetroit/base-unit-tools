@@ -7,6 +7,8 @@ import { DETROIT_BOUNDS, detroitBoundary } from './detroitBoundary';
 const MAPILLARY_TOKEN = 'MLY|4690399437648324|de87555bb6015affa20c3df794ebab15';
 const TOTAL_ROUNDS = 5;
 const MAX_SCORE_PER_ROUND = 5000;
+export const STEP_PENALTY = 250;
+export const LABEL_PENALTY = 500;
 
 // Mulberry32 seeded PRNG - deterministic random from a seed
 function mulberry32(seed) {
@@ -43,10 +45,13 @@ export function formatDateForDisplay(seed) {
 }
 
 // Calculate score based on distance (exponential decay)
-export function calculateScore(distanceMeters) {
-  // Gentler scoring: ~45% at 1 mile, ~20% at 2 miles
-  const score = Math.round(MAX_SCORE_PER_ROUND * Math.exp(-distanceMeters / 2000));
-  return Math.max(0, Math.min(MAX_SCORE_PER_ROUND, score));
+// maxScore allows capping the possible points (e.g. after step penalties)
+export function calculateScore(distanceMeters, maxScore = MAX_SCORE_PER_ROUND) {
+  // Within 30 feet is a perfect score
+  if (distanceMeters <= 9.144) return maxScore;
+  // Reward proximity: ~60% at 1 mile, ~35% at 2 miles
+  const score = Math.round(maxScore * Math.exp(-distanceMeters / 3000));
+  return Math.max(0, Math.min(maxScore, score));
 }
 
 // Calculate distance between two coordinate pairs in meters
@@ -88,31 +93,42 @@ async function fetchNearbyPanoramas(lng, lat, radius = 0.005) {
   }
 }
 
+// Generate a batch of valid candidate points within Detroit
+function generateCandidatePoints(rng, batchSize) {
+  const candidates = [];
+  let safetyLimit = batchSize * 5;
+  while (candidates.length < batchSize && safetyLimit-- > 0) {
+    const [lng, lat] = getRandomPointInDetroit(rng);
+    if (isWithinDetroit([lng, lat])) {
+      candidates.push([lng, lat]);
+    }
+  }
+  return candidates;
+}
+
 // Fetch panorama locations for the game
 // If seed is provided, uses seeded RNG for deterministic locations (daily challenge)
 async function fetchLocations(count = TOTAL_ROUNDS, seed = null) {
   const rng = seed ? mulberry32(seed) : Math.random;
   const locations = [];
   const usedImageIds = new Set();
-  let attempts = 0;
-  const maxAttempts = 100;
+  const BATCH_SIZE = 20;
+  const MAX_BATCHES = 4;
 
-  while (locations.length < count && attempts < maxAttempts) {
-    attempts++;
+  for (let batch = 0; batch < MAX_BATCHES && locations.length < count; batch++) {
+    // Generate candidate points (cheap, no I/O)
+    const candidates = generateCandidatePoints(rng, BATCH_SIZE);
 
-    // Generate random point (deterministic if seeded)
-    const [lng, lat] = getRandomPointInDetroit(rng);
+    // Fetch panoramas for all candidates in parallel
+    const results = await Promise.all(
+      candidates.map(([lng, lat]) => fetchNearbyPanoramas(lng, lat))
+    );
 
-    // Skip if point is outside Detroit boundary polygon
-    if (!isWithinDetroit([lng, lat])) {
-      continue;
-    }
+    // Process results in order (preserves determinism for seeded RNG)
+    for (let i = 0; i < results.length && locations.length < count; i++) {
+      const images = results[i];
+      if (images.length === 0) continue;
 
-    // Fetch nearby panoramas
-    const images = await fetchNearbyPanoramas(lng, lat);
-
-    if (images.length > 0) {
-      // Filter out already used images and verify within Detroit
       const validImages = images.filter(img => {
         if (usedImageIds.has(img.id)) return false;
         const coords = [img.geometry.coordinates[0], img.geometry.coordinates[1]];
@@ -120,7 +136,6 @@ async function fetchLocations(count = TOTAL_ROUNDS, seed = null) {
       });
 
       if (validImages.length > 0) {
-        // Pick image deterministically if seeded, randomly otherwise
         const index = seed
           ? Math.floor(rng() * validImages.length)
           : Math.floor(Math.random() * validImages.length);
@@ -139,12 +154,10 @@ async function fetchLocations(count = TOTAL_ROUNDS, seed = null) {
   return locations;
 }
 
-// Generate share text for daily challenge results
-export function generateShareText(seed, guesses, totalScore, maxTotalScore) {
-  const dateStr = formatDateForDisplay(seed);
+// Generate share text for game results
+export function generateShareText(seed, mode, guesses, totalScore, maxTotalScore) {
   const percent = Math.round((totalScore / maxTotalScore) * 100);
 
-  // Generate emoji grid based on round scores
   const emojis = guesses.map(g => {
     const pct = g.score / MAX_SCORE_PER_ROUND;
     if (pct >= 0.9) return '🟢';
@@ -153,11 +166,17 @@ export function generateShareText(seed, guesses, totalScore, maxTotalScore) {
     return '🔴';
   }).join('');
 
-  return `Detroit Geoguess - ${dateStr}
+  const title = mode === 'daily'
+    ? `Detroit Geoguess - ${formatDateForDisplay(seed)}`
+    : `Detroit Geoguess`;
+
+  const link = `${window.location.origin}/geoguess?seed=${seed}`;
+
+  return `${title}
 ${emojis}
 Score: ${totalScore.toLocaleString()}/${maxTotalScore.toLocaleString()} (${percent}%)
 
-Play at: ${window.location.origin}/geoguess`;
+Play the same game: ${link}`;
 }
 
 const initialState = {
@@ -175,17 +194,32 @@ const initialState = {
 export function useGeoguessGame() {
   const [gameState, setGameState] = useState(initialState);
   const [currentGuess, setCurrentGuess] = useState(null);
+  const [currentSteps, setCurrentSteps] = useState(0);
+  const [labelsUsed, setLabelsUsed] = useState(false);
+
+  // Record a navigation step
+  const recordStep = useCallback(() => {
+    setCurrentSteps(prev => prev + 1);
+  }, []);
+
+  // Toggle street labels (one-time penalty per round)
+  const useLabels = useCallback(() => {
+    setLabelsUsed(true);
+  }, []);
 
   // Get current location for the active round
   const currentLocation = gameState.locations[gameState.currentRound - 1] || null;
 
-  // Start a new game (random mode)
-  const startGame = useCallback(async () => {
-    setGameState(prev => ({ ...prev, status: 'loading', mode: 'random', seed: null, error: null }));
+  // Start a new game (random mode) with a random or provided seed
+  const startGame = useCallback(async (seed = null) => {
+    // Guard against receiving a click event as the seed
+    const validSeed = typeof seed === 'number' ? seed : null;
+    const gameSeed = validSeed || Math.floor(Math.random() * 900000000) + 100000000;
+    setGameState(prev => ({ ...prev, status: 'loading', mode: 'random', seed: gameSeed, error: null }));
     setCurrentGuess(null);
 
     try {
-      const locations = await fetchLocations(TOTAL_ROUNDS, null);
+      const locations = await fetchLocations(TOTAL_ROUNDS, gameSeed);
 
       if (locations.length < TOTAL_ROUNDS) {
         throw new Error(`Only found ${locations.length} locations. Please try again.`);
@@ -194,7 +228,7 @@ export function useGeoguessGame() {
       setGameState({
         status: 'playing',
         mode: 'random',
-        seed: null,
+        seed: gameSeed,
         currentRound: 1,
         totalRounds: TOTAL_ROUNDS,
         locations,
@@ -254,13 +288,21 @@ export function useGeoguessGame() {
     if (!currentGuess || !currentLocation) return;
 
     const dist = calculateDistance(currentGuess, currentLocation.coordinates);
-    const score = calculateScore(dist);
+    const stepPen = currentSteps * STEP_PENALTY;
+    const labelPen = labelsUsed ? LABEL_PENALTY : 0;
+    const penalty = stepPen + labelPen;
+    const maxPossible = Math.max(0, MAX_SCORE_PER_ROUND - penalty);
+    const score = calculateScore(dist, maxPossible);
 
     const guess = {
       round: gameState.currentRound,
       guessCoords: currentGuess,
       actualCoords: currentLocation.coordinates,
       distance: dist,
+      maxPossible,
+      steps: currentSteps,
+      labelsUsed,
+      penalty,
       score
     };
 
@@ -270,11 +312,13 @@ export function useGeoguessGame() {
       guesses: [...prev.guesses, guess],
       totalScore: prev.totalScore + score
     }));
-  }, [currentGuess, currentLocation, gameState.currentRound]);
+  }, [currentGuess, currentLocation, gameState.currentRound, currentSteps, labelsUsed]);
 
   // Move to the next round or end game
   const nextRound = useCallback(() => {
     setCurrentGuess(null);
+    setCurrentSteps(0);
+    setLabelsUsed(false);
 
     if (gameState.currentRound >= TOTAL_ROUNDS) {
       setGameState(prev => ({ ...prev, status: 'game_over' }));
@@ -291,13 +335,16 @@ export function useGeoguessGame() {
   const resetGame = useCallback(() => {
     setGameState(initialState);
     setCurrentGuess(null);
+    setCurrentSteps(0);
+    setLabelsUsed(false);
   }, []);
 
-  // Get share text for daily challenge
+  // Get share text
   const getShareText = useCallback(() => {
-    if (gameState.mode !== 'daily' || !gameState.seed) return null;
+    if (!gameState.seed) return null;
     return generateShareText(
       gameState.seed,
+      gameState.mode,
       gameState.guesses,
       gameState.totalScore,
       MAX_SCORE_PER_ROUND * TOTAL_ROUNDS
@@ -308,13 +355,19 @@ export function useGeoguessGame() {
     gameState,
     currentLocation,
     currentGuess,
+    currentSteps,
+    labelsUsed,
     startGame,
     startDailyChallenge,
     placeGuess,
     submitGuess,
     nextRound,
     resetGame,
+    recordStep,
+    useLabels,
     getShareText,
+    stepPenalty: STEP_PENALTY,
+    labelPenalty: LABEL_PENALTY,
     maxScorePerRound: MAX_SCORE_PER_ROUND,
     maxTotalScore: MAX_SCORE_PER_ROUND * TOTAL_ROUNDS
   };

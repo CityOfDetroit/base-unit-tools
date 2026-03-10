@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { Box, Button, Card, Flex, Heading, Table, Text } from '@radix-ui/themes';
-import { CheckIcon, CopyIcon, ResetIcon, Share1Icon } from '@radix-ui/react-icons';
+import { Box, Button, Flex, Table, Text } from '@radix-ui/themes';
+import { CheckIcon, ResetIcon, Share1Icon } from '@radix-ui/react-icons';
 import { DETROIT_CENTER, detroitBoundary } from './detroitBoundary';
 import { baseStyle } from '../styles/mapstyle';
+import { addMarkerImages } from './markerImages';
 
 // Format distance for display (imperial units)
 function formatDistance(meters) {
@@ -18,13 +19,12 @@ function formatDistance(meters) {
 
 const MAX_SCORE_PER_ROUND = 5000;
 
-// Get color based on score percentage (matches share emoji colors)
 function getScoreColor(score) {
   const pct = score / MAX_SCORE_PER_ROUND;
-  if (pct >= 0.9) return '#22c55e'; // green
-  if (pct >= 0.7) return '#eab308'; // yellow
-  if (pct >= 0.4) return '#f97316'; // orange
-  return '#ef4444'; // red
+  if (pct >= 0.9) return '#22c55e';
+  if (pct >= 0.7) return '#eab308';
+  if (pct >= 0.4) return '#f97316';
+  return '#ef4444';
 }
 
 const GameResults = ({ guesses, totalScore, maxTotalScore, onPlayAgain, mode, shareText }) => {
@@ -35,17 +35,15 @@ const GameResults = ({ guesses, totalScore, maxTotalScore, onPlayAgain, mode, sh
   const handleShare = async () => {
     if (!shareText) return;
 
-    // Try native share first (mobile)
     if (navigator.share) {
       try {
         await navigator.share({ text: shareText });
         return;
       } catch (err) {
-        // User cancelled or share failed, fall back to clipboard
+        // fall back to clipboard
       }
     }
 
-    // Fall back to clipboard
     try {
       await navigator.clipboard.writeText(shareText);
       setCopied(true);
@@ -55,13 +53,9 @@ const GameResults = ({ guesses, totalScore, maxTotalScore, onPlayAgain, mode, sh
     }
   };
 
-  // Calculate stats
   const totalDistance = guesses.reduce((sum, g) => sum + g.distance, 0);
-  const avgDistance = totalDistance / guesses.length;
-  const bestRound = guesses.reduce((best, g) => (g.score > best.score ? g : best), guesses[0]);
   const scorePercent = Math.round((totalScore / maxTotalScore) * 100);
 
-  // Initialize map with all results
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
@@ -75,7 +69,8 @@ const GameResults = ({ guesses, totalScore, maxTotalScore, onPlayAgain, mode, sh
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
 
     map.on('load', () => {
-      // Add Detroit boundary
+      addMarkerImages(map);
+
       map.addSource('detroit-boundary', {
         type: 'geojson',
         data: detroitBoundary,
@@ -92,7 +87,6 @@ const GameResults = ({ guesses, totalScore, maxTotalScore, onPlayAgain, mode, sh
         },
       });
 
-      // Add all result lines
       const lines = guesses.map((g) => ({
         type: 'Feature',
         geometry: {
@@ -103,10 +97,7 @@ const GameResults = ({ guesses, totalScore, maxTotalScore, onPlayAgain, mode, sh
 
       map.addSource('result-lines', {
         type: 'geojson',
-        data: {
-          type: 'FeatureCollection',
-          features: lines,
-        },
+        data: { type: 'FeatureCollection', features: lines },
       });
 
       map.addLayer({
@@ -120,73 +111,48 @@ const GameResults = ({ guesses, totalScore, maxTotalScore, onPlayAgain, mode, sh
         },
       });
 
-      // Add all guess points (red)
       const guessPoints = guesses.map((g, i) => ({
         type: 'Feature',
         properties: { round: i + 1 },
-        geometry: {
-          type: 'Point',
-          coordinates: g.guessCoords,
-        },
+        geometry: { type: 'Point', coordinates: g.guessCoords },
       }));
 
       map.addSource('guess-points', {
         type: 'geojson',
-        data: {
-          type: 'FeatureCollection',
-          features: guessPoints,
-        },
+        data: { type: 'FeatureCollection', features: guessPoints },
       });
 
       map.addLayer({
-        id: 'guess-points-layer',
-        type: 'circle',
+        id: 'guess-points-symbol',
+        type: 'symbol',
         source: 'guess-points',
-        paint: {
-          'circle-radius': 8,
-          'circle-color': '#ff4444',
-          'circle-stroke-width': 2,
-          'circle-stroke-color': '#ffffff',
-        },
+        layout: { 'icon-image': 'guess-icon', 'icon-allow-overlap': true },
       });
 
-      // Add all actual points (green)
       const actualPoints = guesses.map((g, i) => ({
         type: 'Feature',
         properties: { round: i + 1 },
-        geometry: {
-          type: 'Point',
-          coordinates: g.actualCoords,
-        },
+        geometry: { type: 'Point', coordinates: g.actualCoords },
       }));
 
       map.addSource('actual-points', {
         type: 'geojson',
-        data: {
-          type: 'FeatureCollection',
-          features: actualPoints,
-        },
+        data: { type: 'FeatureCollection', features: actualPoints },
       });
 
       map.addLayer({
-        id: 'actual-points-layer',
-        type: 'circle',
+        id: 'actual-points-symbol',
+        type: 'symbol',
         source: 'actual-points',
-        paint: {
-          'circle-radius': 8,
-          'circle-color': '#279989',
-          'circle-stroke-width': 2,
-          'circle-stroke-color': '#ffffff',
-        },
+        layout: { 'icon-image': 'actual-icon', 'icon-allow-overlap': true },
       });
 
-      // Fit map to show all points
       const bounds = new maplibregl.LngLatBounds();
       guesses.forEach((g) => {
         bounds.extend(g.guessCoords);
         bounds.extend(g.actualCoords);
       });
-      map.fitBounds(bounds, { padding: 50 });
+      map.fitBounds(bounds, { padding: 80 });
     });
 
     mapRef.current = map;
@@ -200,117 +166,94 @@ const GameResults = ({ guesses, totalScore, maxTotalScore, onPlayAgain, mode, sh
   }, [guesses]);
 
   return (
-    <Flex direction="column" className="min-h-[calc(100vh-60px)] p-4" gap="4">
-      {/* Header */}
-      <Flex justify="center">
-        <Card size="3" className="text-center">
-          <Flex direction="column" gap="2" align="center">
-            <Heading size="6">Game Complete!</Heading>
-            <Heading size="8" className="text-[#004445]">
-              {totalScore.toLocaleString()} / {maxTotalScore.toLocaleString()}
-            </Heading>
-            <Text size="4" color="gray">
-              {scorePercent}% accuracy
-            </Text>
-          </Flex>
-        </Card>
-      </Flex>
+    <Flex direction={{ initial: 'column', lg: 'row' }} className="h-[calc(100vh-60px)]">
+      {/* Map */}
+      <Box className="flex-1 min-h-[300px] lg:min-h-0">
+        <div ref={mapContainerRef} className="w-full h-full" />
+      </Box>
 
-      {/* Main content */}
-      <Flex gap="4" direction={{ initial: 'column', lg: 'row' }} className="flex-1">
-        {/* Map */}
-        <Box className="flex-1 min-h-[300px] lg:min-h-0">
-          <div ref={mapContainerRef} className="w-full h-full min-h-[300px] rounded-lg overflow-hidden shadow" />
+      {/* Sidebar */}
+      <Flex direction="column" gap="3" className="lg:w-[380px] p-4 overflow-y-auto border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-gray-700">
+        <Box>
+          <Text size="5" weight="bold" className="text-[#004445]">
+            {totalScore.toLocaleString()}
+          </Text>
+          <Text size="5" color="gray"> / {maxTotalScore.toLocaleString()}</Text>
+          <Text as="p" size="2" color="gray">{scorePercent}%</Text>
         </Box>
 
-        {/* Stats and table */}
-        <Card className="lg:w-[400px]">
-          <Flex direction="column" gap="4">
-            {/* Quick stats */}
-            <Flex gap="4" wrap="wrap">
-              <Box className="flex-1 min-w-[100px] text-center p-2 bg-gray-50 dark:bg-gray-800 rounded">
-                <Text size="1" color="gray">Avg Distance</Text>
-                <Text size="3" weight="bold" className="block">{formatDistance(avgDistance)}</Text>
-              </Box>
-              <Box className="flex-1 min-w-[100px] text-center p-2 bg-gray-50 dark:bg-gray-800 rounded">
-                <Text size="1" color="gray">Best Round</Text>
-                <Text size="3" weight="bold" className="block">#{bestRound.round}</Text>
-              </Box>
-              <Box className="flex-1 min-w-[100px] text-center p-2 bg-gray-50 dark:bg-gray-800 rounded">
-                <Text size="1" color="gray">Total Distance</Text>
-                <Text size="3" weight="bold" className="block">{formatDistance(totalDistance)}</Text>
-              </Box>
-            </Flex>
+        <Table.Root size="1">
+          <Table.Header>
+            <Table.Row>
+              <Table.ColumnHeaderCell>Rd</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell align="right">Dist</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell align="right">Steps</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell align="right">Score</Table.ColumnHeaderCell>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {guesses.map((guess, i) => (
+              <Table.Row key={i}>
+                <Table.Cell>
+                  <Flex align="center" gap="2">
+                    <div
+                      className="w-2.5 h-2.5 rounded-full"
+                      style={{ backgroundColor: getScoreColor(guess.score) }}
+                    />
+                    {i + 1}
+                  </Flex>
+                </Table.Cell>
+                <Table.Cell align="right">{formatDistance(guess.distance)}</Table.Cell>
+                <Table.Cell align="right">
+                  {guess.steps > 0 ? (
+                    <Text size="1" color="orange">{guess.steps}</Text>
+                  ) : (
+                    <Text size="1" color="gray">—</Text>
+                  )}
+                </Table.Cell>
+                <Table.Cell align="right">
+                  <Text weight="bold">{guess.score.toLocaleString()}</Text>
+                </Table.Cell>
+              </Table.Row>
+            ))}
+          </Table.Body>
+        </Table.Root>
 
-            {/* Round breakdown table */}
-            <Table.Root>
-              <Table.Header>
-                <Table.Row>
-                  <Table.ColumnHeaderCell>Round</Table.ColumnHeaderCell>
-                  <Table.ColumnHeaderCell align="right">Distance</Table.ColumnHeaderCell>
-                  <Table.ColumnHeaderCell align="right">Score</Table.ColumnHeaderCell>
-                </Table.Row>
-              </Table.Header>
-              <Table.Body>
-                {guesses.map((guess, i) => (
-                  <Table.Row key={i}>
-                    <Table.Cell>
-                      <Flex align="center" gap="2">
-                        <div
-                          className="w-3 h-3 rounded-full"
-                          style={{
-                            backgroundColor: getScoreColor(guess.score),
-                          }}
-                        />
-                        Round {i + 1}
-                      </Flex>
-                    </Table.Cell>
-                    <Table.Cell align="right">{formatDistance(guess.distance)}</Table.Cell>
-                    <Table.Cell align="right">
-                      <Text weight="bold">{guess.score.toLocaleString()}</Text>
-                    </Table.Cell>
-                  </Table.Row>
-                ))}
-              </Table.Body>
-            </Table.Root>
-
-            {/* Legend */}
-            <Flex gap="4" justify="center">
-              <Flex align="center" gap="1">
-                <div className="w-3 h-3 rounded-full bg-[#279989] border border-white shadow" />
-                <Text size="1" color="gray">Actual</Text>
-              </Flex>
-              <Flex align="center" gap="1">
-                <div className="w-3 h-3 rounded-full bg-[#ff4444] border border-white shadow" />
-                <Text size="1" color="gray">Guess</Text>
-              </Flex>
-            </Flex>
-
-            {/* Share button (daily challenge only) */}
-            {mode === 'daily' && shareText && (
-              <Button
-                size="3"
-                onClick={handleShare}
-                className="w-full cursor-pointer"
-                variant="outline"
-              >
-                {copied ? <CheckIcon /> : <Share1Icon />}
-                {copied ? 'Copied!' : 'Share Results'}
-              </Button>
-            )}
-
-            {/* Play again button */}
-            <Button
-              size="3"
-              onClick={onPlayAgain}
-              className="w-full cursor-pointer"
-              style={{ backgroundColor: '#004445' }}
-            >
-              <ResetIcon />
-              Play Again
-            </Button>
+        {/* Legend */}
+        <Flex gap="3">
+          <Flex align="center" gap="1">
+            <div className="w-2.5 h-2.5 rounded-full bg-[#279989]" />
+            <Text size="1" color="gray">Actual</Text>
           </Flex>
-        </Card>
+          <Flex align="center" gap="1">
+            <div className="w-2.5 h-2.5 rounded-full bg-[#ff4444]" />
+            <Text size="1" color="gray">Guess</Text>
+          </Flex>
+        </Flex>
+
+        <Flex direction="column" gap="2" className="mt-auto">
+          {shareText && (
+            <Button
+              size="2"
+              onClick={handleShare}
+              className="w-full cursor-pointer"
+              variant="outline"
+            >
+              {copied ? <CheckIcon /> : <Share1Icon />}
+              {copied ? 'Copied!' : 'Share Results'}
+            </Button>
+          )}
+
+          <Button
+            size="2"
+            variant="soft"
+            onClick={onPlayAgain}
+            className="w-full cursor-pointer"
+          >
+            <ResetIcon />
+            Play Again
+          </Button>
+        </Flex>
       </Flex>
     </Flex>
   );

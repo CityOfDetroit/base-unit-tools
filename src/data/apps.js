@@ -1,4 +1,4 @@
-import { Crosshair2Icon, EnvelopeOpenIcon, GlobeIcon, HomeIcon } from "@radix-ui/react-icons";
+import { Crosshair2Icon, EnvelopeOpenIcon, GlobeIcon, HomeIcon, SewingPinIcon } from "@radix-ui/react-icons";
 
 export const apps = {
     '/': {
@@ -44,16 +44,16 @@ export const apps = {
         private: true,
         show: true
     },
-    'geoguess': {
-        name: 'Geoguess',
-        url: `/geoguess`,
-        description: 'Test your knowledge of Detroit streets using Mapillary imagery.',
+    'guesser': {
+        name: 'Guesser',
+        url: `/guesser`,
+        description: 'Test your knowledge of Detroit streets using Detroit Street View imagery.',
         questions: [
             `I want to play a game guessing locations in Detroit.`
         ],
-        icon: "GlobeIcon",
+        icon: "SewingPinIcon",
         private: false,
-        show: false
+        show: true
     }
 }
 

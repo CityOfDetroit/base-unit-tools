@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { Box, Button, Card, Flex, Heading, Text } from '@radix-ui/themes';
-import { ArrowRightIcon, CheckCircledIcon } from '@radix-ui/react-icons';
+import { Box, Button, Flex, Text } from '@radix-ui/themes';
+import { ArrowRightIcon } from '@radix-ui/react-icons';
 import { DETROIT_CENTER } from './detroitBoundary';
 import { baseStyle } from '../styles/mapstyle';
 
@@ -48,7 +48,6 @@ const RoundResult = ({
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
 
     map.on('load', () => {
-      // Add line connecting guess and actual
       map.addSource('result-line', {
         type: 'geojson',
         data: {
@@ -71,7 +70,6 @@ const RoundResult = ({
         },
       });
 
-      // Add guess marker (red)
       map.addSource('guess-point', {
         type: 'geojson',
         data: {
@@ -88,14 +86,13 @@ const RoundResult = ({
         type: 'circle',
         source: 'guess-point',
         paint: {
-          'circle-radius': 12,
+          'circle-radius': 10,
           'circle-color': '#ff4444',
-          'circle-stroke-width': 3,
+          'circle-stroke-width': 2,
           'circle-stroke-color': '#ffffff',
         },
       });
 
-      // Add actual location marker (green)
       map.addSource('actual-point', {
         type: 'geojson',
         data: {
@@ -112,14 +109,13 @@ const RoundResult = ({
         type: 'circle',
         source: 'actual-point',
         paint: {
-          'circle-radius': 12,
+          'circle-radius': 10,
           'circle-color': '#279989',
-          'circle-stroke-width': 3,
+          'circle-stroke-width': 2,
           'circle-stroke-color': '#ffffff',
         },
       });
 
-      // Fit map to show both points
       map.fitBounds(bounds, {
         padding: 80,
         maxZoom: 15,
@@ -138,86 +134,60 @@ const RoundResult = ({
     };
   }, [result]);
 
-  const scorePercent = Math.round((result.score / maxScorePerRound) * 100);
-
   return (
     <Flex direction="column" className="h-[calc(100vh-60px)]">
       {/* Header */}
       <Flex
         justify="between"
         align="center"
-        className="bg-white dark:bg-gray-800 px-4 py-3 shadow-sm"
+        className="px-4 py-2 border-b border-gray-200 dark:border-gray-700"
       >
-        <Text size="3" weight="bold" className="text-[#004445]">
-          Round {round}/{totalRounds} Result
-        </Text>
+        <Flex gap="3" align="center">
+          <Text size="2" weight="bold" className="text-[#004445]">
+            {round}/{totalRounds}
+          </Text>
+          <Text size="2">
+            <Text weight="bold">{result.score.toLocaleString()}</Text>
+            <Text color="gray"> pts — {formatDistance(result.distance)} off</Text>
+          </Text>
+          {result.steps > 0 && (
+            <Text size="1" color="orange">
+              {result.steps} step{result.steps !== 1 ? 's' : ''} (-{result.penalty})
+            </Text>
+          )}
+        </Flex>
 
-        <Text size="3" weight="bold">
-          Total: {totalScore.toLocaleString()}
-        </Text>
+        <Flex gap="3" align="center">
+          <Text size="2" color="gray">
+            Total: {totalScore.toLocaleString()}
+          </Text>
+          <Button
+            size="2"
+            onClick={onNext}
+            className="cursor-pointer"
+            style={{ backgroundColor: '#004445' }}
+          >
+            {isLastRound ? 'Results' : 'Next'}
+            <ArrowRightIcon />
+          </Button>
+        </Flex>
       </Flex>
 
-      {/* Main content */}
-      <Flex className="flex-1 min-h-0 p-2 gap-2" direction={{ initial: 'column', md: 'row' }}>
-        {/* Map - shows guess vs actual */}
-        <Box className="flex-1 min-h-[300px] md:min-h-0">
-          <div ref={mapContainerRef} className="w-full h-full rounded-lg overflow-hidden" />
-        </Box>
+      {/* Map */}
+      <Box className="flex-1 min-h-0 p-2">
+        <div ref={mapContainerRef} className="w-full h-full rounded-lg overflow-hidden" />
+      </Box>
 
-        {/* Score card */}
-        <Card className="md:w-[300px]">
-          <Flex direction="column" gap="4" className="h-full" justify="center">
-            <Flex direction="column" align="center" gap="2">
-              <CheckCircledIcon
-                width="48"
-                height="48"
-                color={result.score > maxScorePerRound * 0.6 ? '#279989' : '#666'}
-              />
-
-              <Heading size="7" className="text-[#004445]">
-                {result.score.toLocaleString()}
-              </Heading>
-
-              <Text size="2" color="gray">
-                points ({scorePercent}%)
-              </Text>
-            </Flex>
-
-            <Flex direction="column" gap="2" className="text-center">
-              <Text size="2" color="gray">
-                Your guess was
-              </Text>
-              <Text size="4" weight="bold">
-                {formatDistance(result.distance)}
-              </Text>
-              <Text size="2" color="gray">
-                from the actual location
-              </Text>
-            </Flex>
-
-            {/* Legend */}
-            <Flex direction="column" gap="1" className="mt-2">
-              <Flex align="center" gap="2">
-                <div className="w-4 h-4 rounded-full bg-[#279989] border-2 border-white shadow" />
-                <Text size="2">Actual location</Text>
-              </Flex>
-              <Flex align="center" gap="2">
-                <div className="w-4 h-4 rounded-full bg-[#ff4444] border-2 border-white shadow" />
-                <Text size="2">Your guess</Text>
-              </Flex>
-            </Flex>
-
-            <Button
-              size="3"
-              onClick={onNext}
-              className="w-full cursor-pointer mt-4"
-              style={{ backgroundColor: '#004445' }}
-            >
-              {isLastRound ? 'See Final Results' : 'Next Round'}
-              <ArrowRightIcon />
-            </Button>
-          </Flex>
-        </Card>
+      {/* Legend */}
+      <Flex gap="4" justify="center" className="px-4 py-2 border-t border-gray-200 dark:border-gray-700">
+        <Flex align="center" gap="1">
+          <div className="w-2.5 h-2.5 rounded-full bg-[#279989]" />
+          <Text size="1" color="gray">Actual</Text>
+        </Flex>
+        <Flex align="center" gap="1">
+          <div className="w-2.5 h-2.5 rounded-full bg-[#ff4444]" />
+          <Text size="1" color="gray">Guess</Text>
+        </Flex>
       </Flex>
     </Flex>
   );

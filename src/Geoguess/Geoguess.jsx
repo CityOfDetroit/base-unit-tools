@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Flex, Spinner, Text } from '@radix-ui/themes';
 import useGeoguessGame from './useGeoguessGame';
 import GameStart from './GameStart';
 import GameRound from './GameRound';
-import RoundResult from './RoundResult';
 import GameResults from './GameResults';
 
 const Geoguess = () => {
@@ -11,20 +10,45 @@ const Geoguess = () => {
     gameState,
     currentLocation,
     currentGuess,
+    currentSteps,
+    labelsUsed,
     startGame,
     startDailyChallenge,
     placeGuess,
     submitGuess,
     nextRound,
     resetGame,
+    recordStep,
+    useLabels,
     getShareText,
+    stepPenalty,
+    labelPenalty,
     maxScorePerRound,
     maxTotalScore
   } = useGeoguessGame();
 
+  // Auto-start from ?seed= query param (shared game links)
+  const seedHandled = useRef(false);
+  useEffect(() => {
+    if (seedHandled.current) return;
+    const params = new URLSearchParams(window.location.search);
+    const seed = params.get('seed');
+    if (seed && gameState.status === 'idle') {
+      seedHandled.current = true;
+      const seedNum = parseInt(seed, 10);
+      if (!isNaN(seedNum)) {
+        // Clean the URL
+        window.history.replaceState({}, '', window.location.pathname);
+        startGame(seedNum);
+      }
+    }
+  }, [gameState.status, startGame]);
+
+  const isRoundResult = gameState.status === 'round_result';
+  const lastGuess = isRoundResult ? gameState.guesses[gameState.guesses.length - 1] : null;
+
   return (
     <div className="min-h-[calc(100vh-60px)] bg-gray-100 dark:bg-gray-900">
-      {/* Idle - Start Screen */}
       {gameState.status === 'idle' && (
         <GameStart
           onStartRandom={startGame}
@@ -33,7 +57,6 @@ const Geoguess = () => {
         />
       )}
 
-      {/* Loading - Fetching locations */}
       {gameState.status === 'loading' && (
         <Flex
           align="center"
@@ -43,16 +66,15 @@ const Geoguess = () => {
           className="min-h-[calc(100vh-60px)]"
         >
           <Spinner size="3" />
-          <Text size="3" color="gray">
+          <Text size="2" color="gray">
             {gameState.mode === 'daily'
               ? "Loading today's challenge..."
-              : 'Finding random locations in Detroit...'}
+              : 'Finding locations...'}
           </Text>
         </Flex>
       )}
 
-      {/* Playing - Active round */}
-      {gameState.status === 'playing' && currentLocation && (
+      {(gameState.status === 'playing' || isRoundResult) && currentLocation && (
         <GameRound
           round={gameState.currentRound}
           totalRounds={gameState.totalRounds}
@@ -63,23 +85,19 @@ const Geoguess = () => {
           onSubmit={submitGuess}
           maxScorePerRound={maxScorePerRound}
           mode={gameState.mode}
-        />
-      )}
-
-      {/* Round Result */}
-      {gameState.status === 'round_result' && (
-        <RoundResult
-          result={gameState.guesses[gameState.guesses.length - 1]}
-          round={gameState.currentRound}
-          totalRounds={gameState.totalRounds}
-          totalScore={gameState.totalScore}
-          maxScorePerRound={maxScorePerRound}
+          currentSteps={currentSteps}
+          recordStep={recordStep}
+          stepPenalty={stepPenalty}
+          labelsUsed={labelsUsed}
+          useLabels={useLabels}
+          labelPenalty={labelPenalty}
+          isResult={isRoundResult}
+          result={lastGuess}
           onNext={nextRound}
           isLastRound={gameState.currentRound >= gameState.totalRounds}
         />
       )}
 
-      {/* Game Over - Final Results */}
       {gameState.status === 'game_over' && (
         <GameResults
           guesses={gameState.guesses}

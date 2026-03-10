@@ -42,7 +42,7 @@ const App = () => {
                 <Route path="/geocoder" element={<Geocoder />} />
                 <Route path="/mailer" element={<ProtectedRoute path="/mailer"><Mailer /></ProtectedRoute>} />
                 <Route path="/base-unit/:unit" element={<BaseUnitPage />} />
-                <Route path="/geoguess" element={<Geoguess />} />
+                <Route path="/guesser" element={<Geoguess />} />
               </Routes>
             </Suspense>
           </Layout>

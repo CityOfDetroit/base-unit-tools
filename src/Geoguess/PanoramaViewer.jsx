@@ -5,12 +5,13 @@ import { Flex, Spinner, Text } from '@radix-ui/themes';
 
 const MAPILLARY_TOKEN = 'MLY|4690399437648324|de87555bb6015affa20c3df794ebab15';
 
-const PanoramaViewer = ({ imageId, onLoad, onError }) => {
+const PanoramaViewer = ({ imageId, capturedAt, onLoad, onError, onNavigate }) => {
   const viewerRef = useRef(null);
   const viewerInstance = useRef(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const currentImageId = useRef(null);
+  const initialLoadDone = useRef(false);
 
   // Initialize viewer when we have both a container and an imageId
   useEffect(() => {
@@ -48,8 +49,7 @@ const PanoramaViewer = ({ imageId, onLoad, onError }) => {
       accessToken: MAPILLARY_TOKEN,
       container: viewerRef.current,
       component: {
-        // Disable navigation - player shouldn't be able to move to other images
-        direction: false,
+        direction: true,
         sequence: false,
         // Disable other location hints
         bearing: false,
@@ -63,10 +63,17 @@ const PanoramaViewer = ({ imageId, onLoad, onError }) => {
       imageId: imageId,
     });
 
+    initialLoadDone.current = false;
     viewer.on('image', () => {
       setLoading(false);
       setError(null);
-      if (onLoad) onLoad();
+      if (!initialLoadDone.current) {
+        initialLoadDone.current = true;
+        if (onLoad) onLoad();
+      } else {
+        // User navigated to a new image
+        if (onNavigate) onNavigate();
+      }
     });
 
     viewerInstance.current = viewer;
@@ -75,9 +82,10 @@ const PanoramaViewer = ({ imageId, onLoad, onError }) => {
       if (viewerInstance.current) {
         viewerInstance.current.remove();
         viewerInstance.current = null;
+        initialLoadDone.current = false;
       }
     };
-  }, [imageId, onLoad, onError]);
+  }, [imageId, onLoad, onError, onNavigate]);
 
   return (
     <div className="relative w-full h-full min-h-[300px]">
@@ -86,6 +94,16 @@ const PanoramaViewer = ({ imageId, onLoad, onError }) => {
         className="w-full h-full rounded-lg overflow-hidden"
         style={{ minHeight: '300px' }}
       />
+
+      {/* Date overlay */}
+      {capturedAt && !loading && !error && (
+        <Text
+          size="1"
+          className="absolute bottom-2 left-2 bg-black/60 text-white px-2 py-0.5 rounded"
+        >
+          {new Date(capturedAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+        </Text>
+      )}
 
       {/* Loading overlay */}
       {loading && (
