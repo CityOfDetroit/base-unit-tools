@@ -69,7 +69,7 @@ export const baseStyle = {
     satellite: {
       type: "raster",
       tiles: [
-        "https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/MiSAIL_2020_6in_Clip_webMerc/MapServer/tile/{z}/{y}/{x}",
+        "https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/2024Sp_Wayne_6in_MiSAIL_tileCache/MapServer/tile/{z}/{y}/{x}",
       ],
     },
     "linen-map": {
