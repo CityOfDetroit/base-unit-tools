@@ -275,8 +275,8 @@ const GeocoderResults = ({
   // Combine cols - mobile shows only first 3, desktop shows all
   const allCols = [...cols, ...desktopOnlyCols];
 
-  filteredResults.forEach((res, idx) => {
-    res.attributes.input = addresses[idx];
+  filteredResults.forEach((res) => {
+    res.attributes.input = addresses[res.attributes.ResultID - 1];
     if (res.attributes.address_id === 0) {
       res.attributes.address_id = null;
     }
@@ -314,7 +314,7 @@ const GeocoderResults = ({
   );
 
   // Export data preparation
-  let dataForExcelExport = rows.map((row, idx) => {
+  let dataForExcelExport = rows.map((row) => {
     let newRow = { ...row.values };
     newRow["Address"] = newRow["StAddr"];
     delete newRow["StAddr"];
@@ -341,12 +341,12 @@ const GeocoderResults = ({
       newRow.related_parcel = `=""${newRow.related_parcel}""`;
     }
     if (csv) {
-      newRow = { ...csv[idx], ...newRow };
+      newRow = { ...csv[row.original.ResultID - 1], ...newRow };
     }
     return newRow;
   });
 
-  let dataForCsvExport = rows.map((row, idx) => {
+  let dataForCsvExport = rows.map((row) => {
     let newRow = { ...row.values };
     newRow["Address"] = newRow["StAddr"];
     delete newRow["StAddr"];
@@ -373,7 +373,7 @@ const GeocoderResults = ({
       newRow.related_parcel = `=""${newRow.related_parcel}""`;
     }
     if (csv) {
-      newRow = { ...csv[idx], ...newRow };
+      newRow = { ...csv[row.original.ResultID - 1], ...newRow };
     }
     return newRow;
   });
