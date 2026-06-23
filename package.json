@@ -24,6 +24,7 @@
     "@turf/difference": "^7.1.0",
     "@turf/distance": "^7.1.0",
     "@turf/simplify": "^7.1.0",
+    "@turf/union": "^7.3.5",
     "bluebird": "^3.7.2",
     "mapillary-js": "^4.1.2",
     "maplibre-gl": "^4.7.1",

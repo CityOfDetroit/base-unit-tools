@@ -9,8 +9,30 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [username, setUsername] = useState("");
   const [token, setToken] = useState(null);
+  const [groups, setGroups] = useState([]);
+  const [groupsLoading, setGroupsLoading] = useState(false);
 
   const portalUrl = "https://detroitmi.maps.arcgis.com";
+
+  // fetch the signed-in user's group memberships
+  const fetchGroups = (userId, userToken) => {
+    setGroupsLoading(true);
+    const url = `${portalUrl}/sharing/rest/community/users/${encodeURIComponent(
+      userId
+    )}?f=json&token=${userToken}`;
+    return fetch(url)
+      .then((r) => r.json())
+      .then((data) => {
+        setGroups(Array.isArray(data?.groups) ? data.groups : []);
+        setGroupsLoading(false);
+      })
+      .catch(() => {
+        setGroups([]);
+        setGroupsLoading(false);
+      });
+  };
+
+  const isInGroup = (groupId) => groups.some((g) => g.id === groupId);
 
   useEffect(() => {
     const info = new OAuthInfo({
@@ -29,18 +51,24 @@ export const AuthProvider = ({ children }) => {
       })
       .catch(() => {
         setIsAuthenticated(false);
+        setGroups([]);
+        setGroupsLoading(false);
       });
   }, []);
 
   const getCurrentUser = () => {
+    setGroupsLoading(true);
     esriId
       .getCredential(portalUrl + "/sharing")
       .then((credentials) => {
         setUsername(credentials.userId);
         setToken(credentials.token);
+        return fetchGroups(credentials.userId, credentials.token);
       })
       .catch((error) => {
         console.error(error);
+        setGroups([]);
+        setGroupsLoading(false);
       });
   };
 
@@ -65,11 +93,22 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
     setUsername("");
     setToken(null);
+    setGroups([]);
+    setGroupsLoading(false);
   };
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, token, username, handleSignIn, handleSignOut }}
+      value={{
+        isAuthenticated,
+        token,
+        username,
+        groups,
+        groupsLoading,
+        isInGroup,
+        handleSignIn,
+        handleSignOut,
+      }}
     >
       {children}
     </AuthContext.Provider>

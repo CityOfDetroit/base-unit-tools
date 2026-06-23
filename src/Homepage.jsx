@@ -91,13 +91,39 @@ const useFeatureCount = (endpoint) => {
 };
 
 const Homepage = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isInGroup } = useAuth();
   const [chromeNoticeOpen, setChromeNoticeOpen] = useState(false);
 
   const addresses = useFeatureCount(layers.address.endpoint);
   const buildings = useFeatureCount(layers.building.endpoint);
   const parcels = useFeatureCount(layers.parcel.endpoint);
   const streets = useFeatureCount(layers.street.endpoint);
+
+  // apps the current user can see, split into general vs. access-gated
+  const visibleApps = Object.keys(apps)
+    .slice(1)
+    .filter((app) => {
+      if (apps[app].private && !isAuthenticated) return false;
+      if (apps[app].group && !isInGroup(apps[app].group)) return false;
+      return true;
+    });
+  const isRestricted = (app) => apps[app].private || apps[app].group;
+  const publicApps = visibleApps.filter((app) => !isRestricted(app));
+  const accessibleApps = visibleApps.filter(isRestricted);
+
+  const renderAppCard = (app) => (
+    <Link to={apps[app].url} key={app}>
+      <Card size="1" className="text-sm">
+        <Flex direction="row" align="center" gap="2" pb="2">
+          <Icon name={apps[app].icon} />
+          <Text size="3" weight="medium">
+            {apps[app].name}
+          </Text>
+        </Flex>
+        <Text>{apps[app].description}</Text>
+      </Card>
+    </Link>
+  );
 
   return (
     <div className="bg-gray-100 dark:bg-gray-800">
@@ -117,54 +143,50 @@ const Homepage = () => {
           </Link>
         </Box>
 
-        <Box
-          mb="5"
-          className="rounded-md overflow-hidden"
-          style={{ backgroundColor: "#004445" }}
-        >
-          <Box className="p-4">
-            <Flex gap="3" align="start">
-              <InfoCircledIcon
-                width="20"
-                height="20"
-                style={{ color: "#feb70d", flexShrink: 0, marginTop: "2px" }}
-              />
-              <Text size="2" style={{ color: "#f2f2f2" }}>
-                <Text as="span" weight="medium" style={{ color: "#feb70d" }}>
-                  City employees:
-                </Text>{" "}
-                You will need to sign in with <Link to="https://detroitmi.maps.arcgis.com">ArcGIS Online</Link> to access employee-only
-                tools.
-              </Text>
-            </Flex>
-          </Box>
-        </Box>
-
         <Box mb="5">
           <Heading size="4" mb="3">
             Tools available on this site
           </Heading>
           <Grid columns={{ initial: "1", sm: "2" }} gap="4">
-            {Object.keys(apps)
-              .slice(1)
-              .map((app) => {
-                if (apps[app].private && !isAuthenticated) return null;
-                return (
-                  <Link to={apps[app].url} key={app}>
-                    <Card size="1" className="text-sm">
-                      <Flex direction="row" align="center" gap="2" pb="2">
-                        <Icon name={apps[app].icon} />
-                        <Text size="3" weight="medium">
-                          {apps[app].name}
-                        </Text>
-                      </Flex>
-                      <Text>{apps[app].description}</Text>
-                    </Card>
-                  </Link>
-                );
-              })}
+            {publicApps.map(renderAppCard)}
           </Grid>
         </Box>
+
+        {!isAuthenticated && (
+          <Box
+            mb="5"
+            className="rounded-md overflow-hidden"
+            style={{ backgroundColor: "#004445" }}
+          >
+            <Box className="p-4">
+              <Flex gap="3" align="start">
+                <InfoCircledIcon
+                  width="20"
+                  height="20"
+                  style={{ color: "#feb70d", flexShrink: 0, marginTop: "2px" }}
+                />
+                <Text size="2" style={{ color: "#f2f2f2" }}>
+                  <Text as="span" weight="medium" style={{ color: "#feb70d" }}>
+                    City employees:
+                  </Text>{" "}
+                  You will need to sign in with <Link to="https://detroitmi.maps.arcgis.com">ArcGIS Online</Link> to access employee-only
+                  tools.
+                </Text>
+              </Flex>
+            </Box>
+          </Box>
+        )}
+
+        {accessibleApps.length > 0 && (
+          <Box mb="5">
+            <Heading size="4" mb="3">
+              Tools accessible to you
+            </Heading>
+            <Grid columns={{ initial: "1", sm: "2" }} gap="4">
+              {accessibleApps.map(renderAppCard)}
+            </Grid>
+          </Box>
+        )}
 
         <Box pb="5">
           <Heading size="4" mb="3">

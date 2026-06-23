@@ -16,6 +16,7 @@ import Login from "./Login";
 const BaseUnitsMap = lazy(() => import("./Map/BaseUnitsMap"));
 const Geocoder = lazy(() => import("./Geocoder/Geocoder"));
 const Mailer = lazy(() => import("./Mailer/Mailer"));
+const Zoning = lazy(() => import("./Zoning/Zoning"));
 const About = lazy(() => import("./About"));
 const BaseUnitPage = lazy(() => import("./BaseUnitPage"));
 
@@ -40,6 +41,7 @@ const App = () => {
                 <Route path="/map" element={<BaseUnitsMap />} />
                 <Route path="/geocoder" element={<Geocoder />} />
                 <Route path="/mailer" element={<ProtectedRoute path="/mailer"><Mailer /></ProtectedRoute>} />
+                <Route path="/zoning" element={<ProtectedRoute path="/zoning"><Zoning /></ProtectedRoute>} />
                 <Route path="/base-unit/:unit" element={<BaseUnitPage />} />
               </Routes>
             </Suspense>
