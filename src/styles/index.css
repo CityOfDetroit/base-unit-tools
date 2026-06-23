@@ -52,3 +52,20 @@ a {
 p {
   @apply py-2;
 }
+
+/* subtle hover tooltip for the zoning amendment minimap */
+.zoning-parcel-tip {
+  opacity: 0.8;
+}
+.zoning-parcel-tip .maplibregl-popup-content {
+  background: rgba(17, 24, 39, 0.75);
+  color: #fff;
+  padding: 2px 6px;
+  font-size: 11px;
+  border-radius: 3px;
+  box-shadow: none;
+  pointer-events: none;
+}
+.zoning-parcel-tip .maplibregl-popup-tip {
+  display: none;
+}

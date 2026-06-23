@@ -1,4 +1,5 @@
 import { Crosshair2Icon, EnvelopeOpenIcon, GlobeIcon, HomeIcon } from "@radix-ui/react-icons";
+import { ZONING_GROUP_ID } from "./groups";
 
 export const apps = {
     '/': {
@@ -42,6 +43,18 @@ export const apps = {
         ],
         icon: "EnvelopeOpenIcon",
         private: true,
+        show: true
+    },
+    'zoning': {
+        name: 'Zoning Amendments',
+        url: `/zoning`,
+        description: `Create and edit zoning amendment applications.`,
+        questions: [
+            `I need to update the parcels and status for a zoning amendment.`
+        ],
+        icon: "GroupIcon",
+        private: true,
+        group: ZONING_GROUP_ID,
         show: true
     }
 }
