@@ -78,7 +78,12 @@ export const ZONING_FIELDS = [
   { name: "cpc_staff_report_date", label: "CPC staff report date", type: "date" },
   { name: "cpc_public_hearing_date", label: "CPC public hearing date", type: "date" },
   { name: "cpc_action_date", label: "CPC action date", type: "date" },
-  { name: "cpc_action", label: "CPC action", type: "text" },
+  {
+    name: "cpc_action",
+    label: "CPC action",
+    type: "select",
+    options: ["Approve", "Deny"],
+  },
   { name: "cpc_refer_to_council_date", label: "CPC refer to council date", type: "date" },
   { name: "council_hearing_1_date", label: "Council hearing 1 date", type: "date" },
   { name: "ped_public_hearing_date", label: "PED public hearing date", type: "date" },
@@ -89,7 +94,12 @@ export const ZONING_FIELDS = [
     options: ["Approve", "Deny"],
   },
   { name: "council_action_date", label: "Council action date", type: "date" },
-  { name: "council_action", label: "Council action", type: "text" },
+  {
+    name: "council_action",
+    label: "Council action",
+    type: "select",
+    options: ["Approve", "Deny"],
+  },
 ];
 
 export const ZONING_DATE_FIELDS = ZONING_FIELDS.filter((f) => f.type === "date").map(
