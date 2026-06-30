@@ -2,14 +2,25 @@ import { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import bbox from "@turf/bbox";
 import { baseStyle } from "../styles/mapstyle.js";
+import {
+  addZoningDistrictsLayers,
+  setZoningDistrictsVisible,
+} from "./zoningOverlay";
 
 // Map for selecting parcels into a zoning-amendment grouping.
 // - click a parcel to toggle it in/out of the selection (fine control)
 // - selected parcels are highlighted via a vector-tile filter on `parcel_id`
 // - the dissolved amendment boundary is previewed as an outline
+// - an optional zoning-districts overlay (`showZoning`) shows current zoning
 const SELECTION_COLOR = "#2563eb";
 
-const ZoningMap = ({ selectedIds, onToggleParcel, dissolved, height = "65vh" }) => {
+const ZoningMap = ({
+  selectedIds,
+  onToggleParcel,
+  dissolved,
+  showZoning = false,
+  height = "65vh",
+}) => {
   const [theMap, setTheMap] = useState(null);
   // keep the latest toggle callback so the click handler isn't stale
   const toggleRef = useRef(onToggleParcel);
@@ -39,6 +50,10 @@ const ZoningMap = ({ selectedIds, onToggleParcel, dissolved, height = "65vh" }) 
           [14.1, 0.2],
         ],
       });
+
+      // zoning-districts overlay (hidden until toggled on) — added before the
+      // selection/dissolved layers so those highlights stay on top of it
+      addZoningDistrictsLayers(map);
 
       // highlight fill for selected parcels (filtered by parcel_id)
       map.addLayer({
@@ -92,12 +107,29 @@ const ZoningMap = ({ selectedIds, onToggleParcel, dissolved, height = "65vh" }) 
       }
     });
 
-    // pointer cursor over parcels
-    map.on("mouseenter", "parcel-fill", () => {
+    // hover tooltip: parcel id · address · zoning (all carried on the tiles)
+    const popup = new maplibregl.Popup({
+      closeButton: false,
+      closeOnClick: false,
+      offset: 8,
+      className: "zoning-parcel-tip",
+    });
+    map.on("mousemove", "parcel-fill", (e) => {
+      const props = e.features?.[0]?.properties;
+      const pid = props?.parcel_id;
+      if (!pid) {
+        popup.remove();
+        return;
+      }
       map.getCanvas().style.cursor = "pointer";
+      const text = [pid, props.address, props.zoning_district]
+        .filter(Boolean)
+        .join(" · ");
+      popup.setLngLat(e.lngLat).setText(text).addTo(map);
     });
     map.on("mouseleave", "parcel-fill", () => {
       map.getCanvas().style.cursor = "";
+      popup.remove();
     });
 
     return () => map.remove();
@@ -110,6 +142,25 @@ const ZoningMap = ({ selectedIds, onToggleParcel, dissolved, height = "65vh" }) 
     theMap.setFilter("zoning-selection-fill", filter);
     theMap.setFilter("zoning-selection-line", filter);
   }, [theMap, selectedIds]);
+
+  // show/hide the zoning-districts overlay; when on, fade the selection fill to
+  // a faint gray so the district color shows through selected parcels
+  useEffect(() => {
+    if (!theMap) return;
+    setZoningDistrictsVisible(theMap, showZoning);
+    if (theMap.getLayer("zoning-selection-fill")) {
+      theMap.setPaintProperty(
+        "zoning-selection-fill",
+        "fill-color",
+        showZoning ? "#6b7280" : SELECTION_COLOR
+      );
+      theMap.setPaintProperty(
+        "zoning-selection-fill",
+        "fill-opacity",
+        showZoning ? 0.1 : 0.35
+      );
+    }
+  }, [theMap, showZoning]);
 
   // update the dissolved preview; fit to it once (no animation), not on every change
   const didFitRef = useRef(false);

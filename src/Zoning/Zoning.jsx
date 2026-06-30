@@ -12,6 +12,7 @@ import { useAuth } from "../contexts/AuthContext";
 import useGroupAccess from "../hooks/useGroupAccess";
 import {
   EDITOR_FIELDS,
+  deriveUniqueId,
   fmtDate,
   fmtDateTime,
   geojsonToZoningGeometry,
@@ -20,6 +21,7 @@ import {
   PARCEL_LAYER_URL,
   PARCELS_FIELD_MAX,
   parseParcels,
+  REQUIRED_FIELDS,
   SORT_OPTIONS,
   sortKey,
   ZONING_FIELDS,
@@ -53,6 +55,7 @@ const Zoning = () => {
   const [detailRecord, setDetailRecord] = useState(null);
   const [detailGeometry, setDetailGeometry] = useState(null);
   const [detailParcelAddresses, setDetailParcelAddresses] = useState({});
+  const [detailParcelZoning, setDetailParcelZoning] = useState({});
   const [detailError, setDetailError] = useState(null);
 
   // edit state
@@ -149,37 +152,44 @@ const Zoning = () => {
     };
   }, [hasAccess, selectedId, token, refreshSignal]);
 
-  // addresses for the viewed record's affected parcels (view mode)
+  // addresses + zoning for the viewed record's affected parcels (view mode)
   useEffect(() => {
     if (editing || !detailRecord) {
       setDetailParcelAddresses({});
+      setDetailParcelZoning({});
       return;
     }
     const ids = parseParcels(detailRecord.parcels);
     if (ids.length === 0) {
       setDetailParcelAddresses({});
+      setDetailParcelZoning({});
       return;
     }
     let cancelled = false;
     queryFeatures({
       url: PARCEL_LAYER_URL,
       where: `${PARCEL_ID_FIELD} IN (${sqlList(ids)})`,
-      outFields: [PARCEL_ID_FIELD, "address"],
+      outFields: [PARCEL_ID_FIELD, "address", "zoning_district"],
       returnGeometry: false,
       authentication: token,
     })
       .then((res) => {
         if (cancelled) return;
-        const map = {};
+        const addresses = {};
+        const zoning = {};
         (res?.features || []).forEach((f) => {
           const pid = f.attributes?.[PARCEL_ID_FIELD];
-          if (pid != null && f.attributes.address) map[pid] = f.attributes.address;
+          if (pid == null) return;
+          if (f.attributes.address) addresses[pid] = f.attributes.address;
+          if (f.attributes.zoning_district) zoning[pid] = f.attributes.zoning_district;
         });
-        setDetailParcelAddresses(map);
+        setDetailParcelAddresses(addresses);
+        setDetailParcelZoning(zoning);
       })
       .catch(() => {
         if (cancelled) return;
         setDetailParcelAddresses({});
+        setDetailParcelZoning({});
       });
     return () => {
       cancelled = true;
@@ -220,11 +230,21 @@ const Zoning = () => {
     return map;
   }, [parcelGeoms]);
 
+  // parcel_id -> zoning designation, from the fetched parcel features
+  const parcelZoning = useMemo(() => {
+    const map = {};
+    Object.entries(parcelGeoms).forEach(([id, feat]) => {
+      const zone = feat?.properties?.zoning_district;
+      if (zone) map[id] = zone;
+    });
+    return map;
+  }, [parcelGeoms]);
+
   const fetchParcelGeom = (parcelId) =>
     queryFeatures({
       url: PARCEL_LAYER_URL,
       where: `${PARCEL_ID_FIELD} = '${String(parcelId).replace(/'/g, "''")}'`,
-      outFields: [PARCEL_ID_FIELD, "address"],
+      outFields: [PARCEL_ID_FIELD, "address", "zoning_district"],
       returnGeometry: true,
       f: "geojson",
       authentication: token,
@@ -338,7 +358,7 @@ const Zoning = () => {
       queryFeatures({
         url: PARCEL_LAYER_URL,
         where: `${PARCEL_ID_FIELD} IN (${sqlList(ids)})`,
-        outFields: [PARCEL_ID_FIELD, "address"],
+        outFields: [PARCEL_ID_FIELD, "address", "zoning_district"],
         returnGeometry: true,
         f: "geojson",
         authentication: token,
@@ -368,9 +388,17 @@ const Zoning = () => {
 
   const parcelsString = selectedIds.join("|");
   const overLimit = parcelsString.length > PARCELS_FIELD_MAX;
-  const canSave = selectedIds.length > 0 && !!dissolved && !overLimit && !saving;
+  const requiredComplete = REQUIRED_FIELDS.every(
+    (name) => String(attributes[name] ?? "").trim() !== ""
+  );
+  const canSave =
+    selectedIds.length > 0 &&
+    !!dissolved &&
+    !overLimit &&
+    !saving &&
+    requiredComplete;
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!canSave) return;
     setSaving(true);
     setStatus(null);
@@ -383,38 +411,71 @@ const Zoning = () => {
     outAttrs.parcels = parcelsString;
 
     const geometry = geojsonToZoningGeometry(dissolved.geometry);
-    const feature =
-      mode === "edit"
-        ? { attributes: { OBJECTID: objectId, ...outAttrs }, geometry }
-        : { attributes: outAttrs, geometry };
-    const op = mode === "edit" ? updateFeatures : addFeatures;
+    const wasNew = mode === "new";
 
-    op({ url: ZONING_LAYER_URL, features: [feature], authentication: token })
-      .then((res) => {
-        const result = (res?.addResults || res?.updateResults || [])[0];
-        if (result?.success) {
-          const newId = result.objectId ?? objectId;
-          const wasNew = mode === "new";
-          setObjectId(newId);
-          setSelectedId(newId);
-          setMode("edit");
-          setStatus({
-            ok: true,
-            message: wasNew ? "Amendment created." : "Changes saved.",
-          });
-          setRefreshSignal((n) => n + 1);
-        } else {
-          setStatus({
-            ok: false,
-            message: result?.error?.description || "Save failed.",
-          });
+    try {
+      let savedId = objectId;
+
+      if (wasNew) {
+        // OBJECTID is unknown until the insert returns…
+        const res = await addFeatures({
+          url: ZONING_LAYER_URL,
+          features: [{ attributes: outAttrs, geometry }],
+          authentication: token,
+        });
+        const result = (res?.addResults || [])[0];
+        if (!result?.success)
+          throw new Error(result?.error?.description || "Save failed.");
+        savedId = result.objectId;
+
+        // …so auto-assign the file number (the CPC unique id) in a follow-up.
+        // Best-effort: the record already exists, so a failure here just leaves
+        // the file number unset (it gets assigned on the next save).
+        const fileNumber = deriveUniqueId({ ...attributes, OBJECTID: savedId });
+        if (fileNumber) {
+          try {
+            await updateFeatures({
+              url: ZONING_LAYER_URL,
+              features: [
+                { attributes: { OBJECTID: savedId, file_number: fileNumber } },
+              ],
+              authentication: token,
+            });
+          } catch (e) {
+            /* record created; file number stays unset until the next save */
+          }
         }
-        setSaving(false);
-      })
-      .catch((err) => {
-        setStatus({ ok: false, message: err?.message || "Save failed." });
-        setSaving(false);
+      } else {
+        // OBJECTID known — assign the file number only if it's not set yet, so
+        // an established number stays stable, then fold it into the update
+        if (!attributes.file_number) {
+          const fileNumber = deriveUniqueId({ ...attributes, OBJECTID: objectId });
+          if (fileNumber) outAttrs.file_number = fileNumber;
+        }
+        const res = await updateFeatures({
+          url: ZONING_LAYER_URL,
+          features: [{ attributes: { OBJECTID: objectId, ...outAttrs }, geometry }],
+          authentication: token,
+        });
+        const result = (res?.updateResults || [])[0];
+        if (!result?.success)
+          throw new Error(result?.error?.description || "Save failed.");
+        savedId = result.objectId ?? objectId;
+      }
+
+      setObjectId(savedId);
+      setSelectedId(savedId);
+      setMode("edit");
+      setStatus({
+        ok: true,
+        message: wasNew ? "Amendment created." : "Changes saved.",
       });
+      setRefreshSignal((n) => n + 1);
+    } catch (err) {
+      setStatus({ ok: false, message: err?.message || "Save failed." });
+    } finally {
+      setSaving(false);
+    }
   };
 
   // ---- access gating ----
@@ -491,6 +552,7 @@ const Zoning = () => {
               geometry={detailGeometry}
               selectedIds={selectedIds}
               parcelAddresses={editing ? parcelAddresses : detailParcelAddresses}
+              parcelZoning={editing ? parcelZoning : detailParcelZoning}
               dissolved={dissolved}
               onToggleParcel={handleToggleParcel}
               onAddParcel={handleAddParcel}

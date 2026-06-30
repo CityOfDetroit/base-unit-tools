@@ -36,6 +36,16 @@ export const ZONING_OPTIONS = [
   "MKT", "TM", "W1",
 ];
 
+// Planners an amendment can be assigned to (issue #7964 picklist).
+export const ASSIGNED_TO_OPTIONS = [
+  "Kimani Jeffrey",
+  "Rory Bolger",
+  "Eric Fazzini",
+  "Christopher Gulock",
+  "Jamie Murphy",
+  "Timarie DeBruhl",
+];
+
 // Editable attribute fields, in display order, with input types.
 // type: "text" | "textarea" | "date" | "select" | "combobox"
 export const ZONING_FIELDS = [
@@ -45,12 +55,18 @@ export const ZONING_FIELDS = [
     name: "application_type",
     label: "Application type",
     type: "select",
-    options: ["Rezoning", "PD / PC / PCA Zoning Change", "Map Amendment"],
+    options: ["Rezoning", "PD / PC / PCA Zoning Change"],
+    required: true,
   },
   { name: "application_description", label: "Description", type: "textarea" },
   { name: "received_date", label: "Received date", type: "date" },
   { name: "check_number", label: "Check number", type: "text" },
-  { name: "assigned_to", label: "Assigned to", type: "text" },
+  {
+    name: "assigned_to",
+    label: "Assigned to",
+    type: "select",
+    options: ASSIGNED_TO_OPTIONS,
+  },
   {
     name: "current_zoning",
     label: "Current zoning",
@@ -85,7 +101,6 @@ export const ZONING_FIELDS = [
     options: ["Approve", "Deny"],
   },
   { name: "cpc_refer_to_council_date", label: "CPC refer to council date", type: "date" },
-  { name: "council_hearing_1_date", label: "Council hearing 1 date", type: "date" },
   { name: "ped_public_hearing_date", label: "PED public hearing date", type: "date" },
   {
     name: "ped_recommendation",
@@ -110,18 +125,18 @@ export const FIELD_BY_NAME = Object.fromEntries(
   ZONING_FIELDS.map((f) => [f.name, f])
 );
 
+// Field names that must be filled before an amendment can be saved.
+export const REQUIRED_FIELDS = ZONING_FIELDS.filter((f) => f.required).map(
+  (f) => f.name
+);
+
 // Detail fields grouped by workflow stage (application_type & description are
 // shown in the map block, so they're omitted here).
 export const FIELD_GROUPS = [
   {
+    // file_number is the record's title, edited from the header (see AmendmentView).
     title: "Intake",
-    fields: [
-      "file_number",
-      "petition_number",
-      "received_date",
-      "check_number",
-      "assigned_to",
-    ],
+    fields: ["petition_number", "received_date", "check_number", "assigned_to"],
   },
   {
     title: "Zoning",
@@ -144,7 +159,7 @@ export const FIELD_GROUPS = [
   },
   {
     title: "City Council",
-    fields: ["council_hearing_1_date", "council_action_date", "council_action"],
+    fields: ["council_action_date", "council_action"],
   },
 ];
 
@@ -222,6 +237,28 @@ export const sortKey = (value, kind) => {
     return typeof value === "number" ? value : Date.parse(value) || 0;
   }
   return String(value).toLowerCase();
+};
+
+// Application-type prefixes for the derived unique id (issue #7964).
+export const APPLICATION_TYPE_ID_PREFIX = {
+  Rezoning: "R",
+  "PD / PC / PCA Zoning Change": "P",
+};
+
+// Derived, display-only unique identifier for an amendment (issue #7964):
+//   CPC-R-<year>-<OBJECTID>  rezonings
+//   CPC-P-<year>-<OBJECTID>  PD / PC / PCA zoning changes
+// Year prefers `application_year`, falling back to the received-date year.
+// Returns "" when it can't be formed (no prefix, no year, or unsaved record).
+export const deriveUniqueId = (rec) => {
+  if (!rec) return "";
+  const prefix = APPLICATION_TYPE_ID_PREFIX[rec.application_type];
+  const year =
+    rec.application_year ||
+    (rec.received_date ? fmtDate(rec.received_date).slice(0, 4) : "");
+  const oid = rec.OBJECTID;
+  if (!prefix || !year || oid == null || oid === "") return "";
+  return `CPC-${prefix}-${year}-${oid}`;
 };
 
 // Derive a human "status" from the furthest-along workflow field.
