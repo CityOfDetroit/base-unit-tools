@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Box,
   Button,
@@ -5,6 +6,7 @@ import {
   Flex,
   Grid,
   Spinner,
+  Switch,
   Text,
 } from "@radix-ui/themes";
 import {
@@ -18,6 +20,7 @@ import {
 import {
   FIELD_BY_NAME,
   FIELD_GROUPS,
+  REQUIRED_FIELDS,
   ZONING_FIELDS,
   fmtDate,
   parcelMapUrl,
@@ -26,6 +29,7 @@ import {
 import FieldInput from "./FieldInput";
 import ParcelSearch from "./ParcelSearch";
 import ParcelSelectionPanel from "./ParcelSelectionPanel";
+import ZoningBadge from "./ZoningBadge";
 import ZoningMap from "./ZoningMap";
 import AmendmentMiniMap from "./AmendmentMiniMap";
 
@@ -65,7 +69,7 @@ const renderField = (field, { editing, values, onAttrChange }) =>
   );
 
 // Read-only list of affected parcels (view mode counterpart of ParcelSelectionPanel).
-const AffectedParcels = ({ parcelIds, parcelAddresses = {} }) => (
+const AffectedParcels = ({ parcelIds, parcelAddresses = {}, parcelZoning = {} }) => (
   <Card>
     <Text weight="bold" size="3" className="mb-2 block">
       Affected parcels ({parcelIds.length})
@@ -94,16 +98,19 @@ const AffectedParcels = ({ parcelIds, parcelAddresses = {} }) => (
                 </Text>
               )}
             </Flex>
-            <a
-              href={parcelMapUrl(id)}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center shrink-0"
-              style={{ color: "var(--accent-11)" }}
-              title="Open parcel on the Base Units map"
-            >
-              <ExternalLinkIcon />
-            </a>
+            <Flex align="center" gap="2" className="shrink-0">
+              <ZoningBadge zoning={parcelZoning[id]} />
+              <a
+                href={parcelMapUrl(id)}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center"
+                style={{ color: "var(--accent-11)" }}
+                title="Open parcel on the Base Units map"
+              >
+                <ExternalLinkIcon />
+              </a>
+            </Flex>
           </Flex>
         ))}
       </Flex>
@@ -123,6 +130,7 @@ const AmendmentView = ({
   // edit-mode parcels + map
   selectedIds,
   parcelAddresses,
+  parcelZoning,
   dissolved,
   onToggleParcel,
   onAddParcel,
@@ -141,6 +149,9 @@ const AmendmentView = ({
   editedBy,
   editedOn,
 }) => {
+  // whether the zoning-districts overlay is shown on the map (both modes)
+  const [showZoning, setShowZoning] = useState(false);
+
   if (!values) {
     return (
       <Flex align="center" justify="center" gap="2" className="p-8">
@@ -154,6 +165,9 @@ const AmendmentView = ({
   const parcelIds = parseParcels(values.parcels);
   const title =
     values.file_number || (mode === "new" ? "New amendment" : "Amendment");
+  const missingRequired = editing
+    ? REQUIRED_FIELDS.filter((n) => String(values[n] ?? "").trim() === "")
+    : [];
 
   return (
     <Flex direction="column" gap="3">
@@ -166,9 +180,21 @@ const AmendmentView = ({
         ) : (
           <span />
         )}
-        <Text size="5" weight="bold" className="text-[#004445]">
-          {title}
-        </Text>
+        <Flex
+          direction="column"
+          align="center"
+          gap="1"
+          style={{ flex: 1, minWidth: 0 }}
+        >
+          <Text size="5" weight="bold" className="text-[#004445]">
+            {title}
+          </Text>
+          {editing && !values.file_number && (
+            <Text size="1" color="gray">
+              File number is assigned automatically on save.
+            </Text>
+          )}
+        </Flex>
         {editing ? (
           <Button
             size="3"
@@ -185,6 +211,13 @@ const AmendmentView = ({
           </Button>
         )}
       </Flex>
+
+      {editing && missingRequired.length > 0 && (
+        <Text size="1" color="gray">
+          Required before saving:{" "}
+          {missingRequired.map((n) => FIELD_BY_NAME[n]?.label || n).join(", ")}.
+        </Text>
+      )}
 
       {editing && status && (
         <Flex
@@ -224,6 +257,7 @@ const AmendmentView = ({
                 <ParcelSelectionPanel
                   selectedIds={selectedIds}
                   parcelAddresses={parcelAddresses}
+                  parcelZoning={parcelZoning}
                   onRemove={onRemoveParcel}
                   onClear={onClearParcels}
                 />
@@ -231,25 +265,43 @@ const AmendmentView = ({
                 <AffectedParcels
                   parcelIds={parcelIds}
                   parcelAddresses={parcelAddresses}
+                  parcelZoning={parcelZoning}
                 />
               )}
             </Box>
             <Box className="flex-1 min-w-0">
               {editing ? (
-                <>
-                  <ZoningMap
-                    selectedIds={selectedIds}
-                    onToggleParcel={onToggleParcel}
-                    dissolved={dissolved}
-                    height={MAP_HEIGHT}
-                  />
-                  <Text size="1" color="gray" className="mt-1 block">
-                    Click parcels to add or remove them. The red outline previews
-                    the dissolved amendment boundary that will be saved.
-                  </Text>
-                </>
+                <ZoningMap
+                  selectedIds={selectedIds}
+                  onToggleParcel={onToggleParcel}
+                  dissolved={dissolved}
+                  showZoning={showZoning}
+                  height={MAP_HEIGHT}
+                />
               ) : (
-                <AmendmentMiniMap geometry={geometry} height={MAP_HEIGHT} />
+                <AmendmentMiniMap
+                  geometry={geometry}
+                  showZoning={showZoning}
+                  height={MAP_HEIGHT}
+                />
+              )}
+              <Flex asChild align="center" gap="2" className="mt-2">
+                <label style={{ cursor: "pointer", width: "fit-content" }}>
+                  <Switch
+                    size="1"
+                    checked={showZoning}
+                    onCheckedChange={setShowZoning}
+                  />
+                  <Text size="1" color="gray">
+                    Show current zoning districts
+                  </Text>
+                </label>
+              </Flex>
+              {editing && (
+                <Text size="1" color="gray" className="mt-1 block">
+                  Click parcels to add or remove them. The red outline previews
+                  the dissolved amendment boundary that will be saved.
+                </Text>
               )}
             </Box>
           </Flex>

@@ -2,9 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import bbox from "@turf/bbox";
 import { baseStyle } from "../styles/mapstyle.js";
+import {
+  addZoningDistrictsLayers,
+  setZoningDistrictsVisible,
+} from "./zoningOverlay";
 
-// Small read-only map that displays a single amendment's saved geometry.
-const AmendmentMiniMap = ({ geometry, height = "300px" }) => {
+// Small read-only map that displays a single amendment's saved geometry, with
+// an optional zoning-districts overlay (`showZoning`) for context.
+const AmendmentMiniMap = ({ geometry, showZoning = false, height = "300px" }) => {
   const containerRef = useRef(null);
   const [theMap, setTheMap] = useState(null);
 
@@ -28,6 +33,10 @@ const AmendmentMiniMap = ({ geometry, height = "300px" }) => {
       map.touchZoomRotate.disable();
       map.keyboard.disable();
 
+      // zoning-districts overlay (hidden until toggled on) — added before the
+      // amendment polygon so the saved boundary stays on top of it
+      addZoningDistrictsLayers(map);
+
       map.addSource("amendment", {
         type: "geojson",
         data: { type: "FeatureCollection", features: [] },
@@ -45,7 +54,7 @@ const AmendmentMiniMap = ({ geometry, height = "300px" }) => {
         paint: { "line-color": "#1d4ed8", "line-width": 2 },
       });
 
-      // hover tooltip showing the underlying parcel id
+      // hover tooltip showing the underlying parcel id + its zoning
       const popup = new maplibregl.Popup({
         closeButton: false,
         closeOnClick: false,
@@ -53,13 +62,19 @@ const AmendmentMiniMap = ({ geometry, height = "300px" }) => {
         className: "zoning-parcel-tip",
       });
       map.on("mousemove", "parcel-fill", (e) => {
-        const pid = e.features?.[0]?.properties?.parcel_id;
+        const props = e.features?.[0]?.properties;
+        const pid = props?.parcel_id;
         if (!pid) {
           popup.remove();
           return;
         }
         map.getCanvas().style.cursor = "crosshair";
-        popup.setLngLat(e.lngLat).setText(String(pid)).addTo(map);
+        // parcel id · address · zoning all ride on the parcel vector tiles,
+        // so this works for every parcel — not just the amendment's own
+        const text = [pid, props.address, props.zoning_district]
+          .filter(Boolean)
+          .join(" · ");
+        popup.setLngLat(e.lngLat).setText(text).addTo(map);
       });
       map.on("mouseleave", "parcel-fill", () => {
         map.getCanvas().style.cursor = "";
@@ -71,6 +86,25 @@ const AmendmentMiniMap = ({ geometry, height = "300px" }) => {
 
     return () => map.remove();
   }, []);
+
+  // show/hide the zoning-districts overlay; when on, fade the amendment fill to
+  // a faint gray so the district color shows through (outline still marks it)
+  useEffect(() => {
+    if (!theMap) return;
+    setZoningDistrictsVisible(theMap, showZoning);
+    if (theMap.getLayer("amendment-fill")) {
+      theMap.setPaintProperty(
+        "amendment-fill",
+        "fill-color",
+        showZoning ? "#6b7280" : "#2563eb"
+      );
+      theMap.setPaintProperty(
+        "amendment-fill",
+        "fill-opacity",
+        showZoning ? 0.1 : 0.3
+      );
+    }
+  }, [theMap, showZoning]);
 
   useEffect(() => {
     if (!theMap) return;

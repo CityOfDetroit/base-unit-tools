@@ -5,11 +5,13 @@ import {
   ExternalLinkIcon,
 } from "@radix-ui/react-icons";
 import { PARCELS_FIELD_MAX, parcelMapUrl } from "../data/zoning";
+import ZoningBadge from "./ZoningBadge";
 
 // Lists the parcels currently in the amendment grouping.
 const ParcelSelectionPanel = ({
   selectedIds,
   parcelAddresses = {},
+  parcelZoning = {},
   onRemove,
   onClear,
 }) => {
@@ -54,6 +56,7 @@ const ParcelSelectionPanel = ({
                   )}
                 </Flex>
                 <Flex align="center" gap="2" className="shrink-0">
+                  <ZoningBadge zoning={parcelZoning[id]} />
                   <a
                     href={parcelMapUrl(id)}
                     target="_blank"

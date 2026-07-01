@@ -57,6 +57,11 @@ const FieldInput = ({ field, value, onChange }) => {
     <label>
       <Text as="div" size="1" weight="medium" color="gray" mb="1">
         {field.label}
+        {field.required && (
+          <span style={{ color: "var(--red-9)" }} aria-hidden>
+            {" *"}
+          </span>
+        )}
       </Text>
       {control}
     </label>
