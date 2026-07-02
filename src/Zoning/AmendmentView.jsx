@@ -23,6 +23,7 @@ import {
   REQUIRED_FIELDS,
   ZONING_FIELDS,
   fmtDate,
+  isValidApplicationYear,
   parcelMapUrl,
   parseParcels,
 } from "../data/zoning";
@@ -168,6 +169,10 @@ const AmendmentView = ({
   const missingRequired = editing
     ? REQUIRED_FIELDS.filter((n) => String(values[n] ?? "").trim() === "")
     : [];
+  const invalidApplicationYear =
+    editing &&
+    String(values.application_year ?? "").trim() !== "" &&
+    !isValidApplicationYear(values.application_year);
 
   return (
     <Flex direction="column" gap="3">
@@ -216,6 +221,12 @@ const AmendmentView = ({
         <Text size="1" color="gray">
           Required before saving:{" "}
           {missingRequired.map((n) => FIELD_BY_NAME[n]?.label || n).join(", ")}.
+        </Text>
+      )}
+
+      {editing && invalidApplicationYear && (
+        <Text size="1" color="red">
+          Application year must be a 4-digit year after 2000.
         </Text>
       )}
 

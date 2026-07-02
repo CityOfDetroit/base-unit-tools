@@ -58,6 +58,7 @@ export const ZONING_FIELDS = [
     options: ["Rezoning", "PD / PC / PCA Zoning Change"],
     required: true,
   },
+  { name: "application_year", label: "Application year", type: "text", required: true },
   { name: "application_description", label: "Description", type: "textarea" },
   { name: "received_date", label: "Received date", type: "date" },
   { name: "check_number", label: "Check number", type: "text" },
@@ -115,6 +116,9 @@ export const ZONING_FIELDS = [
     type: "select",
     options: ["Approve", "Deny"],
   },
+  { name: "ordinance_year", label: "Ordinance year", type: "text" },
+  { name: "ordinance_number", label: "Ordinance number", type: "text" },
+  { name: "enactment_date", label: "Enactment date", type: "date" },
 ];
 
 export const ZONING_DATE_FIELDS = ZONING_FIELDS.filter((f) => f.type === "date").map(
@@ -130,13 +134,26 @@ export const REQUIRED_FIELDS = ZONING_FIELDS.filter((f) => f.required).map(
   (f) => f.name
 );
 
+// Application year must be a 4-digit year later than 2000 (it drives the
+// unique id, see deriveUniqueId). Returns true for a valid entry.
+export const isValidApplicationYear = (v) => {
+  const s = String(v ?? "").trim();
+  return /^\d{4}$/.test(s) && Number(s) > 2000;
+};
+
 // Detail fields grouped by workflow stage (application_type & description are
 // shown in the map block, so they're omitted here).
 export const FIELD_GROUPS = [
   {
     // file_number is the record's title, edited from the header (see AmendmentView).
     title: "Intake",
-    fields: ["petition_number", "received_date", "check_number", "assigned_to"],
+    fields: [
+      "application_year",
+      "petition_number",
+      "received_date",
+      "check_number",
+      "assigned_to",
+    ],
   },
   {
     title: "Zoning",
@@ -159,7 +176,13 @@ export const FIELD_GROUPS = [
   },
   {
     title: "City Council",
-    fields: ["council_action_date", "council_action"],
+    fields: [
+      "council_action_date",
+      "council_action",
+      "ordinance_year",
+      "ordinance_number",
+      "enactment_date",
+    ],
   },
 ];
 
@@ -239,26 +262,18 @@ export const sortKey = (value, kind) => {
   return String(value).toLowerCase();
 };
 
-// Application-type prefixes for the derived unique id (issue #7964).
-export const APPLICATION_TYPE_ID_PREFIX = {
-  Rezoning: "R",
-  "PD / PC / PCA Zoning Change": "P",
-};
-
 // Derived, display-only unique identifier for an amendment (issue #7964):
-//   CPC-R-<year>-<OBJECTID>  rezonings
-//   CPC-P-<year>-<OBJECTID>  PD / PC / PCA zoning changes
+//   CPC-Z-<four-digit year>-<four-digit zero-padded OBJECTID>
 // Year prefers `application_year`, falling back to the received-date year.
-// Returns "" when it can't be formed (no prefix, no year, or unsaved record).
+// Returns "" when it can't be formed (no year, or unsaved record).
 export const deriveUniqueId = (rec) => {
   if (!rec) return "";
-  const prefix = APPLICATION_TYPE_ID_PREFIX[rec.application_type];
   const year =
     rec.application_year ||
     (rec.received_date ? fmtDate(rec.received_date).slice(0, 4) : "");
   const oid = rec.OBJECTID;
-  if (!prefix || !year || oid == null || oid === "") return "";
-  return `CPC-${prefix}-${year}-${oid}`;
+  if (!year || oid == null || oid === "") return "";
+  return `CPC-Z-${year}-${String(oid).padStart(4, "0")}`;
 };
 
 // Derive a human "status" from the furthest-along workflow field.

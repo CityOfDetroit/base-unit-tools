@@ -16,6 +16,7 @@ import {
   fmtDate,
   fmtDateTime,
   geojsonToZoningGeometry,
+  isValidApplicationYear,
   LIST_OUT_FIELDS,
   PARCEL_ID_FIELD,
   PARCEL_LAYER_URL,
@@ -301,7 +302,14 @@ const Zoning = () => {
   };
 
   const handleAttrChange = (name, value) =>
-    setAttributes((a) => ({ ...a, [name]: value }));
+    setAttributes((a) => {
+      const next = { ...a, [name]: value };
+      // prefill application_year from received_date, unless already set
+      if (name === "received_date" && !a.application_year && value) {
+        next.application_year = fmtDate(value).slice(0, 4);
+      }
+      return next;
+    });
 
   // auto-dismiss success messages
   useEffect(() => {
@@ -388,9 +396,9 @@ const Zoning = () => {
 
   const parcelsString = selectedIds.join("|");
   const overLimit = parcelsString.length > PARCELS_FIELD_MAX;
-  const requiredComplete = REQUIRED_FIELDS.every(
-    (name) => String(attributes[name] ?? "").trim() !== ""
-  );
+  const requiredComplete =
+    REQUIRED_FIELDS.every((name) => String(attributes[name] ?? "").trim() !== "") &&
+    isValidApplicationYear(attributes.application_year);
   const canSave =
     selectedIds.length > 0 &&
     !!dissolved &&
@@ -524,6 +532,8 @@ const Zoning = () => {
         records={sortedRecords}
         loading={loadingList}
         selectedId={selectedId}
+        parcelAddresses={editing ? parcelAddresses : detailParcelAddresses}
+        parcelZoning={editing ? parcelZoning : detailParcelZoning}
         sortField={sortField}
         sortDir={sortDir}
         onSortField={setSortField}
