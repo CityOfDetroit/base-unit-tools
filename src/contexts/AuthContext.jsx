@@ -38,6 +38,9 @@ export const AuthProvider = ({ children }) => {
     const info = new OAuthInfo({
       // appId: import.meta.env.VITE_APP_ID,
       appId: `0baTjvsIAAccckbL`,
+      // without this, OAuthInfo defaults to https://www.arcgis.com and users
+      // land on Esri's generic sign-in chooser instead of the org's SSO page
+      portalUrl,
       popup: false,
     });
 
