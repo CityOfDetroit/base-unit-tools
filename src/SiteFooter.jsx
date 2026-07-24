@@ -3,6 +3,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "./contexts/AuthContext";
 import apps from "./data/apps";
+import { resourceList } from "./data/resources";
 import Icon from "./components/Icon";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
 
@@ -48,6 +49,14 @@ const SiteFooter = () => {
             </Text>
             <Link to="/about">
               <Text size={"2"}>About the base units</Text>
+            </Link>
+            {resourceList.map((r) => (
+              <Link to={`/resources/${r.slug}`} key={r.slug}>
+                <Text size={"2"}>{r.title}</Text>
+              </Link>
+            ))}
+            <Link to="/resources">
+              <Text size={"2"}>All resources →</Text>
             </Link>
             <Link to="https://data.detroitmi.gov/">
               <Text size={"2"}>Open Data Portal</Text>

@@ -4,6 +4,7 @@ import { Box, Card, Container, Flex, Text, Heading, Table } from "@radix-ui/them
 import { ExternalLinkIcon } from "@radix-ui/react-icons";
 import { queryFeatures } from "@esri/arcgis-rest-feature-service";
 import layers from "./data/layers";
+import MdxProse from "./components/MdxProse";
 
 // Import MDX content
 import AddressContent from "./content/address.mdx";
@@ -115,9 +116,9 @@ const BaseUnitPage = () => {
         </Heading>
 
         {MdxContent && (
-          <Box mb="5" className="mdx-content text-sm [&_h1]:text-xl [&_h1]:font-bold [&_h1]:mb-3 [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:mt-4 [&_h2]:mb-2 [&_p]:mb-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:mb-2 [&_li]:mb-1 [&_code]:bg-gray-100 [&_code]:px-1 [&_code]:rounded [&_a]:text-blue-600 [&_a]:underline [&_table]:w-full [&_table]:border-collapse [&_table]:my-3 [&_th]:text-left [&_th]:p-2 [&_th]:bg-gray-100 [&_th]:border [&_th]:border-gray-300 [&_td]:p-2 [&_td]:border [&_td]:border-gray-300 [&_strong]:font-semibold">
+          <MdxProse mb="5">
             <MdxContent />
-          </Box>
+          </MdxProse>
         )}
 
         <Box mb="5">

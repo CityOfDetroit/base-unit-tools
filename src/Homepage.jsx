@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { queryFeatures } from "@esri/arcgis-rest-feature-service";
 import apps from "./data/apps";
 import layers from "./data/layers";
+import { resourceList } from "./data/resources";
 import {
   Box,
   Card,
@@ -187,6 +188,27 @@ const Homepage = () => {
             </Grid>
           </Box>
         )}
+
+        <Box mb="5">
+          <Heading size="4" mb="3">
+            Resources
+          </Heading>
+          <Grid columns={{ initial: "1", sm: "2" }} gap="4">
+            {resourceList.map((r) => (
+              <Link to={`/resources/${r.slug}`} key={r.slug}>
+                <Card size="1" className="text-sm h-full">
+                  <Flex direction="row" align="center" gap="2" pb="2">
+                    <Icon name={r.icon} />
+                    <Text size="3" weight="medium">
+                      {r.title}
+                    </Text>
+                  </Flex>
+                  <Text>{r.description}</Text>
+                </Card>
+              </Link>
+            ))}
+          </Grid>
+        </Box>
 
         <Box pb="5">
           <Heading size="4" mb="3">

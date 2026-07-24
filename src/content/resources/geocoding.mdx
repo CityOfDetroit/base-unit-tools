@@ -1,0 +1,130 @@
+Let's talk about addresses, why they're important, and how we can use them to derive more information about a place.
+
+Addresses are probably the most common method used to refer to specific places, like `2 Woodward Avenue`. You may also come across:
+
+- intersections: `6 Mile and Wildemere`
+- ranges: `Cadieux between Warren and Cincinnati`
+- coordinates: `(42.842354, -83.102335)`
+
+However, the _vast_ majority of location data we process at the city comes in the form of an address. The city sends mail to addresses, assigns addresses to new structures being built, and so much more. Because addresses are so omnipresent, tools that can properly understand address input and return useful data about that address are essential infrastructure that underlies nearly every tool we build.
+
+As an example, a very common operation in our open data processes is **geocoding**: the process which turns a text address (`2 Woodward Avenue`) into coordinates which can be plotted on a webmap (`42.329543, -83.043720`), or a parcel identifier that can be used to join to other datasets (`01004068-85`). In this post, we'll explain how you can use the City of Detroit's geocoder in a couple of ways.
+
+## One geocoder, three kinds of match
+
+Everything below runs against a single endpoint, the **Base Unit Geocoder**:
+
+```
+https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoder/GeocodeServer
+```
+
+This is a _composite_ locator. It accepts an address, parses it into components, and then tries its reference datasets in order — address points first, then street centerlines. Understanding which one produced your match is the key to knowing what you can do with the result, and the `Addr_type` field in the response tells you every time.
+
+### Address point matches (`PointAddress`)
+
+The first reference dataset is a table of discrete address points. Matching works like this:
+
+- Accepts an address input: `2 Woodward Avenue`
+- Parses that input into address components:
+  - the address _house number_ is `2`
+  - the address _street name_ is `Woodward`
+  - the address _street type_ is `Avenue`
+- Finds the best match from the address point table and returns that match
+
+The advantage of an address point match is that the individual address points are related to the other base units; therefore, you can ask the geocoder about an address and get the parcel number back, which is a very common use case. Look for `parcel_id` in the response — alongside `building_id`, `street_id`, and `address_id`. Here's an example for [326 Hendrie](https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoder/GeocodeServer/findAddressCandidates?SingleLine=326+Hendrie&outFields=*&outSR=4326&f=html).
+
+The disadvantage is that you need good input to return a match — you can get away with small typos in the street name, but not much more than that.
+
+### Street centerline matches (`StreetAddress`)
+
+When no address point matches, the geocoder falls back to a layer of city streets which have an address range attached. The same parsing step is performed, but now the match is based on where your input address _should_ exist based on known address ranges.
+
+The advantage is that you can match addresses which **don't exist in the address point table**. The drawback is that the coordinates returned will be inexact, and there will be no parcel number or other base unit identifiers attached.
+
+Here's [the result](https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoder/GeocodeServer/findAddressCandidates?SingleLine=4193+trumbull&outFields=*&outSR=4326&f=html) for `4193 Trumbull`, which isn't an address point — you can see the `Addr_type` field tells us this is a `StreetAddress` and not a `PointAddress`, and that `parcel_id` comes back empty.
+
+### Intersections (`StreetInt`)
+
+The centerline data can also provide coordinates for intersections, formatted as "Street 1 and Street 2" or "Street 1 & Street 2". Here's an example response for [7 Mile and Asbury Park](https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoder/GeocodeServer/findAddressCandidates?SingleLine=7+Mile+and+Asbury+Park&outFields=*&outSR=4326&f=html), which comes back as `StreetInt`.
+
+## How to use this in your workflow
+
+### Web interface
+
+The simplest way to access the geocoder is through the endpoint's own web interface:
+
+- [findAddressCandidates](https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoder/GeocodeServer/findAddressCandidates) — one address at a time
+- [Service description](https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoder/GeocodeServer?f=html) — the full field list and locator properties
+
+You'll want to know about three key parameters:
+
+#### Single Line Input (URL parameter: `SingleLine`)
+
+This is where your address input should go. In order to work, this should just be a number, street name, and (optional) street type. Don't include "Detroit, MI" or a zip code.
+
+For intersections, this should be formatted as "Street 1 and Street 2" or "Street 1 & Street 2".
+
+#### Output Spatial Reference (URL parameter: `outSR`)
+
+This defines what spatial reference the output coordinates should be in. This geocoder already defaults to `4326`, so you'll get lat-long coordinates that other web tools understand without asking for anything.
+
+You only need to set this if you want something else — for instance `2898`, which we use when we want to specify a distance in feet and not degrees.
+
+#### Out fields (URL parameter: `outFields`)
+
+You generally want to set this to `*` to return all match fields. Otherwise, you'll just get back coordinates and a cleaned address.
+
+This matters more than it used to. A full match carries the linked base units (`parcel_id`, `building_id`, `street_id`, `address_id`) plus a lot of the geography an address falls within: `neighborhood_name`, `council_district_2026`, `census_block_geoid_2020`, `scout_car_area`, and more.
+
+### Batch geocoding
+
+But what if you have a list of addresses and you want to geocode all of them at once?
+
+That's what the [Geocoder tool](/geocoder) on this site is for. It accepts a list of Detroit addresses and returns the additional location fields described above. This tool favors spreadsheet workflows, whether that's a Smartsheet, Google Sheet or CSV. You can copy and paste a list of addresses directly into the app's search and we'll generate a table of results that can be smoothly copy-and-pasted right back into your original workspace.
+
+If you're calling the service yourself, the batch endpoint is `geocodeAddresses`, and this locator will take up to **1,000 addresses per request**.
+
+You can also find plenty of tutorials and plugins to enable batch geocoding with your software of choice: [ArcGIS Pro](https://pro.arcgis.com/en/pro-app/latest/help/data/geocoding/geocode-a-table-of-addresses.htm) and [QGIS](https://www.gislounge.com/how-to-geocode-addresses-using-qgis/) both handle it.
+
+## Developer workflows, and where you'll find geocoding in our code
+
+As we mentioned earlier, nearly all of the apps that our team builds rely on being able to request address information from our geocoder. Here are two generalized examples of how we commonly implement geocoding in Javascript and Python.
+
+### Javascript
+
+Let's say we're tasked with building a web map. This web map will have a search box that accepts an address as text input. When someone searches an address, the map should fly to that place. So, we'll need to read this input and request the address' associated lat-lng coordinates from the geocoder to reposition the center of our map.
+
+Assuming you're working in an environment that supports the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API), you might write a function like this:
+
+```js
+/**
+ * Returns more information about an address from the Base Unit Geocoder
+ * @param {string} address
+ * @returns {Promise} Promise object represents a list of matches
+ *   each match has lat-lng coordinates, a parcel identifier, and more
+ */
+function geocodeAddress(address) {
+  const base =
+    "https://opengis.detroitmi.gov/opengis/rest/services/BaseUnits/BaseUnitGeocoder/GeocodeServer/findAddressCandidates";
+  const url = `${base}?SingleLine=${encodeURIComponent(address)}&outSR=4326&outFields=*&f=pjson`;
+
+  return fetch(url)
+    .then((response) => response.json())
+    .then((data) => data.candidates.slice(0, 1))
+    .catch((error) => console.log(error));
+}
+```
+
+This function returns nice JSON `candidates` that we can parse accordingly in our app. The geocoder orders candidates by `score`; we're choosing to just keep the first and most likely candidate above.
+
+In this site's own code, we do the same thing through Esri's client library rather than raw `fetch` — see `useGeocoder.js`, which wraps `geocode()` from `@esri/arcgis-rest-geocoding` in a React hook.
+
+### Python
+
+When it comes to geocoding in Python, we'll point you straight to the [ArcGIS API for Python](https://developers.arcgis.com/python/). You'll find many useful methods for working with geospatial data in this library, like:
+
+- [geocoding](https://developers.arcgis.com/python/latest/guide/part1-what-is-geocoding/) a single location
+- [batch geocoding](https://developers.arcgis.com/python/latest/guide/batch-geocoding/) many addresses at a time
+- [reverse geocoding](https://developers.arcgis.com/python/latest/guide/reverse-geocoding/) an x-y coordinate to return a street address
+
+We use the `arcgis` library in our ETL workflows for open data. We commonly have a table of data where one column is an address and we want to add additional columns with location coordinates and a parcel number. Check out [this Python class](https://github.com/CityOfDetroit/etl/blob/master/etl/geocode.py) to see how it works.

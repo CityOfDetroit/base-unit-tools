@@ -1,6 +1,7 @@
 import { bulkGeocode } from "@esri/arcgis-rest-geocoding";
 import { Promise } from "bluebird";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Button, Card, Flex, Grid, Text } from "@radix-ui/themes";
 import { geocoderFields } from "../data/geocoderFields";
 import { geocoders } from "../hooks/useGeocoder";
@@ -254,6 +255,11 @@ const Geocoder = () => {
         <Text size="5" weight="bold" className="text-[#004445]">
           Geocoder
         </Text>
+        <Link to="/resources/geocoding">
+          <Text size="1" color="blue">
+            How geocoding works →
+          </Text>
+        </Link>
 
         <Stepper
           steps={[
