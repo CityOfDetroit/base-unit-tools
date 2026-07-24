@@ -6,11 +6,11 @@
 // This drives the Atlas "zoning" theme end to end: the per-district map colors,
 // the grouped legend, the zone-explorer panel, and the click popups.
 //
-// Matching: the map fill is colored from the vector tile's `ZONING_REV`
-// attribute, which carries the district designation (R1, B4, SD4, MKT, ...).
-// The districts *view* exposes the same value as `zoning_designation`.
+// Matching: the map fill is colored from the `zoning_designation` attribute,
+// which carries the district designation (R1, B4, SD4, MKT, ...). The vector
+// tiles are cut from the districts *view*, so the tile and the view agree.
 
-export const ZONING_MATCH_PROPERTY = "ZONING_REV"; // vector tile attribute
+export const ZONING_MATCH_PROPERTY = "zoning_designation"; // vector tile attribute
 export const ZONING_VIEW_FIELD = "zoning_designation"; // districts view attribute
 
 // Display order of the district groups.
@@ -72,7 +72,7 @@ export const ZONING_GROUPS = ZONING_GROUP_ORDER.map((group) => ({
 }));
 
 // MapLibre data-driven fill color: one color per district designation, matched
-// on the vector tile's ZONING_REV value. Built from ZONING_ZONES so it never
+// on the vector tile's zoning_designation value. Built from ZONING_ZONES so it never
 // drifts from the legend/popups.
 export const zoningFillColorExpression = () => [
   "match",
