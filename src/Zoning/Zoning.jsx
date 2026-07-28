@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import useGroupAccess from "../hooks/useGroupAccess";
 import {
+  APPLICATION_YEAR_OPTIONS,
   EDITOR_FIELDS,
   deriveUniqueId,
   fmtDate,
@@ -35,8 +36,10 @@ import AmendmentView from "./AmendmentView";
 const sqlList = (ids) =>
   ids.map((id) => `'${String(id).replace(/'/g, "''")}'`).join(",");
 
-const blankAttributes = () =>
-  Object.fromEntries(ZONING_FIELDS.map((f) => [f.name, ""]));
+const blankAttributes = () => ({
+  ...Object.fromEntries(ZONING_FIELDS.map((f) => [f.name, ""])),
+  application_year: String(new Date().getFullYear()),
+});
 
 const LIST_PAGE_SIZE = 2000;
 
@@ -57,6 +60,7 @@ const Zoning = () => {
   const [detailGeometry, setDetailGeometry] = useState(null);
   const [detailParcelAddresses, setDetailParcelAddresses] = useState({});
   const [detailParcelZoning, setDetailParcelZoning] = useState({});
+  const [listParcelAddresses, setListParcelAddresses] = useState({});
   const [detailError, setDetailError] = useState(null);
 
   // edit state
@@ -113,6 +117,48 @@ const Zoning = () => {
       cancelled = true;
     };
   }, [hasAccess, token, refreshSignal]);
+
+  // addresses for every parcel referenced in the loaded list, so the card
+  // list can show them without requiring a card to be selected
+  useEffect(() => {
+    const ids = [...new Set(records.flatMap((r) => parseParcels(r.parcels)))];
+    if (ids.length === 0) {
+      setListParcelAddresses({});
+      return;
+    }
+    let cancelled = false;
+    const BATCH_SIZE = 200;
+    const batches = [];
+    for (let i = 0; i < ids.length; i += BATCH_SIZE) {
+      batches.push(ids.slice(i, i + BATCH_SIZE));
+    }
+
+    Promise.all(
+      batches.map((batch) =>
+        queryFeatures({
+          url: PARCEL_LAYER_URL,
+          where: `${PARCEL_ID_FIELD} IN (${sqlList(batch)})`,
+          outFields: [PARCEL_ID_FIELD, "address"],
+          returnGeometry: false,
+          authentication: token,
+        }).catch(() => ({ features: [] }))
+      )
+    ).then((results) => {
+      if (cancelled) return;
+      const map = {};
+      results.forEach((res) => {
+        (res?.features || []).forEach((f) => {
+          const pid = f.attributes?.[PARCEL_ID_FIELD];
+          if (pid != null && f.attributes.address) map[pid] = f.attributes.address;
+        });
+      });
+      setListParcelAddresses(map);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [records, token]);
 
   // load full attributes + geometry for the selected record
   useEffect(() => {
@@ -306,7 +352,8 @@ const Zoning = () => {
       const next = { ...a, [name]: value };
       // prefill application_year from received_date, unless already set
       if (name === "received_date" && !a.application_year && value) {
-        next.application_year = fmtDate(value).slice(0, 4);
+        const year = fmtDate(value).slice(0, 4);
+        if (APPLICATION_YEAR_OPTIONS.includes(year)) next.application_year = year;
       }
       return next;
     });
@@ -533,7 +580,7 @@ const Zoning = () => {
         loading={loadingList}
         selectedId={selectedId}
         parcelAddresses={editing ? parcelAddresses : detailParcelAddresses}
-        parcelZoning={editing ? parcelZoning : detailParcelZoning}
+        listParcelAddresses={listParcelAddresses}
         sortField={sortField}
         sortDir={sortDir}
         onSortField={setSortField}

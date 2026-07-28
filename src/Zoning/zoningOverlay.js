@@ -7,9 +7,9 @@ import {
 // Atlas "zoning" theme source so the district colors match across the app
 // (see src/data/atlas.js / zoningZones.js).
 const ZONING_TILES = [
-  "https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/Zoning_Vector_Tiles/VectorTileServer/tile/{z}/{y}/{x}.pbf",
+  "https://vectortileservices2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Zoning_Districts_vector_tiles/VectorTileServer/tile/{z}/{y}/{x}.pbf",
 ];
-const ZONING_SOURCE_LAYER = "Zoning";
+const ZONING_SOURCE_LAYER = "Zoning Districts";
 
 export const ZONING_DISTRICT_LAYER_IDS = [
   "zoning-districts-fill",
@@ -25,7 +25,7 @@ export const addZoningDistrictsLayers = (map) => {
   map.addSource("zoning-districts", {
     type: "vector",
     tiles: ZONING_TILES,
-    maxzoom: 19,
+    maxzoom: 23,
   });
   map.addLayer({
     id: "zoning-districts-fill",

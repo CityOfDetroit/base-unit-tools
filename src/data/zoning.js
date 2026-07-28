@@ -46,6 +46,16 @@ export const ASSIGNED_TO_OPTIONS = [
   "Timarie DeBruhl",
 ];
 
+// Selectable application years, most recent first. The upper bound tracks the
+// current year so new records always have their default year in the list.
+const APPLICATION_YEAR_START = 2010;
+export const APPLICATION_YEAR_OPTIONS = (() => {
+  const current = new Date().getFullYear();
+  return Array.from({ length: current - APPLICATION_YEAR_START + 1 }, (_, i) =>
+    String(current - i)
+  );
+})();
+
 // Editable attribute fields, in display order, with input types.
 // type: "text" | "textarea" | "date" | "select" | "combobox"
 export const ZONING_FIELDS = [
@@ -58,7 +68,13 @@ export const ZONING_FIELDS = [
     options: ["Rezoning", "PD / PC / PCA Zoning Change"],
     required: true,
   },
-  { name: "application_year", label: "Application year", type: "text", required: true },
+  {
+    name: "application_year",
+    label: "Application year",
+    type: "select",
+    options: APPLICATION_YEAR_OPTIONS,
+    required: true,
+  },
   { name: "application_description", label: "Description", type: "textarea" },
   { name: "received_date", label: "Received date", type: "date" },
   { name: "check_number", label: "Check number", type: "text" },
