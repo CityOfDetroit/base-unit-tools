@@ -29,7 +29,6 @@ export const baseStyle = {
       "minzoom": 0,
       "maxzoom": 23,
       "scheme": "xyz",
-      "url": "https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitServices/VectorTileServer",
       "tiles": [
         "https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitServices/VectorTileServer/tile/{z}/{y}/{x}.pbf"
       ]
@@ -45,7 +44,6 @@ export const baseStyle = {
       "minzoom": 0,
       "maxzoom": 23,
       "scheme": "xyz",
-      "url": "https://vectortileservices2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitFeatures_vector_tiles/VectorTileServer",
       "tiles": [
         "https://vectortileservices2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/BaseUnitFeatures_vector_tiles/VectorTileServer/tile/{z}/{y}/{x}.pbf"
       ]
@@ -61,7 +59,6 @@ export const baseStyle = {
       "minzoom": 0,
       "maxzoom": 23,
       "scheme": "xyz",
-      "url": "https://vectortileservices2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Parcels_(Current)_vector_tiles/VectorTileServer",
       "tiles": [
         "https://vectortileservices2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Parcels_(Current)_vector_tiles/VectorTileServer/tile/{z}/{y}/{x}.pbf"
       ]
@@ -631,7 +628,7 @@ export const baseStyle = {
       id: "parcel-linked",
       type: "fill",
       "source": "bu_parcels",
-      "source-layer": "Parcels (Current)",
+      "source-layer": "parcels_(current)",
       minzoom: 11,
       filter: ["==", "parcel_id", ""],
       layout: {
@@ -654,7 +651,7 @@ export const baseStyle = {
       id: "parcel-fill",
       type: "fill",
       "source": "bu_parcels",
-      "source-layer": "Parcels (Current)",
+      "source-layer": "parcels_(current)",
       interactive: true,
       minzoom: 12,
       layout: {
@@ -1007,7 +1004,7 @@ export const baseStyle = {
       id: "parcel-line",
       type: "line",
       "source": "bu_parcels",
-      "source-layer": "Parcels (Current)",
+      "source-layer": "parcels_(current)",
       minzoom: 11,
       layout: {
         visibility: "visible",
@@ -1044,7 +1041,7 @@ export const baseStyle = {
       id: "parcel-highlight",
       type: "line",
       "source": "bu_parcels",
-      "source-layer": "Parcels (Current)",
+      "source-layer": "parcels_(current)",
       minzoom: 11,
       filter: ["==", "parcel_id", ""],
       layout: {

@@ -60,7 +60,7 @@ const ZoningMap = ({
         id: "zoning-selection-fill",
         type: "fill",
         source: "bu_parcels",
-        "source-layer": "Parcels (Current)",
+        "source-layer": "parcels_(current)",
         filter: ["in", "parcel_id", ""],
         paint: {
           "fill-color": SELECTION_COLOR,
@@ -71,7 +71,7 @@ const ZoningMap = ({
         id: "zoning-selection-line",
         type: "line",
         source: "bu_parcels",
-        "source-layer": "Parcels (Current)",
+        "source-layer": "parcels_(current)",
         filter: ["in", "parcel_id", ""],
         paint: {
           "line-color": SELECTION_COLOR,
