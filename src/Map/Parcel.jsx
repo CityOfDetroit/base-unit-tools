@@ -4,6 +4,11 @@ import React from "react";
 import { Attribute, Category } from "../components/TableComponents";
 
 
+const currency = (value) => {
+  const num = parseInt(value);
+  return Number.isNaN(num) ? null : `$${num.toLocaleString()}`;
+};
+
 const Parcel = ({ parcel, loading }) => {
 
   if (!parcel) {
@@ -32,7 +37,7 @@ const Parcel = ({ parcel, loading }) => {
         />
         <Attribute
           label="Sale price"
-          value={`$${parseInt(props.amt_sale_price)?.toLocaleString()}`}
+          value={currency(props.amt_sale_price)}
         />
       </Category>
 
@@ -55,11 +60,11 @@ const Parcel = ({ parcel, loading }) => {
         />
         <Attribute
           label="Taxable value"
-          value={`$${parseInt(props.amt_taxable_value).toLocaleString()}`}
+          value={currency(props.amt_taxable_value)}
         />
         <Attribute
           label="Assessed value"
-          value={`$${parseInt(props.amt_assessed_value).toLocaleString()}`}
+          value={currency(props.amt_assessed_value)}
         />
       </Category>
       <Category label="Dimensions">
