@@ -9,13 +9,6 @@ import {
   CheckIcon,
 } from "@radix-ui/react-icons";
 
-let col_i = 1;
-const columnIterator = () => {
-  let blankCol = "blank_column" + col_i.toString();
-  col_i += 1;
-  return blankCol;
-};
-
 export const CsvInput = ({ csv, setCsv, addresses, setAddresses }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [fileName, setFileName] = useState(null);
@@ -64,22 +57,9 @@ export const CsvInput = ({ csv, setCsv, addresses, setAddresses }) => {
     reader.onload = (event) => {
       const text = event.target?.result;
       if (typeof text === 'string') {
-        const lines = text.split('\n');
-        const headers = lines[0].split(',').map((h) =>
-          h.trim().replace(/^"|"$/g, '') || columnIterator()
-        );
-        const data = [];
-        for (let i = 1; i < lines.length; i++) {
-          if (lines[i].trim()) {
-            const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
-            const row = {};
-            headers.forEach((header, idx) => {
-              row[header] = values[idx] || '';
-            });
-            data.push(row);
-          }
-        }
-        setCsv(data);
+        // raw: keep every cell a string so ZIPs like 04820 keep their leading zero
+        const wb = XLSX.read(text, { type: "string", raw: true });
+        setCsv(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: "" }));
         setFileName(file.name);
         setFileType("csv");
       }
