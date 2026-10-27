@@ -95,6 +95,22 @@ export const geocoderFields = [
     group: "other",
     default: false,
   },
+  {
+    name: "pdd_design_district",
+    display: "PDD Design District",
+    geocoderColumn: "pdd_design_district",
+    description: "The Planning & Development design district this address belongs to.",
+    group: "other",
+    default: false,
+  },
+  {
+    name: "snf_zone",
+    display: "SNF Zone",
+    geocoderColumn: "snf_zone",
+    description: "The Strategic Neighborhood Fund zone this address belongs to.",
+    group: "other",
+    default: false,
+  },
 
 
 ];

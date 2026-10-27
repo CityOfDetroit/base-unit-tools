@@ -19,6 +19,7 @@ const Mailer = lazy(() => import("./Mailer/Mailer"));
 const Zoning = lazy(() => import("./Zoning/Zoning"));
 const About = lazy(() => import("./About"));
 const BaseUnitPage = lazy(() => import("./BaseUnitPage"));
+const PublicSafetyLookup = lazy(() => import("./PublicSafetyLookup/PublicSafetyLookup"));
 
 // Protected route component
 const ProtectedRoute = ({ path, children }) => {
@@ -43,6 +44,7 @@ const App = () => {
                 <Route path="/mailer" element={<ProtectedRoute path="/mailer"><Mailer /></ProtectedRoute>} />
                 <Route path="/zoning" element={<ProtectedRoute path="/zoning"><Zoning /></ProtectedRoute>} />
                 <Route path="/base-unit/:unit" element={<BaseUnitPage />} />
+                <Route path="/public-safety-lookup" element={<PublicSafetyLookup />} />
               </Routes>
             </Suspense>
           </Layout>
