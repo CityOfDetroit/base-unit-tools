@@ -69,7 +69,9 @@ export const baseStyle = {
         `https://api.nearmap.com/tiles/v3/Vert/{z}/{x}/{y}.img?apikey=${import.meta.env.VITE_NEARMAP_API_KEY}`,
       ],
       tileSize: 256,
-      maxzoom: 21,
+      // Nearmap public-display terms: no finer than 6" (~1:564, z20), limited to our AOI
+      maxzoom: 20,
+      bounds: [-83.29, 42.25, -82.91, 42.46],
       attribution: "© Nearmap",
     },
     "linen-map": {
