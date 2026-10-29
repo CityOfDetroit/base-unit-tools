@@ -71,7 +71,7 @@ export const baseStyle = {
       tileSize: 256,
       // Nearmap public-display terms: no finer than 6" (~1:564, z20), limited to our AOI
       maxzoom: 20,
-      bounds: [-83.29, 42.25, -82.91, 42.46],
+      bounds: [-83.29, 42.2549, -82.91, 42.4505],
       attribution: "© Nearmap",
     },
     "linen-map": {
