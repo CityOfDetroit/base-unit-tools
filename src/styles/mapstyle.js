@@ -66,8 +66,11 @@ export const baseStyle = {
     satellite: {
       type: "raster",
       tiles: [
-        "https://tiles.arcgis.com/tiles/qvkbeam7Wirps6zC/arcgis/rest/services/2024Sp_Wayne_6in_MiSAIL_tileCache/MapServer/tile/{z}/{y}/{x}",
+        `https://api.nearmap.com/tiles/v3/Vert/{z}/{x}/{y}.img?apikey=${import.meta.env.VITE_NEARMAP_API_KEY}`,
       ],
+      tileSize: 256,
+      maxzoom: 21,
+      attribution: "© Nearmap",
     },
     "linen-map": {
       type: "raster",
