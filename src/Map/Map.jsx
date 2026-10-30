@@ -67,6 +67,7 @@ const MapComponent = ({
         style: style ? mapStyles[style] : baseStyle,
         center: [-83.07715, 42.37927],
         zoom: 10.75,
+        minZoom: 10,
       });
 
       map.on("load", () => {
