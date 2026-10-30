@@ -3,6 +3,7 @@ import { centroid } from "@turf/centroid";
 import maplibregl from "maplibre-gl";
 import React, { useEffect, useRef, useState } from "react";
 import { useTheme } from "../contexts/ThemeContext";
+import { useAuth } from "../contexts/AuthContext";
 import layers from "../data/layers";
 import { baseStyle, darkStyle, linenStyle, satelliteStyle } from "../styles/mapstyle";
 import { geocode } from "@esri/arcgis-rest-geocoding";
@@ -26,6 +27,9 @@ const MapComponent = ({
   const mapInstance = useRef(null);
   const modeRef = useRef(mode);
   const { isDarkMode } = useTheme();
+  const { token, isCityEmployee } = useAuth();
+  const tokenRef = useRef(token);
+  tokenRef.current = token;
   const [mapLoaded, setMapLoaded] = useState(false);
   const [clickedFeatures, setClickedFeatures] = useState([]);
 
@@ -36,7 +40,7 @@ const MapComponent = ({
 
   let mapStyles = {
     streets: baseStyle,
-    satellite: satelliteStyle(),
+    satellite: satelliteStyle(isCityEmployee ? 21 : 20),
     linen: linenStyle()
   }
 
@@ -68,6 +72,11 @@ const MapComponent = ({
         center: [-83.07715, 42.37927],
         zoom: 10.75,
         minZoom: 10,
+        // z21 Nearmap tiles need the ArcGIS token; lower zooms stay CDN-cacheable
+        transformRequest: (url) =>
+          url.includes("/nearmap/21/") && tokenRef.current
+            ? { url, headers: { Authorization: `Bearer ${tokenRef.current}` } }
+            : { url },
       });
 
       map.on("load", () => {
@@ -173,7 +182,8 @@ const MapComponent = ({
     if (mapInstance.current && style && mapLoaded) {
       mapInstance.current.setStyle(mapStyles[style]);
     }
-  }, [style]);
+    // also reload satellite when sign-in changes its maxzoom
+  }, [style, style === "satellite" && isCityEmployee]);
 
   /**
    * Effect for when the user clicks on the map

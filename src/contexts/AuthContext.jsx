@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [groups, setGroups] = useState([]);
   const [groupsLoading, setGroupsLoading] = useState(false);
+  const [orgId, setOrgId] = useState(null);
 
   const portalUrl = "https://detroitmi.maps.arcgis.com";
 
@@ -24,10 +25,12 @@ export const AuthProvider = ({ children }) => {
       .then((r) => r.json())
       .then((data) => {
         setGroups(Array.isArray(data?.groups) ? data.groups : []);
+        setOrgId(data?.orgId ?? null);
         setGroupsLoading(false);
       })
       .catch(() => {
         setGroups([]);
+        setOrgId(null);
         setGroupsLoading(false);
       });
   };
@@ -97,8 +100,12 @@ export const AuthProvider = ({ children }) => {
     setUsername("");
     setToken(null);
     setGroups([]);
+    setOrgId(null);
     setGroupsLoading(false);
   };
+
+  // City of Detroit ArcGIS org; netlify/functions/nearmap.mjs does the same check server-side
+  const isCityEmployee = isAuthenticated && orgId === "qvkbeam7Wirps6zC";
 
   return (
     <AuthContext.Provider
@@ -109,6 +116,7 @@ export const AuthProvider = ({ children }) => {
         groups,
         groupsLoading,
         isInGroup,
+        isCityEmployee,
         handleSignIn,
         handleSignOut,
       }}

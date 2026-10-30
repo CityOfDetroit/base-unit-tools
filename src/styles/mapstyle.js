@@ -66,10 +66,12 @@ export const baseStyle = {
     satellite: {
       type: "raster",
       tiles: [
-        `https://api.nearmap.com/tiles/v3/Vert/{z}/{x}/{y}.img?apikey=${import.meta.env.VITE_NEARMAP_API_KEY}`,
+        `${window.location.origin}/nearmap/{z}/{x}/{y}`,
       ],
       tileSize: 256,
-      // Nearmap public-display terms: no finer than 6" (~1:564, z20), limited to our AOI
+      // Nearmap via netlify/functions/nearmap.mjs, which holds the key and enforces:
+      // public-display terms, no finer than 6" (~1:564, z20), limited to our AOI;
+      // z21 (~3") only for City of Detroit ArcGIS users (see satelliteStyle)
       maxzoom: 20,
       bounds: [-83.29, 42.2549, -82.91, 42.4505],
       attribution: "© Nearmap",
@@ -1360,9 +1362,10 @@ export const baseStyle = {
 
 // since this is a function and not an object, we'll have to call it in the map like so:
 // satelliteStyle()
-export const satelliteStyle = () => {
+export const satelliteStyle = (maxzoom = 20) => {
   // clone the baseStyle into a new object to we can make changes
   let satStyle = JSON.parse(JSON.stringify(baseStyle));
+  satStyle.sources.satellite.maxzoom = maxzoom;
 
   // set the satellite layer, which is first, to visible
   satStyle.layers[0].layout.visibility = "visible";
