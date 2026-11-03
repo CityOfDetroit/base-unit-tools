@@ -80,6 +80,11 @@ const PublicSafetyLookup = () => {
   };
 
   const attrs = feature?.attributes;
+  // street-range matches return one value (the geocoder picks the left/right column by Side);
+  // intersections return col1/col2, one per street, and 0 in col
+  const values = (col) => [...new Set([attrs[col], attrs[`${col}1`], attrs[`${col}2`]].filter(Boolean))];
+  // a bare street name lands on an arbitrary segment, so its scout car area means nothing
+  const scoutAreas = attrs && attrs.Addr_type !== "StreetName" ? values("scout_car_area") : [];
 
   return (
     <Container size="2" p="4">
@@ -122,9 +127,9 @@ const PublicSafetyLookup = () => {
               {/* DPD scout car areas are numbered precinct * 100 + car, e.g. 312 is in precinct 3 */}
               <SafetyStat
                 label="Police Precinct"
-                value={attrs.scout_car_area && Math.floor(attrs.scout_car_area / 100)}
+                value={[...new Set(scoutAreas.map((a) => Math.floor(a / 100)))].join(" / ")}
               />
-              <SafetyStat label="Scout Car Area" value={attrs.scout_car_area} />
+              <SafetyStat label="Scout Car Area" value={scoutAreas.join(" / ")} />
             </Flex>
 
             <Card>
@@ -133,9 +138,11 @@ const PublicSafetyLookup = () => {
                   <Text size="4" weight="bold">
                     {attrs.Match_addr}
                   </Text>
-                  {attrs.geo_source ? (
+                  {scoutAreas.length ? (
                     <Text size="1" color="gray">
-                      Score {attrs.Score} · matched by {attrs.geo_source}
+                      Score {attrs.Score} · matched by{" "}
+                      {attrs.geo_source ||
+                        (attrs.Addr_type === "StreetInt" ? "intersection" : `street centerline (${attrs.Side} side)`)}
                     </Text>
                   ) : (
                     <Text size="1" color="orange">
@@ -170,7 +177,7 @@ const PublicSafetyLookup = () => {
               {geocoderFields
                 .filter((f) => ["council_2026", "neighborhood"].includes(f.name))
                 .map((f) => (
-                  <Attribute key={f.name} label={f.display} value={attrs[f.geocoderColumn] || "—"} />
+                  <Attribute key={f.name} label={f.display} value={values(f.geocoderColumn).join(" / ") || "—"} />
                 ))}
             </Category>
           </Flex>
