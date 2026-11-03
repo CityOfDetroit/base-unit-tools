@@ -1339,10 +1339,10 @@ export const baseStyle = {
         "circle-radius": {
           base: 1,
           stops: [
-            [12.5, 2],
-            [13.5, 3],
-            [16.5, 5],
-            [19, 12],
+            [12.5, 1.5],
+            [13.5, 2],
+            [16.5, 3.5],
+            [19, 8],
           ],
         },
         "circle-color": layers["address"].color,
@@ -1362,10 +1362,12 @@ export const baseStyle = {
 
 // since this is a function and not an object, we'll have to call it in the map like so:
 // satelliteStyle()
-export const satelliteStyle = (maxzoom = 20) => {
+// until: YYYY-MM-DD, newest capture on or before that date (city staff only, see nearmap.mjs)
+export const satelliteStyle = (maxzoom = 20, until = null) => {
   // clone the baseStyle into a new object to we can make changes
   let satStyle = JSON.parse(JSON.stringify(baseStyle));
   satStyle.sources.satellite.maxzoom = maxzoom;
+  if (until) satStyle.sources.satellite.tiles = [`${window.location.origin}/nearmap/{z}/{x}/{y}?until=${until}`];
 
   // set the satellite layer, which is first, to visible
   satStyle.layers[0].layout.visibility = "visible";
@@ -1383,36 +1385,57 @@ export const satelliteStyle = (maxzoom = 20) => {
     }
   });
 
-  // adjust colors for satellite - use muted/semi-transparent colors
-  satStyle.layers.forEach((l, i) => {
-    if (l.id === "streets-line") {
-      satStyle.layers[i].paint["line-color"] = "rgba(148, 70, 109, 0.5)";
-      satStyle.layers[i].paint["line-opacity"] = 0.6;
-    }
-    if (l.id === "streets-highlight") {
-      satStyle.layers[i].paint["line-color"] = "rgba(148, 70, 109, 0.8)";
-      satStyle.layers[i].paint["line-opacity"] = 0.7;
-    }
-    if (l.id === "streets-linked") {
-      satStyle.layers[i].paint["line-color"] = "rgba(148, 70, 109, 0.6)";
-      satStyle.layers[i].paint["line-opacity"] = 0.5;
-    }
-    if (l.id === 'parcel-line') {
-      satStyle.layers[i].paint['line-color'] = "rgba(163, 200, 112, 0.5)";
-      satStyle.layers[i].paint["line-opacity"] = 0.6;
-    }
-    if (l.id === 'parcel-highlight') {
-      satStyle.layers[i].paint["line-color"] = "rgba(163, 200, 112, 0.8)";
-      satStyle.layers[i].paint["line-opacity"] = 0.7;
-    }
-    if (l.id === 'building-fill') {
-      satStyle.layers[i].paint['fill-color'] = "rgba(203, 77, 79, 0.3)";
-      satStyle.layers[i].paint["fill-opacity"] = 0.4;
-    }
-    if (l.id === 'building-highlight') {
-      satStyle.layers[i].paint['line-color'] = "rgba(203, 77, 79, 0.8)";
-      satStyle.layers[i].paint["line-opacity"] = 0.7;
-    }
+  // adjust colors for satellite: thin light base lines, bright selections.
+  // colors are opaque so *-opacity is the only alpha (they'd multiply otherwise)
+  const satPaint = {
+    // keeps its full width as an invisible click target; streets-sat-line below draws it
+    "streets-line": { "line-opacity": 0 },
+    "streets-highlight": {
+      "line-color": "#e879b9",
+      "line-opacity": 0.9,
+      "line-width": { stops: [[11, 2], [15, 4], [20, 20]] },
+    },
+    "streets-linked": {
+      "line-color": "#e879b9",
+      "line-opacity": 0.7,
+      "line-width": { stops: [[11, 2], [15, 4], [20, 20]] },
+    },
+    "parcel-line": {
+      "line-color": "#ffffff",
+      "line-opacity": { stops: [[14, 0], [14.1, 0.35], [18, 0.5]] },
+    },
+    "parcel-highlight": { "line-color": "#b8f04a", "line-opacity": 1 },
+    "building-fill": {
+      "fill-color": "#ff6b6b",
+      "fill-outline-color": "#ff6b6b",
+      "fill-opacity": 0.15,
+    },
+    "building-highlight": { "line-color": "#ff5a5f", "line-opacity": 1 },
+    "address-single": {
+      "circle-color": "#5ab4ff",
+      "circle-opacity": 0.95,
+      "circle-stroke-color": "#ffffff",
+      "circle-stroke-width": 1.5,
+      "circle-stroke-opacity": 0.9,
+    },
+  };
+  satStyle.layers.forEach((l) => {
+    if (satPaint[l.id]) Object.assign(l.paint, satPaint[l.id]);
+  });
+
+  // thin centerline so the road surface shows through
+  const streetsIdx = satStyle.layers.findIndex((l) => l.id === "streets-line");
+  satStyle.layers.splice(streetsIdx + 1, 0, {
+    id: "streets-sat-line",
+    type: "line",
+    source: "baseunits",
+    "source-layer": "streets",
+    minzoom: 11,
+    paint: {
+      "line-color": "#e879b9",
+      "line-opacity": 0.6,
+      "line-width": { stops: [[11, 0.5], [15, 1], [20, 5]] },
+    },
   });
 
   // return the object

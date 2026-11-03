@@ -14,6 +14,8 @@ import Mapillary from "./Mapillary";
 import MapillarySwitch from "./MapillarySwitch";
 import BuildingLinks from "./BuildingLinks";
 import BasemapSelector from "./BasemapSelector";
+import ImageryDateSelector from "./ImageryDateSelector";
+import { useAuth } from "../contexts/AuthContext";
 import ModeSelector from "./ModeSelector";
 import ResizeHandle from "./ResizeHandle";
 
@@ -48,7 +50,13 @@ const BaseUnitsMap = () => {
   // map state
   let [style, setStyle] = useState("streets");
 
-  // selection mode state (all, parcel, building, street)
+  // Nearmap capture dates at the map center (newest first), and the date city staff picked
+  const { isCityEmployee } = useAuth();
+  const [captureDates, setCaptureDates] = useState([]);
+  const [until, setUntil] = useState(null);
+  const pickedUntil = isCityEmployee ? until : null;
+
+  // selection mode state (all, parcel, building, street, none)
   const [mode, setMode] = useState(params?.get("mode") || "all");
 
   // the primary hook for fetching the current feature
@@ -167,6 +175,13 @@ const BaseUnitsMap = () => {
         <Card>
           <BasemapSelector {...{ style, setStyle }} />
         </Card>
+        {style === "satellite" && captureDates.length > 0 && (
+          <Card>
+            <ImageryDateSelector
+              {...{ captureDates, until: pickedUntil, setUntil, canPick: isCityEmployee }}
+            />
+          </Card>
+        )}
         <Card>
           <ModeSelector {...{ mode, setMode }} />
         </Card>
@@ -273,7 +288,9 @@ const BaseUnitsMap = () => {
             viewerImage,
             viewerBearing,
             geocodedFeature,
-            mode
+            mode,
+            setCaptureDates,
+            pickedUntil,
           }}
         />
       </div>
