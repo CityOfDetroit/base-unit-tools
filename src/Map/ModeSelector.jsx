@@ -7,6 +7,8 @@ const modeOptions = [
   { value: "parcel", label: "Parcel" },
   { value: "building", label: "Building" },
   { value: "street", label: "Street" },
+  // hides every base unit layer, e.g. to see the imagery clearly
+  { value: "none", label: "None" },
 ];
 
 const ModeSelector = ({ mode, setMode }) => {

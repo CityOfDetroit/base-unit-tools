@@ -9,6 +9,15 @@ import { baseStyle, darkStyle, linenStyle, satelliteStyle } from "../styles/maps
 import { geocode } from "@esri/arcgis-rest-geocoding";
 import { map } from "underscore";
 
+// base unit layers (streets, parcels, buildings, addresses and their highlights), all hidden in "None" select mode
+const FEATURE_SOURCES = ["baseunits", "bu_parcels", "bu_features", "address-clusters"];
+const hideFeatures = (s) => ({
+  ...s,
+  layers: s.layers.map((l) =>
+    FEATURE_SOURCES.includes(l.source) ? { ...l, layout: { ...l.layout, visibility: "none" } } : l
+  ),
+});
+
 const MapComponent = ({
   layer,
   setLayer,
@@ -21,8 +30,12 @@ const MapComponent = ({
   viewerBearing,
   setSvImages,
   geocodedFeature,
-  mode = "all"
+  mode = "all",
+  // Nearmap capture dates at the map center go up to the top bar; pickedUntil comes back down
+  setCaptureDates,
+  pickedUntil = null,
 }) => {
+  const showFeatures = mode !== "none";
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const modeRef = useRef(mode);
@@ -40,9 +53,10 @@ const MapComponent = ({
 
   let mapStyles = {
     streets: baseStyle,
-    satellite: satelliteStyle(isCityEmployee ? 21 : 20),
+    satellite: satelliteStyle(isCityEmployee ? 21 : 20, pickedUntil),
     linen: linenStyle()
   }
+  const styleFor = (s) => (showFeatures ? mapStyles[s] : hideFeatures(mapStyles[s]));
 
   useEffect(() => {
     if (!mapLoaded) {
@@ -68,13 +82,13 @@ const MapComponent = ({
     if (mapRef.current && !mapInstance.current) {
       const map = new maplibregl.Map({
         container: mapRef.current,
-        style: style ? mapStyles[style] : baseStyle,
+        style: styleFor(style || "streets"),
         center: [-83.07715, 42.37927],
         zoom: 10.75,
         minZoom: 10,
-        // z21 Nearmap tiles need the ArcGIS token; lower zooms stay CDN-cacheable
+        // z21 and dated Nearmap tiles need the ArcGIS token; the rest stay CDN-cacheable
         transformRequest: (url) =>
-          url.includes("/nearmap/21/") && tokenRef.current
+          (url.includes("/nearmap/21/") || /\/nearmap\/.*until=/.test(url)) && tokenRef.current
             ? { url, headers: { Authorization: `Bearer ${tokenRef.current}` } }
             : { url },
       });
@@ -180,10 +194,35 @@ const MapComponent = ({
 
   useEffect(() => {
     if (mapInstance.current && style && mapLoaded) {
-      mapInstance.current.setStyle(mapStyles[style]);
+      mapInstance.current.setStyle(styleFor(style));
     }
-    // also reload satellite when sign-in changes its maxzoom
-  }, [style, style === "satellite" && isCityEmployee]);
+    // also reload satellite when sign-in changes its maxzoom or the imagery date changes
+  }, [style, showFeatures, style === "satellite" && isCityEmployee, style === "satellite" && pickedUntil]);
+
+  // look up capture dates at the map center while on satellite
+  useEffect(() => {
+    const map = mapInstance.current;
+    if (!map || !mapLoaded || style !== "satellite") return setCaptureDates([]);
+    let controller;
+    const update = () => {
+      // drop the previous lookup so a slow response can't overwrite a newer one
+      controller?.abort();
+      controller = new AbortController();
+      const { signal } = controller;
+      const { lng, lat } = map.getCenter();
+      // rounded to ~100m so nearby lookups hit the CDN cache
+      fetch(`/nearmap/coverage?lon=${lng.toFixed(3)}&lat=${lat.toFixed(3)}`, { signal })
+        .then((r) => (r.ok ? r.json() : []))
+        .then(setCaptureDates)
+        .catch(() => !signal.aborted && setCaptureDates([]));
+    };
+    update();
+    map.on("moveend", update);
+    return () => {
+      controller?.abort();
+      map.off("moveend", update);
+    };
+  }, [style, mapLoaded]);
 
   /**
    * Effect for when the user clicks on the map

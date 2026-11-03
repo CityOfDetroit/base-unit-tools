@@ -1,6 +1,7 @@
 // Proxies Nearmap tiles so the API key stays server-side.
 // Public-display terms: no finer than z20 (~6"), Detroit AOI only.
-// z21 (~3") is internal-license imagery, served only to City of Detroit ArcGIS org users.
+// z21 (~3") and past captures (?until=YYYY-MM-DD) are served only to City of Detroit ArcGIS org users.
+// /nearmap/coverage?lon=&lat= lists capture dates at a point, newest first.
 
 const BOUNDS = [-83.29, 42.2549, -82.91, 42.4505]; // keep in sync with the satellite source in src/styles/mapstyle.js
 const DETROIT_ORG_ID = "qvkbeam7Wirps6zC";
@@ -17,6 +18,23 @@ const inBounds = (z, x, y) => {
   return tileLon(x, z) < e && tileLon(x + 1, z) > w && tileLat(y + 1, z) < n && tileLat(y, z) > s;
 };
 
+const NEARMAP_HEADERS = { headers: { Referer: "https://baseunits.detroitmi.gov/" } };
+
+const coverage = async (url) => {
+  const [lon, lat] = ["lon", "lat"].map((k) => Number(url.searchParams.get(k)));
+  const [w, s, e, n] = BOUNDS;
+  if (!(lon > w && lon < e && lat > s && lat < n)) return new Response("Not found", { status: 404 });
+  const upstream = await fetch(
+    `https://api.nearmap.com/coverage/v2/point/${lon},${lat}?resources=tiles:Vert&limit=100&apikey=${process.env.NEARMAP_API_KEY}`,
+    NEARMAP_HEADERS
+  );
+  if (!upstream.ok) return new Response(null, { status: upstream.status });
+  const { surveys = [] } = await upstream.json();
+  return Response.json([...new Set(surveys.map((s) => s.captureDate))], {
+    headers: { "Cache-Control": "public, max-age=86400", "Netlify-CDN-Cache-Control": "public, max-age=86400, durable" },
+  });
+};
+
 const isCityEmployee = async (token) => {
   const cached = orgChecks.get(token);
   if (cached && cached.expires > Date.now()) return cached.ok;
@@ -29,12 +47,18 @@ const isCityEmployee = async (token) => {
 };
 
 export default async (req, context) => {
+  const url = new URL(req.url);
+  if (url.pathname === "/nearmap/coverage") return coverage(url);
+
+  const until = url.searchParams.get("until");
+  if (until !== null && !/^\d{4}-\d{2}-\d{2}$/.test(until)) return new Response("Bad until", { status: 400 });
   const [z, x, y] = ["z", "x", "y"].map((k) => Number(context.params[k]));
   if (![z, x, y].every(Number.isInteger) || z < 0 || z > 21 || !inBounds(z, x, y)) {
     return new Response("Not found", { status: 404 });
   }
 
-  if (z === 21) {
+  const restricted = z === 21 || until !== null;
+  if (restricted) {
     const token = req.headers.get("authorization")?.replace(/^Bearer /, "");
     if (!token || !(await isCityEmployee(token))) {
       return new Response("Unauthorized", { status: 401 });
@@ -42,13 +66,13 @@ export default async (req, context) => {
   }
 
   const upstream = await fetch(
-    `https://api.nearmap.com/tiles/v3/Vert/${z}/${x}/${y}.img?apikey=${process.env.NEARMAP_API_KEY}`,
-    { headers: { Referer: "https://baseunits.detroitmi.gov/" } }
+    `https://api.nearmap.com/tiles/v3/Vert/${z}/${x}/${y}.img?apikey=${process.env.NEARMAP_API_KEY}${until ? `&until=${until}` : ""}`,
+    NEARMAP_HEADERS
   );
   if (!upstream.ok) return new Response(null, { status: upstream.status });
 
   const headers = { "Content-Type": upstream.headers.get("content-type") || "image/jpeg" };
-  if (z === 21) {
+  if (restricted) {
     headers["Cache-Control"] = "private, max-age=86400";
   } else {
     headers["Cache-Control"] = "public, max-age=86400";
@@ -57,4 +81,4 @@ export default async (req, context) => {
   return new Response(upstream.body, { headers });
 };
 
-export const config = { path: "/nearmap/:z/:x/:y" };
+export const config = { path: ["/nearmap/coverage", "/nearmap/:z/:x/:y"] };
