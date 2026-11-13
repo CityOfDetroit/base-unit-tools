@@ -5,6 +5,22 @@ import esriId from "@arcgis/core/identity/IdentityManager";
 
 const AuthContext = createContext();
 
+// The ArcGIS sign-in is kept in sessionStorage (this tab only) unless "keep me signed in" was ticked
+// on the AGO page, so every link opened in a new tab went back to /login. Move it to localStorage,
+// which IdentityManager also reads. Moved, not copied: when both hold a valid copy it revokes one,
+// and both copies share the same refresh token. Only a finished sign-in moves; one still waiting on
+// its OAuth redirect has to stay where IdentityManager left it.
+const OAUTH_KEY = "esriJSAPIOAuth"; // @arcgis/core identity/OAuthCredential.js
+const keepSignIn = () => {
+  try {
+    const v = sessionStorage.getItem(OAUTH_KEY);
+    if (v && /"(refreshToken|token)":"/.test(v)) {
+      localStorage.setItem(OAUTH_KEY, v);
+      sessionStorage.removeItem(OAUTH_KEY);
+    }
+  } catch {}
+};
+
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   // false until the stored sign-in has been checked, so protected routes don't bounce to /login first
@@ -49,6 +65,7 @@ export const AuthProvider = ({ children }) => {
       popup: false,
     });
 
+    keepSignIn();
     esriId.registerOAuthInfos([info]);
 
     esriId
@@ -66,6 +83,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const getCurrentUser = () => {
+    keepSignIn();
     setGroupsLoading(true);
     esriId
       .getCredential(portalUrl + "/sharing")
@@ -95,6 +113,9 @@ export const AuthProvider = ({ children }) => {
 
   const handleSignOut = () => {
     esriId.destroyCredentials();
+    try {
+      localStorage.removeItem(OAUTH_KEY);
+    } catch {}
     setIsAuthenticated(false);
     setUsername("");
     setToken(null);
