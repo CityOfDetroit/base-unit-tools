@@ -8,7 +8,8 @@ import { useAuth } from "../contexts/AuthContext";
 import useGeocoder from "../hooks/useGeocoder";
 import useBaseFeature from "../hooks/useBaseFeature";
 import CardLink, { DataSource } from "../components/CardLink";
-import { GlobeIcon } from "@radix-ui/react-icons";
+import { ChevronDownIcon, GlobeIcon } from "@radix-ui/react-icons";
+import layers from "../data/layers";
 
 // Replica of the "Ownership Explorer" Experience Builder app
 // (experience.arcgis.com/experience/f65391f3f2b84d17b54d8b396a3cc034).
@@ -52,8 +53,47 @@ const classColor = [
   color["Verified"],
 ];
 
+// the legend class of a tile feature (same rules as classColor)
+const classOf = (p) => {
+  const t = p.entity_owner_type || "";
+  if (p.is_verified !== 1) return "Not Verified";
+  if (t === "City of Detroit") return "Municipally Owned";
+  if (t === "Non-Profit" || t === "Religious Institution") return "Religious/Non-Profit";
+  if (t === "Government" || t === "Utility") return "Governmental Entity/Utility";
+  if (t === "Educational") return "Educational";
+  return "Verified";
+};
+// the map hover card: address, owner, legend class. Built with textContent (owner names are data).
+const hoverCard = (address, p) => {
+  const el = document.createElement("div");
+  const line = (cls, text) => {
+    const d = document.createElement("div");
+    d.className = cls;
+    d.textContent = text;
+    return el.appendChild(d);
+  };
+  line("ot-address", address || p.parcel_id);
+  line(p.is_verified === 1 ? "ot-owner" : "ot-owner ot-muted", p.is_verified === 1 ? p.entity_owner : "Owner not yet verified");
+  const cls = classOf(p);
+  const swatch = document.createElement("span");
+  swatch.className = "ot-swatch";
+  swatch.style.background = color[cls];
+  line("ot-class", cls).prepend(swatch);
+  return el;
+};
+
 const LIST_PAGE = 200; // rows shown before "Show more"
-const HOVER_COLOR = "#e8590c";
+const FILL_OPACITY = 0.5; // parcel fills (and legend swatches) when nothing is selected
+const DIMMED_OPACITY = 0.12; // parcels outside the selected cluster or owner, kept visible for context
+const HOVER_COLOR = "#e8590c"; // list hover, and the hovered owner's parcels
+const SELECTED_COLOR = "#00b7ff"; // the clicked parcel
+const POSSIBLE_COLOR = "#7c3aed"; // unverified parcels in the shown cluster ("possible additional")
+
+// highlight entries for the map legend, after the classes
+const HIGHLIGHTS = [
+  ["Selected parcel", { border: `2px solid ${SELECTED_COLOR}` }],
+  ["Possible additional property", { border: `2px dashed ${POSSIBLE_COLOR}`, background: "rgba(124, 58, 237, 0.25)" }],
+];
 
 const mailing = (r) =>
   [r.taxpayer_address, [r.taxpayer_city, r.taxpayer_state].filter(Boolean).join(", "), r.taxpayer_zip_code]
@@ -82,7 +122,7 @@ const Rows = ({ rows }) => (
   </DataList.Root>
 );
 
-const ParcelRow = ({ p, active, onClick, onHover }) => (
+const ParcelRow = ({ p, pre, active, onClick, onHover }) => (
   <button
     className={`flex w-full justify-between gap-2 px-2 py-1 text-left text-sm hover:bg-gray-100 ${active ? "bg-sky-100" : ""}`}
     onClick={onClick}
@@ -90,7 +130,17 @@ const ParcelRow = ({ p, active, onClick, onHover }) => (
     onMouseLeave={() => onHover(null)}
   >
     <span>{p.address || p.parcel_id}</span>
-    {p.is_verified !== 1 && <span className="text-xs text-gray-500">possible</span>}
+    <span className="flex items-center gap-2">
+      {pre > 0 && (
+        <span
+          className="rounded bg-green-100 px-1 text-xs text-green-800"
+          title={`Principal residence exemption (PRE) claimed: ${pre}%`}
+        >
+          PRE{pre < 100 ? ` ${pre}%` : ""}
+        </span>
+      )}
+      {p.is_verified !== 1 && <span className="text-xs text-gray-500">possible</span>}
+    </span>
   </button>
 );
 
@@ -113,6 +163,9 @@ const Ownership = () => {
   const [listLimit, setListLimit] = useState(LIST_PAGE);
   const [listFilter, setListFilter] = useState("");
   const [loadingParcels, setLoadingParcels] = useState(false);
+  // PRE % per parcel_id, from the public parcels layer (the ownership layer doesn't carry it);
+  // fetched only for the rows on screen, in batches, and kept as the list grows or changes
+  const [pre, setPre] = useState({});
   const listed = useMemo(() => {
     const f = listFilter.trim().toUpperCase();
     return f ? parcels.filter((p) => `${p.address} ${p.parcel_id}`.toUpperCase().includes(f)) : parcels;
@@ -226,15 +279,34 @@ const Ownership = () => {
         type: "fill",
         source: "ownership",
         "source-layer": SOURCE_LAYER,
-        paint: { "fill-color": classColor, "fill-opacity": 0.67, "fill-outline-color": "rgba(153,153,153,0.25)" },
+        paint: { "fill-color": classColor, "fill-opacity": FILL_OPACITY, "fill-outline-color": "rgba(153,153,153,0.25)" },
+      });
+      // the shown cluster's unverified "possible" parcels: purple tint + dashed outline
+      // (their class fill is near-white, so they'd otherwise be hard to see)
+      const none = ["==", ["get", "parcel_id"], ""];
+      m.addLayer({
+        id: "possible-fill",
+        type: "fill",
+        source: "ownership",
+        "source-layer": SOURCE_LAYER,
+        filter: none,
+        paint: { "fill-color": POSSIBLE_COLOR, "fill-opacity": 0.25 },
+      });
+      m.addLayer({
+        id: "possible-line",
+        type: "line",
+        source: "ownership",
+        "source-layer": SOURCE_LAYER,
+        filter: none,
+        paint: { "line-color": POSSIBLE_COLOR, "line-width": 2, "line-dasharray": [2, 1] },
       });
       m.addLayer({
         id: "ownership-selected",
         type: "line",
         source: "ownership",
         "source-layer": SOURCE_LAYER,
-        filter: ["==", ["get", "parcel_id"], ""],
-        paint: { "line-color": "#00b7ff", "line-width": 3 },
+        filter: none,
+        paint: { "line-color": SELECTED_COLOR, "line-width": 3 },
       });
       // below TILES_MINZOOM there are no tiles; the cluster or owner shows as dots instead
       m.addSource("filtered-dots", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
@@ -246,10 +318,24 @@ const Ownership = () => {
         paint: {
           "circle-color": classColor, // same classes as the parcel fills
           "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 1.5, 13, 3.5],
-          "circle-stroke-color": "#5c5c5c",
-          "circle-stroke-width": 0.5,
+          // possible (unverified) parcels get a purple ring, like their outline at closer zooms
+          "circle-stroke-color": ["case", ["==", ["get", "is_verified"], 1], "#5c5c5c", POSSIBLE_COLOR],
+          "circle-stroke-width": ["case", ["==", ["get", "is_verified"], 1], 0.5, 1.5],
         },
       });
+      // all parcels of the verified owner under the mouse on the map: shaded a little darker
+      // (drawn just above the fills, under the possible/selected outlines)
+      m.addLayer(
+        {
+          id: "owner-hover",
+          type: "fill",
+          source: "ownership",
+          "source-layer": SOURCE_LAYER,
+          filter: ["==", ["get", "entity_owner"], ""],
+          paint: { "fill-color": "#000", "fill-opacity": 0.2 },
+        },
+        "possible-fill"
+      );
       // the parcel under the mouse in the sidebar list: an outline, or a ringed dot when zoomed out
       m.addLayer({
         id: "list-hover",
@@ -275,18 +361,50 @@ const Ownership = () => {
       setMap(m);
     });
     // hover: owner from the ownership tile, address from the base map's parcel tiles
-    const tip = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 8 });
+    // (anchor fixed so the card doesn't flip sides as the mouse moves)
+    const tip = new maplibregl.Popup({
+      closeButton: false,
+      closeOnClick: false,
+      anchor: "top-left",
+      offset: [14, 14],
+      maxWidth: "260px",
+      className: "ownership-tip",
+    });
+    // and shade every other parcel of the hovered verified owner (by name, from the tiles);
+    // not the Land Bank, whose ~57k parcels would shade half the city
+    let hoveredOwner = null;
+    const setHoveredOwner = (owner) => {
+      if (owner === "Detroit Land Bank Authority (DLBA)") owner = null;
+      if (owner === hoveredOwner) return;
+      hoveredOwner = owner;
+      m.setFilter("owner-hover", ["==", ["get", "entity_owner"], owner ?? ""]);
+    };
+    // To avoid flashing: rebuild the card only when the parcel changes, and clear the card and
+    // outlines a moment after leaving, so crossing a street between parcels doesn't blink them.
+    let hoveredParcel = null;
+    let clearTimer = null;
     m.on("mousemove", "ownership-fill", (e) => {
       const p = e.features?.[0]?.properties;
-      if (!p) return tip.remove();
+      if (!p) return;
+      clearTimeout(clearTimer);
       m.getCanvas().style.cursor = "pointer";
-      const address = m.queryRenderedFeatures(e.point, { layers: ["parcel-fill"] })[0]?.properties?.address;
-      const owner = p.is_verified === 1 ? p.entity_owner : "Owner not verified";
-      tip.setLngLat(e.lngLat).setText([address, owner].filter(Boolean).join(" · ")).addTo(m);
+      tip.setLngLat(e.lngLat);
+      if (p.parcel_id !== hoveredParcel) {
+        hoveredParcel = p.parcel_id;
+        const address = m.queryRenderedFeatures(e.point, { layers: ["parcel-fill"] })[0]?.properties?.address;
+        tip.setDOMContent(hoverCard(address, p));
+        setHoveredOwner(p.is_verified === 1 ? p.entity_owner : null);
+      }
+      if (!tip.isOpen()) tip.addTo(m);
     });
     m.on("mouseleave", "ownership-fill", () => {
       m.getCanvas().style.cursor = "";
-      tip.remove();
+      clearTimeout(clearTimer);
+      clearTimer = setTimeout(() => {
+        hoveredParcel = null;
+        tip.remove();
+        setHoveredOwner(null);
+      }, 150);
     });
     // click a parcel: show its owner's cluster and list; details open from the list
     m.on("click", "ownership-fill", (e) => {
@@ -368,8 +486,13 @@ const Ownership = () => {
         : owner
           ? ["any", ["==", ["get", "entity_owner"], owner], byId]
           : byId;
-    map.setPaintProperty("ownership-fill", "fill-opacity", match ? ["case", match, 0.85, 0.12] : 0.67);
+    map.setPaintProperty("ownership-fill", "fill-opacity", match ? ["case", match, 0.85, DIMMED_OPACITY] : FILL_OPACITY);
     map.setFilter("ownership-selected", ["==", ["get", "parcel_id"], detailId ?? selected?.parcel_id ?? ""]);
+    // a clicked parcel's cluster: mark its unverified ("possible") parcels
+    const possible = selected && !ownerFilter ? parcels.filter((p) => p.is_verified !== 1).map((p) => p.parcel_id) : [];
+    const possibleFilter = ["match", ["get", "parcel_id"], possible.length ? possible : [""], true, false];
+    map.setFilter("possible-fill", possibleFilter);
+    map.setFilter("possible-line", possibleFilter);
   }, [map, ownerFilter, selected, selectedOwner, detailId, parcels]);
 
   useEffect(() => {
@@ -440,6 +563,36 @@ const Ownership = () => {
     };
   }, [map, ownerWhere, clusterWheres.join("|")]);
 
+  const shownIds = listed.slice(0, listLimit).map((p) => p.parcel_id);
+  useEffect(() => {
+    const missing = shownIds.filter((id) => !(id in pre));
+    if (!missing.length) return;
+    let cancelled = false;
+    const batches = [];
+    for (let i = 0; i < missing.length; i += 200) batches.push(missing.slice(i, i + 200));
+    Promise.all(
+      batches.map((ids) =>
+        queryFeatures({
+          url: layers.parcel.endpoint,
+          where: `parcel_id IN (${ids.map((id) => `'${sql(id)}'`).join(",")})`,
+          outFields: "parcel_id,pct_pre_claimed",
+          returnGeometry: false,
+          httpMethod: "POST",
+        })
+      )
+    )
+      .then((results) => {
+        if (cancelled) return;
+        const found = Object.fromEntries(missing.map((id) => [id, 0]));
+        for (const r of results) for (const f of r.features) found[f.attributes.parcel_id] = f.attributes.pct_pre_claimed || 0;
+        setPre((old) => ({ ...old, ...found }));
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [shownIds.join("|")]);
+
   // verified / possible-additional counts, from the loaded list
   const verifiedCount = parcels.filter((p) => p.is_verified === 1).length;
   const possibleCount = parcels.length - verifiedCount;
@@ -454,9 +607,12 @@ const Ownership = () => {
     for (const p of parcels) if (p.is_verified === 1) n.set(p.entity_owner, (n.get(p.entity_owner) || 0) + 1);
     return [...n.entries()].sort((a, b) => b[1] - a[1]).map(([name]) => name);
   }, [parcels]);
+  // a list click selects the parcel, the same as clicking it on the map
   const focusParcel = (p) => {
-    setDetailId(p.parcel_id);
-    map.flyTo({ center: [p.lng, p.lat], zoom: Math.max(map.getZoom(), 17) });
+    setOwnerFilter("");
+    setDetailId(null);
+    setSelected({ parcel_id: p.parcel_id, is_verified: p.is_verified, entity_owner: p.entity_owner });
+    map.flyTo({ center: [p.lng, p.lat], zoom: Math.max(map.getZoom(), 17), duration: 600 });
   };
 
   return (
@@ -630,7 +786,8 @@ const Ownership = () => {
                       <ParcelRow
                         key={p.parcel_id}
                         p={p}
-                        active={p.parcel_id === detailId}
+                        pre={pre[p.parcel_id]}
+                        active={p.parcel_id === selected?.parcel_id}
                         onClick={() => focusParcel(p)}
                         onHover={setHoverId}
                       />
@@ -653,16 +810,28 @@ const Ownership = () => {
 
       <Box className="relative" style={{ height: "80vh", minHeight: "400px" }}>
         <div ref={mapDiv} className="h-full" />
-
         <Card size="1" style={{ position: "absolute", bottom: 12, left: 12 }}>
-          <Flex direction="column" gap="1">
-            {CLASSES.map(([label, c]) => (
-              <Flex key={label} gap="2" align="center">
-                <Box width="12px" height="12px" style={{ background: c, opacity: 0.67, border: "1px solid #999" }} />
-                <Text size="1">{label}</Text>
-              </Flex>
-            ))}
-          </Flex>
+          <details open className="group">
+            <summary className="flex cursor-pointer select-none list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
+              <Text size="1" weight="medium" color="gray">Legend</Text>
+              <ChevronDownIcon className="text-gray-500 transition-transform group-open:rotate-180" />
+            </summary>
+            <Flex direction="column" gap="1" mt="2">
+              {CLASSES.map(([label, c]) => (
+                <Flex key={label} gap="2" align="center">
+                  <Box width="12px" height="12px" style={{ background: c, opacity: FILL_OPACITY, border: "1px solid #999" }} />
+                  <Text size="1">{label}</Text>
+                </Flex>
+              ))}
+              <Box my="1" className="border-t border-gray-200" />
+              {HIGHLIGHTS.map(([label, style]) => (
+                <Flex key={label} gap="2" align="center">
+                  <Box width="12px" height="12px" style={style} />
+                  <Text size="1">{label}</Text>
+                </Flex>
+              ))}
+            </Flex>
+          </details>
         </Card>
       </Box>
     </Grid>

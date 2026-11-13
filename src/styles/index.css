@@ -69,3 +69,45 @@ p {
 .zoning-parcel-tip .maplibregl-popup-tip {
   display: none;
 }
+
+/* Ownership map hover card */
+.ownership-tip {
+  pointer-events: none;
+}
+.ownership-tip .maplibregl-popup-content {
+  padding: 8px 10px;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  font-size: 12px;
+  line-height: 1.35;
+}
+.ownership-tip .maplibregl-popup-tip {
+  display: none;
+}
+.ownership-tip .ot-address {
+  font-weight: 600;
+  color: #111827;
+}
+.ownership-tip .ot-owner {
+  color: #004445;
+  font-weight: 500;
+}
+.ownership-tip .ot-muted {
+  color: #6b7280;
+  font-weight: 400;
+}
+.ownership-tip .ot-class {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 3px;
+  color: #6b7280;
+  font-size: 11px;
+}
+.ownership-tip .ot-swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  border: 1px solid #999;
+  flex: none;
+}
