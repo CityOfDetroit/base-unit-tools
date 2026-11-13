@@ -7,6 +7,8 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // false until the stored sign-in has been checked, so protected routes don't bounce to /login first
+  const [authChecked, setAuthChecked] = useState(false);
   const [username, setUsername] = useState("");
   const [token, setToken] = useState(null);
   const [groups, setGroups] = useState([]);
@@ -59,7 +61,8 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(false);
         setGroups([]);
         setGroupsLoading(false);
-      });
+      })
+      .finally(() => setAuthChecked(true));
   }, []);
 
   const getCurrentUser = () => {
@@ -84,10 +87,6 @@ export const AuthProvider = ({ children }) => {
       .then(() => {
         setIsAuthenticated(true);
         getCurrentUser();
-        // navigate to home page
-
-        navigat
-
       })
       .catch((error) => {
         console.error(error);
@@ -111,6 +110,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         isAuthenticated,
+        authChecked,
         token,
         username,
         groups,
