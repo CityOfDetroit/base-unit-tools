@@ -56,6 +56,17 @@ export const apps = {
         private: true,
         group: ZONING_GROUP_ID,
         show: true
+    },
+    'ownership': {
+        name: 'Ownership',
+        url: `/ownership`,
+        description: `See who owns a parcel and what else they own.`,
+        questions: [
+            `What other properties does this parcel's owner have?`
+        ],
+        icon: "PersonIcon",
+        private: true,
+        show: true
     }
 }
 

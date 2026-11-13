@@ -268,8 +268,10 @@ const MapComponent = ({
   }, [clickedFeatures]);
 
   // fly to centroid of selectedFeature (returned from the API)
+  // (waits for mapLoaded: with ?id= in the URL the feature can arrive before the style, and
+  // setFilter on an unloaded style throws, blanking the page)
   useEffect(() => {
-    if (mapInstance.current && feature && feature.properties) {
+    if (mapInstance.current && mapLoaded && feature && feature.properties) {
       const currentLyr = layers[layer];
 
       Object.keys(layers).forEach((lyr) => {
@@ -311,7 +313,7 @@ const MapComponent = ({
         zoom: 17.51,
       });
     }
-  }, [feature, geocodedFeature]);
+  }, [feature, geocodedFeature, mapLoaded]);
 
   useEffect(() => {
     if (mapInstance.current && linkedAddresses.length > 0 && mapLoaded && layers[layer]) {
