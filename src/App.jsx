@@ -7,7 +7,8 @@ import {
   BrowserRouter,
   Routes,
   Route,
-  Navigate
+  Navigate,
+  useLocation
 } from "react-router-dom";
 import { useAuth, AuthProvider } from "./contexts/AuthContext";
 import Login from "./Login";
@@ -26,8 +27,11 @@ const PublicSafetyLookup = lazy(() => import("./PublicSafetyLookup/PublicSafetyL
 // Protected route component
 const ProtectedRoute = ({ path, children }) => {
   const { isAuthenticated, authChecked } = useAuth();
+  const { pathname, search } = useLocation();
   if (!authChecked) return <div className="p-4">Loading...</div>;
-  return isAuthenticated ? children : <Navigate to={`/login?app=${path.replace("/", "")}`} />;
+  // next: the full address asked for, so links like /ownership?parcel=… survive the sign-in
+  const next = encodeURIComponent(pathname + search);
+  return isAuthenticated ? children : <Navigate to={`/login?app=${path.replace("/", "")}&next=${next}`} />;
 };
 
 

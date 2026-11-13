@@ -64,7 +64,7 @@ export const apps = {
         questions: [
             `What other properties does this parcel's owner have?`
         ],
-        icon: "PersonIcon",
+        icon: "IdCardIcon",
         private: true,
         show: true
     }

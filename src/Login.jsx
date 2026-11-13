@@ -13,9 +13,12 @@ const Login = () => {
   const appKey = params.get("app");
   const app = apps[appKey];
 
-  // once signed in, carry on to the tool that was asked for
+  // once signed in, carry on to the page that was asked for. Only a path on this site:
+  // "//host" and "/\host" would be read as another site.
+  const next = params.get("next");
+  const safeNext = next && /^\/(?![\/\\])/.test(next) ? next : null;
   useEffect(() => {
-    if (isAuthenticated) navigate(`/${appKey ?? ""}`);
+    if (isAuthenticated) navigate(safeNext ?? `/${appKey ?? ""}`, { replace: true });
   }, [isAuthenticated]);
 
   return (
