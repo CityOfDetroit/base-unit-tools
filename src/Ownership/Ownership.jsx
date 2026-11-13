@@ -260,8 +260,8 @@ const Ownership = () => {
     const m = new maplibregl.Map({
       container: mapDiv.current,
       style: baseStyle,
-      center: [-83.08, 42.325],
-      zoom: 15,
+      center: [-83.07715, 42.37927], // citywide, same as /map
+      zoom: 10.75,
       minZoom: 10,
       transformRequest: (url) =>
         url.startsWith(TILES_URL) ? { url: `${url}?token=${tokenRef.current}` } : { url },
