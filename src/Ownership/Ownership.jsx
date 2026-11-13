@@ -88,12 +88,24 @@ const DIMMED_OPACITY = 0.12; // parcels outside the selected cluster or owner, k
 const HOVER_COLOR = "#e8590c"; // list hover, and the hovered owner's parcels
 const SELECTED_COLOR = "#00b7ff"; // the clicked parcel
 const POSSIBLE_COLOR = "#7c3aed"; // unverified parcels in the shown cluster ("possible additional")
+// the shown owner's verified parcels: a bright magenta, apart from the class colors in hue and
+// lightness, so it still stands out with red-green colorblindness
+const OWNER_COLOR = "#e6007e";
 
-// highlight entries for the map legend, after the classes
-const HIGHLIGHTS = [
-  ["Selected parcel", { border: `2px solid ${SELECTED_COLOR}` }],
-  ["Possible additional property", { border: `2px dashed ${POSSIBLE_COLOR}`, background: "rgba(124, 58, 237, 0.25)" }],
-];
+// the selection colors, shown as a swatch beside the sidebar text they belong to
+// (the map legend has the classes)
+const SWATCH = {
+  owner: { background: OWNER_COLOR, opacity: 0.7 },
+  selected: { border: `2px solid ${SELECTED_COLOR}`, background: "rgba(0, 183, 255, 0.9)" },
+  possible: { border: `2px dashed ${POSSIBLE_COLOR}`, background: "rgba(124, 58, 237, 0.25)" },
+};
+// the swatch and its text in one inline flex row, so the swatch is centered on the text
+const Swatch = ({ type, children }) => (
+  <span className="inline-flex items-center gap-1.5">
+    <span className="h-2.5 w-2.5 shrink-0" style={SWATCH[type]} />
+    {children}
+  </span>
+);
 
 const mailing = (r) =>
   [r.taxpayer_address, [r.taxpayer_city, r.taxpayer_state].filter(Boolean).join(", "), r.taxpayer_zip_code]
@@ -110,12 +122,14 @@ const Heading = ({ title, sub }) => (
     {sub != null && <Text as="div" size="1" color="gray">{sub}</Text>}
   </Box>
 );
-// label/value rows; values may be text or elements
+// label/value rows; values may be text or elements; an optional SWATCH key goes before the label
 const Rows = ({ rows }) => (
   <DataList.Root size="1">
-    {rows.filter(Boolean).map(([label, value]) => (
+    {rows.filter(Boolean).map(([label, value, swatch]) => (
       <DataList.Item key={label}>
-        <DataList.Label>{label}</DataList.Label>
+        <DataList.Label>
+          {swatch ? <Swatch type={swatch}>{label}</Swatch> : label}
+        </DataList.Label>
         <DataList.Value>{value || "—"}</DataList.Value>
       </DataList.Item>
     ))}
@@ -300,14 +314,14 @@ const Ownership = () => {
         filter: none,
         paint: { "line-color": POSSIBLE_COLOR, "line-width": 2, "line-dasharray": [2, 1] },
       });
-      m.addLayer({
-        id: "ownership-selected",
-        type: "line",
-        source: "ownership",
-        "source-layer": SOURCE_LAYER,
-        filter: none,
-        paint: { "line-color": SELECTED_COLOR, "line-width": 3 },
-      });
+      // the clicked parcel: solid blue fill and a thick outline on a white edge, so it stands out
+      // from the class fills around it
+      for (const [id, type, paint] of [
+        ["ownership-selected-fill", "fill", { "fill-color": SELECTED_COLOR, "fill-opacity": 0.9 }],
+        ["ownership-selected-casing", "line", { "line-color": "#fff", "line-width": 8 }],
+        ["ownership-selected", "line", { "line-color": SELECTED_COLOR, "line-width": 4 }],
+      ])
+        m.addLayer({ id, type, source: "ownership", "source-layer": SOURCE_LAYER, filter: none, paint });
       // below TILES_MINZOOM there are no tiles; the cluster or owner shows as dots instead
       m.addSource("filtered-dots", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
       m.addLayer({
@@ -486,8 +500,18 @@ const Ownership = () => {
         : owner
           ? ["any", ["==", ["get", "entity_owner"], owner], byId]
           : byId;
-    map.setPaintProperty("ownership-fill", "fill-opacity", match ? ["case", match, 0.85, DIMMED_OPACITY] : FILL_OPACITY);
-    map.setFilter("ownership-selected", ["==", ["get", "parcel_id"], detailId ?? selected?.parcel_id ?? ""]);
+    map.setPaintProperty("ownership-fill", "fill-opacity", match ? ["case", match, 0.7, DIMMED_OPACITY] : FILL_OPACITY);
+    // the shown verified owner's parcels (fills, and dots when zoomed out) all take OWNER_COLOR
+    const shownOwner = ownerFilter || owner;
+    map.setPaintProperty(
+      "ownership-fill",
+      "fill-color",
+      shownOwner ? ["case", ["==", ["get", "entity_owner"], shownOwner], OWNER_COLOR, classColor] : classColor
+    );
+    // the dots are only the shown set, so its verified ones are that owner's
+    map.setPaintProperty("filtered-dots", "circle-color", shownOwner ? ["case", isVerified, OWNER_COLOR, classColor] : classColor);
+    const sel = ["==", ["get", "parcel_id"], detailId ?? selected?.parcel_id ?? ""];
+    for (const id of ["ownership-selected-fill", "ownership-selected-casing", "ownership-selected"]) map.setFilter(id, sel);
     // a clicked parcel's cluster: mark its unverified ("possible") parcels
     const possible = selected && !ownerFilter ? parcels.filter((p) => p.is_verified !== 1).map((p) => p.parcel_id) : [];
     const possibleFilter = ["match", ["get", "parcel_id"], possible.length ? possible : [""], true, false];
@@ -688,7 +712,14 @@ const Ownership = () => {
 
             {ownerFilter && (
               <Card>
-                <Heading title={ownerFilter} sub={`Verified owner · ${num(loadingParcels, parcels.length)} properties`} />
+                <Heading
+                  title={ownerFilter}
+                  sub={
+                    <>
+                      <Swatch type="owner">Verified owner · {num(loadingParcels, parcels.length)} properties</Swatch>
+                    </>
+                  }
+                />
                 <Box mt="2">
                   <DataSource url={OWNERSHIP_ITEM_URL} />
                 </Box>
@@ -698,7 +729,14 @@ const Ownership = () => {
             {!ownerFilter && selected && (
               <Card>
                 <Flex direction="column" gap="3">
-                  <Heading title={selectedRecord?.address ?? "…"} sub={selected.parcel_id} />
+                  <Heading
+                    title={
+                      <>
+                        <Swatch type="selected">{selectedRecord?.address ?? "…"}</Swatch>
+                      </>
+                    }
+                    sub={selected.parcel_id}
+                  />
                   <Box className="rounded bg-gray-50 px-3 py-2">
                     <Text as="div" size="1" color="gray">Verified owner</Text>
                     {cluster == null ? (
@@ -712,10 +750,10 @@ const Ownership = () => {
                   <Rows
                     rows={[
                       verified && ["Owner type", live?.entity_owner_type],
-                      verified && ["Verified properties", num(loadingParcels, verifiedCount)],
-                      verified && ["Possible additional", num(loadingParcels, possibleCount)],
+                      verified && ["Verified properties", num(loadingParcels, verifiedCount), "owner"],
+                      verified && ["Possible additional", num(loadingParcels, possibleCount), "possible"],
                       cluster != null &&
-                        !verified && ["Potentially related", num(loadingParcels, Math.max(parcels.length - 1, 0))],
+                        !verified && ["Potentially related", num(loadingParcels, Math.max(parcels.length - 1, 0)), "possible"],
                       !verified &&
                         potentialOwners.length > 0 && [
                           "Potential owners",
@@ -820,13 +858,6 @@ const Ownership = () => {
               {CLASSES.map(([label, c]) => (
                 <Flex key={label} gap="2" align="center">
                   <Box width="12px" height="12px" style={{ background: c, opacity: FILL_OPACITY, border: "1px solid #999" }} />
-                  <Text size="1">{label}</Text>
-                </Flex>
-              ))}
-              <Box my="1" className="border-t border-gray-200" />
-              {HIGHLIGHTS.map(([label, style]) => (
-                <Flex key={label} gap="2" align="center">
-                  <Box width="12px" height="12px" style={style} />
                   <Text size="1">{label}</Text>
                 </Flex>
               ))}
