@@ -27,6 +27,7 @@ const LAYER_URL =
   "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Verified_Parcel_Ownership/FeatureServer/0";
 // "source" for ownership data: the AGO item's data tab. The layer is org-only and its REST pages
 // don't use the AGO sign-in, so a REST query link would need the user's token in the URL.
+const OWNERS_KEY = "ownership-owners"; // localStorage: the last verified owner list, for the search box
 const OWNERSHIP_ITEM_URL = "https://detroitmi.maps.arcgis.com/home/item.html?id=af308c7ec9964b2db47228727fc2cd3e#data";
 
 const sql = (s) => String(s).replace(/'/g, "''");
@@ -661,32 +662,52 @@ const Ownership = () => {
     for (const id of ["list-hover-casing", "list-hover", "list-hover-dot"]) map.setFilter(id, f);
   }, [map, hoverId]);
 
-  // the verified owner list for the search box (~2 pages of 2000), loaded on first focus of the box
-  // rather than at page load, so its two full scans don't slow the first click or ?parcel= link
+  // the verified owner list for the search box (~2 pages of 2000). The last list is kept in
+  // localStorage and shown at once; a fresh one loads once the map has settled (or when the box is
+  // focused first), so its full scans don't slow the first click or ?parcel= link.
   const ownersRequested = useRef(false);
   useEffect(() => {
-    if (!map || !searchOpen || ownersRequested.current) return;
-    ownersRequested.current = true;
-    (async () => {
-      const out = [];
-      for (let offset = 0; ; offset += 2000) {
-        const r = await query({
-          where: "is_verified = 1",
-          groupByFieldsForStatistics: "entity_owner",
-          outStatistics: [{ statisticType: "count", onStatisticField: "parcel_id", outStatisticFieldName: "n" }],
-          orderByFields: "entity_owner",
-          resultOffset: offset,
-          resultRecordCount: 2000,
-        });
-        out.push(...r.features.map((f) => f.attributes));
-        if (!r.exceededTransferLimit) break;
-      }
-      setOwners(out.sort((a, b) => b.n - a.n));
-      setOwnersError(false);
-    })().catch(() => {
-      setOwnersError(true);
-      ownersRequested.current = false; // try again next time the box opens
-    });
+    if (!map || ownersRequested.current) return;
+    if (!owners) {
+      try {
+        const cached = JSON.parse(localStorage.getItem(OWNERS_KEY));
+        if (Array.isArray(cached)) setOwners(cached);
+      } catch {}
+    }
+    const page = (offset) =>
+      query({
+        where: "is_verified = 1",
+        groupByFieldsForStatistics: "entity_owner",
+        outStatistics: [{ statisticType: "count", onStatisticField: "parcel_id", outStatisticFieldName: "n" }],
+        orderByFields: "entity_owner",
+        resultOffset: offset,
+        resultRecordCount: 2000,
+      });
+    const load = () => {
+      if (ownersRequested.current) return;
+      ownersRequested.current = true;
+      (async () => {
+        const out = [];
+        // two pages at a time: the list fits in two today
+        for (let offset = 0; ; offset += 4000) {
+          const pages = await Promise.all([page(offset), page(offset + 2000)]);
+          for (const r of pages) out.push(...r.features.map((f) => f.attributes));
+          if (!pages[1].exceededTransferLimit) break;
+        }
+        out.sort((a, b) => b.n - a.n);
+        setOwners(out);
+        setOwnersError(false);
+        try {
+          localStorage.setItem(OWNERS_KEY, JSON.stringify(out));
+        } catch {}
+      })().catch(() => {
+        setOwnersError(true);
+        ownersRequested.current = false; // try again next time the box opens
+      });
+    };
+    if (searchOpen) load();
+    else map.once("idle", load);
+    return () => map.off("idle", load);
   }, [map, searchOpen]);
 
   // the cluster's or owner's parcels: the sidebar list, and dots below TILES_MINZOOM.
