@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import maplibregl from "maplibre-gl";
-import { Box, Button, Card, DataList, Flex, Grid, SegmentedControl, Spinner, Text, TextField } from "@radix-ui/themes";
+import { Box, Button, Callout, Card, DataList, Flex, Grid, SegmentedControl, Spinner, Text, TextField } from "@radix-ui/themes";
 import { queryFeatures } from "@esri/arcgis-rest-feature-service";
 import { baseStyle, satelliteStyle } from "../styles/mapstyle.js";
 import { useAuth } from "../contexts/AuthContext";
@@ -106,7 +106,7 @@ const hoverCard = (address, p) => {
     return el.appendChild(d);
   };
   line("ot-address", address || p.parcel_id);
-  line(p.is_verified === 1 ? "ot-owner" : "ot-owner ot-muted", p.is_verified === 1 ? p.entity_owner : "Owner not yet verified");
+  line(p.is_verified === 1 ? "ot-owner" : "ot-owner ot-muted", p.is_verified === 1 ? p.entity_owner : "Owner not verified");
   const cls = classOf(p);
   const swatch = document.createElement("span");
   swatch.className = "ot-swatch";
@@ -116,9 +116,8 @@ const hoverCard = (address, p) => {
 };
 
 const LIST_PAGE = 200; // rows shown before "Show more"
-const FILL_OPACITY = 0.5; // parcel fills (and legend swatches) when nothing is selected
-const DIMMED_OPACITY = 0.12; // parcels outside the selected cluster or owner, kept visible for context
-const HOVER_COLOR = "#e8590c"; // list hover, and the hovered owner's parcels
+const FILL_OPACITY = 0.35; // parcel fills (and legend swatches) when nothing is selected
+const HOVER_COLOR = "#111111"; // the parcel under the mouse in the list (on a white edge)
 const SELECTED_COLOR = "#00b7ff"; // the clicked parcel
 const POSSIBLE_COLOR = "#7c3aed"; // unverified parcels in the shown cluster ("possible additional")
 // the shown owner's verified parcels: a bright magenta, apart from the class colors in hue and
@@ -179,6 +178,8 @@ const ParcelRow = ({ p, pre, active, onClick, onHover }) => (
     onClick={onClick}
     onMouseEnter={() => onHover(p.parcel_id)}
     onMouseLeave={() => onHover(null)}
+    onFocus={() => onHover(p.parcel_id)}
+    onBlur={() => onHover(null)}
   >
     <span>{p.address || p.parcel_id}</span>
     <span className="flex items-center gap-2">
@@ -190,7 +191,7 @@ const ParcelRow = ({ p, pre, active, onClick, onHover }) => (
           PRE{pre < 100 ? ` ${pre}%` : ""}
         </span>
       )}
-      {p.is_verified !== 1 && <span className="text-xs text-gray-500">possible</span>}
+      {p.is_verified !== 1 && <span className="text-xs text-gray-600">possible additional</span>}
     </span>
   </button>
 );
@@ -201,9 +202,32 @@ const boundsOf = (geom) =>
     new maplibregl.LngLatBounds()
   );
 
+// The Land Bank's parcels in view, read from the ownership tiles the map already has, so there's no
+// query (one for a z15 view took 3-8s, 21s cold). Addresses come from the base map's parcel tiles.
+// null below TILES_MINZOOM, where there are no tiles.
+const landBankInView = (map) => {
+  if (map.getZoom() < TILES_MINZOOM) return null;
+  const view = map.getBounds();
+  const found = new Map();
+  const isLandBank = ["==", ["get", "entity_owner"], LAND_BANK];
+  for (const f of map.querySourceFeatures("ownership", { sourceLayer: SOURCE_LAYER, filter: isLandBank })) {
+    const id = f.properties.parcel_id;
+    if (found.has(id)) continue; // a parcel crossing tile edges comes back once per tile
+    const c = boundsOf(f.geometry).getCenter();
+    if (view.contains(c)) found.set(id, { ...f.properties, lng: c.lng, lat: c.lat });
+  }
+  if (found.size) {
+    const byId = ["in", ["get", "parcel_id"], ["literal", [...found.keys()]]];
+    for (const f of map.querySourceFeatures("bu_parcels", { sourceLayer: "parcels_(current)", filter: byId }))
+      found.get(f.properties.parcel_id).address ??= f.properties.address;
+  }
+  return sortByAddress([...found.values()]);
+};
+
 const Ownership = () => {
   const { token } = useAuth();
   const [satellite, setSatellite] = useState(false);
+  const [zoomedOut, setZoomedOut] = useState(true); // below TILES_MINZOOM: no parcels to click yet
   const tokenRef = useRef(token);
   tokenRef.current = token;
   const mapDiv = useRef(null);
@@ -216,14 +240,22 @@ const Ownership = () => {
   const [listFilter, setListFilter] = useState("");
   const [loadingParcels, setLoadingParcels] = useState(false);
   const [landBank, setLandBank] = useState(null); // { count } when the Land Bank is shown (count null while loading)
+  const [landBankRows, setLandBankRows] = useState(null); // its parcels in view (null: zoomed out too far)
   // PRE % per parcel_id, from the public parcels layer (the ownership layer doesn't carry it);
   // fetched only for the rows on screen, in batches, and kept as the list grows or changes
   const [pre, setPre] = useState({});
+  // the sidebar list: the loaded parcels, plus the Land Bank's parcels in view when it's shown
+  const rows = useMemo(
+    () =>
+      landBank && landBankRows?.length
+        ? sortByAddress([...new Map([...parcels, ...landBankRows].map((p) => [p.parcel_id, p])).values()])
+        : parcels,
+    [parcels, landBank, landBankRows]
+  );
   const listed = useMemo(() => {
     const f = listFilter.trim().toUpperCase();
-    return f ? parcels.filter((p) => `${p.address} ${p.parcel_id}`.toUpperCase().includes(f)) : parcels;
-  }, [parcels, listFilter]);
-  const [detailId, setDetailId] = useState(null); // parcel_id in the slide-in details
+    return f ? rows.filter((p) => `${p.address} ${p.parcel_id}`.toUpperCase().includes(f)) : rows;
+  }, [rows, listFilter]);
   const [hoverId, setHoverId] = useState(null); // parcel_id under the mouse in the list
   const { data: selectedFeature, refetch: loadSelected } = useBaseFeature(null, "parcel");
   const flyOnLoad = useRef(null); // parcel_id from address search or URL, flown to once its record loads
@@ -239,7 +271,28 @@ const Ownership = () => {
     return owners.filter((o) => o.entity_owner.toUpperCase().includes(q)).slice(0, 20);
   }, [owners, search]);
   const fitOnLoad = useRef(false); // zoom to the owner's parcels once their list loads
-  const { feature: geocoded, changeAddress } = useGeocoder();
+  const { feature: geocoded, changeAddress, loading: geocoding, error: geocodeError } = useGeocoder();
+  const [searched, setSearched] = useState(""); // the address last sent to the geocoder
+  // a failed query's message, shown with a Retry button; retrying bumps `attempt`, which reruns the queries
+  const [failed, setFailed] = useState(null);
+  const [attempt, setAttempt] = useState(0);
+  const retry = () => {
+    setFailed(null);
+    setAttempt((a) => a + 1);
+  };
+  const [ownersError, setOwnersError] = useState(false);
+  // the search dropdown is a combobox: option 0 finds the address, the rest are owners.
+  // Enter picks the active option; until arrows move it, that's the first owner unless the
+  // query starts with a digit (an address).
+  const [active, setActive] = useState(null);
+  const listOpen = searchOpen && search.trim().length >= 2;
+  const options = [{ address: true }, ...suggestions];
+  const activeIndex = Math.min(active ?? (/^\d/.test(search.trim()) || !suggestions.length ? 0 : 1), options.length - 1);
+  const ownerRef = useRef("");
+  ownerRef.current = ownerFilter;
+  useEffect(() => {
+    if (listOpen) document.getElementById(`ownership-option-${activeIndex}`)?.scrollIntoView({ block: "nearest" });
+  }, [listOpen, activeIndex]);
   const [params, setParams] = useSearchParams();
   const paramsApplied = useRef(false);
 
@@ -292,20 +345,24 @@ const Ownership = () => {
     fitOnLoad.current = true;
     setOwnerFilter(name);
     setSelected(null);
-    setDetailId(null);
     setSearch(name);
     setSearchOpen(false);
   };
   const findAddress = () => {
-    if (!search.trim()) return;
-    changeAddress(search.trim());
+    const q = search.trim();
+    if (!q) return;
     setSearchOpen(false);
+    // the geocoder only reruns when the address changes, so a repeat search reuses its last answer
+    if (q === searched && geocoded?.attributes?.parcel_id) return goToParcel(geocoded.attributes.parcel_id);
+    setSearched(q);
+    changeAddress(q);
   };
+  const choose = (o) => (o.address ? findAddress() : showOwner(o.entity_owner));
   const reset = () => {
     setSelected(null);
     setOwnerFilter("");
-    setDetailId(null);
     setSearch("");
+    setFailed(null);
   };
 
   // build the map once we have a token for the org-only tiles
@@ -326,6 +383,7 @@ const Ownership = () => {
             : { url },
     });
     m.addControl(new maplibregl.NavigationControl(), "top-left");
+    m.on("zoomend", () => setZoomedOut(m.getZoom() < TILES_MINZOOM));
     m.on("load", () => {
       m.addSource("ownership", {
         type: "vector",
@@ -394,15 +452,13 @@ const Ownership = () => {
         },
         "possible-fill"
       );
-      // the parcel under the mouse in the sidebar list: an outline, or a ringed dot when zoomed out
-      m.addLayer({
-        id: "list-hover",
-        type: "line",
-        source: "ownership",
-        "source-layer": SOURCE_LAYER,
-        filter: ["==", ["get", "parcel_id"], ""],
-        paint: { "line-color": HOVER_COLOR, "line-width": 4 },
-      });
+      // the parcel under the mouse (or keyboard focus) in the sidebar list: a dark outline on a white
+      // edge, or a ringed dot when zoomed out
+      for (const [id, paint] of [
+        ["list-hover-casing", { "line-color": "#fff", "line-width": 7 }],
+        ["list-hover", { "line-color": HOVER_COLOR, "line-width": 3 }],
+      ])
+        m.addLayer({ id, type: "line", source: "ownership", "source-layer": SOURCE_LAYER, filter: none, paint });
       m.addLayer({
         id: "list-hover-dot",
         type: "circle",
@@ -441,7 +497,7 @@ const Ownership = () => {
     // outlines a moment after leaving, so crossing a street between parcels doesn't blink them.
     let hoveredParcel = null;
     let clearTimer = null;
-    m.on("mousemove", "ownership-fill", (e) => {
+    const hover = (e) => {
       const p = e.features?.[0]?.properties;
       if (!p) return;
       clearTimeout(clearTimer);
@@ -449,13 +505,14 @@ const Ownership = () => {
       tip.setLngLat(e.lngLat);
       if (p.parcel_id !== hoveredParcel) {
         hoveredParcel = p.parcel_id;
-        const address = m.queryRenderedFeatures(e.point, { layers: ["parcel-fill"] })[0]?.properties?.address;
+        // dots carry their address; parcel fills take it from the base map's parcel tiles
+        const address = p.address ?? m.queryRenderedFeatures(e.point, { layers: ["parcel-fill"] })[0]?.properties?.address;
         tip.setDOMContent(hoverCard(address, p));
         setHoveredOwner(p.is_verified === 1 ? p.entity_owner : null);
       }
       if (!tip.isOpen()) tip.addTo(m);
-    });
-    m.on("mouseleave", "ownership-fill", () => {
+    };
+    const leave = () => {
       m.getCanvas().style.cursor = "";
       clearTimeout(clearTimer);
       clearTimer = setTimeout(() => {
@@ -463,15 +520,21 @@ const Ownership = () => {
         tip.remove();
         setHoveredOwner(null);
       }, 150);
-    });
-    // click a parcel: show its owner's cluster and list; details open from the list
-    m.on("click", "ownership-fill", (e) => {
-      const props = e.features?.[0]?.properties;
-      if (!props?.parcel_id) return;
-      setOwnerFilter("");
-      setSelected(props);
-      setDetailId(null);
-    });
+    };
+    // click a parcel (or its dot when zoomed out): show its owner's cluster and list. A click on the
+    // shown owner's own parcel keeps the owner's list; a dot also flies in to the parcel.
+    const pick = (e) => {
+      const f = e.features?.[0];
+      if (!f?.properties?.parcel_id) return;
+      if (f.properties.entity_owner !== ownerRef.current) setOwnerFilter("");
+      if (f.layer.id === "filtered-dots") flyOnLoad.current = f.properties.parcel_id;
+      setSelected(f.properties);
+    };
+    for (const layer of ["ownership-fill", "filtered-dots"]) {
+      m.on("mousemove", layer, hover);
+      m.on("mouseleave", layer, leave);
+      m.on("click", layer, pick);
+    }
     return () => m.remove();
   }, [token]);
 
@@ -483,22 +546,24 @@ const Ownership = () => {
   useEffect(() => {
     if (!selected?.parcel_id) return setLive(null);
     loadSelected(selected.parcel_id, "parcel");
+    setFailed(null);
     let cancelled = false;
     query({
       where: `parcel_id = '${sql(selected.parcel_id)}'`,
       outFields: "parcel_id,entity_cluster,entity_owner,entity_owner_type,is_verified",
       returnGeometry: false,
-    }).then((r) => !cancelled && setLive(r.features[0]?.attributes ?? null));
+    })
+      .then((r) => !cancelled && setLive(r.features[0]?.attributes ?? null))
+      .catch(() => !cancelled && setFailed("Couldn't load this parcel's owner."));
     return () => {
       cancelled = true;
     };
-  }, [selected?.parcel_id]);
+  }, [selected?.parcel_id, attempt]);
 
   // address search or ?parcel= -> select it straight away (its card, not the details panel; owner
   // and cluster come from the live layer), and fly there once its parcel record has the geometry
   const goToParcel = (pid) => {
     setOwnerFilter("");
-    setDetailId(null);
     flyOnLoad.current = pid;
     setSelected({ parcel_id: pid });
   };
@@ -513,24 +578,32 @@ const Ownership = () => {
     map.fitBounds(boundsOf(selectedFeature.geometry), { padding: 120, maxZoom: 17 });
   }, [map, selectedFeature]);
 
-  // ?parcel=<parcel_id> opens that parcel and its owner's cluster; ?owner=<exact name> opens that owner
+  // The URL holds the view: ?owner=<exact name>, ?parcel=<parcel_id>, or both (a parcel opened from
+  // an owner's list). Each change is a history entry, so links can be shared and Back steps back.
+  // URL -> view: on load, and on Back/Forward
+  const urlOwner = params.get("owner") ?? "";
+  const urlParcel = params.get("parcel") ?? "";
   useEffect(() => {
-    if (!map || paramsApplied.current) return;
+    if (!map) return;
     paramsApplied.current = true;
-    const ownerParam = params.get("owner");
-    const parcelParam = params.get("parcel");
-    if (ownerParam) showOwner(ownerParam);
-    else if (parcelParam) goToParcel(parcelParam);
-  }, [map]);
-  // keep the URL in step with the view, so it can be shared
+    if (urlOwner !== ownerFilter) {
+      fitOnLoad.current = !!urlOwner && !urlParcel;
+      setOwnerFilter(urlOwner);
+      setSearch(urlOwner);
+    }
+    if (urlParcel !== (selected?.parcel_id ?? "")) {
+      flyOnLoad.current = urlParcel || null;
+      setSelected(urlParcel ? { parcel_id: urlParcel } : null);
+    }
+    if (!urlOwner && !urlParcel) setSearch("");
+  }, [map, urlOwner, urlParcel]);
+  // view -> URL
   useEffect(() => {
     if (!paramsApplied.current) return;
-    const next = {};
-    if (ownerFilter) next.owner = ownerFilter;
-    const pid = detailId ?? selected?.parcel_id;
-    if (pid) next.parcel = pid;
-    setParams(next, { replace: true });
-  }, [ownerFilter, detailId, selected?.parcel_id]);
+    const pid = selected?.parcel_id ?? "";
+    if (ownerFilter === urlOwner && pid === urlParcel) return;
+    setParams({ ...(ownerFilter && { owner: ownerFilter }), ...(pid && { parcel: pid }) });
+  }, [ownerFilter, selected?.parcel_id]);
 
   // the cluster or owner stands out; everything else stays on the map, dimmed, for context
   // (a clicked parcel's set is matched by parcel_id from the loaded list, never by the tiles' cluster ids)
@@ -549,7 +622,8 @@ const Ownership = () => {
         : owner
           ? ["any", ["==", ["get", "entity_owner"], owner], byId]
           : byId;
-    map.setPaintProperty("ownership-fill", "fill-opacity", match ? ["case", match, 0.7, DIMMED_OPACITY] : FILL_OPACITY);
+    // the shown set a little stronger; everything else keeps its class color, faded to 10% for context
+    map.setPaintProperty("ownership-fill", "fill-opacity", match ? ["case", match, 0.7, 0.1] : FILL_OPACITY);
     // the shown verified owner's parcels (fills, and dots when zoomed out) all take OWNER_COLOR
     const shownOwner = ownerFilter || owner;
     map.setPaintProperty(
@@ -559,20 +633,19 @@ const Ownership = () => {
     );
     // the dots are only the shown set, so its verified ones are that owner's
     map.setPaintProperty("filtered-dots", "circle-color", shownOwner ? ["case", isVerified, OWNER_COLOR, classColor] : classColor);
-    const sel = ["==", ["get", "parcel_id"], detailId ?? selected?.parcel_id ?? ""];
+    const sel = ["==", ["get", "parcel_id"], selected?.parcel_id ?? ""];
     for (const id of ["ownership-selected-fill", "ownership-selected-casing", "ownership-selected"]) map.setFilter(id, sel);
     // a clicked parcel's cluster: mark its unverified ("possible") parcels
     const possible = selected && !ownerFilter ? parcels.filter((p) => p.is_verified !== 1).map((p) => p.parcel_id) : [];
     const possibleFilter = ["match", ["get", "parcel_id"], possible.length ? possible : [""], true, false];
     map.setFilter("possible-fill", possibleFilter);
     map.setFilter("possible-line", possibleFilter);
-  }, [map, ownerFilter, selected, selectedOwner, detailId, parcels]);
+  }, [map, ownerFilter, selected, selectedOwner, parcels]);
 
   useEffect(() => {
     if (!map) return;
     const f = ["==", ["get", "parcel_id"], hoverId ?? ""];
-    map.setFilter("list-hover", f);
-    map.setFilter("list-hover-dot", f);
+    for (const id of ["list-hover-casing", "list-hover", "list-hover-dot"]) map.setFilter(id, f);
   }, [map, hoverId]);
 
   // the verified owner list for the search box (~2 pages of 2000), loaded on first focus of the box
@@ -596,12 +669,19 @@ const Ownership = () => {
         if (!r.exceededTransferLimit) break;
       }
       setOwners(out.sort((a, b) => b.n - a.n));
-    })().catch(() => setOwners([]));
+      setOwnersError(false);
+    })().catch(() => {
+      setOwnersError(true);
+      ownersRequested.current = false; // try again next time the box opens
+    });
   }, [map, searchOpen]);
 
-  // the cluster's or owner's parcels: the sidebar list, and dots below TILES_MINZOOM
+  // the cluster's or owner's parcels: the sidebar list, and dots below TILES_MINZOOM.
+  // Keyed on the list it shows, so an owner's list stays put while one of their parcels is open.
+  const listKey = ownerWhere || clusterWheres.join("|");
   useEffect(() => {
     if (!map) return;
+    setFailed(null);
     const all = ownerWhere ? [ownerWhere] : clusterWheres;
     const wheres = all.filter((w) => w !== LAND_BANK_WHERE);
     const dots = map.getSource("filtered-dots");
@@ -617,7 +697,7 @@ const Ownership = () => {
       setLandBank({ count: null });
       query({ where: LAND_BANK_WHERE, returnCountOnly: true })
         .then((r) => !cancelled && setLandBank({ count: r.count }))
-        .catch(() => {});
+        .catch(() => !cancelled && setFailed("Couldn't count the Land Bank's properties."));
     }
     const fit = (list) => {
       if (!fitOnLoad.current) return;
@@ -642,16 +722,36 @@ const Ownership = () => {
           features: list.map((p) => ({
             type: "Feature",
             geometry: { type: "Point", coordinates: [p.lng, p.lat] },
-            properties: { parcel_id: p.parcel_id, is_verified: p.is_verified, entity_owner_type: p.entity_owner_type },
+            properties: {
+              parcel_id: p.parcel_id,
+              address: p.address,
+              is_verified: p.is_verified,
+              entity_owner: p.entity_owner,
+              entity_owner_type: p.entity_owner_type,
+            },
           })),
         });
       })
+      .catch(() => !cancelled && setFailed("Couldn't load the properties."))
       .finally(() => !cancelled && setLoadingParcels(false));
     return () => {
       cancelled = true;
       setLoadingParcels(false);
     };
-  }, [map, ownerWhere, clusterWheres.join("|")]);
+  }, [map, listKey, attempt]);
+
+  // while the Land Bank is shown, list its parcels in view whenever the map settles
+  useEffect(() => {
+    if (!map || !landBank) return setLandBankRows(null);
+    const update = () => {
+      const next = landBankInView(map);
+      // idle also fires after repaints that don't move the map; keep the same list then
+      setLandBankRows((old) => (old?.map((p) => p.parcel_id).join() === next?.map((p) => p.parcel_id).join() ? old : next));
+    };
+    update();
+    map.on("idle", update);
+    return () => map.off("idle", update);
+  }, [map, !!landBank]);
 
   const shownIds = listed.slice(0, listLimit).map((p) => p.parcel_id);
   useEffect(() => {
@@ -700,83 +800,129 @@ const Ownership = () => {
     for (const p of parcels) if (p.is_verified === 1) n.set(p.entity_owner, (n.get(p.entity_owner) || 0) + 1);
     return [...n.entries()].sort((a, b) => b[1] - a[1]).map(([name]) => name);
   }, [parcels]);
-  // a list click selects the parcel, the same as clicking it on the map
+  // a list click opens the parcel above the same list (an owner's view stays), and flies the map to it
   const focusParcel = (p) => {
-    setOwnerFilter("");
-    setDetailId(null);
     setSelected({ parcel_id: p.parcel_id, is_verified: p.is_verified, entity_owner: p.entity_owner });
     map.flyTo({ center: [p.lng, p.lat], zoom: Math.max(map.getZoom(), 17), duration: 600 });
+    // stacked layout (narrow screens): the map is below the sidebar
+    if (window.matchMedia("(max-width: 639px)").matches) mapDiv.current.scrollIntoView({ behavior: "smooth" });
   };
+  // the address search's status, while the box still holds that address
+  const addressNote =
+    searched && search.trim() === searched
+      ? geocoding
+        ? `Finding “${searched}”…`
+        : geocodeError
+          ? `No address found for “${searched}”.`
+          : geocoded && !geocoded.attributes?.parcel_id
+            ? `“${searched}” isn't on a parcel.`
+            : null
+      : null;
 
   return (
     <Grid
       columns={{ initial: "1fr", sm: "1fr 3fr" }}
-      gap={{ initial: "0", sm: "4" }}
+      gap="4"
       p={{ initial: "2", sm: "2", lg: "4" }}
+      className="ownership-tool"
     >
-      <Box className="relative min-w-80 overflow-hidden" style={{ height: "80vh", minHeight: "400px" }}>
+      {/* side by side from sm, at a fixed height with the list scrolling; stacked below that, the
+          sidebar takes its natural height and the list scrolls inside a capped box */}
+      <Box className="relative overflow-hidden sm:h-[80vh] sm:min-h-[400px] sm:min-w-80">
         {/* the owner stays put at the top; only the property list below it scrolls */}
         <Flex direction="column" gap="3" className="h-full">
           <Flex direction="column" gap="3" className="shrink-0">
-            <Text size="5" weight="bold" className="text-[#004445]">
-              Ownership
-            </Text>
+            <h1 className="text-xl font-bold text-[#004445]">Ownership</h1>
 
             <Box className="relative">
               <TextField.Root
                 placeholder="Search an address or owner…"
+                aria-label="Search an address or owner"
+                role="combobox"
+                aria-autocomplete="list"
+                aria-expanded={listOpen}
+                aria-controls="ownership-options"
+                aria-activedescendant={listOpen ? `ownership-option-${activeIndex}` : undefined}
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value);
                   setSearchOpen(true);
+                  setActive(null);
                 }}
                 onFocus={() => setSearchOpen(true)}
                 onBlur={() => setSearchOpen(false)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") findAddress();
+                  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                    e.preventDefault();
+                    setSearchOpen(true);
+                    const step = e.key === "ArrowDown" ? 1 : -1;
+                    setActive((activeIndex + step + options.length) % options.length);
+                  }
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    listOpen ? choose(options[activeIndex]) : findAddress();
+                  }
                   if (e.key === "Escape") setSearchOpen(false);
                 }}
               />
-              {searchOpen && search.trim().length >= 2 && (
-                // floats over the cards below; onMouseDown + preventDefault so picking a row doesn't blur the box first
-                <Flex
-                  direction="column"
-                  className="absolute left-0 right-0 top-full z-10 mt-1 max-h-80 overflow-y-auto rounded border border-gray-200 bg-white shadow"
+              {listOpen && (
+                // floats over the cards below; focus stays in the box (aria-activedescendant), and a
+                // click picks on mousedown + preventDefault so the box doesn't blur first
+                <div
+                  id="ownership-options"
+                  role="listbox"
+                  aria-label="Address or owner"
+                  className="absolute left-0 right-0 top-full z-10 mt-1 flex max-h-80 flex-col overflow-y-auto rounded border border-gray-200 bg-white py-1 shadow-md"
                 >
-                  <button
-                    className="px-2 py-1 text-left text-sm hover:bg-gray-100"
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      findAddress();
-                    }}
-                  >
-                    Find address “{search.trim()}” <span className="text-gray-500">↵</span>
-                  </button>
-                  <Text size="1" color="gray" className="border-t border-gray-100 px-2 pt-1">
-                    {!owners ? "Loading owner names…" : suggestions.length ? "Verified owners" : "No matching owners"}
-                  </Text>
-                  {suggestions.map((s) => (
-                    <button
-                      key={s.entity_owner}
-                      className="flex justify-between gap-2 px-2 py-1 text-left text-sm hover:bg-gray-100"
-                      onMouseDown={(e) => {
-                        e.preventDefault();
-                        showOwner(s.entity_owner);
-                      }}
-                    >
-                      <span>{s.entity_owner}</span>
-                      <span className="text-gray-500">{s.n.toLocaleString()}</span>
-                    </button>
+                  {options.map((o, i) => (
+                    <Box key={o.address ? "address" : o.entity_owner}>
+                      {i === 1 && (
+                        <Text as="div" size="1" color="gray" className="border-t border-gray-100 px-2 pb-0.5 pt-1.5" role="presentation">
+                          Verified owners
+                        </Text>
+                      )}
+                      <div
+                        id={`ownership-option-${i}`}
+                        role="option"
+                        aria-selected={i === activeIndex}
+                        className={`flex cursor-pointer justify-between gap-2 px-2 py-1 text-sm ${i === activeIndex ? "bg-gray-100" : ""}`}
+                        onMouseEnter={() => setActive(i)}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          choose(o);
+                        }}
+                      >
+                        {o.address ? (
+                          <span>Find address “{search.trim()}”</span>
+                        ) : (
+                          <>
+                            <span>{o.entity_owner}</span>
+                            <span className="tabular-nums text-gray-600">{o.n.toLocaleString()}</span>
+                          </>
+                        )}
+                      </div>
+                    </Box>
                   ))}
-                </Flex>
+                  {suggestions.length === 0 && (
+                    <Text as="div" size="1" color="gray" className="border-t border-gray-100 px-2 pt-1.5" role="presentation">
+                      {ownersError ? "Couldn't load owner names. Close and reopen the search to try again." : !owners ? "Loading owner names…" : "No matching verified owners"}
+                    </Text>
+                  )}
+                </div>
               )}
             </Box>
 
             {!selected && !ownerFilter && (
-              <Text size="2" color="gray">
-                Click a parcel to see its verified owner and everything they own, or search for an address or an
-                owner's name.
-              </Text>
+              <Flex direction="column" gap="2">
+                <Text size="2" color="gray">
+                  Search for an address or an owner, or zoom in and click a parcel to see its verified owner and
+                  everything they own.
+                </Text>
+                <Text size="1" color="gray">
+                  Possible additional properties aren't verified yet, but share an ownership cluster with an owner's
+                  verified ones.
+                </Text>
+              </Flex>
             )}
 
             {ownerFilter && (
@@ -784,18 +930,25 @@ const Ownership = () => {
                 <Heading
                   title={ownerFilter}
                   sub={
-                    <>
+                    !countLoading && !failed && shownCount === 0 ? (
+                      "No verified properties under this exact name. Search for the owner to pick it from the list."
+                    ) : (
                       <Swatch type="owner">Verified owner · {num(countLoading, shownCount)} properties</Swatch>
-                    </>
+                    )
                   }
                 />
-                <Box mt="2">
+                {landBank?.count === null && (
+                  <Text as="div" size="1" color="gray" mt="1">
+                    Counting the Land Bank's properties can take about 10 seconds.
+                  </Text>
+                )}
+                <Flex justify="end" align="center" gap="3" mt="2">
                   <DataSource url={OWNERSHIP_ITEM_URL} />
-                </Box>
+                </Flex>
               </Card>
             )}
 
-            {!ownerFilter && selected && (
+            {selected && (
               <Card>
                 <Flex direction="column" gap="3">
                   <Heading
@@ -813,18 +966,25 @@ const Ownership = () => {
                     {cluster == null ? (
                       <Text as="div" size="4" color="gray">…</Text>
                     ) : verified ? (
-                      <Text as="div" size="5" weight="bold" className="text-[#004445]">{selectedOwner}</Text>
+                      // opens the owner's view (or goes back to it, from a parcel opened in their list)
+                      <button
+                        className="text-left text-[#004445] underline decoration-[#004445]/30 underline-offset-4 hover:decoration-[#004445]"
+                        onClick={() => showOwner(selectedOwner)}
+                      >
+                        <Text size="5" weight="bold">{selectedOwner}</Text>
+                      </button>
                     ) : (
-                      <Text as="div" size="5" weight="bold" className="text-gray-600">Not yet verified</Text>
+                      <Text as="div" size="5" weight="bold" className="text-gray-600">Not verified</Text>
                     )}
                   </Box>
                   <Rows
                     rows={[
                       verified && ["Owner type", live?.entity_owner_type],
-                      verified && ["Verified properties", num(countLoading, verifiedCount), "owner"],
-                      verified && ["Possible additional", num(loadingParcels, possibleCount), "possible"],
+                      // the owner's view above already counts their properties
+                      verified && !ownerFilter && ["Verified properties", num(countLoading, verifiedCount), "owner"],
+                      verified && !ownerFilter && ["Possible additional", num(loadingParcels, possibleCount), "possible"],
                       cluster != null &&
-                        !verified && ["Potentially related", num(loadingParcels, Math.max(parcels.length - 1, 0)), "possible"],
+                        !verified && ["Possible additional", num(loadingParcels, Math.max(parcels.length - 1, 0)), "possible"],
                       !verified &&
                         potentialOwners.length > 0 && [
                           "Potential owners",
@@ -840,7 +1000,7 @@ const Ownership = () => {
                       ["Taxpayer address", selectedRecord ? mailing(selectedRecord) : "…"],
                     ]}
                   />
-                  <Flex justify="end" gap="4">
+                  <Flex justify="end" align="center" gap="3">
                     <CardLink
                       text="open in map"
                       url={`/map?layer=parcel&id=${encodeURIComponent(selected.parcel_id)}`}
@@ -852,38 +1012,55 @@ const Ownership = () => {
               </Card>
             )}
 
-            {(selected || ownerFilter) && !countLoading && shownCount > 1 && (
-              <Button variant="outline" onClick={() => fitParcels(parcels)}>
-                Zoom to all {shownCount.toLocaleString()} properties
-              </Button>
-            )}
-
             {(selected || ownerFilter) && (
-              <Button variant="soft" onClick={reset}>
-                Clear selection
-              </Button>
-            )}
-
-            {loadingParcels && (
-              <Flex align="center" gap="2" py="2">
-                <Spinner />
-                <Text size="2" color="gray">Loading properties…</Text>
+              <Flex gap="2" wrap="wrap">
+                {!countLoading && shownCount > 1 && (
+                  <Button size="1" variant="outline" onClick={() => fitParcels(parcels)}>
+                    Zoom to all {shownCount.toLocaleString()} properties
+                  </Button>
+                )}
+                <Button size="1" variant="outline" color="gray" onClick={reset}>
+                  Clear selection
+                </Button>
               </Flex>
             )}
 
-            {landBank && (
-              <Text size="1" color="gray">
-                The Land Bank's verified properties are too many to list. Zoom in to see them on the map.
-              </Text>
-            )}
+            <Flex direction="column" gap="2" aria-live="polite">
+              {addressNote && <Text size="2" color="gray">{addressNote}</Text>}
+              {failed && (
+                <Callout.Root size="1" color="red" role="alert">
+                  <Flex align="center" justify="between" gap="3">
+                    <Callout.Text>{failed}</Callout.Text>
+                    <Button size="1" variant="soft" color="red" onClick={retry}>
+                      Retry
+                    </Button>
+                  </Flex>
+                </Callout.Root>
+              )}
+              {loadingParcels && (
+                <Flex align="center" gap="2" py="2">
+                  <Spinner />
+                  <Text size="2" color="gray">Loading properties…</Text>
+                </Flex>
+              )}
+              {landBank && !landBankRows && (
+                <Text size="1" color="gray">
+                  The Land Bank's verified properties are too many to list. Zoom in to list the ones in view.
+                </Text>
+              )}
+            </Flex>
           </Flex>
 
-            {parcels.length > 1 && (
+            {(rows.length > 1 || (landBank && landBankRows)) && (
               <Flex direction="column" gap="2" className="min-h-0">
                 <Text size="2" weight="medium">
-                  Properties ({listFilter.trim() ? `${listed.length.toLocaleString()} of ` : ""}
-                  {parcels.length.toLocaleString()})
+                  {!landBank ? "Properties" : parcels.length ? "Possible additional, and Land Bank properties in view" : "Land Bank properties in view"} (
+                  {listFilter.trim() ? `${listed.length.toLocaleString()} of ` : ""}
+                  {rows.length.toLocaleString()})
                 </Text>
+                {shownIds.some((id) => pre[id] > 0) && (
+                  <Text size="1" color="gray">PRE: a principal residence exemption is claimed on the property.</Text>
+                )}
                 <TextField.Root
                   size="1"
                   placeholder="Filter by address or parcel id…"
@@ -896,7 +1073,7 @@ const Ownership = () => {
                 {listed.length === 0 ? (
                   <Text size="1" color="gray">No properties match.</Text>
                 ) : (
-                  <Box className="min-h-0 overflow-y-auto rounded border border-gray-200">
+                  <Box className="max-h-[50vh] min-h-0 overflow-y-auto rounded border border-gray-200 sm:max-h-none">
                     {listed.slice(0, listLimit).map((p) => (
                       <ParcelRow
                         key={p.parcel_id}
@@ -923,8 +1100,15 @@ const Ownership = () => {
 
       </Box>
 
-      <Box className="relative" style={{ height: "80vh", minHeight: "400px" }}>
+      <Box className="relative h-[70vh] min-h-[400px] sm:h-[80vh]">
         <div ref={mapDiv} className="h-full" />
+        {zoomedOut && (
+          <Box className="pointer-events-none absolute left-1/2 top-3 -translate-x-1/2">
+            <Text size="1" className="whitespace-nowrap rounded-full bg-white px-3 py-1 shadow-md">
+              Zoom in to see who owns each parcel
+            </Text>
+          </Box>
+        )}
         <Box style={{ position: "absolute", top: 12, right: 12 }}>
           <SegmentedControl.Root
             size="1"
@@ -945,7 +1129,11 @@ const Ownership = () => {
             <Flex direction="column" gap="1" mt="2">
               {CLASSES.map(([label, c]) => (
                 <Flex key={label} gap="2" align="center">
-                  <Box width="12px" height="12px" style={{ background: c, opacity: FILL_OPACITY, border: "1px solid #999" }} />
+                  <Box
+                    width="12px"
+                    height="12px"
+                    style={{ background: c.replace("rgb(", "rgba(").replace(")", `, ${FILL_OPACITY})`), border: "1px solid #8a8a8a" }}
+                  />
                   <Text size="1">{label}</Text>
                 </Flex>
               ))}

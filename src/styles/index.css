@@ -70,6 +70,11 @@ p {
   display: none;
 }
 
+/* Ownership: placeholders dark enough to read (Radix's default gray is 3.9:1 on white) */
+.ownership-tool input::placeholder {
+  color: #6b7280;
+}
+
 /* Ownership map hover card */
 .ownership-tip {
   pointer-events: none;
