@@ -13,7 +13,7 @@ const SiteHeader = () => {
         <div className="flex justify-between items-center">
           <div className="flex gap-2 items-center justify-around">
             <img
-              src="./logo-black.png"
+              src="/logo-black.png"
               alt="City of Detroit logo"
               className="h-12 w-12"
             />
