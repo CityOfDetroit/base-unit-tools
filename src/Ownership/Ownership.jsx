@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import maplibregl from "maplibre-gl";
-import { Box, Button, Card, DataList, Flex, Grid, Spinner, Text, TextField } from "@radix-ui/themes";
+import { Box, Button, Card, DataList, Flex, Grid, SegmentedControl, Spinner, Text, TextField } from "@radix-ui/themes";
 import { queryFeatures } from "@esri/arcgis-rest-feature-service";
-import { baseStyle } from "../styles/mapstyle.js";
+import { baseStyle, satelliteStyle } from "../styles/mapstyle.js";
 import { useAuth } from "../contexts/AuthContext";
 import useGeocoder from "../hooks/useGeocoder";
 import useBaseFeature from "../hooks/useBaseFeature";
@@ -30,6 +30,39 @@ const LAYER_URL =
 const OWNERSHIP_ITEM_URL = "https://detroitmi.maps.arcgis.com/home/item.html?id=af308c7ec9964b2db47228727fc2cd3e#data";
 
 const sql = (s) => String(s).replace(/'/g, "''");
+// The Land Bank owns ~57k parcels: listing them all takes 6 large requests. Its verified parcels get
+// only a count instead, fetched in the background (a cold count takes ~10s on AGO, a cached one
+// ~0.1s; an extent query took 14s), and zooming to them fits the city, which they span. The map
+// still shades them from the tiles, and a clicked parcel's possible-additional ones are still listed.
+const LAND_BANK = "Detroit Land Bank Authority (DLBA)";
+const LAND_BANK_WHERE = `entity_owner = '${sql(LAND_BANK)}'`;
+const DETROIT_BOUNDS = [[-83.288, 42.255], [-82.91, 42.45]];
+// Streets/Satellite, switched in place: show the satellite layer and give the base layers the
+// visibility and paint satelliteStyle() uses. Not map.setStyle(): that reloads the style, and every
+// setFilter/setPaintProperty in this tool throws until it's back.
+// z21 imagery: this tool is for City staff, whose token the Nearmap function wants for z21 (see /map).
+const SAT_STYLE = satelliteStyle(21);
+const SAT_LAYERS = new Map(SAT_STYLE.layers.map((l) => [l.id, l]));
+const STREETS_STYLE = { ...baseStyle, sources: { ...baseStyle.sources, satellite: SAT_STYLE.sources.satellite } };
+const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const showSatellite = (map, on) => {
+  for (const base of baseStyle.layers) {
+    const sat = SAT_LAYERS.get(base.id);
+    if (!sat || !map.getLayer(base.id)) continue;
+    const to = on ? sat : base;
+    if (!same(base.layout?.visibility, sat.layout?.visibility))
+      map.setLayoutProperty(base.id, "visibility", to.layout?.visibility ?? "visible");
+    for (const k of new Set([...Object.keys(base.paint ?? {}), ...Object.keys(sat.paint ?? {})]))
+      if (!same(base.paint?.[k], sat.paint?.[k])) map.setPaintProperty(base.id, k, to.paint?.[k]);
+  }
+  // satellite's thin street centerline, which has no streets-style twin; white here, since /map's
+  // pink would read as OWNER_COLOR
+  const i = SAT_STYLE.layers.findIndex((l) => l.id === "streets-sat-line");
+  const line = SAT_STYLE.layers[i];
+  if (on && !map.getLayer(line.id))
+    map.addLayer({ ...line, paint: { ...line.paint, "line-color": "#ffffff", "line-opacity": 0.5 } }, SAT_STYLE.layers[i + 1]?.id);
+  if (!on && map.getLayer("streets-sat-line")) map.removeLayer("streets-sat-line");
+};
 
 // Same classes and colors as the Experience's "Ownership 0" layer.
 const CLASSES = [
@@ -91,12 +124,16 @@ const POSSIBLE_COLOR = "#7c3aed"; // unverified parcels in the shown cluster ("p
 // the shown owner's verified parcels: a bright magenta, apart from the class colors in hue and
 // lightness, so it still stands out with red-green colorblindness
 const OWNER_COLOR = "#e6007e";
+const none = ["==", ["get", "parcel_id"], ""]; // filter that matches nothing
 
 // the selection colors, shown as a swatch beside the sidebar text they belong to
 // (the map legend has the classes)
 const SWATCH = {
   owner: { background: OWNER_COLOR, opacity: 0.7 },
-  selected: { border: `2px solid ${SELECTED_COLOR}`, background: "rgba(0, 183, 255, 0.9)" },
+  selected: { border: `2px solid ${SELECTED_COLOR}`, background: "rgba(0, 183, 255, 0.2)" },
+  // the selected parcel once its status is known: blue outline over what the map draws under it
+  selectedVerified: { border: `2px solid ${SELECTED_COLOR}`, background: "rgba(230, 0, 126, 0.7)" },
+  selectedPossible: { border: `2px solid ${SELECTED_COLOR}`, background: "rgba(124, 58, 237, 0.25)" },
   possible: { border: `2px dashed ${POSSIBLE_COLOR}`, background: "rgba(124, 58, 237, 0.25)" },
 };
 // the swatch and its text in one inline flex row, so the swatch is centered on the text
@@ -166,6 +203,7 @@ const boundsOf = (geom) =>
 
 const Ownership = () => {
   const { token } = useAuth();
+  const [satellite, setSatellite] = useState(false);
   const tokenRef = useRef(token);
   tokenRef.current = token;
   const mapDiv = useRef(null);
@@ -177,6 +215,7 @@ const Ownership = () => {
   const [listLimit, setListLimit] = useState(LIST_PAGE);
   const [listFilter, setListFilter] = useState("");
   const [loadingParcels, setLoadingParcels] = useState(false);
+  const [landBank, setLandBank] = useState(null); // { count } when the Land Bank is shown (count null while loading)
   // PRE % per parcel_id, from the public parcels layer (the ownership layer doesn't carry it);
   // fetched only for the rows on screen, in batches, and kept as the list grows or changes
   const [pre, setPre] = useState({});
@@ -206,9 +245,10 @@ const Ownership = () => {
 
   const query = (params) => queryFeatures({ url: LAYER_URL, authentication: tokenRef.current, ...params });
   // zoom and counts come from the parcel list already loaded, so no extra extent/count queries
-  const fitParcels = (list) => {
-    if (!list.length) return;
+  const fitParcels = (list, withLandBank = !!landBank) => {
     const b = list.reduce((b, p) => b.extend([p.lng, p.lat]), new maplibregl.LngLatBounds());
+    if (withLandBank) b.extend(DETROIT_BOUNDS);
+    if (b.isEmpty()) return;
     map.fitBounds(b, { padding: 60, maxZoom: 17 });
   };
   // every parcel matching `where`, with a centroid. 10k per request (maxRecordCountFactor 5 on the
@@ -273,12 +313,17 @@ const Ownership = () => {
     if (!token) return;
     const m = new maplibregl.Map({
       container: mapDiv.current,
-      style: baseStyle,
+      style: STREETS_STYLE,
       center: [-83.07715, 42.37927], // citywide, same as /map
       zoom: 10.75,
       minZoom: 10,
       transformRequest: (url) =>
-        url.startsWith(TILES_URL) ? { url: `${url}?token=${tokenRef.current}` } : { url },
+        url.startsWith(TILES_URL)
+          ? { url: `${url}?token=${tokenRef.current}` }
+          : // z21 Nearmap tiles need the ArcGIS token (same as /map); the rest stay CDN-cacheable
+            url.includes("/nearmap/21/") && tokenRef.current
+            ? { url, headers: { Authorization: `Bearer ${tokenRef.current}` } }
+            : { url },
     });
     m.addControl(new maplibregl.NavigationControl(), "top-left");
     m.on("load", () => {
@@ -297,7 +342,6 @@ const Ownership = () => {
       });
       // the shown cluster's unverified "possible" parcels: purple tint + dashed outline
       // (their class fill is near-white, so they'd otherwise be hard to see)
-      const none = ["==", ["get", "parcel_id"], ""];
       m.addLayer({
         id: "possible-fill",
         type: "fill",
@@ -314,10 +358,10 @@ const Ownership = () => {
         filter: none,
         paint: { "line-color": POSSIBLE_COLOR, "line-width": 2, "line-dasharray": [2, 1] },
       });
-      // the clicked parcel: solid blue fill and a thick outline on a white edge, so it stands out
+      // the clicked parcel: a light blue tint inside a thick blue outline on a white edge, so it stands out
       // from the class fills around it
       for (const [id, type, paint] of [
-        ["ownership-selected-fill", "fill", { "fill-color": SELECTED_COLOR, "fill-opacity": 0.9 }],
+        ["ownership-selected-fill", "fill", { "fill-color": SELECTED_COLOR, "fill-opacity": 0.2 }],
         ["ownership-selected-casing", "line", { "line-color": "#fff", "line-width": 8 }],
         ["ownership-selected", "line", { "line-color": SELECTED_COLOR, "line-width": 4 }],
       ])
@@ -388,7 +432,7 @@ const Ownership = () => {
     // not the Land Bank, whose ~57k parcels would shade half the city
     let hoveredOwner = null;
     const setHoveredOwner = (owner) => {
-      if (owner === "Detroit Land Bank Authority (DLBA)") owner = null;
+      if (owner === LAND_BANK) owner = null;
       if (owner === hoveredOwner) return;
       hoveredOwner = owner;
       m.setFilter("owner-hover", ["==", ["get", "entity_owner"], owner ?? ""]);
@@ -430,6 +474,11 @@ const Ownership = () => {
     });
     return () => m.remove();
   }, [token]);
+
+  useEffect(() => {
+    if (!map) return;
+    showSatellite(map, satellite);
+  }, [map, satellite]);
 
   useEffect(() => {
     if (!selected?.parcel_id) return setLive(null);
@@ -553,24 +602,41 @@ const Ownership = () => {
   // the cluster's or owner's parcels: the sidebar list, and dots below TILES_MINZOOM
   useEffect(() => {
     if (!map) return;
-    const wheres = ownerWhere ? [ownerWhere] : clusterWheres;
+    const all = ownerWhere ? [ownerWhere] : clusterWheres;
+    const wheres = all.filter((w) => w !== LAND_BANK_WHERE);
     const dots = map.getSource("filtered-dots");
     dots.setData({ type: "FeatureCollection", features: [] });
     setParcels([]);
+    setLandBank(null);
     setListLimit(LIST_PAGE);
     setListFilter("");
-    if (!wheres.length) return;
+    if (!all.length) return;
     let cancelled = false;
+    const hasLandBank = wheres.length < all.length;
+    if (hasLandBank) {
+      setLandBank({ count: null });
+      query({ where: LAND_BANK_WHERE, returnCountOnly: true })
+        .then((r) => !cancelled && setLandBank({ count: r.count }))
+        .catch(() => {});
+    }
+    const fit = (list) => {
+      if (!fitOnLoad.current) return;
+      fitOnLoad.current = false;
+      fitParcels(list, hasLandBank);
+    };
+    if (!wheres.length) {
+      fit([]);
+      return () => {
+        cancelled = true;
+      };
+    }
     setLoadingParcels(true);
     Promise.all(wheres.map(fetchParcels))
       .then((lists) => {
         const list = lists.length === 1 ? lists[0] : sortByAddress([...new Map(lists.flat().map((p) => [p.parcel_id, p])).values()]);
         if (cancelled) return;
         setParcels(list);
-        if (fitOnLoad.current) {
-          fitOnLoad.current = false;
-          fitParcels(list);
-        }
+        fit(list);
         dots.setData({
           type: "FeatureCollection",
           features: list.map((p) => ({
@@ -618,8 +684,11 @@ const Ownership = () => {
   }, [shownIds.join("|")]);
 
   // verified / possible-additional counts, from the loaded list
-  const verifiedCount = parcels.filter((p) => p.is_verified === 1).length;
-  const possibleCount = parcels.length - verifiedCount;
+  const listedVerified = parcels.filter((p) => p.is_verified === 1).length;
+  const verifiedCount = listedVerified + (landBank?.count ?? 0);
+  const possibleCount = parcels.length - listedVerified;
+  const shownCount = parcels.length + (landBank?.count ?? 0);
+  const countLoading = loadingParcels || landBank?.count === null; // the Land Bank count comes separately
 
   const verified = !!selectedOwner;
   // the clicked parcel's own record (address, taxpayer) for the card, like the Experience
@@ -716,7 +785,7 @@ const Ownership = () => {
                   title={ownerFilter}
                   sub={
                     <>
-                      <Swatch type="owner">Verified owner · {num(loadingParcels, parcels.length)} properties</Swatch>
+                      <Swatch type="owner">Verified owner · {num(countLoading, shownCount)} properties</Swatch>
                     </>
                   }
                 />
@@ -732,7 +801,9 @@ const Ownership = () => {
                   <Heading
                     title={
                       <>
-                        <Swatch type="selected">{selectedRecord?.address ?? "…"}</Swatch>
+                        <Swatch type={cluster == null ? "selected" : verified ? "selectedVerified" : "selectedPossible"}>
+                          {selectedRecord?.address ?? "…"}
+                        </Swatch>
                       </>
                     }
                     sub={selected.parcel_id}
@@ -750,7 +821,7 @@ const Ownership = () => {
                   <Rows
                     rows={[
                       verified && ["Owner type", live?.entity_owner_type],
-                      verified && ["Verified properties", num(loadingParcels, verifiedCount), "owner"],
+                      verified && ["Verified properties", num(countLoading, verifiedCount), "owner"],
                       verified && ["Possible additional", num(loadingParcels, possibleCount), "possible"],
                       cluster != null &&
                         !verified && ["Potentially related", num(loadingParcels, Math.max(parcels.length - 1, 0)), "possible"],
@@ -781,9 +852,9 @@ const Ownership = () => {
               </Card>
             )}
 
-            {(selected || ownerFilter) && !loadingParcels && parcels.length > 1 && (
+            {(selected || ownerFilter) && !countLoading && shownCount > 1 && (
               <Button variant="outline" onClick={() => fitParcels(parcels)}>
-                Zoom to all {parcels.length.toLocaleString()} properties
+                Zoom to all {shownCount.toLocaleString()} properties
               </Button>
             )}
 
@@ -798,6 +869,12 @@ const Ownership = () => {
                 <Spinner />
                 <Text size="2" color="gray">Loading properties…</Text>
               </Flex>
+            )}
+
+            {landBank && (
+              <Text size="1" color="gray">
+                The Land Bank's verified properties are too many to list. Zoom in to see them on the map.
+              </Text>
             )}
           </Flex>
 
@@ -848,6 +925,17 @@ const Ownership = () => {
 
       <Box className="relative" style={{ height: "80vh", minHeight: "400px" }}>
         <div ref={mapDiv} className="h-full" />
+        <Box style={{ position: "absolute", top: 12, right: 12 }}>
+          <SegmentedControl.Root
+            size="1"
+            value={satellite ? "satellite" : "streets"}
+            onValueChange={(v) => setSatellite(v === "satellite")}
+            className="bg-white shadow"
+          >
+            <SegmentedControl.Item value="streets">Streets</SegmentedControl.Item>
+            <SegmentedControl.Item value="satellite">Satellite</SegmentedControl.Item>
+          </SegmentedControl.Root>
+        </Box>
         <Card size="1" style={{ position: "absolute", bottom: 12, left: 12 }}>
           <details open className="group">
             <summary className="flex cursor-pointer select-none list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
