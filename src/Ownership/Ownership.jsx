@@ -495,7 +495,12 @@ const Ownership = () => {
     };
     // To avoid flashing: rebuild the card only when the parcel changes, and clear the card and
     // outlines a moment after leaving, so crossing a street between parcels doesn't blink them.
+    // Debounced: the card and the owner shading change only once the mouse rests on a parcel for
+    // HOVER_DELAY, so sweeping across a block doesn't flash through every parcel's owner. The card
+    // follows the mouse meanwhile.
+    const HOVER_DELAY = 120;
     let hoveredParcel = null;
+    let showTimer = null;
     let clearTimer = null;
     const hover = (e) => {
       const p = e.features?.[0]?.properties;
@@ -503,17 +508,21 @@ const Ownership = () => {
       clearTimeout(clearTimer);
       m.getCanvas().style.cursor = "pointer";
       tip.setLngLat(e.lngLat);
-      if (p.parcel_id !== hoveredParcel) {
-        hoveredParcel = p.parcel_id;
-        // dots carry their address; parcel fills take it from the base map's parcel tiles
-        const address = p.address ?? m.queryRenderedFeatures(e.point, { layers: ["parcel-fill"] })[0]?.properties?.address;
+      if (p.parcel_id === hoveredParcel) return;
+      hoveredParcel = p.parcel_id;
+      // dots carry their address; parcel fills take it from the base map's parcel tiles
+      const address = p.address ?? m.queryRenderedFeatures(e.point, { layers: ["parcel-fill"] })[0]?.properties?.address;
+      clearTimeout(showTimer);
+      showTimer = setTimeout(() => {
         tip.setDOMContent(hoverCard(address, p));
         setHoveredOwner(p.is_verified === 1 ? p.entity_owner : null);
-      }
-      if (!tip.isOpen()) tip.addTo(m);
+        if (!tip.isOpen()) tip.addTo(m);
+      }, HOVER_DELAY);
     };
     const leave = () => {
       m.getCanvas().style.cursor = "";
+      clearTimeout(showTimer);
+      if (!tip.isOpen()) hoveredParcel = null; // left before its card showed: show it on return
       clearTimeout(clearTimer);
       clearTimer = setTimeout(() => {
         hoveredParcel = null;
@@ -535,7 +544,11 @@ const Ownership = () => {
       m.on("mouseleave", layer, leave);
       m.on("click", layer, pick);
     }
-    return () => m.remove();
+    // clear `map` first, so effects don't touch a removed map before the next one loads
+    return () => {
+      setMap(null);
+      m.remove();
+    };
   }, [token]);
 
   useEffect(() => {
